@@ -83,7 +83,7 @@ jobs:
 
       - name: Typecheck
         # The full Effect/TS graph can exceed the fork runner's memory with parallel workers.
-        run: vp run -r --cache --concurrency-limit 1 typecheck
+        run: vp run -r --cache --concurrency-limit 1 typecheck || (vp run --last-details && exit 1)
 
   build:
     name: Build
@@ -228,6 +228,8 @@ jobs:
 
       - name: Test
         run: vp run --filter @t3tools/web test
+        env:
+          VITEST_MAX_WORKERS: 1
 
   # apps/server sets `fileParallelism: false`, so its test files run strictly
   # one at a time. Sharding spreads them over separate runners instead of
