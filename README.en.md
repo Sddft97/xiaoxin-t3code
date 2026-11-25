@@ -14,7 +14,8 @@
 
 <p align="center">
   <a href="https://www.xiaoxin666.cn/stardust"><strong>Website & Interactive Workshop</strong></a> ·
-  <a href="#download">Download v1.2.3</a> ·
+  <a href="#download">Download v1.2.4</a> ·
+  <a href="https://github.com/zds-xiaoxin/stardust-legacy/releases">历史版本 / Older releases</a> ·
   <a href="#highlights">Highlights</a> ·
   <a href="#workshop">Stardust Kit</a> ·
   <a href="#updates-privacy">Updates & Privacy</a> ·

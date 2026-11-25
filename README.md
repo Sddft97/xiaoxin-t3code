@@ -14,7 +14,8 @@
 
 <p align="center">
   <a href="https://www.xiaoxin666.cn/stardust"><strong>产品官网与积木工坊</strong></a> ·
-  <a href="#download">下载 v1.2.3</a> ·
+  <a href="#download">下载 v1.2.4</a> ·
+  <a href="https://github.com/zds-xiaoxin/stardust-legacy/releases">历史版本 / Older releases</a> ·
   <a href="#highlights">核心亮点</a> ·
   <a href="#workshop">星尘积木工坊</a> ·
   <a href="#updates-privacy">更新与隐私</a> ·
