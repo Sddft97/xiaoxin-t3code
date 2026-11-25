@@ -9,6 +9,8 @@ import {
   type ReactNode,
 } from "react";
 import { cn } from "../../lib/utils";
+import { conversationLabel } from "../../i18n/conversationLabel";
+import { useUiText } from "../../i18n/useUiText";
 
 const GroupedRows = createContext(false);
 
@@ -58,7 +60,8 @@ const focusRingClassName =
 type LineProps = Omit<ComponentProps<"div">, "className" | "style" | "children">;
 
 function WorkLogLine({ icon, label, trailing, wrapLabel, ...lineProps }: RowContent & LineProps) {
-  const localized = label;
+  const uiText = useUiText();
+  const localized = typeof label === "string" ? conversationLabel(label, uiText) : label;
   return (
     <div
       {...lineProps}

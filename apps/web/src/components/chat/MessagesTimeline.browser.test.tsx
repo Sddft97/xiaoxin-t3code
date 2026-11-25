@@ -466,7 +466,7 @@ describe("MessagesTimeline work rows", () => {
         expect(screen.text()).toContain("Final implementation report");
         expect(screen.text()).toContain("Follow-up explanation");
         expect(screen.text()).not.toContain("Old interrupted progress");
-        await click(screen.buttons("Open Simplify delivery")[0]!);
+        await click(screen.buttons(/Simplify delivery/)[0]!);
         // A subagent's card says how it was clicked, so it opens beside the thread or in its place.
         expect(onOpenThread).toHaveBeenCalledWith(childThreadId, undefined, "primary");
       } else if (source === "legacy") {

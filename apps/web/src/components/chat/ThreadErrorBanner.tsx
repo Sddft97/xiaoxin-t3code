@@ -1,4 +1,4 @@
-import { uiText } from "~/i18n";
+import { useUiText } from "~/i18n/useUiText";
 import { conversationLabel } from "~/i18n/conversationLabel";
 import { Tooltip, TooltipTrigger, TooltipPopup } from "../ui/tooltip";
 
@@ -95,9 +95,10 @@ export const ThreadErrorBanner = memo(function ThreadErrorBanner({
   onDismiss?: () => void;
 }) {
   const gt = useGT();
+  const text = useUiText();
   if (!error) return null;
   const message = getThreadErrorBannerMessage(error);
-  const localized = conversationLabel(message, uiText);
+  const localized = conversationLabel(message, text);
   const workspaceLimit = errorCode === CHATGPT_WORKSPACE_USAGE_LIMIT_CODE;
   const chatGptLimit = workspaceLimit || errorCode === CHATGPT_USAGE_LIMIT_CODE;
   const variant = errorClass === "usage_limit" || chatGptLimit ? "warning" : "error";
@@ -132,7 +133,7 @@ export const ThreadErrorBanner = memo(function ThreadErrorBanner({
             <ExpandableText
               text={error}
               collapsedText={localized}
-              expandLabel={uiText("Show full error")}
+              expandLabel={text("Show full error")}
             />
           )}
         </AlertDescription>
