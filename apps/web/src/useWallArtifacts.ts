@@ -53,7 +53,7 @@ class Collection {
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : uiText("Couldn’t read artifacts");
-      // A repeating poll failure must not wake every subscriber (and ChatView) every 15 seconds.
+      // A repeating poll failure must not wake every subscriber (and ChatView) every 30 seconds.
       if (
         !controller.signal.aborted &&
         (this.snapshot.loading || this.snapshot.error !== message)

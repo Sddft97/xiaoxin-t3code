@@ -84,7 +84,11 @@ export function HtmlRenderFrame(props: {
   }, [expanded, onFullscreenChange]);
 
   return (
-    <div ref={observeBox} className="group/html-render relative" style={{ height }}>
+    <div
+      ref={observeBox}
+      className="group/html-render relative"
+      style={{ height: failed ? "48px" : height }}
+    >
       {src !== null ? (
         <>
           <HtmlRenderDocument

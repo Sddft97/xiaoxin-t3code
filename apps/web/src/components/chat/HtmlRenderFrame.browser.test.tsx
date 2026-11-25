@@ -8,11 +8,14 @@ import { render, type Screen } from "../../../test/render";
 const assetUrl = vi.hoisted(() => ({ current: "about:blank" }));
 
 vi.mock(import("~/assets/longLivedAssetUrls"), () => ({
-  useLongLivedAssetUrl: () => ({
-    _tag: "Success",
-    url: assetUrl.current,
-    expiresAt: Date.now() + 60 * 60_000,
-  }),
+  useLongLivedAssetUrl: () =>
+    assetUrl.current === "error"
+      ? { _tag: "Failure" }
+      : {
+          _tag: "Success",
+          url: assetUrl.current,
+          expiresAt: Date.now() + 60 * 60_000,
+        },
 }));
 vi.mock(import("~/assets/assetUrls"), async (importOriginal) => ({
   ...(await importOriginal()),
@@ -83,6 +86,7 @@ describe("HtmlRenderFrame", () => {
 });
 
 it("keeps a missing tall HTML attachment compact so adjacent history stays visible", async () => {
+  assetUrl.current = "error";
   await using screen = await render(
     <HtmlRenderFrame
       environmentId={EnvironmentId.make("environment")}
