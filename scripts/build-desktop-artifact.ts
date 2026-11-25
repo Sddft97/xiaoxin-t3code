@@ -3821,7 +3821,8 @@ const buildDesktopArtifactUnlocked = Effect.fn("buildDesktopArtifactUnlocked")(f
 
   // Stardust: keep the production web brand under the nightly-named native shell.
   const webAssetBrand: WebAssetBrand =
-    process.env.T3CODE_DESKTOP_WEB_ASSET_BRAND === "production"
+    (yield* Config.String("T3CODE_DESKTOP_WEB_ASSET_BRAND").pipe(Config.option))._tag === "Some" &&
+    (yield* Config.String("T3CODE_DESKTOP_WEB_ASSET_BRAND")) === "production"
       ? "production"
       : resolveDesktopWebAssetBrand(appVersion);
   yield* applyWebBrandAssets(webAssetBrand, "apps/server/dist/client");

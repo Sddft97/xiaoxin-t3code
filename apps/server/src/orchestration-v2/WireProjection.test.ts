@@ -310,8 +310,11 @@ describe("orchestration V2 wire projection", () => {
       exitCode: 1,
     };
     const miss = projectTurnItemForWire({ ...item, output: "" });
-    expect(miss).toMatchObject({ exitCode: 1, status: "failed" });
-    expect(miss).not.toHaveProperty("outputIndicatesFailure");
+    expect(miss).toMatchObject({
+      exitCode: 1,
+      status: "failed",
+      outputIndicatesFailure: true,
+    });
     const diagnostic = projectTurnItemForWire({ ...item, output: "rg: Permission denied" });
     expect(diagnostic).toMatchObject({
       exitCode: 1,

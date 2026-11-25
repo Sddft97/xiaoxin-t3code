@@ -1,11 +1,8 @@
 import { uiText } from "../../i18n";
-import type {
-  ProviderDriverKind,
-  ServerProvider,
-  UsageProviderKind,
-} from "@t3tools/contracts";
+import type { ProviderDriverKind, ServerProvider, UsageProviderKind } from "@t3tools/contracts";
 import type { ModelThroughputTotals } from "@t3tools/shared/usageMerge";
 import { DEFAULT_QUOTA_PREFERENCES, quotaState, quotaWindow } from "../usage/quotaTopbarModel";
+import { quotaReadingStale } from "@t3tools/shared/usageLimits";
 
 /** Minimum completed turns required before a model can earn the "Ultrafast" tag. */
 export const MIN_FASTEST_MODEL_TURNS = 5;
@@ -98,7 +95,13 @@ export function modelPickerQuotaInfo(
     failed: !!limits?.unavailable,
   };
   const status = quotaState(account, quotaWindow(account, DEFAULT_QUOTA_PREFERENCES), now);
-  if (limits?.unavailable || status.state !== "current" || status.remaining === null) return null;
+  if (
+    limits?.unavailable ||
+    status.state !== "current" ||
+    status.remaining === null ||
+    quotaReadingStale(limits, now, true, !!limits?.unavailable)
+  )
+    return null;
   return {
     label: uiText("{remaining}% left", { remaining: status.remaining }),
     low: status.remaining < 15,

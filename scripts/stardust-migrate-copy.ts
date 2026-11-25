@@ -1,3 +1,5 @@
+// @effect-diagnostics nodeBuiltinImport:off globalConsoleInEffect:off globalJsonInEffect:off
+// One-shot operator migration for an explicitly isolated database copy, not an Effect service.
 import * as NodeFS from "node:fs";
 import * as NodePath from "node:path";
 import * as Effect from "effect/Effect";
