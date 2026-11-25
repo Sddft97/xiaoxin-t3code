@@ -15,8 +15,30 @@ afterEach(() => {
 });
 
 describe("loadRepoEnv", () => {
-  it("applies process, root local, and root precedence in that order", () => {
+  it("uses the shipped public config when local env files are absent", () => {
     const repoRoot = makeTemporaryDirectory();
+    NodeFS.writeFileSync(
+      NodePath.join(repoRoot, ".env.example"),
+      "T3CODE_CLERK_PUBLISHABLE_KEY=pk_example\nT3CODE_CLERK_JWT_TEMPLATE=template_example\nT3CODE_CLERK_CLI_OAUTH_CLIENT_ID=oauth_example\nT3CODE_RELAY_URL=https://relay.example.test\n",
+    );
+
+    expect(loadRepoEnv({ baseEnv: {}, repoRoot })).toMatchObject({
+      T3CODE_CLERK_PUBLISHABLE_KEY: "pk_example",
+      VITE_CLERK_PUBLISHABLE_KEY: "pk_example",
+      T3CODE_CLERK_JWT_TEMPLATE: "template_example",
+      VITE_CLERK_JWT_TEMPLATE: "template_example",
+      T3CODE_CLERK_CLI_OAUTH_CLIENT_ID: "oauth_example",
+      T3CODE_RELAY_URL: "https://relay.example.test",
+      VITE_T3CODE_RELAY_URL: "https://relay.example.test",
+    });
+  });
+
+  it("applies example, process, root local, and root precedence in that order", () => {
+    const repoRoot = makeTemporaryDirectory();
+    NodeFS.writeFileSync(
+      NodePath.join(repoRoot, ".env.example"),
+      "T3CODE_CLERK_PUBLISHABLE_KEY=pk_example\nT3CODE_CLERK_JWT_TEMPLATE=template_example\nT3CODE_CLERK_CLI_OAUTH_CLIENT_ID=oauth_example\nT3CODE_RELAY_URL=https://relay.example.test\n",
+    );
     NodeFS.writeFileSync(
       NodePath.join(repoRoot, ".env"),
       "T3CODE_CLERK_PUBLISHABLE_KEY=pk_root\nT3CODE_CLERK_JWT_TEMPLATE=template_root\nT3CODE_CLERK_CLI_OAUTH_CLIENT_ID=oauth_root\nT3CODE_RELAY_URL=https://root.example.test\n",

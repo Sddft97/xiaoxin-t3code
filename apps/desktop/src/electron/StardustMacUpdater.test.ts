@@ -210,7 +210,7 @@ describe("StardustMacUpdater check", () => {
       const exit = yield* fixture.run(fixture.service.checkForUpdates);
       expect(Exit.isSuccess(exit)).toBe(true);
       expect(fixture.fetches).toEqual([
-        "https://api.github.com/repos/zds-xiaoxin/xiaoxin-t3code/releases/latest",
+        "https://api.github.com/repos/Sddft97/xiaoxin-t3code/releases/latest",
       ]);
       expect(fixture.events.map((event) => event.name)).toEqual([
         "checking-for-update",
@@ -269,7 +269,7 @@ describe("StardustMacUpdater download", () => {
       expect(Exit.isSuccess(exit)).toBe(true);
 
       expect(fixture.fetches[1]).toBe(
-        "https://github.com/zds-xiaoxin/xiaoxin-t3code/releases/download/v1.2.2/T3-Stardust-v1.2.2-macOS-arm64.zip",
+        "https://github.com/Sddft97/xiaoxin-t3code/releases/download/v1.2.2/T3-Stardust-v1.2.2-macOS-arm64.zip",
       );
       const progress = fixture.events.filter((event) => event.name === "download-progress");
       expect(progress.length).toBe(2);

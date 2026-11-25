@@ -1,0 +1,171 @@
+name: Publish fork Stardust updates
+
+# Upstream publishes the feature source. This fork publishes only packages
+# rebuilt after that source and this fork's commits have been merged.
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      upstream_tag:
+        description: Existing upstream Stardust release tag to package
+        required: true
+        type: string
+        default: v1.2.3
+
+permissions:
+  contents: write
+  actions: read
+  issues: write
+
+concurrency:
+  group: fork-stardust-release
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Merge upstream release into the fork
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      upstream_tag: ${{ steps.version.outputs.upstream_tag }}
+    steps:
+      - name: Resolve the upstream Stardust release
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_TAG: ${{ inputs.upstream_tag || '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$REQUESTED_TAG" ]]; then
+            gh api "repos/zds-xiaoxin/xiaoxin-t3code/releases/tags/$REQUESTED_TAG" > "$RUNNER_TEMP/release.json"
+          else
+            gh api repos/zds-xiaoxin/xiaoxin-t3code/releases/latest > "$RUNNER_TEMP/release.json"
+          fi
+          node -e '
+            const fs = require("node:fs");
+            const release = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + "/release.json", "utf8"));
+            const match = /^v([1-9]\d{0,5})\.(\d{1,5})\.(\d{1,5})$/.exec(release.tag_name || "");
+            if (!match || release.draft || release.prerelease) throw new Error("Expected a stable Stardust release");
+            const version = `${match[1]}.${match[2]}.${Number(match[3]) + 1}`;
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `upstream_tag=${release.tag_name}\ntag=v${version}\nupstream_version=${match.slice(1).join(".")}\n`);
+          '
+          gh api "repos/zds-xiaoxin/xiaoxin-t3code/git/ref/tags/$(node -p 'require(process.env.RUNNER_TEMP + "/release.json").tag_name')" > "$RUNNER_TEMP/upstream-commit.json"
+          node -e '
+            const fs = require("node:fs");
+            const ref = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + "/upstream-commit.json", "utf8"));
+            if (ref.object.type !== "commit") throw new Error(`Expected a commit-tagged release, got ${ref.object.type}`);
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `upstream_commit=${ref.object.sha}\n`);
+          '
+          if gh release view "$(node -p '"v" + require(process.env.RUNNER_TEMP + "/release.json").tag_name.slice(1).replace(/(\d+)$/, (_, patch) => Number(patch) + 1)')" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo 'This fork release is already published; no package will be replaced.'
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'skip=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout the fork
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Merge the released source without changing fork features
+        if: steps.version.outputs.skip != 'true'
+        env:
+          UPSTREAM_COMMIT: ${{ steps.version.outputs.upstream_commit }}
+          UPSTREAM_TAG: ${{ steps.version.outputs.upstream_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git remote add upstream https://github.com/zds-xiaoxin/xiaoxin-t3code.git
+          git fetch --no-tags --depth=1 upstream "$UPSTREAM_COMMIT"
+          # Already-integrated upstream releases produce no second merge commit.
+          if ! git merge-base --is-ancestor "$UPSTREAM_COMMIT" HEAD; then
+            git merge --no-ff "$UPSTREAM_COMMIT" -m "chore: merge Stardust $UPSTREAM_TAG into the fork"
+            git push origin main
+          fi
+
+      - name: Verify the fork customizations survive every merge
+        if: steps.version.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${GITHUB_SHA}" || test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+          grep -q 'readEnvFile(NodePath.join(repoRoot, ".env.example"))' scripts/lib/public-config.ts
+          grep -q 'resolvePublicConfig(baseEnv, localEnv, rootEnv, exampleEnv)' scripts/lib/public-config.ts
+          test "$(git show "${{ steps.version.outputs.upstream_commit }}:scripts/lib/public-config.ts" | grep -c 'resolvePublicConfig(baseEnv, localEnv, rootEnv)')" -gt 0
+
+  build:
+    name: Build fork macOS arm64 update
+    needs: sync
+    if: needs.sync.outputs.skip != 'true'
+    runs-on: macos-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout merged fork source
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@250f29ce396baf5e8f24498e17c0dfdebabc26eb # v1
+        with:
+          node-version-file: package.json
+          cache: true
+          run-install: false
+
+      - name: Install desktop dependencies
+        run: vp install --filter=@t3tools/desktop... --filter=t3... --filter=@t3tools/scripts...
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable
+        with:
+          toolchain: stable
+          targets: aarch64-apple-darwin
+
+      - name: Restore Electron downloads
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: |
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+          key: fork-electron-${{ hashFiles('apps/desktop/package.json', 'scripts/build-desktop-artifact.ts') }}
+          restore-keys: fork-electron-
+
+      - name: Test the retained T3 Connect configuration
+        run: vp test run scripts/lib/public-config.test.ts apps/web/src/cloud/publicConfig.test.ts apps/web/src/cloud/t3ConnectState.test.ts apps/web/src/cloud/linkEnvironment.test.ts apps/server/src/cloud/CloudLink.test.ts apps/server/src/cloud/ConnectReachability.test.ts apps/server/src/cli/connect.test.ts
+
+      - name: Build the update package from merged source
+        run: vp run dist:desktop:dmg:arm64 --build-version "${{ needs.sync.outputs.tag }}-nightly.fork" --output-dir release/fork
+
+      - name: Verify package payload
+        run: node scripts/verify-fork-stardust-package.mjs release/fork "${{ needs.sync.outputs.tag }}"
+
+      - name: Attach updater build metadata
+        env:
+          TAG: ${{ needs.sync.outputs.tag }}
+          UPSTREAM_TAG: ${{ needs.sync.outputs.upstream_tag }}
+        run: node scripts/prepare-fork-stardust-package.mjs release/fork "$TAG" "$UPSTREAM_TAG"
+      - name: Publish the fork release only after its package passes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.sync.outputs.tag }}
+          UPSTREAM_TAG: ${{ needs.sync.outputs.upstream_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "Release $TAG already exists; refusing to replace an already-published package." >&2
+            exit 1
+          fi
+          gh release create "$TAG" release/fork/T3-Stardust-${TAG#v}-macOS-arm64.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$(git rev-parse HEAD)" \
+            --title "T3 Stardust $TAG · Fork with T3 Connect" \
+            --notes "Built from Stardust $UPSTREAM_TAG merged into $GITHUB_REPOSITORY at $(git rev-parse HEAD). This package retains the fork's T3 Connect public-config fallback. macOS Apple Silicon."

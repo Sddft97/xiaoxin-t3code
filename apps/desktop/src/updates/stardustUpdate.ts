@@ -13,7 +13,7 @@
 import * as NodeCrypto from "node:crypto";
 import * as NodeFS from "node:fs";
 
-export const STARDUST_REPOSITORY = "zds-xiaoxin/xiaoxin-t3code";
+export const STARDUST_REPOSITORY = "Sddft97/xiaoxin-t3code";
 export const STARDUST_LATEST_RELEASE_API = `https://api.github.com/repos/${STARDUST_REPOSITORY}/releases/latest`;
 export const STARDUST_BUILD_INFO_FILE = "stardust-build.json";
 
