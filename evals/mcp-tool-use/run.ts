@@ -33,6 +33,7 @@ import * as Path from "effect/Path";
 import * as Schedule from "effect/Schedule";
 import * as Schema from "effect/Schema";
 import * as Semaphore from "effect/Semaphore";
+import * as Stream from "effect/Stream";
 import { Tool } from "effect/ai";
 import * as McpSchema from "effect/ai/McpSchema";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
@@ -78,6 +79,7 @@ import {
 import { proxyConfig } from "../shared/proxy.ts";
 import { changeRequestsCreatedBy } from "../../apps/server/src/orchestration-v2/PullRequestSyncReactor.ts";
 import { type BackgroundWait, makeBackgroundWait } from "./backgroundWait.ts";
+import { UsageLimitSources } from "../../apps/server/src/usage/UsageLimitSources.ts";
 import { DeviceExpect, gradeDevice } from "./device-grading.ts";
 import { FileLinksExpect, gradeFileLinks } from "./file-link-grading.ts";
 import {
@@ -3439,10 +3441,24 @@ const main = Effect.gen(function* () {
   yield* Effect.log(`Wrote ${rows.length} samples to ${out}.\n\n${summary}`);
 });
 
+export const emptyUsageLimitSourcesLayer = Layer.succeed(UsageLimitSources, {
+  current: Effect.succeed([]),
+  streamChanges: Stream.empty,
+  refresh: Effect.void,
+  consumeResetCredit: Effect.fn("UsageLimitSources.consumeResetCredit")(() =>
+    Effect.die(new Error("Reset credits are unavailable in evals")),
+  ),
+});
+
 if (import.meta.main) {
   main.pipe(
     Effect.provide(
-      Layer.mergeAll(NodeServices.layer, PlatformNodeCrypto.layer, FetchHttpClient.layer),
+      Layer.mergeAll(
+        NodeServices.layer,
+        PlatformNodeCrypto.layer,
+        FetchHttpClient.layer,
+        emptyUsageLimitSourcesLayer,
+      ),
     ),
     NodeRuntime.runMain,
   );

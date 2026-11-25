@@ -20,6 +20,7 @@ import {
   buildBase,
   buildMessages,
   failedEarly,
+  emptyUsageLimitSourcesLayer,
   executeCodex,
   gradeSample,
   modelRequests,
@@ -1850,7 +1851,12 @@ it.effect("seeds T3's error for a prior background wait whose IDs match nothing"
       assert.isDefined(replayed, id);
       assert.equal(replayed?.is_error === true, isError, id);
     }
-  }).pipe(Effect.scoped, Effect.provide(Layer.mergeAll(NodeServices.layer, NodeCrypto.layer))),
+  }).pipe(
+    Effect.scoped,
+    Effect.provide(
+      Layer.mergeAll(NodeServices.layer, NodeCrypto.layer, emptyUsageLimitSourcesLayer),
+    ),
+  ),
 );
 
 const secretCases = () =>
