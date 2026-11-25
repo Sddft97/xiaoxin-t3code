@@ -1,0 +1,6 @@
+[data-stardust-wordmark] {
+  color: var(--foreground);
+}
+[data-stardust-wordmark][data-on-backdrop] {
+  color: white;
+}

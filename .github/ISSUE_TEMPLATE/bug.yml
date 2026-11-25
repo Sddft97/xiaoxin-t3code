@@ -1,0 +1,18 @@
+name: Bug report / 错误反馈
+description: Report a reproducible problem in Stardust Agent / 反馈星尘 Agent 中可复现的问题
+title: "[Bug] "
+body:
+  - type: input
+    id: environment
+    attributes:
+      label: Stardust version and OS / 星尘版本和操作系统
+      placeholder: "v1.2.4 · Windows 11 x64"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce / 复现步骤
+      description: Include expected and actual behavior. Remove credentials and personal information. / 请写明预期和实际结果，并去掉凭据和个人信息。
+    validations:
+      required: true

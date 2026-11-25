@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="250 258 524 492">
+  <defs>
+    <filter id="b50" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="50" />
+    </filter>
+    <filter id="b40" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="40" />
+    </filter>
+    <filter id="b6">
+      <feGaussianBlur stdDeviation="6" />
+    </filter>
+    <linearGradient id="body" x1=".2" y1="0" x2=".8" y2="1">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset=".55" stop-color="#eeeaff" />
+      <stop offset="1" stop-color="#d4ccff" />
+    </linearGradient>
+    <clipPath id="cD">
+      <path d="M475.4 324.7 Q512.0 265.0 548.6 324.7 L581.3 378.0 Q600.2 408.6 635.2 417.1 L696.0 431.7 Q764.0 448.1 718.6 501.4 L678.0 549.0 Q654.7 576.4 657.5 612.2 L662.3 674.6 Q667.8 744.4 603.1 717.6 L545.3 693.8 Q512.0 680.0 478.7 693.8 L420.9 717.6 Q356.2 744.4 361.7 674.6 L366.5 612.2 Q369.3 576.4 346.0 549.0 L305.4 501.4 Q260.0 448.1 328.0 431.7 L388.8 417.1 Q423.8 408.6 442.7 378.0 Z" />
+    </clipPath>
+  </defs>
+  <path d="M475.4 324.7 Q512.0 265.0 548.6 324.7 L581.3 378.0 Q600.2 408.6 635.2 417.1 L696.0 431.7 Q764.0 448.1 718.6 501.4 L678.0 549.0 Q654.7 576.4 657.5 612.2 L662.3 674.6 Q667.8 744.4 603.1 717.6 L545.3 693.8 Q512.0 680.0 478.7 693.8 L420.9 717.6 Q356.2 744.4 361.7 674.6 L366.5 612.2 Q369.3 576.4 346.0 549.0 L305.4 501.4 Q260.0 448.1 328.0 431.7 L388.8 417.1 Q423.8 408.6 442.7 378.0 Z" fill="url(#body)" />
+  <g clip-path="url(#cD)">
+    <ellipse cx="600" cy="640" rx="190" ry="160" fill="#8d7dff" opacity=".8" filter="url(#b50)" />
+    <ellipse cx="430" cy="400" rx="150" ry="110" fill="#fff" opacity=".9" filter="url(#b40)" />
+    <path d="M475.4 324.7 Q512.0 265.0 548.6 324.7 L581.3 378.0 Q600.2 408.6 635.2 417.1 L696.0 431.7 Q764.0 448.1 718.6 501.4 L678.0 549.0 Q654.7 576.4 657.5 612.2 L662.3 674.6 Q667.8 744.4 603.1 717.6 L545.3 693.8 Q512.0 680.0 478.7 693.8 L420.9 717.6 Q356.2 744.4 361.7 674.6 L366.5 612.2 Q369.3 576.4 346.0 549.0 L305.4 501.4 Q260.0 448.1 328.0 431.7 L388.8 417.1 Q423.8 408.6 442.7 378.0 Z" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="14" filter="url(#b6)" />
+  </g>
+  <rect x="452" y="470" width="34" height="74" rx="17" fill="#2f3cc4" />
+  <rect x="540" y="470" width="34" height="74" rx="17" fill="#2f3cc4" />
+  <circle cx="474" cy="488" r="7" fill="#fff" opacity=".9" />
+  <circle cx="562" cy="488" r="7" fill="#fff" opacity=".9" />
+</svg>
