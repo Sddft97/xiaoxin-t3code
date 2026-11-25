@@ -11,7 +11,7 @@ if (!directory || !/^v[1-9]\d{0,5}\.\d{1,5}\.\d{1,5}$/.test(expectedTag ?? "")) 
 
 const upstreamTag = process.argv[4] ?? expectedTag;
 const appName = "T3 Stardust.app";
-const fileName = `T3-Stardust-${expectedTag}-macOS-arm64.zip`;
+const fileName = `T3-Stardust-v${expectedTag.slice(1)}-macOS-arm64.zip`;
 const sourceZip = NodeFS.readdirSync(directory).find((name) =>
   /^T3-Code-.*-arm64\.zip$/.test(name),
 );
