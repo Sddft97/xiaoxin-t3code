@@ -1,0 +1,10 @@
+"CFBundleDisplayName" = "星尘";
+"NSLocalNetworkUsageDescription" = "星尘会连接本地网络上的设备，以访问远程环境或执行终端和编程智能体发起的命令。";
+"NSCalendarsUsageDescription" = "你在星尘中运行的命令可能需要访问日历。";
+"NSCalendarsFullAccessUsageDescription" = "你在星尘中运行的命令可能需要读取和修改日历日程。";
+"NSCalendarsWriteOnlyAccessUsageDescription" = "你在星尘中运行的命令可能需要添加日历日程。";
+"NSScreenCaptureUsageDescription" = "使用窗口截图快捷键时，星尘会截取当前窗口。";
+"NSCameraUsageDescription" = "终端和编程智能体可通过星尘运行需要使用相机的命令。";
+"NSMicrophoneUsageDescription" = "终端和编程智能体可通过星尘运行需要使用麦克风的命令。";
+"NSAppleEventsUsageDescription" = "终端和编程智能体可通过星尘运行需要控制其他应用的命令。";
+"NSSpeechRecognitionUsageDescription" = "选择 Apple 语音识别时，星尘会在这台 Mac 上转录你的听写。";

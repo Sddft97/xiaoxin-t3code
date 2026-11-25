@@ -11,15 +11,28 @@ done
 staged="$out/Stardust.app"
 rm -rf "$staged"
 ditto "$built" "$staged"
-/usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName 'Stardust Agent'" "$staged/Contents/Info.plist"
-/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${VERSION}" "$staged/Contents/Info.plist"
-/usr/libexec/PlistBuddy -c "Set :LSHasLocalizedDisplayName true" "$staged/Contents/Info.plist" || \
-  /usr/libexec/PlistBuddy -c "Add :LSHasLocalizedDisplayName bool true" "$staged/Contents/Info.plist"
-for l in en.lproj zh-Hans.lproj zh_CN.lproj; do
-  mkdir -p "$staged/Contents/Resources/$l"
-  name="Stardust Agent"
-  [[ "$l" == zh* ]] && name="星尘 Agent"
-  printf '"CFBundleDisplayName" = "%s";\n' "$name" > "$staged/Contents/Resources/$l/InfoPlist.strings"
+plist="$staged/Contents/Info.plist"
+resources="$staged/Contents/Resources"
+plutil -replace CFBundleDisplayName -string Stardust "$plist"
+plutil -replace CFBundleShortVersionString -string "$VERSION" "$plist"
+plutil -replace LSHasLocalizedDisplayName -bool YES "$plist"
+
+mkdir -p "$resources"/{en,zh-Hans,zh_CN}.lproj
+chinese="$(dirname "$0")/zh-Hans.lproj/InfoPlist.strings"
+english="$resources/en.lproj/InfoPlist.strings"
+plutil -create xml1 "$english"
+plutil -convert json -o - "$chinese" | jq -r 'keys[]' | while IFS= read -r key; do
+  value="$(plutil -extract "$key" raw "$plist")"
+  [[ "$value" == *Stardust* ]]
+  plutil -insert "$key" -string "$value" "$english"
+done
+for locale in zh-Hans zh_CN; do
+  cp "$chinese" "$resources/$locale.lproj/InfoPlist.strings"
+done
+
+for helper_plist in "$staged"/Contents/Frameworks/*.app/Contents/Info.plist; do
+  display_name="$(plutil -extract CFBundleDisplayName raw "$helper_plist")"
+  plutil -replace CFBundleDisplayName -string "Stardust Helper${display_name#* Helper}" "$helper_plist"
 done
 commit="$(git rev-parse HEAD)"
 node -e '
