@@ -972,7 +972,11 @@ export const type = async (page: Page, input: PreviewAutomationTypeInput) => {
   const focused =
     locator === null
       ? await focusedTextField(page, timeout)
-      : await locator.evaluate(focusTextTarget, undefined, { timeout });
+      : await locator.evaluate(
+          (element) => focusTextTarget(element as unknown as FocusCandidate),
+          undefined,
+          { timeout },
+        );
   if (focused !== true) {
     throw new ServerBrowserOperationError({
       tag: "PreviewAutomationTargetNotEditableError",

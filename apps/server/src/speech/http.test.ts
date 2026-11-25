@@ -131,7 +131,7 @@ effectIt.live("rejects oversized chunked audio without invoking transcription", 
               },
             }),
             duplex: "half",
-          }),
+          } as RequestInit & { duplex: "half" }),
         ).resolves.toMatchObject({ status: 413 }),
       );
       expect(transcribe).not.toHaveBeenCalled();

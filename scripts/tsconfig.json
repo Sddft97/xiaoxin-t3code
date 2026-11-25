@@ -5,5 +5,14 @@
     "types": ["node"],
     "lib": ["ESNext", "esnext.disposable"]
   },
-  "include": ["**/*.ts", "../apps/server/src/**/*.ts", "../packages/shared/src/**/*.ts"]
+  "include": [
+    "**/*.ts",
+    "../apps/server/src/**/*.ts",
+    "../apps/server/schema/expo.graphql.ts",
+    "../packages/shared/src/**/*.ts",
+    "../packages/client-runtime/src/state/orchestrationV2Projection.ts",
+    "../packages/client-runtime/src/threadPullRequests.ts",
+    "../packages/client-runtime/src/sourceControlClients.ts",
+    "../packages/provider-muse/src/server/sdk.ts"
+  ]
 }

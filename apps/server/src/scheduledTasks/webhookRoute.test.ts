@@ -242,7 +242,7 @@ describe("webhook route", () => {
           body: chunked,
           // Node's fetch needs duplex for streamed bodies.
           duplex: "half",
-        }),
+        } as RequestInit & { duplex: "half" }),
       );
       expect(streamed.status).toBe(413);
       expect(calls).toBe(0);

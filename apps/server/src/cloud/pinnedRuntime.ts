@@ -283,7 +283,7 @@ const installFromArchive = Effect.fn("cloud.pinned_runtime.install_archive")(fun
   );
   input.onProgress?.({ stage: "verify" });
   const digest = yield* Effect.tryPromise({
-    try: () => crypto.subtle.digest("SHA-256", archive),
+    try: () => crypto.subtle.digest("SHA-256", new Uint8Array(archive)),
     catch: (cause) =>
       new PinnedRuntimeInstallError({ step: "verifying the t3 release archive", cause }),
   });
