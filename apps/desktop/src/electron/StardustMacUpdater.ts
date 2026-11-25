@@ -87,7 +87,7 @@ interface PreparedUpdate {
 }
 
 /** Fails unless the app can replace itself without elevated rights. */
-export function assertReplaceableAppLocation(appPath: string): void {
+function assertReplaceableAppLocation(appPath: string): void {
   if (isTranslocatedAppPath(appPath)) throw new StardustUpdateError("translocated", appPath);
   try {
     NodeFS.accessSync(NodePath.dirname(appPath), NodeFS.constants.W_OK);
@@ -146,7 +146,7 @@ async function readBundleCommunityVersion(
  * Extracts and checks a verified zip: one .app, the running app's bundle id, the release's
  * version, a valid code signature, and no quarantine flag. Returns the extracted bundle.
  */
-export async function prepareStardustUpdate(options: {
+async function prepareStardustUpdate(options: {
   readonly zipPath: string;
   readonly extractDir: string;
   readonly expectedBundleId: string;

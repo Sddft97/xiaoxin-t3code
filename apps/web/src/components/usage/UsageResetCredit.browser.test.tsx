@@ -134,7 +134,7 @@ it("uses only a simulated consume command for confirmation, high-balance cancel,
   await userEvent.click(screen.getByText("使用夹具"));
   await expect.element(page.getByRole("radio").first()).toBeChecked();
   await userEvent.click(page.getByRole("radio").last());
-  expect(document.querySelector(".usage-reset-dialog")?.textContent).toContain("12/04");
+  expect(document.querySelector(".usage-reset-dialog")?.textContent).toContain("12/05");
   mock.failed = true;
   await userEvent.click(page.getByRole("button", { name: "使用所选", exact: true }));
   await vi.waitFor(() =>

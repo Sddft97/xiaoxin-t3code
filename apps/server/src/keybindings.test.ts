@@ -524,26 +524,24 @@ it.layer(NodeServices.layer)("keybindings", (it) => {
       yield* writeKeybindingsConfig(
         keybindingsConfigPath,
         Array.from({ length: 210 }, (_, index) => ({
-          key: "mod+alt+f1",
+          key: "f1",
           command: `script.filler-${index}.run` as const,
+          when: `filler${index}`,
         })),
       );
 
       const target = { key: "mod+shift+o", command: "chat.new", when: "!terminalFocus" } as const;
-      const local = { ...target, key: "mod+shift+n", command: "chat.newLocal" } as const;
       const relevant = (rule: { readonly command: KeybindingCommand }) =>
-        rule.command === target.command || rule.command === local.command;
+        rule.command === target.command;
       const before = yield* keybindings.getSnapshot;
-      assert.deepEqual(
-        before.keybindings.filter(relevant),
-        SharedKeybindings.compileResolvedKeybindingsConfig([target, local]),
-      );
+      // Both chat.new defaults are already hidden; editing one must not resurrect the other.
+      assert.deepEqual(before.keybindings.filter(relevant), []);
 
       const replacement = { ...target, key: "f8" };
       const saved = yield* keybindings.upsertKeybindingRule({ ...replacement, replace: target });
       assert.deepEqual(
         saved.keybindings.filter(relevant),
-        SharedKeybindings.compileResolvedKeybindingsConfig([local, replacement]),
+        SharedKeybindings.compileResolvedKeybindingsConfig([replacement]),
       );
     }).pipe(Effect.provide(layerKeybindings())),
   );
@@ -556,9 +554,10 @@ it.layer(NodeServices.layer)("keybindings", (it) => {
         const keybindings = yield* Keybindings.Keybindings;
         yield* writeKeybindingsConfig(
           keybindingsConfigPath,
-          Array.from({ length: 209 }, (_, index) => ({
-            key: "mod+alt+f1",
+          Array.from({ length: 208 }, (_, index) => ({
+            key: "f1",
             command: `script.filler-${index}.run` as const,
+            when: `filler${index}`,
           })),
         );
 
@@ -573,7 +572,7 @@ it.layer(NodeServices.layer)("keybindings", (it) => {
         );
 
         const afterUnrelatedSave = yield* keybindings.upsertKeybindingRule({
-          key: "mod+alt+f1",
+          key: "f1",
           command: "script.extra.run",
         });
         assert.deepEqual(

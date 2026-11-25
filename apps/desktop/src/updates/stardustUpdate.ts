@@ -13,7 +13,7 @@
 import * as NodeCrypto from "node:crypto";
 import * as NodeFS from "node:fs";
 
-export const STARDUST_REPOSITORY = "Sddft97/xiaoxin-t3code";
+const STARDUST_REPOSITORY = "Sddft97/xiaoxin-t3code";
 export const STARDUST_LATEST_RELEASE_API = `https://api.github.com/repos/${STARDUST_REPOSITORY}/releases/latest`;
 export const STARDUST_BUILD_INFO_FILE = "stardust-build.json";
 
@@ -36,7 +36,7 @@ export type StardustUpdateErrorCode =
  * User-facing English source text; the web UI translates these exact strings, so keep them free of
  * interpolated values. Details go to the cause and the update log.
  */
-export const STARDUST_UPDATE_ERROR_MESSAGES: Readonly<Record<StardustUpdateErrorCode, string>> = {
+const STARDUST_UPDATE_ERROR_MESSAGES: Readonly<Record<StardustUpdateErrorCode, string>> = {
   network: "Couldn’t reach GitHub to check for updates. Try again later.",
   "rate-limited": "GitHub is rate-limiting update checks. Try again later.",
   "invalid-release": "The latest release information is invalid.",
@@ -156,7 +156,7 @@ export interface StardustRelease {
   };
 }
 
-export function stardustMacAssetNames(version: string): ReadonlyArray<string> {
+function stardustMacAssetNames(version: string): ReadonlyArray<string> {
   return [`T3-Stardust-v${version}-macOS-arm64.zip`, `T3-Stardust-${version}-macOS-arm64.zip`];
 }
 
@@ -205,7 +205,7 @@ export function parseStardustRelease(value: unknown): StardustRelease {
   throw new StardustUpdateError("no-mac-asset", `release ${tag} has no complete arm64 zip`);
 }
 
-export function sha256OfFile(filePath: string): Promise<string> {
+function sha256OfFile(filePath: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const hash = NodeCrypto.createHash("sha256");
     const stream = NodeFS.createReadStream(filePath);

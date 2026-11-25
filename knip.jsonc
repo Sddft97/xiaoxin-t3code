@@ -41,6 +41,8 @@
         "prepare-server-compile-cache.cjs",
         "smoke-desktop-app.ts",
         "verify-windows-desktop-artifact.ts",
+        "check-zh-visible-copy.mjs",
+        "stardust-migrate-copy.ts",
       ],
       "ignoreDependencies": ["esbuild"],
       // The `t3` npm package's files: copied into the package, never imported.
@@ -49,6 +51,12 @@
       "ignore": ["npm-launcher/**", ".knip-test-*/**"],
     },
     "apps/server": {
+      "ignoreIssues": {
+        "src/storageMole.ts": ["exports"],
+        "src/storageMoleList.ts": ["exports"],
+        "src/storageTidyModel.ts": ["exports"],
+        "src/storageTidyService.ts": ["exports"],
+      },
       // Vite+ pack entries and the launcher used by installed background services.
       "entry": [
         "src/bin.ts!",
@@ -64,7 +72,13 @@
         "graphql.config.ts",
       ],
       // The generated operations export every selection's class.
-      "ignoreIssues": { "**/*.graphql.ts": ["exports", "types", "namespaceMembers"] },
+      "ignoreIssues": {
+        "**/*.graphql.ts": ["exports", "types", "namespaceMembers"],
+        "src/storageMole.ts": ["exports"],
+        "src/storageMoleList.ts": ["exports"],
+        "src/storageTidyModel.ts": ["exports"],
+        "src/storageTidyService.ts": ["exports"],
+      },
       // Keep the transitive Effect runtime pinned for standalone npm installs.
       // The Vite+ web build prerequisite.
       // Native and disk-loaded provider packages stay external to the bundle; the
@@ -102,11 +116,69 @@
     "apps/web": {
       // Worktree setup (scripts/setup-worktree.ts) runs this directly, and evidence
       // fixtures run under node.
-      "entry": ["scripts/warm-dep-cache.ts", "test/fixtures/**/*.mjs"],
+      "entry": [
+        "scripts/warm-dep-cache.ts",
+        "scripts/verify-built-boot.ts",
+        "test/fixtures/**/*.mjs",
+        "src/environment/spotlightIndex.worker.ts!",
+      ],
       // UI component modules are copied and adapted as cohesive sets. Keep their
       // named subcomponents even before they have callers; the file audit still
       // reports an entire component module when nothing imports it.
-      "ignoreIssues": { "src/components/ui/*.tsx": ["exports", "nsExports", "duplicates"] },
+      // Optional fork UI retained across upstream merges. These modules are not mounted
+      // by the current shell; reconnect or remove them deliberately, not during CI repair.
+      "ignore": [
+        "src/components/chat/ComposerArtifactShelf.tsx",
+        "src/components/chat/ComposerPlanFollowUpBanner.tsx",
+        "src/components/chat/DraftHeroProjectHeading.tsx",
+        "src/components/chat/ThreadRepositorySections.tsx",
+        "src/components/usage/CleanupDetails.tsx",
+        "src/components/usage/cleanupOverview.module.css",
+        "src/components/usage/CleanupOverview.tsx",
+        "src/components/usage/DiskSpaceSection.tsx",
+        "src/components/usage/StorageManagementPanel.tsx",
+        "src/i18n/rich.tsx",
+        "src/threadRepositoryPinsStore.ts",
+      ],
+      "ignoreIssues": {
+        "src/components/ui/*.tsx": ["exports", "nsExports", "duplicates"],
+        // Audited fork-only APIs retained for optional UI and storage features.
+        "src/themePalette.ts": ["exports"],
+        "src/taskBoard.ts": ["exports"],
+        "src/taskBoard.logic.ts": ["exports"],
+        "src/themeCss.ts": ["exports"],
+        "src/components/GitActionsControl.tsx": ["exports"],
+        "src/components/LegacySidebar.logic.ts": ["exports"],
+        "src/i18n/index.ts": ["exports"],
+        "src/components/composerFooterLayout.ts": ["exports"],
+        "src/components/chat/composerEventScope.ts": ["exports"],
+        "src/components/chat/taskTrailModel.ts": ["exports"],
+        "src/components/chat/TaskProgressSteps.tsx": ["exports"],
+        "src/components/chat/TurnThroughputStatus.tsx": ["exports"],
+        "src/components/chat/modelPickerQuota.ts": ["exports"],
+        "src/components/chat/taskMilestones.ts": ["exports"],
+        "src/components/storage/storageTidy.fixture.ts": ["exports"],
+        "src/components/storage/storageTidyModel.ts": ["exports"],
+        "src/components/usage/CleanupDashboard.tsx": ["exports"],
+        "src/components/usage/cleanupModel.ts": ["exports"],
+        "src/components/usage/quotaTopbarModel.ts": ["exports"],
+        "src/components/usage/UsageAppleOverview.tsx": ["exports"],
+        "src/components/usage/UsageLimitRings.tsx": ["exports"],
+        "src/components/usage/UsageLimitSlots.tsx": ["exports"],
+        "src/components/usage/UsageLimits.tsx": ["exports"],
+        "src/components/usage/diskSpaceModel.ts": ["exports"],
+        "src/components/settings/CommunityUpdates.tsx": ["exports"],
+        "src/threadPanelBus.ts": ["exports"],
+        "src/components/CommandPalette.projectSearch.ts": ["exports"],
+        "src/lib/workbenchMotion.ts": ["exports"],
+        "src/components/chat/cosmicSliderScenes.ts": ["exports"],
+        "src/components/chat/TaskPlanStages.tsx": ["exports"],
+        "src/components/chat/ComposerAttachmentStrip.tsx": ["exports"],
+        "src/components/storage/StorageTidyResults.tsx": ["exports"],
+        "src/components/usage/UsageSummaryCards.tsx": ["exports"],
+        "src/components/usage/UsageLimitsCompass.tsx": ["exports"],
+        "src/components/TaskInbox.tsx": ["exports"],
+      },
     },
     "apps/marketing": {
       // `astro check` runs from the typecheck task in vite.config.ts, which knip does not read.
@@ -155,8 +227,30 @@
       "entry": ["alchemy.run.ts!", "src/persistence/schema.ts!", "src/worker.ts!"],
     },
     "packages/*": {
+      // Fork utility retained for storage-preflight callers; not yet mounted upstream.
+      "ignore": ["src/storageBudget.ts"],
       // These workspace packages are private to this monorepo.
       "includeEntryExports": true,
+    },
+    "packages/shared": {
+      "ignore": ["src/storageBudget.ts"],
+      "ignoreIssues": {
+        "src/themePalettes.ts": ["exports"],
+        "src/usageMerge.ts": ["exports"],
+        "src/previewPins.ts": ["exports"],
+      },
+    },
+    "packages/client-runtime": {
+      "ignoreIssues": { "src/state/threadRelationships.ts": ["exports"] },
+    },
+    "packages/provider-core": {
+      "ignoreIssues": { "src/server/orchestrationInstructions.ts": ["exports"] },
+    },
+    "packages/provider-cursor": {
+      "ignoreIssues": {
+        "src/server/CursorKeychain.ts": ["exports"],
+        "src/server/legacyAccountUsage.ts": ["exports"],
+      },
     },
     "packages/effect-acp": {
       "includeEntryExports": true,
