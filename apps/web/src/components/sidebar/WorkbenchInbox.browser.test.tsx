@@ -374,7 +374,7 @@ it("V12 shows finish / archive / more on a result row and a handle button on a w
     hasPendingUserInput: true,
   };
   const navigate = vi.fn();
-  await using screen = await render(
+  await using _screen = await render(
     <div data-slot="sidebar" style={{ width: 300, padding: 8, background: "var(--sidebar)" }}>
       <WorkbenchInbox
         threads={[waiting, finished(1)]}
@@ -405,13 +405,15 @@ it("V12 shows finish / archive / more on a result row and a handle button on a w
 });
 
 it("V14 keeps titles clear of the hover actions, lists today's done threads, and offers status changes", async () => {
+  vi.setSystemTime(new Date("2026-11-25T12:00:00.000Z"));
+  using _clock = { [Symbol.dispose]: () => vi.useRealTimers() };
   using _locale = testUiLocale("zh-CN");
   applyThemePalette("apple", "light");
   await page.viewport(360, 520);
   const doneToday = {
     ...makeThreadFixture({ id: ThreadId.make("settled-today"), title: "Settled today" }),
     settledOverride: "settled" as const,
-    settledAt: new Date().toISOString(),
+    settledAt: "2026-11-25T11:00:00.000Z",
   };
   await using screen = await render(
     <div data-slot="sidebar" style={{ width: 300, padding: 8, background: "var(--sidebar)" }}>
@@ -437,14 +439,11 @@ it("V14 keeps titles clear of the hover actions, lists today's done threads, and
   await expect.element(doneHeader).toHaveAttribute("aria-expanded", "false");
   expect(document.querySelector('[data-inbox-done-thread="settled-today"]')).toBeNull();
   await doneHeader.click();
-  await expect
-    .element(screen.getByRole("button", { name: /Settled today/ }))
-    .toBeVisible();
+  await expect.element(screen.getByRole("button", { name: /Settled today/ })).toBeVisible();
   // The status dot opens the state list: done is checked, "in progress" follows the agent.
   await userEvent.click(row.querySelector<HTMLButtonElement>("[data-inbox-status]")!);
   await expect.element(page.getByRole("menuitem", { name: /待我处理/ })).toBeVisible();
-  await expect.element(page.getByRole("menuitem", { name: /进行中/ })).toHaveAttribute(
-    "aria-disabled",
-    "true",
-  );
+  await expect
+    .element(page.getByRole("menuitem", { name: /进行中/ }))
+    .toHaveAttribute("aria-disabled", "true");
 });

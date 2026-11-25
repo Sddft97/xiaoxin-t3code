@@ -56,7 +56,16 @@ import { isModelPickerOpen } from "../../modelPickerVisibility";
 import { shortcutLabelForCommand } from "../../keybindings";
 import { useUsage, type EnvironmentUsageStatus } from "../../state/usage";
 import { useAtomCommand } from "../../state/use-atom-command";
-import { enumerateDays, enumerateHourStarts, formatCount, formatPercent, formatTokens, formatUsd, makeWindow, usageSourceMessages } from "@t3tools/shared/usageFormat";
+import {
+  enumerateDays,
+  enumerateHourStarts,
+  formatCount,
+  formatPercent,
+  formatTokens,
+  formatUsd,
+  makeWindow,
+  usageSourceMessages,
+} from "@t3tools/shared/usageFormat";
 import { formatUsageContractMismatch } from "@t3tools/shared/usageFormatCopy";
 import { Button, InlineButton } from "../ui/button";
 import { ProviderInstanceIcon } from "../chat/ProviderInstanceIcon";
@@ -229,7 +238,9 @@ export function UsagePage() {
   const shownWindow = shown?.window ?? window;
   const shownHourly = shownWindow.resolution === "hour";
   const refreshingUsage = isRefreshing && !showingLimits;
-  const diskEnvironmentId = selectedEnvironments.find((environment) => environment.canReadDiagnostics)?.environmentId;
+  const diskEnvironmentId = selectedEnvironments.find(
+    (environment) => environment.canReadDiagnostics,
+  )?.environmentId;
   const showingKept = shown !== null && shown.window !== window;
   const presentations = useAtomValue(environmentPresentations.presentationsAtom);
   const presentationsWithProviders = useAtomValue(

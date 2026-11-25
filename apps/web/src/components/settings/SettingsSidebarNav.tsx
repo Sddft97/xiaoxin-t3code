@@ -405,8 +405,7 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
                         <SidebarMenu>
                           {group.paths.map((to) => {
                             const Icon = SETTINGS_SECTION_ICONS[to];
-                            const isActive =
-                              activePath === to || activePath.startsWith(`${to}/`);
+                            const isActive = activePath === to || activePath.startsWith(`${to}/`);
                             return (
                               <SidebarMenuItem key={to}>
                                 <SidebarMenuButton

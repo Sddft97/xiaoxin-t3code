@@ -227,9 +227,7 @@ export function TaskPlanCapsule({
   };
   const barLabel = liveFallback
     ? [title, pill].filter((part) => part !== null).join(" · ")
-    : [title, pill, `${finished}/${milestones.length}`]
-        .filter((part) => part !== null)
-        .join(" · ");
+    : [title, pill, `${finished}/${milestones.length}`].filter((part) => part !== null).join(" · ");
 
   return (
     <section
@@ -284,11 +282,7 @@ export function TaskPlanCapsule({
                   </>
                 )}
                 <span className="plan-panel-spacer" />
-                <button
-                  type="button"
-                  className="plan-collapse-btn"
-                  onClick={() => setOpen(false)}
-                >
+                <button type="button" className="plan-collapse-btn" onClick={() => setOpen(false)}>
                   {uiText("Collapse")}
                 </button>
                 <kbd className="plan-esc-kbd">esc</kbd>

@@ -97,7 +97,11 @@ function RecordingStatus(props: {
 
   return (
     <span data-v9-voice-recording-pill>
-      <span aria-hidden="true" data-v9-voice-bars style={{ transform: `scaleY(${gain.toFixed(2)})` }}>
+      <span
+        aria-hidden="true"
+        data-v9-voice-bars
+        style={{ transform: `scaleY(${gain.toFixed(2)})` }}
+      >
         <i />
         <i />
         <i />

@@ -91,13 +91,13 @@
   <img src="assets/community/v1.2.0/demo-slider-gallery.gif" alt="星尘积木工坊：V18 流体星舰 / V16 星尘观测站 / V19 像素星舰 / V19 赛博机甲 HUD" width="94%" />
 </p>
 
-| 积木方案 | 视觉风格 | 仓库目录 | 在线体验 |
-| --- | --- | --- | --- |
-| **V18 流体写实星舰** | 正式版默认搭载 · 连续飞行 + 离屏贴图 + 2s 自动休眠 | [`stardust-kit/v18-starship-fluid`](stardust-kit/v18-starship-fluid/) | [demo.html](stardust-kit/v18-starship-fluid/demo.html) |
-| **V16 星尘观测站** | 治愈像素叙事 · 小机器人夜间逐件点亮观测站与流星 | [`stardust-kit/v16-stardust-observatory`](stardust-kit/v16-stardust-observatory/) | [demo.html](stardust-kit/v16-stardust-observatory/demo.html) |
-| **V19-A 16-Bit 像素星舰** | 复古街机高精像素火箭与圆润火焰烟球 | [`stardust-kit/v19-pixel-starship`](stardust-kit/v19-pixel-starship/) | [demo.html](stardust-kit/v19-pixel-starship/demo.html) |
-| **V19-B 赛博机甲 HUD** | 高达 / EVA 遥测网格、流体光带尾迹与曲速护盾 | [`stardust-kit/v19-cyber-hud`](stardust-kit/v19-cyber-hud/) | [demo.html](stardust-kit/v19-cyber-hud/demo.html) |
-| **V17 高对比实验 4 套** | 星舰 / 聚变核心超频 / 日食引力弹弓 / 星钢淬火 | [`stardust-kit/v17-thrill-experiments`](stardust-kit/v17-thrill-experiments/) | [demo.html](stardust-kit/v17-thrill-experiments/demo.html) |
+| 积木方案                  | 视觉风格                                           | 仓库目录                                                                          | 在线体验                                                     |
+| ------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| **V18 流体写实星舰**      | 正式版默认搭载 · 连续飞行 + 离屏贴图 + 2s 自动休眠 | [`stardust-kit/v18-starship-fluid`](stardust-kit/v18-starship-fluid/)             | [demo.html](stardust-kit/v18-starship-fluid/demo.html)       |
+| **V16 星尘观测站**        | 治愈像素叙事 · 小机器人夜间逐件点亮观测站与流星    | [`stardust-kit/v16-stardust-observatory`](stardust-kit/v16-stardust-observatory/) | [demo.html](stardust-kit/v16-stardust-observatory/demo.html) |
+| **V19-A 16-Bit 像素星舰** | 复古街机高精像素火箭与圆润火焰烟球                 | [`stardust-kit/v19-pixel-starship`](stardust-kit/v19-pixel-starship/)             | [demo.html](stardust-kit/v19-pixel-starship/demo.html)       |
+| **V19-B 赛博机甲 HUD**    | 高达 / EVA 遥测网格、流体光带尾迹与曲速护盾        | [`stardust-kit/v19-cyber-hud`](stardust-kit/v19-cyber-hud/)                       | [demo.html](stardust-kit/v19-cyber-hud/demo.html)            |
+| **V17 高对比实验 4 套**   | 星舰 / 聚变核心超频 / 日食引力弹弓 / 星钢淬火      | [`stardust-kit/v17-thrill-experiments`](stardust-kit/v17-thrill-experiments/)     | [demo.html](stardust-kit/v17-thrill-experiments/demo.html)   |
 
 ---
 
@@ -107,18 +107,18 @@
 
 仅列出可在源码中核实的差异，不包含官方原生已有且未改动的通用能力：
 
-| 维度 / 功能 | 官方 T3 Code | T3 星尘版 v1.2 |
-| --- | --- | --- |
-| **推理强度交互** | 下拉 / 基础选项列表 | **✓ V18 星舰流体滑块**（5 档连续演进、180ms 升档反馈、离屏贴图、2s 休眠）+ 开源积木工坊多套方案 |
-| **Composer 输入台** | 基础选择栏 | **✓ Composer V9**（一体化触发胶囊、Spotlight 搜索、三段式弹性权限滑块） |
-| **底部会话与令牌浮层** | — | **✓ 居中磁吸 Dock 栏 + 3 层纯合成弹簧弹窗**（轮次/速率/思考占比/缓存命中率） |
-| **顶栏常驻额度胶囊** | — | **✓ 常驻顶栏毛玻璃圆环胶囊**，实时预览多账号剩余额度 |
-| **用量、费用与限额页** | 基础用量与明细 | **✓ 费用 / 令牌 / 限额 / 清理四分页**，含圆环、燃尽预测、前一时段对比与首次打开加速 |
-| **任务步骤卡** | 原始工具日志 | **✓ 人话步骤卡**（耗时、产出数、展开看原始命令） |
-| **内置预览批注** | 画笔涂鸦 | **✓ 图钉批注**（待改/已改筛选、双向定位、附带局部截图） |
-| **产物面板 & 磁盘清理** | — | **✓ 右侧产物墙 + macOS 先预览再执行磁盘清理** |
-| **中文界面 & 主题** | 官方已支持中文 | **✓ 星尘版新增功能全部中文化 + Apple 极简浅/深双色主题 + `T3 Stardust.app` 正式正名** |
-| **社区版更新提醒** | 上游通道 | **✓ 自动检查本仓库 GitHub 发行版**（启动时及每 6 小时），有新版时提醒并直达下载页；下载、安装与重启由你手动完成 |
+| 维度 / 功能             | 官方 T3 Code        | T3 星尘版 v1.2                                                                                                  |
+| ----------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **推理强度交互**        | 下拉 / 基础选项列表 | **✓ V18 星舰流体滑块**（5 档连续演进、180ms 升档反馈、离屏贴图、2s 休眠）+ 开源积木工坊多套方案                 |
+| **Composer 输入台**     | 基础选择栏          | **✓ Composer V9**（一体化触发胶囊、Spotlight 搜索、三段式弹性权限滑块）                                         |
+| **底部会话与令牌浮层**  | —                   | **✓ 居中磁吸 Dock 栏 + 3 层纯合成弹簧弹窗**（轮次/速率/思考占比/缓存命中率）                                    |
+| **顶栏常驻额度胶囊**    | —                   | **✓ 常驻顶栏毛玻璃圆环胶囊**，实时预览多账号剩余额度                                                            |
+| **用量、费用与限额页**  | 基础用量与明细      | **✓ 费用 / 令牌 / 限额 / 清理四分页**，含圆环、燃尽预测、前一时段对比与首次打开加速                             |
+| **任务步骤卡**          | 原始工具日志        | **✓ 人话步骤卡**（耗时、产出数、展开看原始命令）                                                                |
+| **内置预览批注**        | 画笔涂鸦            | **✓ 图钉批注**（待改/已改筛选、双向定位、附带局部截图）                                                         |
+| **产物面板 & 磁盘清理** | —                   | **✓ 右侧产物墙 + macOS 先预览再执行磁盘清理**                                                                   |
+| **中文界面 & 主题**     | 官方已支持中文      | **✓ 星尘版新增功能全部中文化 + Apple 极简浅/深双色主题 + `T3 Stardust.app` 正式正名**                           |
+| **社区版更新提醒**      | 上游通道            | **✓ 自动检查本仓库 GitHub 发行版**（启动时及每 6 小时），有新版时提醒并直达下载页；下载、安装与重启由你手动完成 |
 
 ---
 
@@ -127,6 +127,7 @@
 ## 更新提醒与隐私说明
 
 ### 应用内新版本提醒
+
 - 启动时及之后每 6 小时，应用会请求 GitHub 公开接口，查看本仓库最新的正式发行版（只认带完整 macOS Apple Silicon 安装包和 SHA256 摘要的版本）。
 - 发现新版本时弹出提醒，点击直达发行页下载。**应用不会自动下载、替换或重启**，升级请按下方「下载与安装」步骤手动完成。
 - 在 **设置 → 关于** 中可以：
@@ -135,6 +136,7 @@
 - 检查更新不发送聊天、账号或项目数据。
 
 ### 使用统计与隐私
+
 - **星尘版活跃人数（v1.2.1 起，默认开启）**：为了知道有多少人在用，应用每天最多发送一次：随机安装 ID、星尘版版本号、系统和芯片类型，发到 `xiaoxin666.cn/api/stardust`。不发送聊天、账号、项目或文件路径；网站接口不读取也不转发你的 IP，服务器只保存安装 ID 的再哈希值，按天去重，90 天后删除。
 - 第一次启动新版本会弹出说明，可以直接点「关闭统计」；之后在 **设置 → 关于 →「计入星尘版活跃用户」** 随时开关。关闭后不再发送。
 - 网站 [xiaoxin666.cn/stardust](https://www.xiaoxin666.cn/stardust) 只公开「近 7 天活跃设备数」一个数字。
@@ -152,6 +154,7 @@
 - **安装包下载**：[T3-Stardust-v1.2.3-macOS-arm64.zip](https://github.com/zds-xiaoxin/xiaoxin-t3code/releases/download/v1.2.3/T3-Stardust-v1.2.3-macOS-arm64.zip) · [Releases 发行页 & SHA256SUMS.txt](https://github.com/zds-xiaoxin/xiaoxin-t3code/releases/tag/v1.2.3) · [详细发行说明](docs/community/v1.2.3/RELEASE.zh.md)
 
 ### 快速校验与安装
+
 1. 下载 ZIP 与 `SHA256SUMS.txt` 到同一目录，终端校验完整性：
    ```bash
    shasum -a 256 -c SHA256SUMS.txt

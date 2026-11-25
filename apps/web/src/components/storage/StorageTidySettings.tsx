@@ -35,7 +35,10 @@ export function StorageTidySettingsSection({
       <SettingsRow
         id="storage-tidy-rescue"
         title={t("Rescue first, then clean")}
-        description={t("Before worktrees and backup folders are removed, copy their screenshots, previews, components and uncommitted changes to {path}.", { path: rescueRoot })}
+        description={t(
+          "Before worktrees and backup folders are removed, copy their screenshots, previews, components and uncommitted changes to {path}.",
+          { path: rescueRoot },
+        )}
         control={
           <Switch
             checked={settings.rescueFirst}
@@ -48,14 +51,30 @@ export function StorageTidySettingsSection({
       <SettingsRow
         id="storage-tidy-keep"
         title={t("Keep the newest rollback copies")}
-        description={t("Old app copies, .bak-pre-* and .orig files, and older builds in My build folder: keep this many per source.")}
+        description={t(
+          "Old app copies, .bak-pre-* and .orig files, and older builds in My build folder: keep this many per source.",
+        )}
         control={
           <div className="flex items-center gap-1 rounded-lg bg-muted p-0.5">
-            <Button size="icon-xs" variant="ghost" aria-label={t("Keep fewer")} disabled={disabled || settings.keepNewest <= 1} onClick={() => onChange({ keepNewest: settings.keepNewest - 1 })}>
+            <Button
+              size="icon-xs"
+              variant="ghost"
+              aria-label={t("Keep fewer")}
+              disabled={disabled || settings.keepNewest <= 1}
+              onClick={() => onChange({ keepNewest: settings.keepNewest - 1 })}
+            >
               <MinusIcon />
             </Button>
-            <span className="w-6 text-center text-sm tabular-nums" data-testid="keep-newest">{settings.keepNewest}</span>
-            <Button size="icon-xs" variant="ghost" aria-label={t("Keep more")} disabled={disabled || settings.keepNewest >= 20} onClick={() => onChange({ keepNewest: settings.keepNewest + 1 })}>
+            <span className="w-6 text-center text-sm tabular-nums" data-testid="keep-newest">
+              {settings.keepNewest}
+            </span>
+            <Button
+              size="icon-xs"
+              variant="ghost"
+              aria-label={t("Keep more")}
+              disabled={disabled || settings.keepNewest >= 20}
+              onClick={() => onChange({ keepNewest: settings.keepNewest + 1 })}
+            >
               <PlusIcon />
             </Button>
           </div>
@@ -68,7 +87,9 @@ export function StorageTidySettingsSection({
           error ? (
             <span className="text-destructive">{error}</span>
           ) : (
-            t("A folder of old build generations, for example c97-build, c98-build. Leave it empty to skip builds.")
+            t(
+              "A folder of old build generations, for example c97-build, c98-build. Leave it empty to skip builds.",
+            )
           )
         }
         control={

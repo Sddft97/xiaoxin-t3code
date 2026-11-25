@@ -1,4 +1,3 @@
-
 import {
   STATIC_KEYBINDING_COMMANDS,
   type ClientSettings,

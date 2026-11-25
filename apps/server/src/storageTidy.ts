@@ -117,14 +117,27 @@ type Manifest = {
 
 // A build folder is scanned for old generations that then move to Trash, so system locations and
 // any folder that contains the home folder can never be chosen.
-const UNSAFE_BUILD_DIRECTORIES = ["/System", "/usr", "/bin", "/sbin", "/etc", "/private/etc", "/Library", "/Applications"];
+const UNSAFE_BUILD_DIRECTORIES = [
+  "/System",
+  "/usr",
+  "/bin",
+  "/sbin",
+  "/etc",
+  "/private/etc",
+  "/Library",
+  "/Applications",
+];
 // Rescue copies and transcript archives are written to the same disk, so they stop well before it is full.
 const MIN_FREE_AFTER_WRITE_BYTES = 1024 ** 3;
 const defaultFreeBytes = async (path: string) => {
   const stats = await NodeFSP.statfs(path);
   return stats.bavail * stats.bsize;
 };
-const DEFAULT_SETTINGS: StorageTidySettings = { buildDirectory: "", keepNewest: 2, rescueFirst: true };
+const DEFAULT_SETTINGS: StorageTidySettings = {
+  buildDirectory: "",
+  keepNewest: 2,
+  rescueFirst: true,
+};
 const decodeSettings = Schema.decodeUnknownSync(StorageTidySettings);
 const decodeOperation = Schema.decodeUnknownSync(StorageTidyOperation);
 const SAMPLE_PATHS = 8;
@@ -214,7 +227,9 @@ export function createStorageTidyEngine(deps: TidyDeps) {
   const readManifest = async (id: string): Promise<Manifest | null> => {
     if (!/^op-[0-9a-z-]+$/.test(id)) return null;
     try {
-      const raw = JSON.parse(await NodeFSP.readFile(NodePath.join(operationsDir, `${id}.json`), "utf8"));
+      const raw = JSON.parse(
+        await NodeFSP.readFile(NodePath.join(operationsDir, `${id}.json`), "utf8"),
+      );
       return {
         operation: decodeOperation(raw.operation),
         moves: Array.isArray(raw.moves) ? raw.moves : [],
@@ -227,7 +242,10 @@ export function createStorageTidyEngine(deps: TidyDeps) {
   const latestManifest = async (): Promise<Manifest | null> => {
     if (current) return current;
     const names = await NodeFSP.readdir(operationsDir).catch(() => []);
-    for (const name of names.filter((n) => n.endsWith(".json")).toSorted().reverse()) {
+    for (const name of names
+      .filter((n) => n.endsWith(".json"))
+      .toSorted()
+      .reverse()) {
       const manifest = await readManifest(name.slice(0, -5));
       if (manifest) return manifest;
     }
@@ -245,7 +263,8 @@ export function createStorageTidyEngine(deps: TidyDeps) {
       if (Date.parse(op.recoverableUntil) > deps.now()) continue;
       for (const batch of manifest.batches) {
         const parent = NodePath.dirname(batch);
-        const trashes = parent === NodePath.join(roots.home, ".Trash") || /\.Trashes\/\d+$/.test(parent);
+        const trashes =
+          parent === NodePath.join(roots.home, ".Trash") || /\.Trashes\/\d+$/.test(parent);
         if (!trashes || NodePath.basename(batch) !== trashBatchName(op.id)) continue;
         const st = await NodeFSP.lstat(batch).catch(() => null);
         if (!st || st.isSymbolicLink() || !st.isDirectory()) continue;
@@ -309,7 +328,8 @@ export function createStorageTidyEngine(deps: TidyDeps) {
       stored.set(entry.item.id, entry);
       items.push(entry.item);
     };
-    const itemId = (kind: StorageTidyKind, key: string) => `tidy-${sha(`${kind}\0${key}`).slice(0, 24)}`;
+    const itemId = (kind: StorageTidyKind, key: string) =>
+      `tidy-${sha(`${kind}\0${key}`).slice(0, 24)}`;
     const measureMany = async (paths: ReadonlyArray<string>, tallyAssets = false) => {
       const good: Stamp[] = [];
       const skipped: Array<{ path: string; code: string }> = [];
@@ -368,7 +388,11 @@ export function createStorageTidyEngine(deps: TidyDeps) {
       const relative = NodePath.relative(boundary, path);
       if (SKIP_DIRTY_FIRST.has(relative.split(NodePath.sep)[0] ?? "")) return 0;
       let repo = (await exists(NodePath.join(path, ".git"))) ? path : "";
-      for (let dir = NodePath.dirname(path); repo === "" && isInside(dir, boundary); dir = NodePath.dirname(dir)) {
+      for (
+        let dir = NodePath.dirname(path);
+        repo === "" && isInside(dir, boundary);
+        dir = NodePath.dirname(dir)
+      ) {
         if (await exists(NodePath.join(dir, ".git"))) repo = dir;
       }
       if (repo === "") return 0;
@@ -385,7 +409,8 @@ export function createStorageTidyEngine(deps: TidyDeps) {
           "--",
           NodePath.relative(repo, path),
         ]);
-        count = result && result.code === 0 ? result.stdout.split("\0").filter(Boolean).length : null;
+        count =
+          result && result.code === 0 ? result.stdout.split("\0").filter(Boolean).length : null;
       }
       dirtyCache.set(key, count);
       return count;
@@ -422,13 +447,13 @@ export function createStorageTidyEngine(deps: TidyDeps) {
     const dirtyBucket: Array<{ stamp: Stamp; files: number | null }> = [];
 
     try {
-      const molePreview = deps.mole().catch(
-        (error): Awaited<ReturnType<typeof previewWithMole>> => ({
+      const molePreview = deps
+        .mole()
+        .catch((error): Awaited<ReturnType<typeof previewWithMole>> => ({
           status: "failed",
           binary: "mo",
           message: String(error),
-        }),
-      );
+        }));
 
       // 1. Developer caches this app already knows by name.
       step("devcache");
@@ -474,13 +499,22 @@ export function createStorageTidyEngine(deps: TidyDeps) {
           break;
         }
         const dirty = await gitDirtyCount(deps.git, worktree);
-        const common = await deps.git(worktree, ["rev-parse", "--path-format=absolute", "--git-common-dir"]);
+        const common = await deps.git(worktree, [
+          "rev-parse",
+          "--path-format=absolute",
+          "--git-common-dir",
+        ]);
         const commonDir = common?.code === 0 ? common.stdout.trim() : "";
-        const branch = (await deps.git(worktree, ["rev-parse", "--abbrev-ref", "HEAD"]))?.stdout.trim() ?? "";
+        const branch =
+          (await deps.git(worktree, ["rev-parse", "--abbrev-ref", "HEAD"]))?.stdout.trim() ?? "";
         let merged: boolean | null = null;
         const head = await deps.git(worktree, ["rev-parse", "HEAD"]);
         if (head?.code === 0) {
-          const origin = await deps.git(worktree, ["symbolic-ref", "--short", "refs/remotes/origin/HEAD"]);
+          const origin = await deps.git(worktree, [
+            "symbolic-ref",
+            "--short",
+            "refs/remotes/origin/HEAD",
+          ]);
           const candidates = [
             ...(origin?.code === 0 ? [origin.stdout.trim()] : []),
             "origin/main",
@@ -489,9 +523,19 @@ export function createStorageTidyEngine(deps: TidyDeps) {
             "master",
           ];
           for (const candidate of candidates) {
-            const verify = await deps.git(worktree, ["rev-parse", "--verify", "--quiet", `${candidate}^{commit}`]);
+            const verify = await deps.git(worktree, [
+              "rev-parse",
+              "--verify",
+              "--quiet",
+              `${candidate}^{commit}`,
+            ]);
             if (verify?.code !== 0) continue;
-            const ancestor = await deps.git(worktree, ["merge-base", "--is-ancestor", "HEAD", candidate]);
+            const ancestor = await deps.git(worktree, [
+              "merge-base",
+              "--is-ancestor",
+              "HEAD",
+              candidate,
+            ]);
             merged = ancestor?.code === 0;
             break;
           }
@@ -512,20 +556,28 @@ export function createStorageTidyEngine(deps: TidyDeps) {
         const stamps = measured ? [measured] : [];
         const repoName = commonDir ? NodePath.basename(NodePath.dirname(commonDir)) : "";
         add({
-          item: base("worktree", verdict.tier, "worktrees", NodePath.basename(worktree), "t3-worktree", stamps, {
-            key: `worktree:${worktree}`,
-            detail: {
-              repo: repoName,
-              branch,
-              merged: merged === null ? "unknown" : merged ? "yes" : "no",
-              dirty: dirty === null ? "unknown" : String(dirty),
+          item: base(
+            "worktree",
+            verdict.tier,
+            "worktrees",
+            NodePath.basename(worktree),
+            "t3-worktree",
+            stamps,
+            {
+              key: `worktree:${worktree}`,
+              detail: {
+                repo: repoName,
+                branch,
+                merged: merged === null ? "unknown" : merged ? "yes" : "no",
+                dirty: dirty === null ? "unknown" : String(dirty),
+              },
+              blocked: verdict.blocked,
+              dirtyFiles: Math.max(0, dirty ?? 0),
+              paths: [worktree],
+              pathCount: 1,
+              lastUsed: lastUsedMs > 0 ? iso(lastUsedMs) : null,
             },
-            blocked: verdict.blocked,
-            dirtyFiles: Math.max(0, dirty ?? 0),
-            paths: [worktree],
-            pathCount: 1,
-            lastUsed: lastUsedMs > 0 ? iso(lastUsedMs) : null,
-          }),
+          ),
           stamps,
           allowedRoots: worktreeRoots,
           repos: [worktree],
@@ -630,7 +682,8 @@ export function createStorageTidyEngine(deps: TidyDeps) {
       const settingsNow = await loadSettings();
       const buildDirectory = await effectiveBuildDirectory();
       const keep = settingsNow.keepNewest;
-      const mtimeOf = async (path: string) => (await NodeFSP.lstat(path).catch(() => null))?.mtimeMs ?? 0;
+      const mtimeOf = async (path: string) =>
+        (await NodeFSP.lstat(path).catch(() => null))?.mtimeMs ?? 0;
       const reviewGroup = async (
         kind: "app-backup" | "backup-file" | "build-generation",
         familyKey: string,
@@ -643,18 +696,28 @@ export function createStorageTidyEngine(deps: TidyDeps) {
         const { good } = await measureMany(paths, true);
         const plain: Stamp[] = [];
         for (const stamp of good) {
-          const files = (await exists(NodePath.join(stamp.path, ".git"))) ? await gitDirtyCount(deps.git, stamp.path) : 0;
+          const files = (await exists(NodePath.join(stamp.path, ".git")))
+            ? await gitDirtyCount(deps.git, stamp.path)
+            : 0;
           if (files === 0) plain.push(stamp);
           else {
             // Uncommitted work: its own row, rescued before anything is moved.
             add({
-              item: base("dirty-repo", "review", "builds", NodePath.basename(stamp.path), tool, [stamp], {
-                key: `dirty:${stamp.path}`,
-                dirtyFiles: files ?? 0,
-                paths: [stamp.path],
-                pathCount: 1,
-                detail: { family: name, unknown: files === null ? "yes" : "no" },
-              }),
+              item: base(
+                "dirty-repo",
+                "review",
+                "builds",
+                NodePath.basename(stamp.path),
+                tool,
+                [stamp],
+                {
+                  key: `dirty:${stamp.path}`,
+                  dirtyFiles: files ?? 0,
+                  paths: [stamp.path],
+                  pathCount: 1,
+                  detail: { family: name, unknown: files === null ? "yes" : "no" },
+                },
+              ),
               stamps: [stamp],
               allowedRoots: [allowedRoot],
               repos: [stamp.path],
@@ -696,10 +759,19 @@ export function createStorageTidyEngine(deps: TidyDeps) {
           keep,
         });
         const byFamily = new Map<string, string[]>();
-        for (const entry of older) byFamily.set(entry.family, [...(byFamily.get(entry.family) ?? []), entry.path]);
+        for (const entry of older)
+          byFamily.set(entry.family, [...(byFamily.get(entry.family) ?? []), entry.path]);
         for (const [family, paths] of byFamily) {
           const keptCount = kept.filter((e) => e.family === family).length;
-          await reviewGroup(kind, `${real}:${family}`, family, kind === "app-backup" ? family : "build", paths, real, keptCount);
+          await reviewGroup(
+            kind,
+            `${real}:${family}`,
+            family,
+            kind === "app-backup" ? family : "build",
+            paths,
+            real,
+            keptCount,
+          );
         }
       };
       await grouped(roots.applications, "app-backup", backupFamily, true);
@@ -735,10 +807,18 @@ export function createStorageTidyEngine(deps: TidyDeps) {
           const { good } = await measureMany(older.map((e) => e.path));
           if (good.length > 0)
             add({
-              item: base("backup-file", "review", "builds", ".bak-pre-* / .orig", "backup-files", good, {
-                key: `backup-file:${buildDirectory}`,
-                detail: { count: String(good.length), kept: String(kept.length) },
-              }),
+              item: base(
+                "backup-file",
+                "review",
+                "builds",
+                ".bak-pre-* / .orig",
+                "backup-files",
+                good,
+                {
+                  key: `backup-file:${buildDirectory}`,
+                  detail: { count: String(good.length), kept: String(kept.length) },
+                },
+              ),
               stamps: good,
               allowedRoots: [buildDirectory],
               repos: [],
@@ -774,7 +854,13 @@ export function createStorageTidyEngine(deps: TidyDeps) {
         preview.status === "missing"
           ? { status: "missing", binary: null, message: null, listed: 0, ignored: 0 }
           : preview.status === "failed"
-            ? { status: "failed", binary: preview.binary, message: preview.message, listed: 0, ignored: 0 }
+            ? {
+                status: "failed",
+                binary: preview.binary,
+                message: preview.message,
+                listed: 0,
+                ignored: 0,
+              }
             : {
                 status: "found",
                 binary: preview.binary,
@@ -784,13 +870,16 @@ export function createStorageTidyEngine(deps: TidyDeps) {
               };
       if (preview.status === "found") {
         const sectionOf = new Map<string, string>();
-        for (const entry of preview.items) if (!sectionOf.has(entry.path)) sectionOf.set(entry.path, entry.section);
+        for (const entry of preview.items)
+          if (!sectionOf.has(entry.path)) sectionOf.set(entry.path, entry.section);
         const allowed = [...sectionOf.keys()].filter((path) => isMoleRemovable(path, roots.home));
         const outside = pruneNestedPaths(allowed).filter(
-          (path) => !devPaths.some((dev) => path === dev || isInside(path, dev) || isInside(dev, path)),
+          (path) =>
+            !devPaths.some((dev) => path === dev || isInside(path, dev) || isInside(dev, path)),
         );
         const { good, skipped } = await measureMany(outside);
-        moleIgnored = sectionOf.size - good.length - skipped.filter((s) => s.code === "scan-budget").length;
+        moleIgnored =
+          sectionOf.size - good.length - skipped.filter((s) => s.code === "scan-budget").length;
         const { clean, dirty } = await splitUncommitted(good, roots.home);
         dirtyBucket.push(...dirty);
         const bySection = new Map<string, Stamp[]>();
@@ -850,7 +939,11 @@ export function createStorageTidyEngine(deps: TidyDeps) {
       patches++;
       bytes += Buffer.byteLength(diff.stdout);
     }
-    const untracked = await deps.git(repo, ["ls-files", "--others", "--exclude-standard", "-z"], 120_000);
+    const untracked = await deps.git(
+      repo,
+      ["ls-files", "--others", "--exclude-standard", "-z"],
+      120_000,
+    );
     if (!untracked) throw new TidyGuardError("rescue-failed", "git ls-files failed");
     if (untracked.stdout.length > 0) {
       const list = NodePath.join(directory, `${name}.untracked.list`);
@@ -912,7 +1005,8 @@ export function createStorageTidyEngine(deps: TidyDeps) {
     // Pick the volume that holds the most bytes: the headline accounting is for that disk.
     const devBytes = new Map<number, number>();
     for (const entry of selected)
-      for (const s of entry?.stamps ?? []) devBytes.set(s.dev, (devBytes.get(s.dev) ?? 0) + s.bytes);
+      for (const s of entry?.stamps ?? [])
+        devBytes.set(s.dev, (devBytes.get(s.dev) ?? 0) + s.bytes);
     const primaryDev = [...devBytes].toSorted((a, b) => b[1] - a[1])[0]?.[0];
     volumeCache = undefined;
     const volume = await volumeFor(primaryDev).catch(() => undefined);
@@ -950,7 +1044,14 @@ export function createStorageTidyEngine(deps: TidyDeps) {
         rescueDirReady = true;
         return rescueDirectory;
       };
-      const rescueStats = { assets: 0, patches: 0, archives: 0, sessionArchives: 0, bytes: 0, repos: [] as Array<{ name: string; files: number }> };
+      const rescueStats = {
+        assets: 0,
+        patches: 0,
+        archives: 0,
+        sessionArchives: 0,
+        bytes: 0,
+        repos: [] as Array<{ name: string; files: number }>,
+      };
       const assetBudget = { left: MAX_RESCUE_TOTAL_BYTES };
       const trashBatches = new Map<string, string>();
       const batchFor = async (path: string) => {
@@ -970,7 +1071,15 @@ export function createStorageTidyEngine(deps: TidyDeps) {
         const progressNow = { done: index, total: selected.length };
         current.operation = { ...current.operation, progress: progressNow };
         if (!entry) {
-          entries.push({ itemId: requestedId, kind: "dirty-repo", tier: "remind", name: "", outcome: "skipped", bytes: 0, reason: "unknown-item" });
+          entries.push({
+            itemId: requestedId,
+            kind: "dirty-repo",
+            tier: "remind",
+            name: "",
+            outcome: "skipped",
+            bytes: 0,
+            reason: "unknown-item",
+          });
           continue;
         }
         const { item } = entry;
@@ -978,17 +1087,31 @@ export function createStorageTidyEngine(deps: TidyDeps) {
           kind: StorageTidyOutcome["outcome"],
           bytes: number,
           reason: string | null,
-        ): StorageTidyOutcome => ({ itemId: item.id, kind: item.kind, tier: item.tier, name: item.name, outcome: kind, bytes, reason });
+        ): StorageTidyOutcome => ({
+          itemId: item.id,
+          kind: item.kind,
+          tier: item.tier,
+          name: item.name,
+          outcome: kind,
+          bytes,
+          reason,
+        });
         if (item.tier === "remind" || item.disposal === "none") {
           entries.push(outcome("skipped", 0, item.blocked ?? "reminder-only"));
           continue;
         }
-        const needsRescue = item.kind !== "dev-cache" && item.kind !== "mole-section" && item.kind !== "agent-tmp" && item.kind !== "session-archive";
+        const needsRescue =
+          item.kind !== "dev-cache" &&
+          item.kind !== "mole-section" &&
+          item.kind !== "agent-tmp" &&
+          item.kind !== "session-archive";
         if (needsRescue && item.dirtyFiles > 0 && !useRescue) {
           entries.push(outcome("skipped", 0, "uncommitted-needs-rescue"));
           continue;
         }
-        const writeEstimate = (needsRescue && useRescue ? item.rescueAssetBytes + 64 * 1024 ** 2 : 0) + (item.compress ? item.bytes : 0);
+        const writeEstimate =
+          (needsRescue && useRescue ? item.rescueAssetBytes + 64 * 1024 ** 2 : 0) +
+          (item.compress ? item.bytes : 0);
         if (writeEstimate > 0) {
           const free = await (deps.freeBytes ?? defaultFreeBytes)(roots.home).catch(() => 0);
           if (free - writeEstimate < MIN_FREE_AFTER_WRITE_BYTES) {
@@ -998,35 +1121,57 @@ export function createStorageTidyEngine(deps: TidyDeps) {
         }
         try {
           if (needsRescue && useRescue) {
-            const directory = NodePath.join(await ensureRescueDirectory(), "组件素材归档", `${slug(item.name)}-${index + 1}`);
+            const directory = NodePath.join(
+              await ensureRescueDirectory(),
+              "组件素材归档",
+              `${slug(item.name)}-${index + 1}`,
+            );
             await NodeFSP.mkdir(directory, { recursive: true, mode: 0o700 });
             for (const stamp of entry.stamps) {
-              const copied = await copyAssets(stamp.path, NodePath.join(directory, slug(NodePath.basename(stamp.path))), assetBudget);
+              const copied = await copyAssets(
+                stamp.path,
+                NodePath.join(directory, slug(NodePath.basename(stamp.path))),
+                assetBudget,
+              );
               rescueStats.assets += copied.copied;
               rescueStats.bytes += copied.bytes;
             }
             for (const repo of entry.repos) {
               const patchDirectory = NodePath.join(await ensureRescueDirectory(), "未提交改动");
               await NodeFSP.mkdir(patchDirectory, { recursive: true, mode: 0o700 });
-              const saved = await dirtyPatchFor(repo, patchDirectory, `${slug(NodePath.basename(repo))}-${index + 1}`);
+              const saved = await dirtyPatchFor(
+                repo,
+                patchDirectory,
+                `${slug(NodePath.basename(repo))}-${index + 1}`,
+              );
               rescueStats.patches += saved.patches;
               rescueStats.archives += saved.archives;
               rescueStats.bytes += saved.bytes;
-              if (saved.files > 0) rescueStats.repos.push({ name: NodePath.basename(repo), files: saved.files });
+              if (saved.files > 0)
+                rescueStats.repos.push({ name: NodePath.basename(repo), files: saved.files });
             }
           }
           if (item.compress && entry.archiveBase) {
             const directory = NodePath.join(await ensureRescueDirectory(), "会话归档");
             await NodeFSP.mkdir(directory, { recursive: true, mode: 0o700 });
-            const archive = NodePath.join(directory, `${slug(item.tool)}-sessions-${localDateStamp(startedAt)}.tar.gz`);
+            const archive = NodePath.join(
+              directory,
+              `${slug(item.tool)}-sessions-${localDateStamp(startedAt)}.tar.gz`,
+            );
             const list = `${archive}.list`;
-            const relatives = entry.stamps.map((s) => NodePath.relative(entry.archiveBase!, s.path));
+            const relatives = entry.stamps.map((s) =>
+              NodePath.relative(entry.archiveBase!, s.path),
+            );
             await NodeFSP.writeFile(list, relatives.join("\0"), { mode: 0o600 });
-            const made = await deps.tar(["-czf", archive, "--null", "-T", list], { cwd: entry.archiveBase });
+            const made = await deps.tar(["-czf", archive, "--null", "-T", list], {
+              cwd: entry.archiveBase,
+            });
             await NodeFSP.rm(list, { force: true });
             if (made.code !== 0) throw new TidyGuardError("archive-failed");
             const listing = await deps.tar(["-tzf", archive]);
-            const members = listing.stdout.split("\n").filter((line) => line !== "" && !line.endsWith("/")).length;
+            const members = listing.stdout
+              .split("\n")
+              .filter((line) => line !== "" && !line.endsWith("/")).length;
             if (listing.code !== 0 || members !== relatives.length) {
               await NodeFSP.rm(archive, { force: true });
               throw new TidyGuardError("archive-unverified");
@@ -1040,14 +1185,22 @@ export function createStorageTidyEngine(deps: TidyDeps) {
           let failure: string | null = null;
           for (const stamp of entry.stamps) {
             try {
-              const measured = await verifyForRemoval(stamp.path, stamp, entry.allowedRoots, measureOptions(deps.now() + 30_000));
+              const measured = await verifyForRemoval(
+                stamp.path,
+                stamp,
+                entry.allowedRoots,
+                measureOptions(deps.now() + 30_000),
+              );
               if (item.kind === "mole-section" && !isMoleRemovable(stamp.path, roots.home))
                 throw new TidyGuardError("outside-allowed-roots");
               if (item.disposal === "delete") {
                 await NodeFSP.rm(stamp.path, { recursive: true });
               } else {
                 const batch = await batchFor(stamp.path);
-                const target = NodePath.join(batch, `${String(moves.length + 1).padStart(4, "0")}-${slug(NodePath.basename(stamp.path))}`);
+                const target = NodePath.join(
+                  batch,
+                  `${String(moves.length + 1).padStart(4, "0")}-${slug(NodePath.basename(stamp.path))}`,
+                );
                 await NodeFSP.rename(stamp.path, target);
                 moves.push({ original: stamp.path, trashed: target, bytes: measured.bytes });
               }
@@ -1060,16 +1213,29 @@ export function createStorageTidyEngine(deps: TidyDeps) {
           if (item.disposal === "delete") deletedBytes += doneBytes;
           else trashedBytes += doneBytes;
           if (item.disposal === "delete" && done > 0)
-            for (const git of entry.pruneGit ?? []) await deps.git(NodePath.dirname(git), ["--git-dir", git, "worktree", "prune"]).catch(() => null);
+            for (const git of entry.pruneGit ?? [])
+              await deps
+                .git(NodePath.dirname(git), ["--git-dir", git, "worktree", "prune"])
+                .catch(() => null);
           entries.push(
             done === 0
               ? outcome("failed", 0, failure)
-              : outcome(item.disposal === "delete" ? "deleted" : "trashed", doneBytes, failure === null ? null : `partial:${failure}`),
+              : outcome(
+                  item.disposal === "delete" ? "deleted" : "trashed",
+                  doneBytes,
+                  failure === null ? null : `partial:${failure}`,
+                ),
           );
         } catch (error) {
           entries.push(outcome("failed", 0, guardCode(error)));
         }
-        current.operation = { ...current.operation, entries: [...entries], deletedBytes, trashedBytes, writtenBytes: writtenBytes + rescueStats.bytes };
+        current.operation = {
+          ...current.operation,
+          entries: [...entries],
+          deletedBytes,
+          trashedBytes,
+          writtenBytes: writtenBytes + rescueStats.bytes,
+        };
       }
       writtenBytes += rescueStats.bytes;
       if (rescueDirReady)
@@ -1107,7 +1273,14 @@ export function createStorageTidyEngine(deps: TidyDeps) {
       await writeManifest(manifest);
     } catch (error) {
       const manifest: Manifest = {
-        operation: { ...current.operation, phase: "failed", finishedAt: iso(deps.now()), error: guardCode(error), entries, progress: null },
+        operation: {
+          ...current.operation,
+          phase: "failed",
+          finishedAt: iso(deps.now()),
+          error: guardCode(error),
+          entries,
+          progress: null,
+        },
         moves,
         batches,
       };
@@ -1134,8 +1307,12 @@ export function createStorageTidyEngine(deps: TidyDeps) {
       for (const move of manifest.moves.toReversed()) {
         const parent = NodePath.dirname(move.original);
         const inTrash = await NodeFSP.lstat(move.trashed).catch(() => null);
-        const parentOk = await NodeFSP.lstat(parent).then((st) => st.isDirectory(), () => false);
-        if (!inTrash || inTrash.isSymbolicLink() || !parentOk || (await exists(move.original))) continue;
+        const parentOk = await NodeFSP.lstat(parent).then(
+          (st) => st.isDirectory(),
+          () => false,
+        );
+        if (!inTrash || inTrash.isSymbolicLink() || !parentOk || (await exists(move.original)))
+          continue;
         await NodeFSP.rename(move.trashed, move.original);
         restored++;
       }
@@ -1150,7 +1327,9 @@ export function createStorageTidyEngine(deps: TidyDeps) {
           ...operation,
           undone: true,
           recoverableUntil: null,
-          entries: operation.entries.map((e) => (e.outcome === "trashed" ? { ...e, reason: "restored" } : e)),
+          entries: operation.entries.map((e) =>
+            e.outcome === "trashed" ? { ...e, reason: "restored" } : e,
+          ),
         },
       };
       if (restored === 0 && manifest.moves.length > 0) throw new TidyGuardError("nothing-restored");
@@ -1164,7 +1343,8 @@ export function createStorageTidyEngine(deps: TidyDeps) {
   const openArchive = async (operationId: string) => {
     const manifest = await readManifest(operationId);
     const directory = manifest?.operation.rescue?.directory;
-    if (!directory || !isInside(directory, roots.rescueRoot)) throw new TidyGuardError("archive-missing");
+    if (!directory || !isInside(directory, roots.rescueRoot))
+      throw new TidyGuardError("archive-missing");
     const st = await NodeFSP.lstat(directory).catch(() => null);
     if (!st?.isDirectory() || st.isSymbolicLink()) throw new TidyGuardError("archive-missing");
     await deps.openPath(directory);
@@ -1173,7 +1353,9 @@ export function createStorageTidyEngine(deps: TidyDeps) {
   const state = async (): Promise<StorageTidyState> => {
     await purgeExpired().catch(() => undefined);
     const latest = await latestManifest();
-    const rescueItems = (scanResult?.items ?? []).filter((item) => item.tier === "review" && item.kind !== "session-archive");
+    const rescueItems = (scanResult?.items ?? []).filter(
+      (item) => item.tier === "review" && item.kind !== "session-archive",
+    );
     return {
       settings: await loadSettings(),
       volumes: [...(await volumes())],
@@ -1197,6 +1379,15 @@ export function createStorageTidyEngine(deps: TidyDeps) {
     };
   };
 
-  return { state, scan, execute, undo, saveSettings, openArchive, purgeExpired, effectiveBuildDirectory };
+  return {
+    state,
+    scan,
+    execute,
+    undo,
+    saveSettings,
+    openArchive,
+    purgeExpired,
+    effectiveBuildDirectory,
+  };
 }
 export type StorageTidyEngine = ReturnType<typeof createStorageTidyEngine>;

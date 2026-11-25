@@ -49,7 +49,9 @@ it("ignores blank lines, control characters and a bare tilde", () => {
 });
 
 async function fakeHome() {
-  const dir = await NodeFSP.realpath(await NodeFSP.mkdtemp(NodePath.join(NodeOS.tmpdir(), "tidy-mole-")));
+  const dir = await NodeFSP.realpath(
+    await NodeFSP.mkdtemp(NodePath.join(NodeOS.tmpdir(), "tidy-mole-")),
+  );
   await NodeFSP.mkdir(NodePath.join(dir, ".local/bin"), { recursive: true });
   return dir;
 }

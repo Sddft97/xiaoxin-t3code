@@ -1,4 +1,3 @@
-
 import { uiText } from "~/i18n";
 import { useAuth } from "@clerk/react";
 import { useAtomValue } from "@effect/atom-react";

@@ -62,12 +62,8 @@
   transform: none;
   transition-duration: 180ms, 180ms, 180ms, 140ms, 140ms, 0s;
   transition-timing-function:
-    cubic-bezier(0.22, 1, 0.36, 1),
-    cubic-bezier(0.22, 1, 0.36, 1),
-    cubic-bezier(0.22, 1, 0.36, 1),
-    ease,
-    ease,
-    linear;
+    cubic-bezier(0.22, 1, 0.36, 1), cubic-bezier(0.22, 1, 0.36, 1), cubic-bezier(0.22, 1, 0.36, 1),
+    ease, ease, linear;
 }
 .scroll-end-button:hover {
   color: var(--foreground);

@@ -69,11 +69,7 @@ export function ScrollToEndCircleButton(props: {
 }) {
   const uiText = useUiText();
   const baseLabel = uiText("Jump to latest");
-  const fullLabel = [
-    baseLabel,
-    props.unread ? uiText("New messages") : null,
-    props.summary,
-  ]
+  const fullLabel = [baseLabel, props.unread ? uiText("New messages") : null, props.summary]
     .filter(Boolean)
     .join(" · ");
   return (

@@ -1,5 +1,3 @@
-
-
 import { resolvePullRequestDetailChecks } from "@t3tools/client-runtime/pull-request-checks";
 import { sourceControlClients } from "@t3tools/client-runtime/source-control-clients";
 import { changeRequestTermKind } from "../pullRequest/changeRequestTerm";

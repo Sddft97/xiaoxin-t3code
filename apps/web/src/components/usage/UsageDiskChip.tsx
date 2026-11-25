@@ -17,14 +17,21 @@ export function UsageDiskChip({ environmentId }: { readonly environmentId: Envir
   const state = Option.getOrNull(AsyncResult.value(result));
   const volume = state?.volumes.find((row) => row.internal) ?? state?.volumes[0];
   if (!volume) return null;
-  const low = volume.totalBytes !== null && volume.totalBytes > 0 && volume.freeBytes / volume.totalBytes < 0.15;
+  const low =
+    volume.totalBytes !== null &&
+    volume.totalBytes > 0 &&
+    volume.freeBytes / volume.totalBytes < 0.15;
   return (
     <Link
       to="/settings/storage"
-      aria-label={t("Disk free {size}. Open Storage and cleanup", { size: formatBytes(volume.freeBytes) })}
+      aria-label={t("Disk free {size}. Open Storage and cleanup", {
+        size: formatBytes(volume.freeBytes),
+      })}
       className={cn(
         "inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-xs tabular-nums transition-colors hover:bg-accent",
-        low ? "border-warning/40 bg-warning/8 text-warning-foreground" : "border-border text-muted-foreground",
+        low
+          ? "border-warning/40 bg-warning/8 text-warning-foreground"
+          : "border-border text-muted-foreground",
       )}
       data-testid="usage-disk-chip"
     >

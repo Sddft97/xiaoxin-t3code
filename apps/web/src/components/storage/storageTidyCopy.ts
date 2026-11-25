@@ -43,7 +43,9 @@ export function itemCopy(t: Translate, item: StorageTidyItem): ItemCopy {
         what: t("Cache files that apps and tools rebuild by themselves when they need them."),
         tool: t("Mole (tw93/Mole), run as a separate program in preview mode"),
         why: t("Caches are rebuilt automatically, so removing them loses nothing."),
-        recover: t("Nothing to restore. The apps recreate what they need; the next launch may be a little slower."),
+        recover: t(
+          "Nothing to restore. The apps recreate what they need; the next launch may be a little slower.",
+        ),
       };
     case "dev-cache":
       return {
@@ -66,26 +68,45 @@ export function itemCopy(t: Translate, item: StorageTidyItem): ItemCopy {
         tool: t("T3 Stardust worktree"),
         why:
           item.tier === "safe"
-            ? t("Its branch is merged and nothing in it is uncommitted, so every change already lives in git.")
+            ? t(
+                "Its branch is merged and nothing in it is uncommitted, so every change already lives in git.",
+              )
             : item.tier === "review"
-              ? t("It has no uncommitted changes, but its branch is not merged yet or it was used in the last 3 days. Commits stay in git; only this folder goes to Trash.")
-              : t("It holds {count} uncommitted files that a removal would lose, so it is never touched.", { count: dirtyFiles }),
+              ? t(
+                  "It has no uncommitted changes, but its branch is not merged yet or it was used in the last 3 days. Commits stay in git; only this folder goes to Trash.",
+                )
+              : t(
+                  "It holds {count} uncommitted files that a removal would lose, so it is never touched.",
+                  { count: dirtyFiles },
+                ),
         recover:
           item.tier === "safe"
-            ? t("Create a worktree for the branch again with git; the files come back from the commit.")
-            : t("Undo from the summary while it is in Trash, or create the worktree again from the branch."),
+            ? t(
+                "Create a worktree for the branch again with git; the files come back from the commit.",
+              )
+            : t(
+                "Undo from the summary while it is in Trash, or create the worktree again from the branch.",
+              ),
       };
     }
     case "session-archive": {
-      const tool = item.tool === "codex" ? "Codex" : item.tool === "claude-code" ? "Claude Code" : item.tool;
+      const tool =
+        item.tool === "codex" ? "Codex" : item.tool === "claude-code" ? "Claude Code" : item.tool;
       return {
         title: t("{tool} session transcripts", { tool }),
-        subtitle: t("{sessions} sessions · not opened for {days}+ days", { sessions: d.sessions ?? count, days: d.oldestDays ?? "60" }),
+        subtitle: t("{sessions} sessions · not opened for {days}+ days", {
+          sessions: d.sessions ?? count,
+          days: d.oldestDays ?? "60",
+        }),
         badge: t("Compress and archive"),
         what: t("Transcripts of past agent conversations, stored as one file per session."),
         tool,
-        why: t("Old transcripts only matter if you want to reread them, and they compress to a fraction of their size."),
-        recover: t("A compressed copy goes to the rescue folder first, and the originals can be put back while they are in Trash."),
+        why: t(
+          "Old transcripts only matter if you want to reread them, and they compress to a fraction of their size.",
+        ),
+        recover: t(
+          "A compressed copy goes to the rescue folder first, and the originals can be put back while they are in Trash.",
+        ),
       };
     }
     case "t3-data":
@@ -95,7 +116,9 @@ export function itemCopy(t: Translate, item: StorageTidyItem): ItemCopy {
         badge: null,
         what: t("The database and attachments behind your T3 conversations."),
         tool: "T3 Stardust",
-        why: t("Removing these would delete conversations, so this page never touches them. Use Maintenance settings to compact or archive."),
+        why: t(
+          "Removing these would delete conversations, so this page never touches them. Use Maintenance settings to compact or archive.",
+        ),
         recover: "",
       };
     case "agent-tmp":
@@ -106,7 +129,9 @@ export function itemCopy(t: Translate, item: StorageTidyItem): ItemCopy {
         what: t("Scratch folders that agents and test browsers leave in /tmp."),
         tool: t("Codex, Claude Code, T3 and test browsers"),
         why: t("Nothing has written to them for 24 hours, and /tmp is scratch space by design."),
-        recover: t("Nothing to restore. The tool recreates its scratch folder the next time it runs."),
+        recover: t(
+          "Nothing to restore. The tool recreates its scratch folder the next time it runs.",
+        ),
       };
     case "app-backup":
       return {
@@ -121,7 +146,10 @@ export function itemCopy(t: Translate, item: StorageTidyItem): ItemCopy {
     case "backup-file":
       return {
         title: t(".bak-pre-* and .orig files"),
-        subtitle: t("{count} files · newest {kept} per source kept", { count, kept: d.kept ?? "2" }),
+        subtitle: t("{count} files · newest {kept} per source kept", {
+          count,
+          kept: d.kept ?? "2",
+        }),
         badge: t("Rollback copies"),
         what: t("Backup copies of single files that a patch or a merge left next to the original."),
         tool: t("Patch and merge tools"),
@@ -144,9 +172,13 @@ export function itemCopy(t: Translate, item: StorageTidyItem): ItemCopy {
             title: t("Caches inside repositories with uncommitted changes"),
             subtitle: t("{count} locations", { count }),
             badge: null,
-            what: t("Cache folders that sit inside a git repository whose files are not committed."),
+            what: t(
+              "Cache folders that sit inside a git repository whose files are not committed.",
+            ),
             tool: "git",
-            why: t("A cache rule matched them, but uncommitted work must never be deleted automatically."),
+            why: t(
+              "A cache rule matched them, but uncommitted work must never be deleted automatically.",
+            ),
             recover: "",
           }
         : {
@@ -155,8 +187,12 @@ export function itemCopy(t: Translate, item: StorageTidyItem): ItemCopy {
             badge: t("Uncommitted work"),
             what: t("A build folder that is also a git repository with uncommitted changes."),
             tool: t("Your build folder"),
-            why: t("It is older than your newest builds. Its uncommitted changes are saved to the rescue folder before it moves to Trash."),
-            recover: t("Rescued changes stay in the archive folder; undo while the folder is in Trash."),
+            why: t(
+              "It is older than your newest builds. Its uncommitted changes are saved to the rescue folder before it moves to Trash.",
+            ),
+            recover: t(
+              "Rescued changes stay in the archive folder; undo while the folder is in Trash.",
+            ),
           };
   }
 }

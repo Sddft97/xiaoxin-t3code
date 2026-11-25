@@ -54,9 +54,7 @@ export const SessionStatsBar = memo(function SessionStatsBar({
       positionStatsDockPill(dockPillRef.current, null);
       return;
     }
-    const target = clusterRef.current?.querySelector<HTMLElement>(
-      `[data-v9-stats-trig="${open}"]`,
-    );
+    const target = clusterRef.current?.querySelector<HTMLElement>(`[data-v9-stats-trig="${open}"]`);
     positionStatsDockPill(dockPillRef.current, target ?? null);
   }, [open]);
 
@@ -119,10 +117,7 @@ export const SessionStatsBar = memo(function SessionStatsBar({
   ]
     .filter(Boolean)
     .join(" · ");
-  const narrowRightSummary = [
-    totalText,
-    cacheHitPercent === null ? null : `${cacheHitPercent}%`,
-  ]
+  const narrowRightSummary = [totalText, cacheHitPercent === null ? null : `${cacheHitPercent}%`]
     .filter(Boolean)
     .join(" · ");
 
@@ -137,7 +132,10 @@ export const SessionStatsBar = memo(function SessionStatsBar({
       >
         <div ref={dockPillRef} aria-hidden="true" data-v9-stats-dock-pill />
 
-        <Popover open={open === "session"} onOpenChange={(next) => setOpen(next ? "session" : null)}>
+        <Popover
+          open={open === "session"}
+          onOpenChange={(next) => setOpen(next ? "session" : null)}
+        >
           <PopoverTrigger
             render={
               <button

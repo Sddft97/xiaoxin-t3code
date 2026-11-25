@@ -149,9 +149,7 @@ export function ActiveWorkOverview({
                   className={cn(
                     "flex min-w-0 items-center gap-1.5 text-xs",
                     // V14: the hover actions take this space instead of covering the title.
-                    attention
-                      ? "group-hover/inbox-row:pe-18"
-                      : "group-hover/inbox-row:pe-12.5",
+                    attention ? "group-hover/inbox-row:pe-18" : "group-hover/inbox-row:pe-12.5",
                   )}
                 >
                   <span

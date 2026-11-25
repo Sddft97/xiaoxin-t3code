@@ -56,16 +56,30 @@ function LastRunStrip({
 }) {
   const t = useUiText();
   const days = recoveryDaysLeft(operation.recoverableUntil, nowMs);
-  if (operation.phase !== "completed" || operation.undone || operation.purged || days === null || days <= 0 || operation.trashedBytes === 0)
+  if (
+    operation.phase !== "completed" ||
+    operation.undone ||
+    operation.purged ||
+    days === null ||
+    days <= 0 ||
+    operation.trashedBytes === 0
+  )
     return null;
   return (
-    <section className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card px-5 py-3.5" data-testid="last-run">
+    <section
+      className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card px-5 py-3.5"
+      data-testid="last-run"
+    >
       <div className="min-w-0 flex-1 text-sm">
         <div className="font-medium">
-          {t("Last cleanup: {size} is still in Trash", { size: formatBytes(operation.trashedBytes) })}
+          {t("Last cleanup: {size} is still in Trash", {
+            size: formatBytes(operation.trashedBytes),
+          })}
         </div>
         <div className="text-xs text-muted-foreground">
-          {t("You can undo it for {days} more days. After that this app empties its Trash batch.", { days })}
+          {t("You can undo it for {days} more days. After that this app empties its Trash batch.", {
+            days,
+          })}
         </div>
       </div>
       <Button variant="outline" size="sm" disabled={busy} onClick={onUndo}>
@@ -83,21 +97,34 @@ export function StorageTidyView(props: StorageTidyViewProps) {
   const dateLabel = new Date(props.nowMs).toLocaleDateString("sv-SE");
   const operation = state.operation;
   return (
-    <div className="mx-auto w-full max-w-[920px] space-y-8 pb-4" data-testid="storage-tidy" data-mode={mode}>
+    <div
+      className="mx-auto w-full max-w-[920px] space-y-8 pb-4"
+      data-testid="storage-tidy"
+      data-mode={mode}
+    >
       <header className="flex flex-wrap items-start justify-between gap-x-8 gap-y-4">
         <div className="min-w-0 max-w-md">
           <h1 className="text-3xl font-bold tracking-tight">{t("Storage & cleanup")}</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            {t("See what is taking up the disk first, then clean only what can be safely recovered or rebuilt.")}
+            {t(
+              "See what is taking up the disk first, then clean only what can be safely recovered or rebuilt.",
+            )}
           </p>
         </div>
         {state.volumes.length > 0 ? (
-          <VolumeCards volumes={state.volumes} activePath={volume?.path ?? ""} onSelect={props.onVolumeChange} />
+          <VolumeCards
+            volumes={state.volumes}
+            activePath={volume?.path ?? ""}
+            onSelect={props.onVolumeChange}
+          />
         ) : null}
       </header>
 
       {props.error ? (
-        <p role="alert" className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-2.5 text-sm text-destructive-foreground">
+        <p
+          role="alert"
+          className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-2.5 text-sm text-destructive-foreground"
+        >
           {props.error}
         </p>
       ) : null}
@@ -113,19 +140,30 @@ export function StorageTidyView(props: StorageTidyViewProps) {
           />
           {mode === "scanning" ? (
             <p className="text-sm text-muted-foreground" role="status" data-testid="scan-step">
-              {t("Checked {checked} of {total} places", { checked: state.progress.checked, total: state.progress.total })}
+              {t("Checked {checked} of {total} places", {
+                checked: state.progress.checked,
+                total: state.progress.total,
+              })}
               {" · "}
               {t(scanStepLabel(state.progress.step))}
             </p>
           ) : null}
           {mode === "start" && operation ? (
-            <LastRunStrip operation={operation} nowMs={props.nowMs} busy={props.busy} onUndo={() => props.onUndo(operation)} />
+            <LastRunStrip
+              operation={operation}
+              nowMs={props.nowMs}
+              busy={props.busy}
+              onUndo={() => props.onUndo(operation)}
+            />
           ) : null}
         </>
       ) : null}
 
       {mode === "executing" ? (
-        <div className="grid items-center gap-x-10 gap-y-6 md:grid-cols-[300px_minmax(0,1fr)]" data-testid="tidy-executing">
+        <div
+          className="grid items-center gap-x-10 gap-y-6 md:grid-cols-[300px_minmax(0,1fr)]"
+          data-testid="tidy-executing"
+        >
           <StorageTidyDonut
             segments={volume ? volumeSegments(volume, state.scan) : []}
             busy
@@ -137,11 +175,16 @@ export function StorageTidyView(props: StorageTidyViewProps) {
             <p className="text-xl font-semibold">{t("Cleaning…")}</p>
             <p className="text-sm text-muted-foreground" role="status">
               {state.operation?.phase === "running" && state.operation.progress
-                ? t("{done} of {total} items", { done: state.operation.progress.done, total: state.operation.progress.total })
+                ? t("{done} of {total} items", {
+                    done: state.operation.progress.done,
+                    total: state.operation.progress.total,
+                  })
                 : t("Starting…")}
             </p>
             <p className="text-xs text-muted-foreground">
-              {t("Keep this page open. Items are re-checked one by one right before they are touched.")}
+              {t(
+                "Keep this page open. Items are re-checked one by one right before they are touched.",
+              )}
             </p>
           </div>
         </div>
@@ -149,7 +192,13 @@ export function StorageTidyView(props: StorageTidyViewProps) {
 
       {mode === "result" ? (
         <>
-          <StorageTidyOverview state={state} volume={volume} scanning={false} disabled={!props.canWrite || props.busy} onScan={props.onScan} />
+          <StorageTidyOverview
+            state={state}
+            volume={volume}
+            scanning={false}
+            disabled={!props.canWrite || props.busy}
+            onScan={props.onScan}
+          />
           <StorageTidyResults
             state={state}
             volume={volume}
@@ -166,7 +215,9 @@ export function StorageTidyView(props: StorageTidyViewProps) {
             onCopyMoleInstall={props.onCopyMoleInstall}
             settingsHint={
               <p className="px-1 text-xs text-muted-foreground" data-testid="build-folder-hint">
-                {t("Set My build folder in the preferences below to include older builds and rollback copies.")}
+                {t(
+                  "Set My build folder in the preferences below to include older builds and rollback copies.",
+                )}
               </p>
             }
           />

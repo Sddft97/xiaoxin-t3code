@@ -298,9 +298,7 @@ export const SETTINGS_SEARCH_ITEMS = [
     title: msg("Cleanup preferences"),
     to: "/settings/storage",
     scope: "environment-defaults",
-    searchTerms: [
-      msg("rescue first build folder keep newest rollback copies bak orig"),
-    ],
+    searchTerms: [msg("rescue first build folder keep newest rollback copies bak orig")],
   },
   {
     id: "storage-worktree-keep-when",
@@ -817,7 +815,7 @@ export const SETTINGS_SEARCH_ITEMS = [
     to: "/settings/general",
     searchTerms: [
       msg(
-      // oxlint-disable-next-line t3code/no-hardcoded-ui-han -- search keywords in every supported language
+        // oxlint-disable-next-line t3code/no-hardcoded-ui-han -- search keywords in every supported language
         "locale translation english deutsch german español spanish français french português portuguese brasil brazilian chinese 中文 japanese 日本語 korean 한국어 russian русский swedish svenska sprache idioma langue 语言 言語 언어 язык",
       ),
     ],

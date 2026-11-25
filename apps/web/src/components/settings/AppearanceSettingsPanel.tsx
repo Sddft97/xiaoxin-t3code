@@ -1,4 +1,3 @@
-
 import { uiText } from "~/i18n";
 import type { CSSProperties } from "react";
 import { useState } from "react";

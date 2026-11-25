@@ -1,4 +1,3 @@
-
 import { uiText } from "~/i18n";
 import { useAtomValue } from "@effect/atom-react";
 import type { OtlpEndpointCheckResult, OtlpSignal, ServerObservability } from "@t3tools/contracts";

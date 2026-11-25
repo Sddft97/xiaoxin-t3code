@@ -49,9 +49,11 @@ it("allows Mole results only inside rebuildable cache locations under the home f
 });
 
 it("keeps only the outermost path of nested duplicates", () => {
-  expect(
-    pruneNestedPaths(["/a/b/c", "/a/b", "/a/b", "/a/x", "/a/bc"]).toSorted(),
-  ).toEqual(["/a/b", "/a/bc", "/a/x"]);
+  expect(pruneNestedPaths(["/a/b/c", "/a/b", "/a/b", "/a/x", "/a/bc"]).toSorted()).toEqual([
+    "/a/b",
+    "/a/bc",
+    "/a/x",
+  ]);
 });
 
 it("maps Mole sections to stable keys", () => {
@@ -71,12 +73,12 @@ it("puts only merged, clean and idle worktrees in 放心清; dirty or unreadable
     tier: "remind",
     blocked: "dirty-worktree",
   });
-  expect(classifyWorktree({ dirtyFiles: null, merged: true, lastUsedMs: idle, nowMs: now }).tier).toBe(
-    "remind",
-  );
-  expect(classifyWorktree({ dirtyFiles: 0, merged: false, lastUsedMs: idle, nowMs: now }).tier).toBe(
-    "review",
-  );
+  expect(
+    classifyWorktree({ dirtyFiles: null, merged: true, lastUsedMs: idle, nowMs: now }).tier,
+  ).toBe("remind");
+  expect(
+    classifyWorktree({ dirtyFiles: 0, merged: false, lastUsedMs: idle, nowMs: now }).tier,
+  ).toBe("review");
   expect(classifyWorktree({ dirtyFiles: 0, merged: null, lastUsedMs: idle, nowMs: now }).tier).toBe(
     "review",
   );

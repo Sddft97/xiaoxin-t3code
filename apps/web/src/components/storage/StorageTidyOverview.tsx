@@ -161,15 +161,46 @@ export function StorageTidyOverview({
         <ul className="divide-y divide-border/60 text-sm">
           {scan ? (
             <>
-              <LegendRow color={TIER_COLORS.safe} name={t("Safe to clean")} value={formatBytes(tierBytes.safe)} ratio={total ? tierBytes.safe / total : 0} />
-              <LegendRow color={TIER_COLORS.review} name={t("Take a look")} value={formatBytes(tierBytes.review)} ratio={total ? tierBytes.review / total : 0} />
-              <LegendRow color={TIER_COLORS.remind} name={t("Remind only")} value={formatBytes(tierBytes.remind)} ratio={total ? tierBytes.remind / total : 0} />
-              <LegendRow color={TIER_COLORS.used} name={t("Other used space")} value={formatBytes(Math.max(0, used - known))} ratio={total ? Math.max(0, used - known) / total : 0} />
+              <LegendRow
+                color={TIER_COLORS.safe}
+                name={t("Safe to clean")}
+                value={formatBytes(tierBytes.safe)}
+                ratio={total ? tierBytes.safe / total : 0}
+              />
+              <LegendRow
+                color={TIER_COLORS.review}
+                name={t("Take a look")}
+                value={formatBytes(tierBytes.review)}
+                ratio={total ? tierBytes.review / total : 0}
+              />
+              <LegendRow
+                color={TIER_COLORS.remind}
+                name={t("Remind only")}
+                value={formatBytes(tierBytes.remind)}
+                ratio={total ? tierBytes.remind / total : 0}
+              />
+              <LegendRow
+                color={TIER_COLORS.used}
+                name={t("Other used space")}
+                value={formatBytes(Math.max(0, used - known))}
+                ratio={total ? Math.max(0, used - known) / total : 0}
+              />
             </>
           ) : (
-            <LegendRow color={TIER_COLORS.used} name={t("Used")} value={formatBytes(used)} ratio={total ? used / total : 0} />
+            <LegendRow
+              color={TIER_COLORS.used}
+              name={t("Used")}
+              value={formatBytes(used)}
+              ratio={total ? used / total : 0}
+            />
           )}
-          <LegendRow color="var(--muted)" outline name={t("Free")} value={formatBytes(volume.freeBytes)} ratio={total ? volume.freeBytes / total : 0} />
+          <LegendRow
+            color="var(--muted)"
+            outline
+            name={t("Free")}
+            value={formatBytes(volume.freeBytes)}
+            ratio={total ? volume.freeBytes / total : 0}
+          />
         </ul>
         <p className="flex items-start gap-2 text-xs text-muted-foreground">
           <ShieldCheckIcon className="mt-0.5 size-3.5 shrink-0" />

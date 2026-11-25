@@ -21,9 +21,7 @@ describe("ComposerAttachButton", () => {
       </GTProvider>,
     );
 
-    const button = screen
-      .getByRole("button", { name: "添加附件" })
-      .element() as HTMLButtonElement;
+    const button = screen.getByRole("button", { name: "添加附件" }).element() as HTMLButtonElement;
     expect(button.hasAttribute("title")).toBe(false);
     expect(button.getAttribute("data-v9-sf-btn")).toBe("attach");
     const rect = button.getBoundingClientRect();
@@ -113,9 +111,7 @@ describe("ComposerAttachButton", () => {
         </TooltipProvider>
       </GTProvider>,
     );
-    const button = screen
-      .getByRole("button", { name: "添加附件" })
-      .element() as HTMLButtonElement;
+    const button = screen.getByRole("button", { name: "添加附件" }).element() as HTMLButtonElement;
     expect(button.disabled).toBe(true);
   });
 });

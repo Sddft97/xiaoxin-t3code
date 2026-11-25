@@ -110,8 +110,7 @@ function GroupedToolChips({
     <div className="plan-step-sub">
       {groups.map((group) => {
         const kindLabel = uiText(TOOL_KIND_LABELS[group.kind]);
-        const tag =
-          group.items.length > 1 ? `${kindLabel} ×${group.items.length}` : kindLabel;
+        const tag = group.items.length > 1 ? `${kindLabel} ×${group.items.length}` : kindLabel;
         const separator = group.kind === "search" ? " / " : " · ";
         return (
           <div className="plan-tool-chip" key={group.kind} data-tool-kind={group.kind}>

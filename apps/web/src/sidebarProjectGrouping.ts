@@ -179,17 +179,20 @@ export function buildPhysicalToLogicalProjectKeyMap(input: {
   return mapping;
 }
 
-export function buildSidebarProjectSnapshots(input: {
-  projects: ReadonlyArray<Project>;
-  settings: ProjectGroupingSettings;
-  groupScratchProjects?: boolean;
-  primaryEnvironmentId: EnvironmentId | null;
-  resolveEnvironmentLabel: (environmentId: EnvironmentId) => string | null;
-  workspaceCollections?: boolean;
-  legacyCategoryRules?: Parameters<typeof buildWorkspaceCollections>[0]["legacyCategoryRules"];
-  isDesktopLocalEnvironment?: (environmentId: EnvironmentId) => boolean;
-  isWslEnvironment?: (environmentId: EnvironmentId) => boolean;
-}, _resolve?: unknown): SidebarProjectSnapshot[] {
+export function buildSidebarProjectSnapshots(
+  input: {
+    projects: ReadonlyArray<Project>;
+    settings: ProjectGroupingSettings;
+    groupScratchProjects?: boolean;
+    primaryEnvironmentId: EnvironmentId | null;
+    resolveEnvironmentLabel: (environmentId: EnvironmentId) => string | null;
+    workspaceCollections?: boolean;
+    legacyCategoryRules?: Parameters<typeof buildWorkspaceCollections>[0]["legacyCategoryRules"];
+    isDesktopLocalEnvironment?: (environmentId: EnvironmentId) => boolean;
+    isWslEnvironment?: (environmentId: EnvironmentId) => boolean;
+  },
+  _resolve?: unknown,
+): SidebarProjectSnapshot[] {
   const buildGroups =
     input.workspaceCollections === true ? buildWorkspaceCollections : buildProjectGroups;
   return buildGroups({

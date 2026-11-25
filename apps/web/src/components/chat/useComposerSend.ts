@@ -1860,8 +1860,8 @@ export function useComposerSend(input: ComposerSendInput) {
   // only time a detached send runs, so the draft keeps the environment it was dictated for.
   const captureDetachedSend = useStableCallback(() => onSend);
   return {
-      onSend: onSendWithRouting,
-      sendFeedback: sendFeedback?.threadKey === routeThreadKey ? sendFeedback : null,
-      captureDetachedSend,
-    };
+    onSend: onSendWithRouting,
+    sendFeedback: sendFeedback?.threadKey === routeThreadKey ? sendFeedback : null,
+    captureDetachedSend,
+  };
 }

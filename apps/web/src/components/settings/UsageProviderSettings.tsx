@@ -1,7 +1,6 @@
 import { uiText } from "~/i18n";
 import { Switch } from "../ui/switch";
 
-
 import type { EnvironmentId, UnifiedSettings } from "@t3tools/contracts";
 import { T, useGT, Var } from "gt-react";
 import { PlusIcon } from "lucide-react";

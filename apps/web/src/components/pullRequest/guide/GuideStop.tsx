@@ -1,4 +1,3 @@
-
 import { uiText } from "~/i18n";
 import type { FileDiffContentsLoader, FileDiffMetadata } from "@pierre/diffs";
 import type {

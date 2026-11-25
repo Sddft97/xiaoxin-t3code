@@ -147,7 +147,8 @@ export function splitKeepNewest<T>(
   const older: T[] = [];
   for (const group of families.values()) {
     const sorted = group.toSorted(
-      (a, b) => options.mtime(b) - options.mtime(a) || options.name(b).localeCompare(options.name(a)),
+      (a, b) =>
+        options.mtime(b) - options.mtime(a) || options.name(b).localeCompare(options.name(a)),
     );
     kept.push(...sorted.slice(0, options.keep));
     older.push(...sorted.slice(options.keep));

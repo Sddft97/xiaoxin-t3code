@@ -1,6 +1,5 @@
 import { uiText } from "~/i18n";
 
-
 import {
   AuthOrchestrationOperateScope,
   type EnvironmentId,

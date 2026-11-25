@@ -89,7 +89,9 @@ it("start: disk overview, one scan button and the two required lines", async () 
   expect(screen.container.textContent).toContain("剩余 40.0 GB");
   expect(screen.container.textContent).toContain(MOLE_ATTRIBUTION);
   expect(screen.container.textContent).toContain(FIXED_RULES);
-  const buttons = [...screen.container.querySelectorAll("button")].filter((b) => b.textContent?.startsWith("扫描"));
+  const buttons = [...screen.container.querySelectorAll("button")].filter((b) =>
+    b.textContent?.startsWith("扫描"),
+  );
   expect(buttons).toHaveLength(1);
   buttons[0]!.click();
   expect(onScan).toHaveBeenCalledOnce();
@@ -105,16 +107,26 @@ it("result: three tiers, only 放心清 preselected, 只提醒不动 cannot be t
     </Frame>,
   );
   const text = screen.container.textContent ?? "";
-  for (const heading of ["放心清", "看一眼", "只提醒不动", "系统与应用缓存（Mole 规则）", "先抢救，再清理"])
+  for (const heading of [
+    "放心清",
+    "看一眼",
+    "只提醒不动",
+    "系统与应用缓存（Mole 规则）",
+    "先抢救，再清理",
+  ])
     expect(text, heading).toContain(heading);
   expect(text).toContain(MOLE_ATTRIBUTION);
   expect(text).toContain(FIXED_RULES);
   const safe = screen.container.querySelector('[data-testid="tidy-tier-safe"]')!;
   const review = screen.container.querySelector('[data-testid="tidy-tier-review"]')!;
   const remind = screen.container.querySelector('[data-testid="tidy-tier-remind"]')!;
-  expect(safe.querySelectorAll('[role="checkbox"][aria-checked="true"]').length).toBeGreaterThanOrEqual(9);
+  expect(
+    safe.querySelectorAll('[role="checkbox"][aria-checked="true"]').length,
+  ).toBeGreaterThanOrEqual(9);
   expect(review.querySelectorAll('[role="checkbox"][aria-checked="true"]')).toHaveLength(0);
-  for (const box of remind.querySelectorAll<HTMLElement>('[data-testid="tidy-item"] [role="checkbox"]'))
+  for (const box of remind.querySelectorAll<HTMLElement>(
+    '[data-testid="tidy-item"] [role="checkbox"]',
+  ))
     expect(box.getAttribute("aria-disabled")).toBe("true");
   // Uncommitted work is never in 放心清.
   expect(safe.querySelector('[data-kind="dirty-repo"]')).toBeNull();
@@ -129,17 +141,27 @@ it("rows expand to what / tool / last used / why / recovery / size / path", asyn
   using _locale = testUiLocale("zh-CN");
   await using screen = await render(
     <Frame>
-      <StorageTidyView {...props({ mode: "result", state: fixtureResultState, selected: new Set() })} />
+      <StorageTidyView
+        {...props({ mode: "result", state: fixtureResultState, selected: new Set() })}
+      />
     </Frame>,
   );
-  const row = [...screen.container.querySelectorAll<HTMLElement>('[data-testid="tidy-item"]')].find((r) =>
-    r.textContent?.includes("Codex 会话记录"),
+  const row = [...screen.container.querySelectorAll<HTMLElement>('[data-testid="tidy-item"]')].find(
+    (r) => r.textContent?.includes("Codex 会话记录"),
   )!;
   expect(row.textContent).toContain("压缩归档");
   row.querySelector<HTMLButtonElement>("button[aria-expanded]")!.click();
   await vi.waitFor(() => expect(row.querySelector("dl")).not.toBeNull());
   const detail = row.querySelector("dl")!.textContent!;
-  for (const label of ["这是什么", "来源工具", "上次使用", "为什么可以清", "怎么恢复", "大小", "路径"])
+  for (const label of [
+    "这是什么",
+    "来源工具",
+    "上次使用",
+    "为什么可以清",
+    "怎么恢复",
+    "大小",
+    "路径",
+  ])
     expect(detail, label).toContain(label);
   expect(detail).toContain("214 天前");
   expect(detail).toContain("/Users/me/.codex/sessions");
@@ -151,7 +173,9 @@ it("shows pending release for Trash items and sends the selection when clicked",
   const selected = new Set(["mole-user", "sess-codex"]);
   await using screen = await render(
     <Frame>
-      <StorageTidyView {...props({ mode: "result", state: fixtureResultState, selected, onExecute })} />
+      <StorageTidyView
+        {...props({ mode: "result", state: fixtureResultState, selected, onExecute })}
+      />
     </Frame>,
   );
   const bar = screen.container.querySelector('[data-testid="tidy-action-bar"]')!;
@@ -165,10 +189,18 @@ it("shows pending release for Trash items and sends the selection when clicked",
 it("Mole missing: a calm install row that copies the brew command and links the project", async () => {
   using _locale = testUiLocale("zh-CN");
   const onCopyMoleInstall = vi.fn();
-  const state = { ...fixtureResultState, scan: { ...fixtureScan, mole: { status: "missing" as const, binary: null, message: null, listed: 0, ignored: 0 } } };
+  const state = {
+    ...fixtureResultState,
+    scan: {
+      ...fixtureScan,
+      mole: { status: "missing" as const, binary: null, message: null, listed: 0, ignored: 0 },
+    },
+  };
   await using screen = await render(
     <Frame>
-      <StorageTidyView {...props({ mode: "result", state, selected: new Set(), onCopyMoleInstall })} />
+      <StorageTidyView
+        {...props({ mode: "result", state, selected: new Set(), onCopyMoleInstall })}
+      />
     </Frame>,
   );
   const row = screen.container.querySelector('[data-testid="mole-missing"]')!;
@@ -189,15 +221,32 @@ it("done: honest summary with pending Trash, undo and open archive", async () =>
     </Frame>,
   );
   const text = screen.container.textContent ?? "";
-  expect(screen.container.querySelector('[data-testid="freed-now"]')?.textContent?.replace(/\s/g, "")).toBe("55.0GB");
-  for (const part of ["实际释放", "废纸篓暂存 17.0 GB", "清理前", "清理后", "7 天后", "已用 92%", "已用 81%", "撤销废纸篓里的部分", "已抢救 1,020 个文件", "c72-port：794 个文件未提交"])
+  expect(
+    screen.container.querySelector('[data-testid="freed-now"]')?.textContent?.replace(/\s/g, ""),
+  ).toBe("55.0GB");
+  for (const part of [
+    "实际释放",
+    "废纸篓暂存 17.0 GB",
+    "清理前",
+    "清理后",
+    "7 天后",
+    "已用 92%",
+    "已用 81%",
+    "撤销废纸篓里的部分",
+    "已抢救 1,020 个文件",
+    "c72-port：794 个文件未提交",
+  ])
     expect(text, part).toContain(part);
   expect(text).toContain("/Users/me/Documents/T3 Stardust 抢救/2026-11-22");
   expect(text).toContain("部分路径已跳过：刚刚还在使用，已跳过");
-  const undo = [...screen.container.querySelectorAll("button")].find((b) => b.textContent === "撤销废纸篓里的部分")!;
+  const undo = [...screen.container.querySelectorAll("button")].find(
+    (b) => b.textContent === "撤销废纸篓里的部分",
+  )!;
   undo.click();
   expect(onUndo).toHaveBeenCalledOnce();
-  [...screen.container.querySelectorAll("button")].find((b) => b.textContent === "打开归档")!.click();
+  [...screen.container.querySelectorAll("button")]
+    .find((b) => b.textContent === "打开归档")!
+    .click();
   expect(onOpenArchive).toHaveBeenCalledOnce();
   await shot("done-light");
   await shot("done-detail-light", '[data-testid="undo-card"]');
@@ -205,13 +254,19 @@ it("done: honest summary with pending Trash, undo and open archive", async () =>
 
 it("scanning shows progress without a second scan button", async () => {
   using _locale = testUiLocale("zh-CN");
-  const state = { ...fixtureState, phase: "scanning" as const, progress: { checked: 3, total: 8, step: "tmp" } };
+  const state = {
+    ...fixtureState,
+    phase: "scanning" as const,
+    progress: { checked: 3, total: 8, step: "tmp" },
+  };
   await using screen = await render(
     <Frame>
       <StorageTidyView {...props({ mode: "scanning", state })} />
     </Frame>,
   );
-  expect(screen.container.querySelector('[data-testid="scan-step"]')?.textContent).toContain("已检查 3/8 处");
+  expect(screen.container.querySelector('[data-testid="scan-step"]')?.textContent).toContain(
+    "已检查 3/8 处",
+  );
   await userEvent.hover(screen.container.querySelector("button")!);
   await shot("scanning-light");
 });

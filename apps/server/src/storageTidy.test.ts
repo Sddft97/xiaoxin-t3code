@@ -12,7 +12,11 @@ import { runGit, runTar } from "./storageTidyFs.ts";
 
 const DAY = 86_400_000;
 const now = () => DateTime.toEpochMillis(DateTime.nowUnsafe());
-const exists = (p: string) => NodeFSP.lstat(p).then(() => true, () => false);
+const exists = (p: string) =>
+  NodeFSP.lstat(p).then(
+    () => true,
+    () => false,
+  );
 
 async function write(path: string, body = "x".repeat(4096), ageDays = 30) {
   await NodeFSP.mkdir(NodePath.dirname(path), { recursive: true });
@@ -23,7 +27,8 @@ async function write(path: string, body = "x".repeat(4096), ageDays = 30) {
 async function age(path: string, days: number) {
   const t = (now() - days * DAY) / 1000;
   const st = await NodeFSP.lstat(path);
-  if (st.isDirectory()) for (const n of await NodeFSP.readdir(path)) await age(NodePath.join(path, n), days);
+  if (st.isDirectory())
+    for (const n of await NodeFSP.readdir(path)) await age(NodePath.join(path, n), days);
   await NodeFSP.lutimes(path, t, t);
 }
 function git(cwd: string, ...args: string[]) {
@@ -43,7 +48,9 @@ async function fixture(
     freeBytes?: () => Promise<number>;
   } = {},
 ) {
-  const dir = await NodeFSP.realpath(await NodeFSP.mkdtemp(NodePath.join(NodeOS.tmpdir(), "tidy-")));
+  const dir = await NodeFSP.realpath(
+    await NodeFSP.mkdtemp(NodePath.join(NodeOS.tmpdir(), "tidy-")),
+  );
   const home = NodePath.join(dir, "home");
   const roots = {
     home,
@@ -57,7 +64,14 @@ async function fixture(
     stagingDir: "",
   };
   const worktrees = NodePath.join(dir, "worktrees");
-  for (const d of [home, `${home}/.Trash`, roots.applications, roots.tmp, roots.stateDir, worktrees])
+  for (const d of [
+    home,
+    `${home}/.Trash`,
+    roots.applications,
+    roots.tmp,
+    roots.stateDir,
+    worktrees,
+  ])
     await NodeFSP.mkdir(d, { recursive: true });
   let opened = "";
   const engine = createStorageTidyEngine({
@@ -67,7 +81,8 @@ async function fixture(
     git: runGit,
     tar: runTar,
     ...(options.freeBytes ? { freeBytes: options.freeBytes } : {}),
-    mole: () => (options.mole ? options.mole(home, dir) : Promise.resolve({ status: "missing" as const })),
+    mole: () =>
+      options.mole ? options.mole(home, dir) : Promise.resolve({ status: "missing" as const }),
     devCaches: async () => [],
     volumes: async () => [
       { id: "v", name: "Test", path: dir, totalBytes: 500e9, freeBytes: 40e9, internal: true },
@@ -84,7 +99,11 @@ const itemsOf = async (engine: Awaited<ReturnType<typeof fixture>>["engine"]) =>
 const find = (items: ReadonlyArray<StorageTidyItem>, kind: string, name?: string) =>
   items.find((i) => i.kind === kind && (name === undefined || i.name === name));
 
-async function makeWorktree(f: Awaited<ReturnType<typeof fixture>>, name: string, options: { dirty?: boolean; merged?: boolean }) {
+async function makeWorktree(
+  f: Awaited<ReturnType<typeof fixture>>,
+  name: string,
+  options: { dirty?: boolean; merged?: boolean },
+) {
   const repo = NodePath.join(f.home, "proj");
   if (!(await exists(repo))) {
     await NodeFSP.mkdir(repo, { recursive: true });
@@ -117,7 +136,11 @@ it("sorts agent worktrees: merged+clean 放心清, unmerged 看一眼, dirty 只
   const unmerged = await makeWorktree(f, "wip", { merged: false });
   const dirty = await makeWorktree(f, "dirty", { dirty: true });
   const items = await itemsOf(f.engine);
-  expect(find(items, "worktree", "done")).toMatchObject({ tier: "safe", disposal: "delete", dirtyFiles: 0 });
+  expect(find(items, "worktree", "done")).toMatchObject({
+    tier: "safe",
+    disposal: "delete",
+    dirtyFiles: 0,
+  });
   expect(find(items, "worktree", "wip")).toMatchObject({ tier: "review", disposal: "trash" });
   expect(find(items, "worktree", "dirty")).toMatchObject({
     tier: "remind",
@@ -135,7 +158,10 @@ it("sorts agent worktrees: merged+clean 放心清, unmerged 看一眼, dirty 只
   expect(await exists(merged)).toBe(false);
   expect(await exists(unmerged)).toBe(false);
   expect(await exists(dirty)).toBe(true);
-  expect(op.entries.find((e) => e.name === "dirty")).toMatchObject({ outcome: "skipped", reason: "dirty-worktree" });
+  expect(op.entries.find((e) => e.name === "dirty")).toMatchObject({
+    outcome: "skipped",
+    reason: "dirty-worktree",
+  });
   expect(op.deletedBytes).toBeGreaterThan(0);
   expect(op.trashedBytes).toBeGreaterThan(0);
   expect(op.recoverableUntil).not.toBeNull();
@@ -144,7 +170,9 @@ it("sorts agent worktrees: merged+clean 放心清, unmerged 看一眼, dirty 只
   expect(rescued.some((p) => String(p).endsWith("shot.png"))).toBe(true);
   expect(rescued.some((p) => String(p).includes("node_modules"))).toBe(false);
   // git no longer lists the deleted worktree.
-  const listing = NodeChildProcess.execFileSync("git", ["worktree", "list", "--porcelain"], { cwd: NodePath.join(f.home, "proj") }).toString();
+  const listing = NodeChildProcess.execFileSync("git", ["worktree", "list", "--porcelain"], {
+    cwd: NodePath.join(f.home, "proj"),
+  }).toString();
   expect(listing).not.toContain("/done");
 });
 
@@ -179,7 +207,11 @@ it("empties only its own Trash batches after seven days", async () => {
   await f.engine.purgeExpired();
   expect(await NodeFSP.readdir(NodePath.join(f.home, ".Trash"))).toEqual(["mine.txt"]);
   expect(await exists(userFile)).toBe(true);
-  expect((await f.engine.state()).operation).toMatchObject({ id: op.id, purged: true, recoverableUntil: null });
+  expect((await f.engine.state()).operation).toMatchObject({
+    id: op.id,
+    purged: true,
+    recoverableUntil: null,
+  });
   await expect(f.engine.undo(op.id)).rejects.toMatchObject({ code: "not-recoverable" });
   expect(await exists(wt)).toBe(false);
 });
@@ -195,7 +227,10 @@ it("maps a Mole preview into 放心清 under its own allowlist, deleting only al
         { section: "Developer tools", path: `${home}/Projects/tool/__pycache__` },
         { section: "Developer tools", path: `${home}/Projects/repo/__pycache__` },
         { section: "Documents", path: `${home}/Documents/important.docx` },
-        { section: "Application Support", path: `${home}/Library/Application Support/App/Login Data` },
+        {
+          section: "Application Support",
+          path: `${home}/Library/Application Support/App/Login Data`,
+        },
         { section: "Other", path: `${dir}/elsewhere/cache` },
       ],
     }),
@@ -207,7 +242,8 @@ it("maps a Mole preview into 放心清 under its own allowlist, deleting only al
   const doc = `${f.home}/Documents/important.docx`;
   const login = `${f.home}/Library/Application Support/App/Login Data`;
   const outside = `${f.dir}/elsewhere/cache`;
-  for (const p of [`${cache}/a.bin`, `${pyc}/m.pyc`, doc, login, outside, `${dirtyPyc}/m.pyc`]) await write(p);
+  for (const p of [`${cache}/a.bin`, `${pyc}/m.pyc`, doc, login, outside, `${dirtyPyc}/m.pyc`])
+    await write(p);
   for (const dir of [cache, pyc, dirtyPyc]) await age(dir, 30);
   await write(`${busy}/live`, "live", 0);
   // An untracked __pycache__ in a repository with uncommitted changes must not be 放心清.
@@ -222,7 +258,10 @@ it("maps a Mole preview into 放心清 under its own allowlist, deleting only al
   expect(find(items, "dirty-repo")).toMatchObject({ tier: "remind", blocked: "dirty-worktree" });
   expect(state.scan!.mole.ignored).toBe(3);
 
-  await f.engine.execute(safe.map((i) => i.id), true);
+  await f.engine.execute(
+    safe.map((i) => i.id),
+    true,
+  );
   const op = (await f.engine.state()).operation!;
   expect(await exists(cache)).toBe(false);
   expect(await exists(pyc)).toBe(false);
@@ -232,27 +271,46 @@ it("maps a Mole preview into 放心清 under its own allowlist, deleting only al
   expect(op.deletedBytes).toBeGreaterThan(0);
   expect(op.trashedBytes).toBe(0);
   expect(op.recoverableUntil).toBeNull();
-  expect(op.entries.find((e) => e.name === "user")).toMatchObject({ outcome: "deleted", reason: expect.stringContaining("in-use") });
+  expect(op.entries.find((e) => e.name === "user")).toMatchObject({
+    outcome: "deleted",
+    reason: expect.stringContaining("in-use"),
+  });
 });
 
 it("reports a missing or failed Mole calmly and still scans everything else", async () => {
   const missing = await fixture();
-  expect((await (async () => { await missing.engine.scan(); return missing.engine.state(); })()).scan!.mole).toMatchObject({ status: "missing", binary: null });
-  const failed = await fixture({ mole: async () => ({ status: "failed", binary: "/x/mo", message: "boom" }) });
+  expect(
+    (
+      await (async () => {
+        await missing.engine.scan();
+        return missing.engine.state();
+      })()
+    ).scan!.mole,
+  ).toMatchObject({ status: "missing", binary: null });
+  const failed = await fixture({
+    mole: async () => ({ status: "failed", binary: "/x/mo", message: "boom" }),
+  });
   await failed.engine.scan();
-  expect((await failed.engine.state()).scan!.mole).toMatchObject({ status: "failed", message: "boom" });
+  expect((await failed.engine.state()).scan!.mole).toMatchObject({
+    status: "failed",
+    message: "boom",
+  });
 });
 
 it("offers old session transcripts as a compress-archive suggestion in 看一眼", async () => {
   const f = await fixture();
-  for (const n of ["a", "b"]) await write(`${f.roots.codexSessions}/2026/01/01/${n}.jsonl`, "{}\n".repeat(200), 200);
+  for (const n of ["a", "b"])
+    await write(`${f.roots.codexSessions}/2026/01/01/${n}.jsonl`, "{}\n".repeat(200), 200);
   await write(`${f.roots.codexSessions}/2026/11/21/recent.jsonl`, "{}", 1);
   await write(`${f.roots.claudeProjects}/-proj/s1.jsonl`, "{}\n".repeat(50), 120);
   const items = await itemsOf(f.engine);
   const codex = find(items, "session-archive", "codex")!;
   expect(codex).toMatchObject({ tier: "review", compress: true, pathCount: 2, disposal: "trash" });
   expect(codex.detail.oldestDays).toBe("200");
-  expect(find(items, "session-archive", "claude-code")).toMatchObject({ tier: "review", pathCount: 1 });
+  expect(find(items, "session-archive", "claude-code")).toMatchObject({
+    tier: "review",
+    pathCount: 1,
+  });
 
   await f.engine.execute([codex.id], true);
   const op = (await f.engine.state()).operation!;
@@ -298,7 +356,11 @@ it("keeps the newest N build generations and old app copies, everything else goe
   await write(`${builds}/cfg/config.json.bak-pre-c2`, "2", 40);
   await write(`${builds}/cfg/config.json.bak-pre-c3`, "3", 30);
   await write(`${builds}/cfg/config.json.orig`, "0", 60);
-  for (const [i, name] of ["App.before-C1.app", "App.before-C2.app", "App.before-C3.app"].entries()) {
+  for (const [i, name] of [
+    "App.before-C1.app",
+    "App.before-C2.app",
+    "App.before-C3.app",
+  ].entries()) {
     await write(`${f.roots.applications}/${name}/Contents/x`, "a".repeat(4096), 30 - i * 5);
     await age(`${f.roots.applications}/${name}`, 30 - i * 5);
   }
@@ -308,7 +370,11 @@ it("keeps the newest N build generations and old app copies, everything else goe
   expect(gen.paths.map((p) => NodePath.basename(p)).toSorted()).toEqual(["c1-build", "c2-build"]);
   expect(find(items, "backup-file")!.pathCount).toBe(2);
   expect(find(items, "app-backup")).toMatchObject({ tier: "review", name: "App", pathCount: 1 });
-  expect(items.filter((i) => ["build-generation", "backup-file", "app-backup"].includes(i.kind)).every((i) => i.tier === "review")).toBe(true);
+  expect(
+    items
+      .filter((i) => ["build-generation", "backup-file", "app-backup"].includes(i.kind))
+      .every((i) => i.tier === "review"),
+  ).toBe(true);
   await f.engine.saveSettings({ keepNewest: 3 });
   const more = await itemsOf(f.engine);
   expect(find(more, "build-generation")!.pathCount).toBe(1);
@@ -335,7 +401,10 @@ it("rescues uncommitted work from a build folder before it moves to Trash, and r
   const dirty = find(items, "dirty-repo")!;
   expect(dirty).toMatchObject({ tier: "review", dirtyFiles: 3 });
   await f.engine.execute([dirty.id], false);
-  expect((await f.engine.state()).operation!.entries[0]).toMatchObject({ outcome: "skipped", reason: "uncommitted-needs-rescue" });
+  expect((await f.engine.state()).operation!.entries[0]).toMatchObject({
+    outcome: "skipped",
+    reason: "uncommitted-needs-rescue",
+  });
   expect(await exists(port)).toBe(true);
   const again = await itemsOf(f.engine);
   await f.engine.execute([find(again, "dirty-repo")!.id], true);
@@ -348,7 +417,9 @@ it("rescues uncommitted work from a build folder before it moves to Trash, and r
   expect(files.some((n) => n.endsWith("untracked.tgz"))).toBe(true);
   expect(files.some((n) => n.endsWith("shot.png"))).toBe(true);
   const patch = files.find((n) => n.endsWith(".patch"))!;
-  expect(await NodeFSP.readFile(NodePath.join(op.rescue!.directory, patch), "utf8")).toContain("color:red");
+  expect(await NodeFSP.readFile(NodePath.join(op.rescue!.directory, patch), "utf8")).toContain(
+    "color:red",
+  );
   await f.engine.openArchive(op.id);
   expect(f.opened()).toBe(op.rescue!.directory);
 });
@@ -385,21 +456,43 @@ it("executes only ids it produced and never a reminder", async () => {
   await f.engine.execute(["/etc/passwd", "tidy-nonexistent", find(items, "worktree")!.id], true);
   const op = (await f.engine.state()).operation!;
   expect(op.entries.map((e) => e.outcome)).toEqual(["skipped", "skipped", "skipped"]);
-  expect(op.entries.map((e) => e.reason)).toEqual(["unknown-item", "unknown-item", "dirty-worktree"]);
+  expect(op.entries.map((e) => e.reason)).toEqual([
+    "unknown-item",
+    "unknown-item",
+    "dirty-worktree",
+  ]);
   await expect(f.engine.execute([], true)).rejects.toMatchObject({ code: "scan-required" });
 });
 
 it("validates the build directory setting", async () => {
   const f = await fixture();
-  await expect(f.engine.saveSettings({ buildDirectory: "relative/dir" })).rejects.toMatchObject({ code: "build-directory-invalid" });
-  await expect(f.engine.saveSettings({ buildDirectory: "/" })).rejects.toMatchObject({ code: "build-directory-invalid" });
-  await expect(f.engine.saveSettings({ buildDirectory: f.home })).rejects.toMatchObject({ code: "build-directory-invalid" });
-  await expect(f.engine.saveSettings({ buildDirectory: `${f.dir}/missing` })).rejects.toMatchObject({ code: "build-directory-invalid" });
+  await expect(f.engine.saveSettings({ buildDirectory: "relative/dir" })).rejects.toMatchObject({
+    code: "build-directory-invalid",
+  });
+  await expect(f.engine.saveSettings({ buildDirectory: "/" })).rejects.toMatchObject({
+    code: "build-directory-invalid",
+  });
+  await expect(f.engine.saveSettings({ buildDirectory: f.home })).rejects.toMatchObject({
+    code: "build-directory-invalid",
+  });
+  await expect(f.engine.saveSettings({ buildDirectory: `${f.dir}/missing` })).rejects.toMatchObject(
+    { code: "build-directory-invalid" },
+  );
   for (const unsafe of ["/Library", "/System/Library", NodePath.dirname(f.home), "/usr/local"])
-    await expect(f.engine.saveSettings({ buildDirectory: unsafe })).rejects.toMatchObject({ code: "build-directory-invalid" });
+    await expect(f.engine.saveSettings({ buildDirectory: unsafe })).rejects.toMatchObject({
+      code: "build-directory-invalid",
+    });
   await NodeFSP.mkdir(`${f.dir}/builds`);
-  await f.engine.saveSettings({ buildDirectory: `${f.dir}/builds`, keepNewest: 4, rescueFirst: false });
-  expect((await f.engine.state()).settings).toEqual({ buildDirectory: `${f.dir}/builds`, keepNewest: 4, rescueFirst: false });
+  await f.engine.saveSettings({
+    buildDirectory: `${f.dir}/builds`,
+    keepNewest: 4,
+    rescueFirst: false,
+  });
+  expect((await f.engine.state()).settings).toEqual({
+    buildDirectory: `${f.dir}/builds`,
+    keepNewest: 4,
+    rescueFirst: false,
+  });
 });
 
 it("does not write rescue copies or archives when the disk is nearly full, and keeps the originals", async () => {
@@ -409,7 +502,10 @@ it("does not write rescue copies or archives when the disk is nearly full, and k
   const items = await itemsOf(f.engine);
   await f.engine.execute([find(items, "worktree")!.id, find(items, "session-archive")!.id], true);
   const op = (await f.engine.state()).operation!;
-  expect(op.entries.map((e) => [e.outcome, e.reason])).toEqual([["skipped", "low-disk"], ["skipped", "low-disk"]]);
+  expect(op.entries.map((e) => [e.outcome, e.reason])).toEqual([
+    ["skipped", "low-disk"],
+    ["skipped", "low-disk"],
+  ]);
   expect(await exists(wt)).toBe(true);
   expect(await exists(`${f.roots.codexSessions}/2026/01/01/a.jsonl`)).toBe(true);
   expect(op.rescue).toBeNull();

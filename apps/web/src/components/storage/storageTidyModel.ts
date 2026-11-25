@@ -28,7 +28,9 @@ export const isSelectable = (item: StorageTidyItem) =>
 
 /** 放心清 starts selected; 看一眼 always waits for the person to look. */
 export function defaultSelection(items: ReadonlyArray<StorageTidyItem>): ReadonlySet<string> {
-  return new Set(items.filter((item) => item.tier === "safe" && isSelectable(item)).map((i) => i.id));
+  return new Set(
+    items.filter((item) => item.tier === "safe" && isSelectable(item)).map((i) => i.id),
+  );
 }
 
 export function selectionSummary(
@@ -39,8 +41,15 @@ export function selectionSummary(
   const chosen = items.filter((item) => selected.has(item.id) && isSelectable(item));
   const freeNow = sumBytes(chosen.filter((item) => item.disposal === "delete"));
   const pending = sumBytes(chosen.filter((item) => item.disposal === "trash"));
-  const rescueAssets = chosen.reduce((n, item) => n + (item.tier === "review" || item.kind === "worktree" ? item.rescueAssets : 0), 0);
-  const rescueBytes = chosen.reduce((n, item) => n + (item.tier === "review" || item.kind === "worktree" ? item.rescueAssetBytes : 0), 0);
+  const rescueAssets = chosen.reduce(
+    (n, item) => n + (item.tier === "review" || item.kind === "worktree" ? item.rescueAssets : 0),
+    0,
+  );
+  const rescueBytes = chosen.reduce(
+    (n, item) =>
+      n + (item.tier === "review" || item.kind === "worktree" ? item.rescueAssetBytes : 0),
+    0,
+  );
   const dirtyFiles = chosen.reduce((n, item) => n + item.dirtyFiles, 0);
   const free = volume?.freeBytes ?? null;
   const total = volume?.totalBytes ?? null;
@@ -53,7 +62,10 @@ export function selectionSummary(
     rescueBytes,
     dirtyFiles,
     freeAfter: free === null ? null : free + freeNow,
-    usedPercentAfter: free === null || total === null || total <= 0 ? null : Math.round(((total - free - freeNow) / total) * 100),
+    usedPercentAfter:
+      free === null || total === null || total <= 0
+        ? null
+        : Math.round(((total - free - freeNow) / total) * 100),
     hasTrash: pending > 0,
   };
 }
@@ -75,7 +87,9 @@ export function completionSummary(operation: StorageTidyOperation) {
   const measuredAfter = operation.freeAfter;
   const freeAfter = measuredAfter ?? (before === null ? null : before + freedNow);
   const percent = (free: number | null) =>
-    free === null || total === null || total <= 0 ? null : Math.round(((total - free) / total) * 100);
+    free === null || total === null || total <= 0
+      ? null
+      : Math.round(((total - free) / total) * 100);
   return {
     freedNow,
     pending,
@@ -90,7 +104,9 @@ export function completionSummary(operation: StorageTidyOperation) {
     total,
     trashed: operation.entries.filter((entry) => entry.outcome === "trashed").length,
     deleted: operation.entries.filter((entry) => entry.outcome === "deleted").length,
-    problems: operation.entries.filter((entry) => entry.outcome === "failed" || entry.outcome === "skipped").length,
+    problems: operation.entries.filter(
+      (entry) => entry.outcome === "failed" || entry.outcome === "skipped",
+    ).length,
   };
 }
 

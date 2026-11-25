@@ -177,7 +177,7 @@ export async function writeTextToClipboard(
 
   if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
     if (writeTextWithExecCommand(value, extraFlavors, options?.requireHtml)) return true;
-      manualClipboard.reveal(value);
+    manualClipboard.reveal(value);
     throw new ClipboardApiUnavailableError(clipboardTargetFields(target, "unavailable"));
   }
 

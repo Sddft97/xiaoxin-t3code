@@ -1,5 +1,3 @@
-
-
 import {
   EMPTY_PULL_REQUEST_DIFF_FOLDS,
   foldAllPullRequestDiffs,

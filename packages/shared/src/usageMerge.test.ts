@@ -836,7 +836,13 @@ describe("mergeUsage", () => {
       throughput: [
         // ~47.37 tok/s over 19s (4 turns)
         { provider: "codex", model: "gpt-5.4", outputTokens: 900, modelMs: 19_000, turns: 4 },
-        { provider: "claude", model: "claude-opus-4-6", outputTokens: 500, modelMs: 10_000, turns: 2 },
+        {
+          provider: "claude",
+          model: "claude-opus-4-6",
+          outputTokens: 500,
+          modelMs: 10_000,
+          turns: 2,
+        },
       ],
     };
 

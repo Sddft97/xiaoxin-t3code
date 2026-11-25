@@ -49,16 +49,40 @@ it("preselects only 放心清 and never offers a checkbox for 只提醒不动", 
   ];
   expect([...defaultSelection(items)]).toEqual(["a"]);
   expect(items.map(isSelectable)).toEqual([true, true, false, false]);
-  expect(Object.values(itemsByTier({ scannedAt: "", items, mole: { status: "missing", binary: null, message: null, listed: 0, ignored: 0 }, truncated: false, buildDirectoryMissing: false })).map((l) => l.length)).toEqual([2, 1, 1]);
+  expect(
+    Object.values(
+      itemsByTier({
+        scannedAt: "",
+        items,
+        mole: { status: "missing", binary: null, message: null, listed: 0, ignored: 0 },
+        truncated: false,
+        buildDirectoryMissing: false,
+      }),
+    ).map((l) => l.length),
+  ).toEqual([2, 1, 1]);
 });
 
 it("counts only deleted bytes as freed now; Trash is pending", () => {
   const items = [
     item({ id: "a", bytes: 10 * GB }),
-    item({ id: "b", tier: "review", disposal: "trash", bytes: 20 * GB, rescueAssets: 5, rescueAssetBytes: 1000 }),
+    item({
+      id: "b",
+      tier: "review",
+      disposal: "trash",
+      bytes: 20 * GB,
+      rescueAssets: 5,
+      rescueAssetBytes: 1000,
+    }),
   ];
   const summary = selectionSummary(items, new Set(["a", "b"]), volume);
-  expect(summary).toMatchObject({ count: 2, freeNow: 10 * GB, pending: 20 * GB, bytes: 30 * GB, rescueAssets: 5, hasTrash: true });
+  expect(summary).toMatchObject({
+    count: 2,
+    freeNow: 10 * GB,
+    pending: 20 * GB,
+    bytes: 30 * GB,
+    rescueAssets: 5,
+    hasTrash: true,
+  });
   expect(summary.freeAfter).toBe(50 * GB);
   expect(summary.usedPercentAfter).toBe(Math.round(((500 - 50) / 500) * 100));
   expect(selectionSummary(items, new Set(["b"]), volume).freeNow).toBe(0);
@@ -81,9 +105,33 @@ const operation = (over: Partial<StorageTidyOperation>): StorageTidyOperation =>
   purged: false,
   rescue: null,
   entries: [
-    { itemId: "a", kind: "mole-section", tier: "safe", name: "a", outcome: "deleted", bytes: 1, reason: null },
-    { itemId: "b", kind: "app-backup", tier: "review", name: "b", outcome: "trashed", bytes: 1, reason: null },
-    { itemId: "c", kind: "worktree", tier: "remind", name: "c", outcome: "skipped", bytes: 0, reason: "dirty-worktree" },
+    {
+      itemId: "a",
+      kind: "mole-section",
+      tier: "safe",
+      name: "a",
+      outcome: "deleted",
+      bytes: 1,
+      reason: null,
+    },
+    {
+      itemId: "b",
+      kind: "app-backup",
+      tier: "review",
+      name: "b",
+      outcome: "trashed",
+      bytes: 1,
+      reason: null,
+    },
+    {
+      itemId: "c",
+      kind: "worktree",
+      tier: "remind",
+      name: "c",
+      outcome: "skipped",
+      bytes: 0,
+      reason: "dirty-worktree",
+    },
   ],
   error: null,
   progress: null,

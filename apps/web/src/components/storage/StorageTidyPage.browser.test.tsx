@@ -1,4 +1,8 @@
-import { EnvironmentId, type StorageTidyActionInput, type StorageTidyState } from "@t3tools/contracts";
+import {
+  EnvironmentId,
+  type StorageTidyActionInput,
+  type StorageTidyState,
+} from "@t3tools/contracts";
 import { page } from "vite-plus/test/browser";
 import { expect, it, vi } from "vite-plus/test";
 
@@ -28,13 +32,17 @@ vi.mock(import("~/state/server"), async (original) => {
     serverEnvironment: {
       ...actual.serverEnvironment,
       storageTidyState: (() => queried) as never,
-      storageTidyAct: { ...actual.serverEnvironment.storageTidyAct, permissionAtom: () => Atom.make(true) } as never,
+      storageTidyAct: {
+        ...actual.serverEnvironment.storageTidyAct,
+        permissionAtom: () => Atom.make(true),
+      } as never,
     },
   };
 });
 vi.mock(import("~/state/use-atom-command"), async (original) => ({
   ...(await original()),
-  useAtomCommand: (() => (value: unknown) => (hoisted.run as (v: unknown) => unknown)(value)) as never,
+  useAtomCommand: (() => (value: unknown) =>
+    (hoisted.run as (v: unknown) => unknown)(value)) as never,
 }));
 
 import { StorageTidyEnvironment } from "./StorageTidyPage";
@@ -72,7 +80,9 @@ it("scan → results → clean sends only ids the user chose, never reminders", 
 it("the usage page keeps only a small disk-free chip that links to the page", async () => {
   using _locale = testUiLocale("zh-CN");
   await using screen = await render(<UsageDiskChip environmentId={ENVIRONMENT} />);
-  const chip = screen.container.querySelector<HTMLAnchorElement>('[data-testid="usage-disk-chip"]')!;
+  const chip = screen.container.querySelector<HTMLAnchorElement>(
+    '[data-testid="usage-disk-chip"]',
+  )!;
   expect(chip.textContent).toContain("磁盘剩余 40.0 GB");
   expect(chip.getAttribute("href")).toBe("/settings/storage");
   expect(fixtureState.volumes[0]?.internal).toBe(true);

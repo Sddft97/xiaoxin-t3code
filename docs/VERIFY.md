@@ -4,27 +4,27 @@ The README and the release notes stay short on purpose. The details are here for
 
 ## Build identity
 
-| Item | Value |
-| --- | --- |
-| Build | C96, the 1.0.7 build. It contains everything since 1.0.2 (internal builds C91 to C95: quota cards four to a row with provider grouping and drag to reorder, sidebar task actions and status menu, "Done today", live Claude quota from response headers, separate Cost and Tokens pages, composer effort slider and context ring, the T3 Stardust name). C96 only restores the stable release flag that C94 and C95 lost (they showed a "Nightly" badge). |
-| Web bundle `index.html` SHA-256 | `3ce507575f14d056de81dbbb2c04625a40964591bc24dbbb068d64c0f969d441` |
-| Release-candidate app archive (ASAR) SHA-256 | `bb2f076be0ebbd08c6a772d1e60ebf8800bd64cbf765767081e94672d5d81273` |
-| App archive (ASAR) in the download package | `30caca00e617fd5c5379241256cd106e344bd180224176ca2133c04c9b3a383a`. It differs from the candidate in exactly one entry: the bundled copy of the resource monitor, whose build-machine file paths were overwritten with neutral bytes of the same length. Every other entry is byte-identical |
-| Signature of the download package | ad-hoc (`codesign -dv` shows `Signature=adhoc`, no Team ID); not signed with an Apple Developer ID; not notarized. `codesign --verify --deep --strict` passes on the unpacked ZIP |
-| Package for download | `T3-Stardust-1.0.7-macOS-arm64.zip`, SHA-256 `8fb1509319093698fb20c2b65f3814739c92f966236238eba2e16ec906482184` |
+| Item                                         | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Build                                        | C96, the 1.0.7 build. It contains everything since 1.0.2 (internal builds C91 to C95: quota cards four to a row with provider grouping and drag to reorder, sidebar task actions and status menu, "Done today", live Claude quota from response headers, separate Cost and Tokens pages, composer effort slider and context ring, the T3 Stardust name). C96 only restores the stable release flag that C94 and C95 lost (they showed a "Nightly" badge). |
+| Web bundle `index.html` SHA-256              | `3ce507575f14d056de81dbbb2c04625a40964591bc24dbbb068d64c0f969d441`                                                                                                                                                                                                                                                                                                                                                                                        |
+| Release-candidate app archive (ASAR) SHA-256 | `bb2f076be0ebbd08c6a772d1e60ebf8800bd64cbf765767081e94672d5d81273`                                                                                                                                                                                                                                                                                                                                                                                        |
+| App archive (ASAR) in the download package   | `30caca00e617fd5c5379241256cd106e344bd180224176ca2133c04c9b3a383a`. It differs from the candidate in exactly one entry: the bundled copy of the resource monitor, whose build-machine file paths were overwritten with neutral bytes of the same length. Every other entry is byte-identical                                                                                                                                                              |
+| Signature of the download package            | ad-hoc (`codesign -dv` shows `Signature=adhoc`, no Team ID); not signed with an Apple Developer ID; not notarized. `codesign --verify --deep --strict` passes on the unpacked ZIP                                                                                                                                                                                                                                                                         |
+| Package for download                         | `T3-Stardust-1.0.7-macOS-arm64.zip`, SHA-256 `8fb1509319093698fb20c2b65f3814739c92f966236238eba2e16ec906482184`                                                                                                                                                                                                                                                                                                                                           |
 
 Every product screenshot in this repository was rendered from the Stardust web bundle (the banners and social preview add brand art and HTML text around a real render).
 
 ## Automated checks (C96 / v1.0.7)
 
-| Check | Result |
-| --- | --- |
-| Type check, `web` package | 0 errors |
-| Lint (`vp lint`) on the changed files | 0 errors |
-| Unit & Chromium browser tests for quota, sidebar, inbox and composer (changed areas) | all passed |
-| Full web test suite | no new failures; the only failures are known ones that existed before this release (2 tests, plus 17 render scenarios that need a report directory to run) |
-| Privacy scan on unpacked ZIP | 2,962 members scanned, 0 maintainer hits |
-| Isolated smoke & PTY check | Welcome page rendered, 0 console/runtime errors, resource monitor healthy, no "Nightly" badge, `node-pty` exit 0, 0 leftover processes |
+| Check                                                                                | Result                                                                                                                                                     |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type check, `web` package                                                            | 0 errors                                                                                                                                                   |
+| Lint (`vp lint`) on the changed files                                                | 0 errors                                                                                                                                                   |
+| Unit & Chromium browser tests for quota, sidebar, inbox and composer (changed areas) | all passed                                                                                                                                                 |
+| Full web test suite                                                                  | no new failures; the only failures are known ones that existed before this release (2 tests, plus 17 render scenarios that need a report directory to run) |
+| Privacy scan on unpacked ZIP                                                         | 2,962 members scanned, 0 maintainer hits                                                                                                                   |
+| Isolated smoke & PTY check                                                           | Welcome page rendered, 0 console/runtime errors, resource monitor healthy, no "Nightly" badge, `node-pty` exit 0, 0 leftover processes                     |
 
 ## Data migration: schema 79 → 95
 
@@ -55,53 +55,53 @@ Every product screenshot in this repository was rendered from the Stardust web b
 
 ### Media inventory
 
-| File | Type | Size | SHA-256 (first 16) | What it shows |
-| --- | --- | --- | --- | --- |
-| banner-en-dark.webp | webp | 52 KB | f75c9cb1bf20eade | README banner: brand background art + HTML text (no UI) |
-| banner-en-light.webp | webp | 47 KB | 83230a9978a76921 | README banner: brand background art + HTML text (no UI) |
-| banner-zh-dark.webp | webp | 43 KB | fd527662844bf2c4 | README banner: brand background art + HTML text (no UI) |
-| banner-zh-light.webp | webp | 40 KB | ad608410be3089ab | README banner: brand background art + HTML text (no UI) |
-| categories-en-dark.webp | webp | 105 KB | 399155a94f89406e | Suggested categories dialog before anything moves |
-| categories-en-light.webp | webp | 105 KB | f256532a0d17ded7 | Suggested categories dialog before anything moves |
-| categories-zh-dark.webp | webp | 88 KB | 617cd246e676797e | Suggested categories dialog before anything moves |
-| categories-zh-light.webp | webp | 89 KB | 31fcd785807cba15 | Suggested categories dialog before anything moves |
-| cleanup-en-dark.webp | webp | 84 KB | 493553dc6d526969 | Usage → Cleanup & organization, suggestions before any removal |
-| cleanup-en-light.webp | webp | 86 KB | ca6ebfc4cf8e6c7f | Usage → Cleanup & organization, suggestions before any removal |
-| cleanup-zh-dark.webp | webp | 76 KB | 30aa6e51d5852746 | Usage → Cleanup & organization, suggestions before any removal |
-| cleanup-zh-light.webp | webp | 78 KB | af02054a99ea0b6f | Usage → Cleanup & organization, suggestions before any removal |
-| hero-en-dark.webp | webp | 90 KB | 22135553ded4caa4 | Whole workbench, a run in progress at 4 of 6 milestones, sidebar sorted into categories |
-| hero-en-light.webp | webp | 90 KB | b5dbefee6c752766 | Whole workbench, a run in progress at 4 of 6 milestones, sidebar sorted into categories |
-| hero-zh-dark.webp | webp | 87 KB | cf43a3956fa378e7 | Whole workbench, a run in progress at 4 of 6 milestones, sidebar sorted into categories |
-| hero-zh-light.webp | webp | 88 KB | 2a92b375797ab354 | Whole workbench, a run in progress at 4 of 6 milestones, sidebar sorted into categories |
-| inbox-en-dark.webp | webp | 39 KB | d3c18f248db798bf | Sidebar task with its hover actions and the status menu |
-| inbox-en-light.webp | webp | 39 KB | 062cae09e7855700 | Sidebar task with its hover actions and the status menu |
-| inbox-zh-dark.webp | webp | 37 KB | 47035a7036f7e398 | Sidebar task with its hover actions and the status menu |
-| inbox-zh-light.webp | webp | 37 KB | 8f736d0d66b99770 | Sidebar task with its hover actions and the status menu |
-| quota-en-dark.gif | gif | 175 KB | 43150064261b71a8 | Quota cards and Resets this week, lanes hovered one by one |
-| quota-en-dark.webp | webp | 88 KB | 8621d1fcdda47d5a | Usage → Limits: four account cards in a row and "Resets this week" |
-| quota-en-light.gif | gif | 152 KB | b80d384d4dac429b | Quota cards and Resets this week, lanes hovered one by one |
-| quota-en-light.webp | webp | 95 KB | 91233b60e175be5e | Usage → Limits: four account cards in a row and "Resets this week" |
-| quota-zh-dark.gif | gif | 189 KB | a402c3ff2bc993e1 | Quota cards and Resets this week, lanes hovered one by one |
-| quota-zh-dark.webp | webp | 78 KB | a7610e3c1bb2ce97 | Usage → Limits: four account cards in a row and "Resets this week" |
-| quota-zh-light.gif | gif | 163 KB | 19738390381a4371 | Quota cards and Resets this week, lanes hovered one by one |
-| quota-zh-light.webp | webp | 87 KB | f90b554b0be70479 | Usage → Limits: four account cards in a row and "Resets this week" |
-| social-preview.png | png | 539 KB | d3acede9688a3366 | Social preview: brand background + HTML text + real hero render |
-| stats-en-dark.webp | webp | 36 KB | db580bb79c0ef892 | Session statistics popover after the first turn |
-| stats-en-light.webp | webp | 37 KB | a455bbdc024c6caf | Session statistics popover after the first turn |
-| stats-zh-dark.webp | webp | 32 KB | 659636ca0f1914f5 | Session statistics popover after the first turn |
-| stats-zh-light.webp | webp | 34 KB | 37d6bfc9624af33a | Session statistics popover after the first turn |
-| steps-en-dark.gif | gif | 1.84 MB | 86035ca191d624b5 | Step capsule: expand, open a stage, finish |
-| steps-en-dark.webp | webp | 98 KB | e0fd65ffa649c7ed | Step capsule expanded, one stage open to show its operations |
-| steps-en-light.gif | gif | 1.93 MB | 7cd6dcf6f06ca16f | Step capsule: expand, open a stage, finish |
-| steps-en-light.webp | webp | 101 KB | 554a575f86d467a6 | Step capsule expanded, one stage open to show its operations |
-| steps-zh-dark.gif | gif | 1.57 MB | 3cf2f63f017ea701 | Step capsule: expand, open a stage, finish |
-| steps-zh-dark.webp | webp | 93 KB | bc324599dbf4fb13 | Step capsule expanded, one stage open to show its operations |
-| steps-zh-light.gif | gif | 1.55 MB | 1e4c229398f51541 | Step capsule: expand, open a stage, finish |
-| steps-zh-light.webp | webp | 95 KB | a7ef8c79c3a315d1 | Step capsule expanded, one stage open to show its operations |
-| welcome-en-dark.webp | webp | 80 KB | ea754962b69545eb | First-run welcome page, detected agents |
-| welcome-en-light.webp | webp | 79 KB | 4dfe0030ee4a1bf8 | First-run welcome page, detected agents |
-| welcome-zh-dark.webp | webp | 75 KB | b744ea9254a77466 | First-run welcome page, detected agents |
-| welcome-zh-light.webp | webp | 74 KB | 7ac0e9b56ad6dafe | First-run welcome page, detected agents |
+| File                     | Type | Size    | SHA-256 (first 16) | What it shows                                                                           |
+| ------------------------ | ---- | ------- | ------------------ | --------------------------------------------------------------------------------------- |
+| banner-en-dark.webp      | webp | 52 KB   | f75c9cb1bf20eade   | README banner: brand background art + HTML text (no UI)                                 |
+| banner-en-light.webp     | webp | 47 KB   | 83230a9978a76921   | README banner: brand background art + HTML text (no UI)                                 |
+| banner-zh-dark.webp      | webp | 43 KB   | fd527662844bf2c4   | README banner: brand background art + HTML text (no UI)                                 |
+| banner-zh-light.webp     | webp | 40 KB   | ad608410be3089ab   | README banner: brand background art + HTML text (no UI)                                 |
+| categories-en-dark.webp  | webp | 105 KB  | 399155a94f89406e   | Suggested categories dialog before anything moves                                       |
+| categories-en-light.webp | webp | 105 KB  | f256532a0d17ded7   | Suggested categories dialog before anything moves                                       |
+| categories-zh-dark.webp  | webp | 88 KB   | 617cd246e676797e   | Suggested categories dialog before anything moves                                       |
+| categories-zh-light.webp | webp | 89 KB   | 31fcd785807cba15   | Suggested categories dialog before anything moves                                       |
+| cleanup-en-dark.webp     | webp | 84 KB   | 493553dc6d526969   | Usage → Cleanup & organization, suggestions before any removal                          |
+| cleanup-en-light.webp    | webp | 86 KB   | ca6ebfc4cf8e6c7f   | Usage → Cleanup & organization, suggestions before any removal                          |
+| cleanup-zh-dark.webp     | webp | 76 KB   | 30aa6e51d5852746   | Usage → Cleanup & organization, suggestions before any removal                          |
+| cleanup-zh-light.webp    | webp | 78 KB   | af02054a99ea0b6f   | Usage → Cleanup & organization, suggestions before any removal                          |
+| hero-en-dark.webp        | webp | 90 KB   | 22135553ded4caa4   | Whole workbench, a run in progress at 4 of 6 milestones, sidebar sorted into categories |
+| hero-en-light.webp       | webp | 90 KB   | b5dbefee6c752766   | Whole workbench, a run in progress at 4 of 6 milestones, sidebar sorted into categories |
+| hero-zh-dark.webp        | webp | 87 KB   | cf43a3956fa378e7   | Whole workbench, a run in progress at 4 of 6 milestones, sidebar sorted into categories |
+| hero-zh-light.webp       | webp | 88 KB   | 2a92b375797ab354   | Whole workbench, a run in progress at 4 of 6 milestones, sidebar sorted into categories |
+| inbox-en-dark.webp       | webp | 39 KB   | d3c18f248db798bf   | Sidebar task with its hover actions and the status menu                                 |
+| inbox-en-light.webp      | webp | 39 KB   | 062cae09e7855700   | Sidebar task with its hover actions and the status menu                                 |
+| inbox-zh-dark.webp       | webp | 37 KB   | 47035a7036f7e398   | Sidebar task with its hover actions and the status menu                                 |
+| inbox-zh-light.webp      | webp | 37 KB   | 8f736d0d66b99770   | Sidebar task with its hover actions and the status menu                                 |
+| quota-en-dark.gif        | gif  | 175 KB  | 43150064261b71a8   | Quota cards and Resets this week, lanes hovered one by one                              |
+| quota-en-dark.webp       | webp | 88 KB   | 8621d1fcdda47d5a   | Usage → Limits: four account cards in a row and "Resets this week"                      |
+| quota-en-light.gif       | gif  | 152 KB  | b80d384d4dac429b   | Quota cards and Resets this week, lanes hovered one by one                              |
+| quota-en-light.webp      | webp | 95 KB   | 91233b60e175be5e   | Usage → Limits: four account cards in a row and "Resets this week"                      |
+| quota-zh-dark.gif        | gif  | 189 KB  | a402c3ff2bc993e1   | Quota cards and Resets this week, lanes hovered one by one                              |
+| quota-zh-dark.webp       | webp | 78 KB   | a7610e3c1bb2ce97   | Usage → Limits: four account cards in a row and "Resets this week"                      |
+| quota-zh-light.gif       | gif  | 163 KB  | 19738390381a4371   | Quota cards and Resets this week, lanes hovered one by one                              |
+| quota-zh-light.webp      | webp | 87 KB   | f90b554b0be70479   | Usage → Limits: four account cards in a row and "Resets this week"                      |
+| social-preview.png       | png  | 539 KB  | d3acede9688a3366   | Social preview: brand background + HTML text + real hero render                         |
+| stats-en-dark.webp       | webp | 36 KB   | db580bb79c0ef892   | Session statistics popover after the first turn                                         |
+| stats-en-light.webp      | webp | 37 KB   | a455bbdc024c6caf   | Session statistics popover after the first turn                                         |
+| stats-zh-dark.webp       | webp | 32 KB   | 659636ca0f1914f5   | Session statistics popover after the first turn                                         |
+| stats-zh-light.webp      | webp | 34 KB   | 37d6bfc9624af33a   | Session statistics popover after the first turn                                         |
+| steps-en-dark.gif        | gif  | 1.84 MB | 86035ca191d624b5   | Step capsule: expand, open a stage, finish                                              |
+| steps-en-dark.webp       | webp | 98 KB   | e0fd65ffa649c7ed   | Step capsule expanded, one stage open to show its operations                            |
+| steps-en-light.gif       | gif  | 1.93 MB | 7cd6dcf6f06ca16f   | Step capsule: expand, open a stage, finish                                              |
+| steps-en-light.webp      | webp | 101 KB  | 554a575f86d467a6   | Step capsule expanded, one stage open to show its operations                            |
+| steps-zh-dark.gif        | gif  | 1.57 MB | 3cf2f63f017ea701   | Step capsule: expand, open a stage, finish                                              |
+| steps-zh-dark.webp       | webp | 93 KB   | bc324599dbf4fb13   | Step capsule expanded, one stage open to show its operations                            |
+| steps-zh-light.gif       | gif  | 1.55 MB | 1e4c229398f51541   | Step capsule: expand, open a stage, finish                                              |
+| steps-zh-light.webp      | webp | 95 KB   | a7ef8c79c3a315d1   | Step capsule expanded, one stage open to show its operations                            |
+| welcome-en-dark.webp     | webp | 80 KB   | ea754962b69545eb   | First-run welcome page, detected agents                                                 |
+| welcome-en-light.webp    | webp | 79 KB   | 4dfe0030ee4a1bf8   | First-run welcome page, detected agents                                                 |
+| welcome-zh-dark.webp     | webp | 75 KB   | b744ea9254a77466   | First-run welcome page, detected agents                                                 |
+| welcome-zh-light.webp    | webp | 74 KB   | 7ac0e9b56ad6dafe   | First-run welcome page, detected agents                                                 |
 
 ## Not covered
 

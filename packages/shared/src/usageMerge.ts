@@ -518,7 +518,13 @@ export function mergeUsage(
   >();
   const modelThroughputAccumulator = new Map<
     string,
-    { provider: UsageProviderKind; model: string; outputTokens: number; modelMs: number; turns: number }
+    {
+      provider: UsageProviderKind;
+      model: string;
+      outputTokens: number;
+      modelMs: number;
+      turns: number;
+    }
   >();
   const modelUnitPrices: Record<string, number> = {};
   const orderedByReadAt = [...current].sort(

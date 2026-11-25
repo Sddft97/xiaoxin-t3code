@@ -60,7 +60,10 @@ export async function listTidyVolumes(): Promise<StorageTidyVolume[]> {
   const names = await NodeFSP.readdir("/Volumes").catch(() => [] as string[]);
   for (const name of names) {
     const link = await NodeFSP.lstat(NodePath.join("/Volumes", name)).catch(() => null);
-    if (link?.isSymbolicLink() && (await NodeFSP.realpath(NodePath.join("/Volumes", name)).catch(() => "")) === "/")
+    if (
+      link?.isSymbolicLink() &&
+      (await NodeFSP.realpath(NodePath.join("/Volumes", name)).catch(() => "")) === "/"
+    )
       internalName = name;
   }
   await add("/", internalName, true);
@@ -107,20 +110,30 @@ const make = Effect.gen(function* () {
     mole: () => previewWithMole({ home }),
     devCaches: async () =>
       (await scanCleanup(cleanupRoots(), [], undefined, 12_000)).entries
-        .filter((entry) => entry.category === "developer-cache" && entry.rebuildable && !entry.locked && entry.canRelease)
+        .filter(
+          (entry) =>
+            entry.category === "developer-cache" &&
+            entry.rebuildable &&
+            !entry.locked &&
+            entry.canRelease,
+        )
         .map((entry) => ({ path: entry.path, name: entry.name })),
     volumes: listTidyVolumes,
     worktreeDirs: () =>
       runPromise(
         settings.getSettings.pipe(
-          Effect.map((current) => managedWorktreesDirectories(current, config.worktreesDir, path, home)),
+          Effect.map((current) =>
+            managedWorktreesDirectories(current, config.worktreesDir, path, home),
+          ),
           Effect.orElseSucceed(() => [config.worktreesDir] as ReadonlyArray<string>),
         ),
       ),
     openPath: (target) =>
       new Promise<void>((resolve, reject) => {
         // Fixed program; the folder was recorded by this app inside its own rescue root.
-        NodeChildProcess.execFile("/usr/bin/open", [target], (error) => (error ? reject(error) : resolve()));
+        NodeChildProcess.execFile("/usr/bin/open", [target], (error) =>
+          error ? reject(error) : resolve(),
+        );
       }),
   });
 
@@ -128,7 +141,9 @@ const make = Effect.gen(function* () {
   const state = Effect.tryPromise({ try: () => engine.state(), catch: fail });
   const logged = (name: string, work: () => Promise<unknown>) =>
     Effect.tryPromise({ try: work, catch: fail }).pipe(
-      Effect.catch((error) => Effect.logWarning(`Storage tidy ${name} failed`, { error: error.message })),
+      Effect.catch((error) =>
+        Effect.logWarning(`Storage tidy ${name} failed`, { error: error.message }),
+      ),
     );
 
   const act = Effect.fn("StorageTidy.act")(function* (input: StorageTidyActionInput) {
@@ -149,7 +164,9 @@ const make = Effect.gen(function* () {
         yield* Effect.tryPromise({
           try: () =>
             engine.saveSettings({
-              ...(input.buildDirectory !== undefined ? { buildDirectory: input.buildDirectory } : {}),
+              ...(input.buildDirectory !== undefined
+                ? { buildDirectory: input.buildDirectory }
+                : {}),
               ...(input.keepNewest !== undefined ? { keepNewest: input.keepNewest } : {}),
               ...(input.rescueFirst !== undefined ? { rescueFirst: input.rescueFirst } : {}),
             }),

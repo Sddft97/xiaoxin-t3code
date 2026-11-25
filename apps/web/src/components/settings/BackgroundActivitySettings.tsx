@@ -1,4 +1,3 @@
-
 import { uiText } from "~/i18n";
 import { useScopedSettingsWriteAllowed } from "./useScopedSettings";
 import { SettingsIcon } from "lucide-react";

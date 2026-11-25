@@ -126,7 +126,9 @@ export function runMoleDryRun(
     child.on("error", (error) => finish({ ok: false, reason: "spawn", message: String(error) }));
     child.on("close", (code) =>
       finish(
-        code === 0 ? { ok: true } : { ok: false, reason: "exit", message: stderr || `exit ${code}` },
+        code === 0
+          ? { ok: true }
+          : { ok: false, reason: "exit", message: stderr || `exit ${code}` },
       ),
     );
   });
