@@ -52,6 +52,9 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_OUTPUT, `upstream_tag=${release.tag_name}\ntag=v${version}\nupstream_version=${match.slice(1).join(".")}\n`);
           '
           gh api "repos/zds-xiaoxin/xiaoxin-t3code/git/ref/tags/$(node -p 'require(process.env.RUNNER_TEMP + "/release.json").tag_name')" > "$RUNNER_TEMP/upstream-commit.json"
+          if [[ "$(node -p 'require(process.env.RUNNER_TEMP + "/upstream-commit.json").object.type')" == tag ]]; then
+            gh api "repos/zds-xiaoxin/xiaoxin-t3code/git/tags/$(node -p 'require(process.env.RUNNER_TEMP + "/upstream-commit.json").object.sha')" > "$RUNNER_TEMP/upstream-commit.json"
+          fi
           node -e '
             const fs = require("node:fs");
             const ref = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + "/upstream-commit.json", "utf8"));
