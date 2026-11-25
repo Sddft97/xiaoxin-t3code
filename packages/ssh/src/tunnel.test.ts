@@ -428,6 +428,7 @@ describe("ssh tunnel scripts", () => {
           NodePath.join(bin, tool),
         );
       }
+      NodeFS.rmSync(NodePath.join(bin, "tar"));
       // Emulate a tar that delegates decompression to gzip, including on bsdtar hosts.
       NodeFS.writeFileSync(
         NodePath.join(bin, "tar"),
