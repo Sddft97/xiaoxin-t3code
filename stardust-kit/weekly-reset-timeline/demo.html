@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Stardust · 这周的重置 · hover 改点击（Mockup）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* ===== Tokens: copied value-for-value from limitsV9.css:6-79 (page canvas/card colours are approximations of the app theme) ===== */
+:root { --canvas:#f5f5f7; --card:#ffffff; --foreground:#1d1d1f; --ctl-bg:#fff; --ctl-fg:#1d1d1f; --ctl-line:rgba(0,0,0,.12); color-scheme: light; }
+:root.dark { --canvas:#161618; --card:#232326; --foreground:#f5f5f7; --ctl-bg:#2a2a2e; --ctl-fg:#f5f5f7; --ctl-line:rgba(255,255,255,.16); color-scheme: dark; }
+[data-lv9-root] {
+  --motion-scale: 1;
+  --spring: cubic-bezier(0.3, 0.7, 0.2, 1);
+  --ac: #ff5a1f; --ac-soft: rgba(255, 90, 31, 0.1); --ac-glow: rgba(255, 90, 31, 0.24);
+  --surface: var(--card, #ffffff);
+  --fg: var(--foreground, #1d1d1f); --fg-2: #6e6e73; --fg-3: #9a9aa1;
+  --line: rgba(0, 0, 0, 0.085); --hair: rgba(0, 0, 0, 0.055);
+  --fill: rgba(118, 118, 128, 0.095); --fill-hover: rgba(118, 118, 128, 0.155);
+  --sel-surface: rgba(0, 0, 0, 0.048);
+  --ok: #1d8a3f; --warn: #c25400; --bad: #d70015;
+  --v9-red: #ff3b30; --v9-green: #34c759; --v9-on-ac: #ffffff;
+  --shadow-card: 0 0 0 0.5px rgba(0, 0, 0, 0.075), 0 1px 2px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.035);
+  --shadow-float: 0 0 0 0.5px rgba(0, 0, 0, 0.09), 0 16px 40px -8px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.05);
+  font-size: 13px; line-height: 1.5; color: var(--fg); -webkit-font-smoothing: antialiased;
+}
+:root.dark [data-lv9-root] {
+  --fg-2: #a1a1a6; --fg-3: #76767d;
+  --line: rgba(255, 255, 255, 0.11); --hair: rgba(255, 255, 255, 0.07);
+  --fill: rgba(255, 255, 255, 0.085); --fill-hover: rgba(255, 255, 255, 0.145);
+  --sel-surface: rgba(255, 255, 255, 0.08);
+  --ok: #30d158; --warn: #ff9f0a; --bad: #ff453a;
+  --shadow-card: 0 0 0 0.5px rgba(255, 255, 255, 0.1), 0 8px 28px rgba(0, 0, 0, 0.38);
+  --shadow-float: 0 0 0 0.5px rgba(255, 255, 255, 0.14), 0 20px 50px rgba(0, 0, 0, 0.65);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--canvas); }
+body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif; color: var(--foreground); }
+
+/* ===== Mock chrome (NOT part of the product) ===== */
+#ctl { display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:14px 24px 0; font-size:12px; }
+#ctl .grp { display:inline-flex; background:var(--ctl-bg); border:1px solid var(--ctl-line); border-radius:9px; overflow:hidden; }
+#ctl button { all:unset; cursor:pointer; padding:5px 12px; font-size:12px; color:var(--ctl-fg); opacity:.62; }
+#ctl button[aria-pressed="true"] { background:var(--ac,#ff5a1f); color:#fff; opacity:1; font-weight:600; }
+#ctl .note { color:var(--ctl-fg); opacity:.55; }
+#stage { padding: 18px 24px 240px; max-width: 1180px; }
+body.clean #ctl { display:none; }
+body.clean #stage { max-width:none; padding: 22px 36px 0; }
+.badge { display:none; }
+body.clean .badge { display:inline-flex; align-items:center; gap:10px; margin: 0 0 16px; font-size:15px; font-weight:700; letter-spacing:.02em; color:var(--foreground); }
+.badge b { padding:4px 12px; border-radius:999px; color:#fff; font-size:13px; letter-spacing:.08em; }
+.badge b.before { background:#ff3b30; } .badge b.after { background:#34c759; }
+.badge span { font-weight:500; opacity:.62; font-size:14px; }
+.cap { display:none; }
+body.clean .cap { display:block; margin-top:22px; font-size:15px; opacity:.72; }
+body.tall .badge { font-size:26px; margin-bottom:22px; } body.tall .badge b { font-size:20px; padding:6px 18px; } body.tall .badge span { font-size:22px; }
+body.tall .cap { font-size:24px; margin-top:190px; line-height:1.5; }
+body.tall #stage { min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:0 24px 80px; }
+#cursor { position:fixed; left:0; top:0; width:24px; height:24px; z-index:99; pointer-events:none; display:none; margin:-3px 0 0 -3px; }
+body.cur #cursor { display:block; }
+
+/* ===== Card CSS: limitsV9.css:238-256 + 1297-1327 ===== */
+[data-lv9~="card-title"] { display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:650; margin-bottom:12px; flex-wrap:wrap; }
+[data-lv9~="card-title"] [data-lv9~="sub"] { font-weight:400; font-size:11.8px; color:var(--fg-2); }
+[data-lv9~="gantt-wrap"] { position:relative; background:var(--surface); border-radius:18px; box-shadow:var(--shadow-card); padding:16px 18px; border:0.5px solid var(--line); margin-bottom:16px; }
+[data-lv9~="gantt-wrap"] [data-lv9~="card-title"] { margin-bottom:6px; }
+[data-lv9~="gantt-readout"] { min-height:22px; font-size:12px; color:var(--fg-2); margin-bottom:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+[data-lv9~="gantt-svg"] { width:100%; height:auto; overflow:visible; display:block; }
+[data-lv9~="gantt-svg"] text { font-family:inherit; }
+[data-lv9~="gantt-svg"] a, [data-lv9~="gantt-svg"] g { outline:none; }
+
+/* ===== AFTER-only additions ===== */
+.lane-bg, .lane-ring { display:none; }
+body.after .lane-bg { display:block; }
+body.after .lane-ring { display:block; }
+.lane-bg { fill:transparent; }
+.lane.sel .lane-bg { fill:var(--sel-surface); }
+.lane-ring { fill:none; stroke:var(--ac); stroke-width:1.5; opacity:0; }
+.lane:focus-visible .lane-ring { opacity:1; }
+body.after .lane { cursor:pointer; }
+.pop { position:absolute; z-index:5; width:318px; background:var(--surface); border-radius:14px; box-shadow:var(--shadow-float); border:0.5px solid var(--line); padding:12px 14px 12px; font-size:12px; color:var(--fg-2); display:none; }
+.pop.on { display:block; animation:popin 120ms ease-out both; }
+@keyframes popin { from { opacity:0; } to { opacity:1; } }
+@media (prefers-reduced-motion: reduce) { .pop.on { animation:none; } }
+.pop h4 { margin:0 0 7px; font-size:12.5px; font-weight:650; color:var(--fg); }
+.pop .ev { display:flex; gap:7px; align-items:baseline; padding:2px 0; font-variant-numeric:tabular-nums; color:var(--fg); }
+.pop .ev i { flex:none; width:7px; height:7px; border-radius:50%; background:var(--v9-green); transform:translateY(-1px); }
+.pop .ev i.red { background:var(--v9-red); }
+.pop .gap { margin-top:6px; padding:6px 9px; border-radius:8px; background:rgba(255,59,48,.10); color:var(--bad); font-weight:600; }
+:root.dark .pop .gap { background:rgba(255,69,58,.16); }
+.pop .go { all:unset; cursor:pointer; margin-top:9px; padding:4px 10px; border-radius:8px; background:var(--fill); color:var(--fg); font-size:11.5px; font-weight:600; }
+.pop .go:hover { background:var(--fill-hover); }
+.pop .go:focus-visible { outline:1.5px solid var(--ac); }
+.below { margin-top:0; height:64px; border-radius:18px; background:var(--surface); box-shadow:var(--shadow-card); border:0.5px solid var(--line); }
+body.clean .below { display:none; }
+</style>
+<style>#stage{padding-bottom:8px}</style><script>
+addEventListener('DOMContentLoaded', () => {
+  if ("weekly-reset-timeline" === 'slider-r4-q') document.querySelector('#vSeg [data-l="Q"]').click();
+  const component = document.querySelector("#stage");
+  if (!component) throw new Error('Missing original workshop component: ' + "#stage");
+  const stage = document.createElement('div');
+  stage.id = 'workshop-original';
+  document.body.insertBefore(stage, document.body.firstChild);
+  let branch = component;
+  while (branch.parentElement !== document.body) {
+    const parent = branch.parentElement;
+    for (const sibling of parent.children) {
+      if (sibling === branch) continue;
+      if ("weekly-reset-timeline" === 'v16-stardust-observatory' && sibling.matches('.card')) {
+        sibling.inert = true;
+        sibling.style.cssText += ';position:fixed;left:0;top:0;width:min(280px,100vw);visibility:hidden;pointer-events:none';
+      } else sibling.style.setProperty('display', 'none', 'important');
+    }
+    branch = parent;
+  }
+  for (const child of document.body.children) {
+    if (child !== stage && child !== branch && !child.matches('svg,script,style')) {
+      child.style.setProperty('display', 'none', 'important');
+    }
+  }
+  stage.append(branch);
+  for (let el = branch; el !== component; el = [...el.children].find(n => n.contains(component))) {
+    el.style.cssText += ';display:block!important;width:100%;min-width:0;max-width:none;margin:0;padding:0;min-height:0;background:transparent;border:0;box-shadow:none';
+  }
+  document.body.style.cssText += ';width:auto;max-width:none;margin:0;padding:0;background:#111025;min-height:0';
+  document.documentElement.style.background = '#111025';
+  if (component.matches('.gx,.cos')) {
+    const row = () => {
+      stage.style.width = '360px';
+      stage.style.marginInline = 'auto';
+      stage.style.zoom = Math.min(1, document.documentElement.clientWidth / 360);
+    };
+    row();
+    addEventListener('resize', row);
+  }
+});
+</script></head>
+<body class="before">
+<div id="ctl">
+  <div class="grp" id="gMode"><button data-v="before">Before 现在</button><button data-v="after">After 改后</button></div>
+  <div class="grp" id="gTheme"><button data-v="light">浅色</button><button data-v="dark">深色</button></div>
+  <div class="grp" id="gLang"><button data-v="zh">中文</button><button data-v="en">EN</button></div>
+  <span class="note" id="note"></span>
+</div>
+<div id="stage">
+  <div class="badge"><b id="bTag"></b><span id="bSub"></span></div>
+  <div data-lv9-root>
+    <div data-lv9="gantt-wrap" id="wrap">
+      <div data-lv9="card-title"><span id="tTitle"></span><span data-lv9="sub" id="tSub"></span></div>
+      <div data-lv9="gantt-readout" role="status" id="readout"></div>
+      <svg data-lv9="gantt-svg" id="svg" role="img"></svg>
+      <div class="pop" id="pop" role="dialog"></div>
+    </div>
+    <div class="below"></div>
+  </div>
+  <div class="cap" id="cap"></div>
+</div>
+<svg id="cursor" viewBox="0 0 24 24"><g id="cArrow"><path d="M4 2 L4 18 L8.2 14.2 L11 20.5 L13.6 19.3 L10.9 13.1 L16.5 13 Z" fill="#000" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/></g><g id="cHand" style="display:none"><path d="M9 3.2c1 0 1.7.8 1.7 1.8v5.2l.2-.1c.4-.5 1-.7 1.6-.5.6.1 1 .5 1.2 1 .4-.3 1-.4 1.5-.2.6.2 1 .7 1.1 1.2.5-.2 1.1-.1 1.5.2.5.4.7.9.7 1.5v3.7c0 3.2-2.2 5.4-5.1 5.4-2.2 0-3.5-1-4.6-2.6l-3.1-4.8c-.5-.8-.2-1.6.5-1.9.6-.3 1.3-.1 1.8.4L7.4 14V5c0-1 .7-1.8 1.6-1.8z" fill="#fff" stroke="#000" stroke-width="1.1" stroke-linejoin="round"/></g></svg>
+
+<script>
+(() => {
+const Q = new URLSearchParams(`theme=dark&mode=before&${location.search.slice(1)}`);
+const S = { mode: Q.get('mode') || 'before', theme: Q.get('theme') || 'light', lang: Q.get('lang') || 'zh', active: null, sel: null };
+if (Q.get('clean')) document.body.classList.add('clean');
+if (Q.get('tall')) document.body.classList.add('tall');
+if (Q.get('cursor')) document.body.classList.add('cur');
+
+/* ---------- i18n (strings marked NEW are the only added copy) ---------- */
+const T = {
+  zh: {
+    title: '这周的重置', sub: '圆点表示重置，斜纹表示没额度的时间。',
+    hintBefore: '指一行看详情；点一行定位到上面的卡片',
+    hintAfter: '点一行看详情，再点一次或按 Esc 收起',                                   // NEW (replaces the hint)
+    go: '定位到上面的卡片 ↑',                                                           // NEW
+    ev: (p, w, t) => `${p}% 剩余 · ${w} · ${t} 重置`,
+    gapD: n => `约 ${n} 天用不了`, gapH: n => `约 ${n} 小时用不了`,
+    today: '今天', now: '现在', aria: '未来七天额度重置时间轴',
+    win: { Weekly: '本周', '5 hours': '5 小时' }, c1: 'Claude 1 号', c2: 'Claude 2 号',
+    loc: 'zh-CN', dark: '深色', light: '浅色'
+  },
+  en: {
+    title: 'Resets this week', sub: 'Dots show resets. Stripes show time without quota.',
+    hintBefore: 'Hover for details. Select a row to find its card above.',
+    hintAfter: 'Click a row for details. Click again or press Esc to close.',          // NEW
+    go: 'Show card above ↑',                                                            // NEW
+    ev: (p, w, t) => `${p}% remaining · ${w} · resets ${t}`,
+    gapD: n => n === 1 ? 'About 1 day without quota' : `About ${n} days without quota`,
+    gapH: n => n === 1 ? 'About 1 hour without quota' : `About ${n} hours without quota`,
+    today: 'Today', now: 'Now', aria: 'Quota resets over the next seven days',
+    win: { Weekly: 'Weekly', '5 hours': '5 hours' }, c1: 'Claude 1', c2: 'Claude 2', loc: 'en-US'
+  }
+};
+const t = () => T[S.lang];
+
+/* ---------- data (fixed "now" = Wed 25 Nov 2026 10:30 so every capture is identical) ---------- */
+const NOW = new Date(2026, 10, 25, 10, 30).getTime();
+const A = (d, h, m = 0) => new Date(2026, 10, 25 + d, h, m).getTime();
+const LANES = [
+  { id: 'antigravity', anti: true, name: () => 'Antigravity', events: [{ at: A(3, 3, 0), label: 'Weekly', remaining: 82, runOut: null, kind: 'weekly' }] },
+  { id: 'codex', name: () => 'Codex', events: [
+      { at: A(0, 15, 30), label: '5 hours', remaining: 61, runOut: null, kind: 'session' },
+      { at: A(2, 9, 12), label: 'Weekly', remaining: 38, runOut: null, kind: 'weekly' } ] },
+  { id: 'claude1', rc: true, name: () => t().c1, events: [{ at: A(4, 9, 0), label: 'Weekly', remaining: 12, runOut: A(1, 22, 0), kind: 'weekly' }] },
+  { id: 'claude2', name: () => t().c2, events: [{ at: A(6, 5, 0), label: 'Weekly', remaining: 55, runOut: null, kind: 'weekly' }] }
+];
+
+/* ---------- geometry: UsageResetTimeline.tsx:13-31 (v9) ---------- */
+function geometry(now) {
+  const start = new Date(now); start.setHours(0, 0, 0, 0);
+  const dates = Array.from({ length: 8 }, (_, i) => { const d = new Date(start); d.setDate(d.getDate() + i); return d.getTime(); });
+  const left = 165, width = 850;
+  const x = at => {
+    let day = dates.findIndex((end, i) => i > 0 && at < end) - 1;
+    if (day < 0) day = at < dates[0] ? 0 : 6;
+    return left + ((day + (at - dates[day]) / (dates[day + 1] - dates[day])) / 7) * width;
+  };
+  return { dates, x, left, width };
+}
+const stamp = at => new Date(at).toLocaleString(t().loc, { weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+const gapLabel = ms => ms >= 86400000 ? t().gapD(Math.round(ms / 86400000)) : t().gapH(Math.max(1, Math.round(ms / 3600000)));
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+/* ---------- derived per-lane layout (UsageResetTimeline.tsx:228-257) ---------- */
+let G, L, R, W, rowH = 56, topY = 34, height, nowX, laneInfo;
+function derive() {
+  G = geometry(NOW); L = G.left; W = G.width; R = L + W;
+  height = Math.max(140, topY + 14 + LANES.length * rowH + 24);
+  nowX = G.x(NOW);
+  laneInfo = LANES.map((lane, idx) => {
+    const y = topY + 26 + idx * rowH;
+    const primary = lane.events.find(e => e.kind === 'weekly') || lane.events.at(-1);
+    const gapEvent = lane.events.filter(e => e.runOut !== null && e.runOut < e.at).sort((a, b) => (b.at - b.runOut) - (a.at - a.runOut))[0] || null;
+    const main = gapEvent || primary;
+    const hasGap = !!(gapEvent && gapEvent.at > Math.max(NOW, gapEvent.runOut) + 1800000);
+    const runAt = hasGap ? Math.max(NOW, gapEvent.runOut) : main.at;
+    return { lane, idx, y, main, gapEvent, hasGap, runX: G.x(runAt), resX: G.x(main.at),
+      col: hasGap ? 'var(--v9-red)' : 'var(--v9-green)',
+      title: lane.anti ? lane.name() : `${lane.name()} · ${t().win[main.label]}` };
+  });
+}
+
+/* ---------- render (static DOM; later updates only mutate attributes so the node under the cursor is never replaced) ---------- */
+const svg = document.getElementById('svg');
+function render() {
+  derive();
+  document.documentElement.classList.toggle('dark', S.theme === 'dark');
+  document.body.classList.remove('before', 'after'); document.body.classList.add(S.mode);
+  document.documentElement.lang = S.lang === 'zh' ? 'zh-CN' : 'en';
+  document.getElementById('tTitle').textContent = t().title;
+  document.getElementById('tSub').textContent = t().sub;
+  svg.setAttribute('viewBox', `0 0 1040 ${height}`); svg.setAttribute('aria-label', t().aria);
+  let h = `<defs><pattern id="hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="0" y2="7" stroke="var(--v9-red)" stroke-width="2" opacity="0.45"/></pattern></defs>`;
+  h += `<rect x="${L}" y="24" width="${W / 7}" height="${LANES.length * rowH + 14}" rx="8" fill="var(--fg)" opacity="0.035"/>`;
+  G.dates.slice(0, 7).forEach((at, i) => {
+    const cx = L + (i / 7) * W; const wd = new Date(at).toLocaleDateString(t().loc, { weekday: 'short' });
+    h += `<g><line x1="${cx}" y1="24" x2="${cx}" y2="${LANES.length * rowH + 36}" stroke="var(--hair)"/><text x="${cx + W / 14}" y="16" text-anchor="middle" font-size="11" font-weight="${i === 0 ? 700 : 500}" fill="${i === 0 ? 'var(--fg)' : 'var(--fg-3)'}">${i === 0 ? `${wd}(${t().today})` : wd}</text></g>`;
+  });
+  h += `<line x1="${nowX}" y1="24" x2="${nowX}" y2="${LANES.length * rowH + 36}" stroke="var(--ac)" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+  h += `<rect x="${nowX - 16}" y="22" width="32" height="15" rx="7" fill="var(--ac)"/><text x="${nowX}" y="33" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--v9-on-ac)">${t().now}</text>`;
+  laneInfo.forEach(li => {
+    const { lane, y, main, gapEvent, hasGap, runX, resX, col } = li;
+    h += `<g class="lane" data-lane="${lane.id}" role="button" tabindex="0" aria-expanded="false" style="cursor:pointer" aria-label="${esc(lane.name())} · ${lane.events.map(e => stamp(e.at)).join(' · ')}">`;
+    h += `<rect class="lane-bg" x="-6" y="${y - 28}" width="1052" height="56" rx="10"/><rect class="lane-ring" x="-6" y="${y - 28}" width="1052" height="56" rx="10"/>`;
+    h += `<text class="lbl" x="${L - 14}" y="${y + 4}" text-anchor="end" font-size="12" font-weight="550" fill="var(--fg)">${esc(li.title)}</text>`;
+    h += `<rect x="${L}" y="${y - 7}" width="${W}" height="14" rx="7" fill="var(--fill)"/>`;
+    h += `<rect class="bar" x="${nowX}" y="${y - 7}" width="${Math.max(8, runX - nowX)}" height="14" rx="7" fill="${col}" opacity="0.86"/>`;
+    if (hasGap) {
+      h += `<rect x="${runX}" y="${y - 7}" width="${Math.max(0, resX - runX)}" height="14" rx="4" fill="url(#hatch)" stroke="var(--v9-red)" stroke-width="0.8" stroke-dasharray="3 2"/>`;
+      h += `<text x="${(runX + resX) / 2}" y="${y - 12}" text-anchor="middle" font-size="10.5" font-weight="650" fill="var(--bad)">${esc(gapLabel(gapEvent.at - gapEvent.runOut))}</text>`;
+      if (lane.rc) h += `<g style="cursor:pointer" data-rc="1"><circle cx="${runX}" cy="${y}" r="7.5" fill="var(--surface)" stroke="var(--warn)" stroke-width="2"/><circle cx="${runX}" cy="${y}" r="3" fill="var(--warn)"/></g>`;
+    }
+    h += `<rect x="${resX}" y="${y - 5}" width="${Math.max(8, R - resX)}" height="10" rx="5" fill="${col}" opacity="0.22"/>`;
+    h += `<circle class="dot" cx="${resX}" cy="${y}" r="6" fill="var(--surface)" stroke="${col}" stroke-width="2.5"/></g>`;
+  });
+  svg.innerHTML = h;
+  bind(); update();
+}
+
+/* ---------- interaction ---------- */
+const pop = document.getElementById('pop'), wrap = document.getElementById('wrap'), readout = document.getElementById('readout');
+function bind() {
+  svg.querySelectorAll('.lane').forEach(g => {
+    const id = g.dataset.lane;
+    // --- BEFORE: UsageResetTimeline.tsx:267-282 (hover/focus => active) ---
+    g.addEventListener('mouseenter', () => { if (S.mode === 'before') { S.active = id; update(); } });
+    g.addEventListener('mouseleave', () => { if (S.mode === 'before') { S.active = null; update(); } });
+    g.addEventListener('focus', () => { if (S.mode === 'before') { S.active = id; update(); } });
+    g.addEventListener('blur', () => { if (S.mode === 'before') { S.active = null; update(); } });
+    // --- AFTER: click / Enter / Space toggles the detail popover ---
+    g.addEventListener('click', e => { if (S.mode === 'after') { e.stopPropagation(); toggle(id); } });
+    g.addEventListener('keydown', e => { if (S.mode === 'after' && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(id); } });
+  });
+  svg.querySelectorAll('[data-rc]').forEach(el => el.addEventListener('click', e => e.stopPropagation()));
+}
+function toggle(id) { S.sel = S.sel === id ? null : id; update(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.sel) { const id = S.sel; S.sel = null; update(); svg.querySelector(`[data-lane="${id}"]`)?.focus({ preventScroll: true }); } });
+document.addEventListener('click', e => { if (S.mode === 'after' && S.sel && !pop.contains(e.target)) { S.sel = null; update(); } });
+
+function update() {
+  const after = S.mode === 'after';
+  const sel = after ? S.sel : null;
+  const act = after ? null : S.active;
+  svg.querySelectorAll('.lane').forEach((g, i) => {
+    const li = laneInfo[i], id = li.lane.id;
+    const hi = act === id;
+    g.setAttribute('opacity', act !== null && act !== id ? 0.35 : 1);               // :249 dim
+    g.querySelector('.lbl').setAttribute('font-weight', hi ? 700 : 550);              // :302
+    g.querySelector('.bar').setAttribute('opacity', hi ? 1 : 0.86);                   // :315
+    g.querySelector('.dot').setAttribute('r', hi ? 7.5 : 6);                          // :411
+    g.classList.toggle('sel', sel === id);
+    g.setAttribute('aria-expanded', String(sel === id));
+  });
+  // readout
+  if (!after && act) {
+    const li = laneInfo.find(l => l.lane.id === act);
+    readout.innerHTML = `<b>${esc(li.lane.name())}</b> · ` + li.lane.events.slice(0, 4).map(e => esc(t().ev(Math.round(e.remaining), t().win[e.label], stamp(e.at)))).join('  ·  ');
+  } else readout.textContent = after ? t().hintAfter : t().hintBefore;
+  // popover
+  if (!sel) { pop.classList.remove('on'); return; }
+  const li = laneInfo.find(l => l.lane.id === sel);
+  let p = `<h4>${esc(li.title)}</h4>` + li.lane.events.map(e => `<div class="ev"><i class="${li.hasGap && e === li.gapEvent ? 'red' : ''}"></i><span>${esc(t().ev(Math.round(e.remaining), t().win[e.label], stamp(e.at)))}</span></div>`).join('');
+  if (li.hasGap) p += `<div class="gap">${esc(gapLabel(li.gapEvent.at - li.gapEvent.runOut))}</div>`;
+  p += `<button class="go" type="button">${esc(t().go)}</button>`;
+  const wasOn = pop.classList.contains('on') && pop.dataset.for === sel;
+  pop.innerHTML = p; pop.dataset.for = sel; pop.setAttribute('aria-label', li.title);
+  pop.querySelector('.go').addEventListener('click', () => { document.getElementById('wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+  const sr = svg.getBoundingClientRect(), wr = wrap.getBoundingClientRect(), sc = sr.width / 1040;
+  const pw = 318;
+  let left = (sr.left - wr.left) + li.resX * sc - 30;
+  left = Math.max(10, Math.min(left, wr.width - pw - 10));
+  pop.style.left = left + 'px'; pop.style.top = ((sr.top - wr.top) + (li.y + 29) * sc) + 'px';
+  if (!wasOn) { pop.classList.remove('on'); void pop.offsetWidth; }
+  pop.classList.add('on');
+}
+
+/* ---------- controls ---------- */
+function syncCtl() {
+  for (const [gid, key] of [['gMode', 'mode'], ['gTheme', 'theme'], ['gLang', 'lang']])
+    document.querySelectorAll(`#${gid} button`).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === S[key])));
+  const zh = S.lang === 'zh';
+  document.getElementById('note').textContent = S.mode === 'before'
+    ? (zh ? '现状：在行上快速上下扫，观察其余行 0.35↔1 闪烁（行间空白是死区）' : 'Current: sweep the mouse over the rows — others flash 0.35↔1 (gaps between rows are dead zones)')
+    : (zh ? '改后：指上去没有任何变化；点一行出详情，再点 / Esc / 点空白收起' : 'After: hover changes nothing; click a row for details, click again / Esc / click outside to close');
+  const tag = document.getElementById('bTag');
+  tag.className = S.mode; tag.textContent = S.mode === 'before' ? 'BEFORE' : 'AFTER';
+  document.getElementById('bSub').textContent = S.mode === 'before' ? (zh ? '现在 · 指一行：其余行变暗' : 'Now · hover dims the other rows') : (zh ? '改后 · 指一行：什么都不变' : 'After · hover changes nothing');
+  document.getElementById('cap').textContent = S.mode === 'before'
+    ? (zh ? '快速上下扫过 4 行：其余行在 0.35 ↔ 1 之间来回闪，行名还会加粗抖动。' : 'Sweeping fast over 4 rows: the other rows flash 0.35 ↔ 1 and labels jump in weight.')
+    : (zh ? '同样的扫动：画面静止。点一行看详情，再点一次或按 Esc 收起。' : 'Same sweep: nothing moves. Click a row for details; click again or press Esc to close.');
+}
+document.querySelectorAll('#ctl .grp').forEach(grp => grp.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const key = { gMode: 'mode', gTheme: 'theme', gLang: 'lang' }[grp.id];
+  S[key] = b.dataset.v; S.active = null; S.sel = null; syncCtl(); render();
+}));
+window.addEventListener('resize', () => { if (S.sel) update(); });
+
+/* fake cursor for recordings */
+const cur = document.getElementById('cursor');
+addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
+  const onLane = !!e.target.closest?.('.lane');
+  document.getElementById('cArrow').style.display = onLane ? 'none' : ''; document.getElementById('cHand').style.display = onLane ? '' : 'none';
+}, true);
+
+window.__S = S; window.__laneY = id => { const i = laneInfo.findIndex(l => l.lane.id === id); const sr = svg.getBoundingClientRect(); return { x: sr.left + 700 * sr.width / 1040, y: sr.top + laneInfo[i].y * sr.width / 1040 }; };
+syncCtl(); render();
+})();
+</script>
+</body>
+</html>

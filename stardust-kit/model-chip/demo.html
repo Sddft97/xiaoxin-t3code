@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>星尘 · 模型 chip 紧凑化方案（设计稿）</title>
+<style>
+/* =====================================================================
+   星尘 model chip 紧凑化 · 纯视觉稿（未改动任何 app 仓库）
+   色板：light = Apple-neutral（紫仅作小面积强调 #5B4BE0）；dark = 夜紫（强调 #6A5AF0）
+   ===================================================================== */
+*{box-sizing:border-box}
+:root{--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB",sans-serif}
+.th-light{
+  --page:#F5F5F7;--surface:#fff;--fg:#1D1D1F;--fg2:rgba(60,60,67,.74);--fg3:rgba(60,60,67,.46);
+  --chip:#F1F1F3;--chip-h:#E7E7EB;--hair:rgba(0,0,0,.09);--line:rgba(0,0,0,.10);
+  --tile:#fff;--tile-ring:rgba(0,0,0,.10);--tile-sh:0 .5px 1.5px rgba(0,0,0,.10);--logo:#EDEDF0;
+  --acc:#5B4BE0;--acc-thin:#5B4BE0;--acc-bg:rgba(91,75,224,.10);--acc-fg:#5B4BE0;
+  --ink:#1D1D1F;--ink-fg:#fff;--oai:#000;--pop:#fff;--pop-sh:0 0 0 .5px rgba(0,0,0,.10),0 10px 28px -6px rgba(0,0,0,.20);
+  --comp-sh:0 0 0 .5px rgba(0,0,0,.10),0 8px 24px -8px rgba(0,0,0,.10);--ok:#1d8a3f;--warn:#9A5200;
+}
+.th-dark{
+  --page:#0B0A1F;--surface:#171538;--fg:#F2F0FF;--fg2:rgba(212,204,255,.72);--fg3:rgba(212,204,255,.46);
+  --chip:#272454;--chip-h:#322F68;--hair:rgba(212,204,255,.12);--line:rgba(212,204,255,.14);
+  --tile:#37336F;--tile-ring:rgba(212,204,255,.16);--tile-sh:0 .5px 1.5px rgba(0,0,0,.35);--logo:#26235A;
+  --acc:#6A5AF0;--acc-thin:#8D7DFF;--acc-bg:rgba(141,125,255,.18);--acc-fg:#B3A8FF;
+  --ink:#F2F0FF;--ink-fg:#171538;--oai:#fff;--pop:#26235A;--pop-sh:0 0 0 .5px rgba(212,204,255,.16),0 14px 34px -6px rgba(3,2,20,.7);
+  --comp-sh:0 0 0 .5px rgba(212,204,255,.14),0 14px 36px -10px rgba(3,2,20,.7);--ok:#30d158;--warn:#FFC65C;
+}
+html,body{margin:0}
+body{font:14px/1.5 var(--font);background:#ECECF0;color:#1D1D1F;-webkit-font-smoothing:antialiased}
+.page{width:1360px;margin:0 auto;padding:44px 0 90px}
+h1{font-size:30px;line-height:1.25;margin:0 0 6px;letter-spacing:-.01em}
+h2{font-size:21px;margin:0 0 4px;letter-spacing:-.005em}
+h3{font-size:15px;margin:0 0 6px}
+p.lead{color:#555a66;margin:0 0 4px;max-width:980px}
+.sec{margin-top:54px;padding-top:6px}
+.sec>p{color:#5b6070;margin:2px 0 16px;max-width:1040px}
+.muted{color:#6b7080}
+code,.mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+.card{background:#fff;border-radius:16px;box-shadow:0 0 0 .5px rgba(0,0,0,.08),0 6px 20px -10px rgba(0,0,0,.12);padding:20px 22px}
+.reco{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;align-items:center}
+.reco b.tag{display:inline-block;background:#5B4BE0;color:#fff;border-radius:999px;font-size:11px;padding:2px 9px;margin-right:6px;vertical-align:2px}
+ul.tight{margin:6px 0 0;padding-left:18px}ul.tight li{margin:3px 0}
+
+/* ---- stage: 一块 composer 表面，用来放 chip ---- */
+.stage{background:var(--surface);color:var(--fg);border-radius:12px;box-shadow:inset 0 0 0 .5px var(--line);padding:16px 18px;display:flex;align-items:center;gap:14px;min-height:62px;position:relative}
+.stage.pad{padding:22px 22px}
+.stage .lab{font-size:11px;color:var(--fg3)}
+.grid-m{display:grid;grid-template-columns:230px 1fr 1fr 150px;gap:10px 12px;align-items:stretch}
+.grid-m .hd{font-size:12px;color:#6b7080;padding:0 4px;display:flex;align-items:end}
+.vname{display:flex;flex-direction:column;justify-content:center;gap:2px;padding:4px 6px}
+.vname b{font-size:14px}.vname span{font-size:12px;color:#6b7080;line-height:1.4}
+.vname .star{color:#5B4BE0}
+.wcell{display:flex;flex-direction:column;justify-content:center;font-size:12px;color:#444;gap:1px;padding-left:4px}
+.wcell b{font-size:15px;font-variant-numeric:tabular-nums}.neg{color:#1d8a3f;font-weight:600}.pos{color:#c0262d;font-weight:600}
+.pair{display:flex;gap:18px;align-items:center}
+.pair .lab{font-size:11px;color:var(--fg3);width:34px;flex:none}
+
+/* ================== model chip（共用） ================== */
+.chip{display:inline-flex;align-items:center;gap:6px;height:28px;border-radius:999px;background:var(--chip);color:var(--fg);
+  font:560 12px/1 var(--font);white-space:nowrap;position:relative;flex:none;border:0;padding:0;cursor:default;transition:background .16s}
+.chip:hover,.chip.hov{--chip:var(--chip-h)}
+.chip .nm{display:block;overflow:hidden;text-overflow:ellipsis;max-width:var(--nmw,128px);line-height:15px;letter-spacing:.005em}
+svg.pv{width:15px;height:15px;display:block;flex:none;overflow:visible}
+.pv.claude{color:#D97757}.pv.codex,.pv.grok,.pv.ollama{color:var(--oai)}
+.tile{position:relative;width:22px;height:22px;border-radius:7px;background:var(--tile);flex:none;display:grid;place-items:center;
+  box-shadow:inset 0 0 0 .5px var(--tile-ring),var(--tile-sh)}
+/* 账号角标：墨色实心 + 与 chip 底同色的环形镂空 → 任何底色上都清晰 */
+.bdg{position:absolute;right:-4px;bottom:-3px;min-width:12.5px;height:12.5px;padding:0 2.5px;border-radius:7px;background:var(--ink);color:var(--ink-fg);
+  font:700 9.5px/12.5px var(--font);text-align:center;box-shadow:0 0 0 1.5px var(--chip);font-variant-numeric:tabular-nums;letter-spacing:0;pointer-events:none}
+/* 推理强度：柱状（沿用 app 现有 EffortGlyph 的几何：2px 宽、3px 步长、整数像素） */
+svg.bars{width:14px;height:10px;display:block;flex:none;overflow:visible}
+svg.bars rect{fill:var(--fg3);opacity:.38}svg.bars rect.on{fill:var(--acc-thin);opacity:1}
+
+/* --- 现状 chip（忠实复刻：19px 瓷砖 + 13px 图标 + 12px/7px 字角标 + 前缀 + 色点药丸） --- */
+.chip.cur{height:30px;padding:0 9px 0 6px}
+.cur .ctile{position:relative;width:19px;height:19px;border-radius:6px;background:var(--logo);box-shadow:inset 0 0 0 .5px var(--hair);display:grid;place-items:center;flex:none}
+.cur .ctile svg.pv{width:13px;height:13px}
+.cur .cbdg{position:absolute;right:-2px;bottom:-2px;height:12px;min-width:12px;padding:0 2px;border-radius:999px;background:var(--surface);color:var(--fg3);border:1px solid var(--logo);
+  font:600 7px/10px var(--font);text-align:center;box-shadow:0 .5px 1px rgba(0,0,0,.18)}
+.cur .nm{font-size:12px;max-width:none}
+.cur .tier{display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:999px;background:var(--surface);box-shadow:inset 0 0 0 .5px var(--hair);font:650 10.5px/1.25 var(--font);color:var(--fg2)}
+.cur .tier i{width:6.5px;height:6.5px;border-radius:50%;display:block}
+
+/* --- A 数字角标 + 柱状 --- */
+.v-a{padding:0 9px 0 3px}
+/* --- B 色环 + 弧 --- */
+.v-b{padding:0 10px 0 0;gap:7px}
+.rw{position:relative;width:28px;height:28px;flex:none}
+.rw svg.ring{position:absolute;inset:0;width:28px;height:28px;overflow:visible}
+.rw .tile{position:absolute;left:4px;top:4px;width:20px;height:20px;border-radius:50%}
+.rw .tile svg.pv{width:13.5px;height:13.5px}
+.rw .bdg{opacity:0;transform:scale(.7);transition:.16s;right:-3px;bottom:-3px}
+.chip:hover .rw .bdg,.chip.hov .rw .bdg{opacity:1;transform:none}
+/* --- C 胶囊分段 + 星 --- */
+.v-c{padding:0 9px 0 3px}
+.seg{height:22px;border-radius:11px;background:var(--tile);box-shadow:inset 0 0 0 .5px var(--tile-ring),var(--tile-sh);display:flex;align-items:center;padding:0 7px 0 3.5px;flex:none}
+.seg i.sep{width:1px;height:10px;background:var(--hair);margin:0 5px 0 5px}
+.seg b{font:650 11px/1 var(--font);font-variant-numeric:tabular-nums;color:var(--fg)}
+svg.stars{height:6.5px;width:32px;display:block;flex:none;overflow:visible}
+svg.stars path{fill:var(--fg3);opacity:.32}svg.stars path.on{fill:var(--acc-thin);opacity:1}
+/* --- D 角标 + 零宽度强度轨 --- */
+.v-d{padding:0 9px 0 3px}
+.v-d .tx{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px}
+.rail{display:flex;gap:1.5px;height:2px}
+.rail i{width:5px;height:2px;border-radius:1px;background:var(--fg3);opacity:.34}
+.rail i.on{background:var(--acc-thin);opacity:1}
+
+/* tooltip */
+.tipw{position:relative;display:inline-flex}
+.tip{position:absolute;left:0;bottom:calc(100% + 8px);background:var(--pop);color:var(--fg);box-shadow:var(--pop-sh);border-radius:10px;padding:8px 11px;font:500 12px/1.45 var(--font);white-space:nowrap;z-index:5;min-width:170px}
+.tip b{font-weight:650}.tip .r2{color:var(--fg2);margin-top:1px;display:flex;align-items:center;gap:6px}
+.tip .sub{color:var(--fg3);font-size:11px;margin-top:3px}
+.tip:after{content:"";position:absolute;left:18px;bottom:-4px;width:8px;height:8px;background:var(--pop);transform:rotate(45deg);box-shadow:1px 1px 0 var(--line)}
+.tip.stat{position:static;display:inline-block}.tip.stat:after{display:none}
+
+/* ================== composer 复刻 ================== */
+.comp{background:var(--surface);border-radius:20px;box-shadow:var(--comp-sh);color:var(--fg);width:100%}
+.comp .ed{padding:15px 18px 0;min-height:44px;font-size:13.5px;color:var(--fg3);line-height:1.4;white-space:nowrap;overflow:hidden}
+.comp .cf{display:flex;align-items:center;gap:6px;padding:0 12px 10px 12px;height:46px}
+.comp .sp{flex:1}
+.sfb{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--fg2);flex:none}
+.sfb svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.perm{display:inline-flex;align-items:center;gap:4.5px;height:28px;padding:0 10px 0 9px;border-radius:999px;font:580 11.5px/1 var(--font);flex:none;background:var(--acc-bg);color:var(--acc-fg);box-shadow:inset 0 0 0 .5px color-mix(in srgb,var(--acc-fg) 26%,transparent);white-space:nowrap}
+.perm svg{width:13.5px;height:13.5px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.send{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--acc);color:#fff;flex:none;box-shadow:0 2px 10px color-mix(in srgb,var(--acc) 26%,transparent)}
+.send svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.cmpcard{display:grid;grid-template-columns:150px 1fr 1fr;gap:12px;align-items:stretch;margin-bottom:14px}
+.cmpcard .vname{padding:6px 4px}
+.thbox{border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:var(--page);box-shadow:inset 0 0 0 .5px var(--line)}
+.thbox .tg{font-size:11px;color:var(--fg3);display:flex;justify-content:space-between}
+.thbox .tg b{color:var(--fg2);font-weight:600}
+
+/* ================== 长名字 / 状态 ================== */
+.grid-n{display:grid;grid-template-columns:200px repeat(5,1fr);gap:8px;align-items:center}
+.grid-n .stage{min-height:54px;padding:10px 12px;justify-content:flex-start;overflow:hidden}
+.grid-n .hd{font-size:12px;color:#6b7080;padding:0 4px}
+.grid-n .rn{font-size:12.5px;padding:2px 4px;line-height:1.35}.grid-n .rn small{display:block;color:#7a7f8e;font-size:11px}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.rules .card{padding:16px 18px;font-size:13px}.rules h3{margin-bottom:4px}
+.lv5{display:flex;flex-wrap:wrap;gap:10px 14px}
+.grid-l{display:grid;grid-template-columns:190px 1fr;gap:8px 12px;align-items:center}
+
+/* ================== 图标集 ================== */
+.icgrid{display:grid;grid-template-columns:130px repeat(5,1fr);gap:8px}
+.icgrid .hd{font-size:11.5px;color:#6b7080;padding:2px 4px;line-height:1.35}
+.icgrid .rn{font-weight:600;font-size:13px;display:flex;align-items:center;padding-left:4px}
+.icc{display:flex;align-items:center;justify-content:center;gap:12px;min-height:50px;border-radius:12px;background:var(--surface);color:var(--fg);box-shadow:inset 0 0 0 .5px var(--line)}
+.bare svg.pv{width:var(--s)}
+.tint{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;background:var(--tt);box-shadow:inset 0 0 0 .5px var(--tile-ring)}
+.tile.lg{width:var(--ts);height:var(--ts)}
+
+.pxbox{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.pxbox figure{margin:0}
+.pxbox figcaption{font-size:12px;color:#6b7080;margin:6px 0 0}
+img.px{image-rendering:pixelated;display:block;border-radius:8px;box-shadow:0 0 0 .5px rgba(0,0,0,.14)}
+img.nat{display:block;border-radius:8px;box-shadow:0 0 0 .5px rgba(0,0,0,.14)}
+
+/* ================== 导出视图 ================== */
+body[data-view=strip],body[data-view=icons]{background:transparent}
+body[data-view=strip] .page,body[data-view=icons] .page{width:auto;padding:0}
+.stripwrap{display:inline-block}
+.striprow{display:flex;gap:0}
+.stripcol{padding:10px 12px;display:flex;flex-direction:column;gap:9px;background:var(--surface);color:var(--fg)}
+.stripcol .chip{align-self:flex-start}
+.sheet{width:1920px;height:1080px;background:linear-gradient(180deg,#F2F2F6,#E8E8EE);padding:36px 48px 30px;position:relative;overflow:hidden;color:#1D1D1F}
+.sheet h1{font-size:34px;margin:0}
+.sheet .sub{font-size:16px;color:#5b6070;margin-top:2px}
+.sheet .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:20px}
+.sheet .col{border-radius:22px;padding:14px 16px 12px;background:var(--page);box-shadow:inset 0 0 0 .5px var(--line);color:var(--fg)}
+.sheet .col .ch{display:flex;justify-content:space-between;font-size:13px;color:var(--fg3);margin:0 4px 6px}
+.sheet .row{display:grid;grid-template-columns:128px 1fr;gap:14px;align-items:center;margin-bottom:13px}
+.sheet .row .vname{padding:0 2px}.sheet .row .vname b{font-size:15px;color:var(--fg)}.sheet .row .vname span{color:var(--fg3);font-size:11.5px}
+.sheet .row .comp .ed{padding-top:14px;min-height:42px;font-size:13.5px}
+.sheet .row .comp .cf{height:48px;padding-bottom:10px}
+.sheet .foot{display:grid;grid-template-columns:560px 1fr 360px;gap:26px;margin-top:6px;align-items:stretch}
+.sheet .others{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:2px}
+.sheet .others .stage{flex-wrap:wrap;gap:12px 14px;padding:12px 16px;min-height:0}
+.sheet .fcard{border-radius:20px;padding:14px 18px;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.08)}
+.sheet .fcard h3{font-size:14px;margin:0 0 8px;color:#444}
+.sheet .reco2{background:#5B4BE0;color:#fff;border-radius:20px;padding:16px 20px;display:flex;flex-direction:column;justify-content:center}
+.sheet .reco2 b{font-size:20px}.sheet .reco2 span{font-size:13.5px;opacity:.9;line-height:1.5;margin-top:4px}
+.sheet .zoom{display:flex;gap:14px;align-items:center}
+.zoomwrap{zoom:2.6}
+.sheet .iconrow{display:flex;gap:10px}
+.sheet .iconrow>div{padding:8px 12px;border-radius:12px;display:flex;gap:10px;align-items:center;background:var(--surface);box-shadow:inset 0 0 0 .5px var(--line)}
+</style>
+<script>
+addEventListener('DOMContentLoaded', () => {
+  if ("model-chip" === 'slider-r4-q') document.querySelector('#vSeg [data-l="Q"]').click();
+  const component = document.querySelector(".reco .stage.th-dark .v-d");
+  if (!component) throw new Error('Missing original workshop component: ' + ".reco .stage.th-dark .v-d");
+  const stage = document.createElement('div');
+  stage.id = 'workshop-original';
+  document.body.insertBefore(stage, document.body.firstChild);
+  let branch = component;
+  while (branch.parentElement !== document.body) {
+    const parent = branch.parentElement;
+    for (const sibling of parent.children) {
+      if (sibling === branch) continue;
+      if ("model-chip" === 'v16-stardust-observatory' && sibling.matches('.card')) {
+        sibling.inert = true;
+        sibling.style.cssText += ';position:fixed;left:0;top:0;width:min(280px,100vw);visibility:hidden;pointer-events:none';
+      } else sibling.style.setProperty('display', 'none', 'important');
+    }
+    branch = parent;
+  }
+  for (const child of document.body.children) {
+    if (child !== stage && child !== branch && !child.matches('svg,script,style')) {
+      child.style.setProperty('display', 'none', 'important');
+    }
+  }
+  stage.append(branch);
+  for (let el = branch; el !== component; el = [...el.children].find(n => n.contains(component))) {
+    el.style.cssText += ';display:block!important;width:100%;min-width:0;max-width:none;margin:0;padding:0;min-height:0;background:transparent;border:0;box-shadow:none';
+  }
+  document.body.style.cssText += ';width:auto;max-width:none;margin:0;padding:0;background:#111025;min-height:0';
+  document.documentElement.style.background = '#111025';
+  if (component.matches('.gx,.cos')) {
+    const row = () => {
+      stage.style.width = '360px';
+      stage.style.marginInline = 'auto';
+      stage.style.zoom = Math.min(1, document.documentElement.clientWidth / 360);
+    };
+    row();
+    addEventListener('resize', row);
+  }
+});
+</script></head>
+<body data-view="page">
+<!-- 全局 defs：Gemini 渐变 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <linearGradient id="g-gem" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#4285F4"/><stop offset=".52" stop-color="#9B72CB"/><stop offset="1" stop-color="#D96570"/></linearGradient>
+</defs></svg>
+<div class="page th-light" id="root"></div>
+
+<script>
+/* ---------------------------------------------------------------- 数据 */
+const D = {
+  claude: "m50.228 170.321 50.357-28.257.843-2.463-.843-1.361h-2.462l-8.426-.518-28.775-.778-24.952-1.037-24.175-1.296-6.092-1.297L0 125.796l.583-3.759 5.12-3.434 7.324.648 16.202 1.101 24.304 1.685 17.629 1.037 26.118 2.722h4.148l.583-1.685-1.426-1.037-1.101-1.037-25.147-17.045-27.22-18.017-14.258-10.37-7.713-5.25-3.888-4.925-1.685-10.758 7-7.713 9.397.649 2.398.648 9.527 7.323 20.35 15.75L94.817 91.9l3.889 3.24 1.555-1.102.195-.777-1.75-2.917-14.453-26.118-15.425-26.572-6.87-11.018-1.814-6.61c-.648-2.723-1.102-4.991-1.102-7.778l7.972-10.823L71.42 0 82.05 1.426l4.472 3.888 6.61 15.101 10.694 23.786 16.591 32.34 4.861 9.592 2.592 8.879.973 2.722h1.685v-1.556l1.36-18.211 2.528-22.36 2.463-28.776.843-8.1 4.018-9.722 7.971-5.25 6.222 2.981 5.12 7.324-.713 4.73-3.046 19.768-5.962 30.98-3.889 20.739h2.268l2.593-2.593 10.499-13.934 17.628-22.036 7.778-8.749 9.073-9.657 5.833-4.601h11.018l8.1 12.055-3.628 12.443-11.342 14.388-9.398 12.184-13.48 18.147-8.426 14.518.778 1.166 2.01-.194 30.46-6.481 16.462-2.982 19.637-3.37 8.88 4.148.971 4.213-3.5 8.62-20.998 5.184-24.628 4.926-36.682 8.685-.454.324.519.648 16.526 1.555 7.065.389h17.304l32.21 2.398 8.426 5.574 5.055 6.805-.843 5.184-12.962 6.611-17.498-4.148-40.83-9.721-14-3.5h-1.944v1.167l11.666 11.406 21.387 19.314 26.767 24.887 1.36 6.157-3.434 4.86-3.63-.518-23.526-17.693-9.073-7.972-20.545-17.304h-1.36v1.814l4.73 6.935 25.017 37.59 1.296 11.536-1.814 3.76-6.481 2.268-7.13-1.297-14.647-20.544-15.1-23.138-12.185-20.739-1.49.843-7.194 77.448-3.37 3.953-7.778 2.981-6.48-4.925-3.436-7.972 3.435-15.749 4.148-20.544 3.37-16.333 3.046-20.285 1.815-6.74-.13-.454-1.49.194-15.295 20.999-23.267 31.433-18.406 19.702-4.407 1.75-7.648-3.954.713-7.064 4.277-6.286 25.47-32.405 15.36-20.092 9.917-11.6-.065-1.686h-.583L44.07 198.125l-12.055 1.555-5.185-4.86.648-7.972 2.463-2.593 20.35-13.999-.064.065Z",
+  openai: "M252.794 108.802C289.191 99.0484 326.265 110.305 351.148 135.135C385.113 126.072 422.85 134.862 449.492 161.505C476.136 188.149 484.925 225.888 475.862 259.85V259.854C500.696 284.735 511.95 321.81 502.198 358.207C492.447 394.602 464.161 421.084 430.215 430.217C421.083 464.162 394.603 492.448 358.206 502.199C321.812 511.951 284.734 500.693 259.852 475.864C225.887 484.927 188.15 476.137 161.507 449.495C134.864 422.851 126.073 385.111 135.136 351.149C110.304 326.266 99.0496 289.192 108.801 252.795C118.552 216.4 146.84 189.918 180.784 180.785C189.917 146.841 216.396 118.553 252.794 108.802ZM374.292 407.145C374.292 411.271 372.092 415.086 368.517 417.148L283.723 466.102C302.487 480.585 327.555 486.459 352.217 479.852C386.997 470.532 410.068 439.312 410.555 405.006V317.717C410.555 315.08 409.125 312.621 406.843 311.303L374.292 292.509V407.145ZM251.868 415.897C248.296 417.959 243.893 417.959 240.317 415.897L155.526 366.942C152.366 390.436 159.811 415.08 177.866 433.136H177.863C203.325 458.594 241.896 462.962 271.85 446.232L347.449 402.586C349.735 401.268 351.148 398.8 351.148 396.163V358.579L251.868 415.897ZM368.602 220.628C366.319 219.309 363.474 219.318 361.191 220.637L328.641 239.431L427.921 296.749C431.496 298.811 433.697 302.627 433.697 306.752V404.661C455.622 395.654 473.244 376.881 479.851 352.218C489.169 317.442 473.668 281.85 444.201 264.274L368.602 220.628ZM177.303 206.34C155.377 215.348 137.756 234.122 131.148 258.783C121.832 293.561 137.331 329.153 166.799 346.727L242.398 390.373C244.68 391.692 247.525 391.684 249.807 390.366L282.357 371.572L183.078 314.253C179.504 312.189 177.303 308.375 177.303 304.251V206.34ZM259.849 279.145V331.858L305.5 358.213L351.15 331.858V279.145L305.5 252.789L259.849 279.145ZM327.276 144.9C308.512 130.418 283.445 124.543 258.782 131.15C224.002 140.471 200.931 171.691 200.445 205.995V293.286C200.445 295.923 201.875 298.381 204.158 299.7L236.707 318.493V203.856C236.707 199.731 238.909 195.916 242.483 193.853L327.276 144.9ZM433.137 177.867C407.675 152.407 369.103 148.038 339.149 164.769L263.55 208.415C261.265 209.734 259.852 212.202 259.852 214.838V252.423L359.132 195.105C362.703 193.041 367.108 193.041 370.682 195.105L455.473 244.06C458.635 220.567 451.189 195.922 433.135 177.867H433.137Z",
+  ollama: "M16.361 10.26a.894.894 0 0 0-.558.47l-.072.148.001.207c0 .193.004.217.059.353.076.193.152.312.291.448.24.238.51.3.872.205a.86.86 0 0 0 .517-.436.752.752 0 0 0 .08-.498c-.064-.453-.33-.782-.724-.897a1.06 1.06 0 0 0-.466 0zm-9.203.005c-.305.096-.533.32-.65.639a1.187 1.187 0 0 0-.06.52c.057.309.31.59.598.667.362.095.632.033.872-.205.14-.136.215-.255.291-.448.055-.136.059-.16.059-.353l.001-.207-.072-.148a.894.894 0 0 0-.565-.472 1.02 1.02 0 0 0-.474.007Zm4.184 2c-.131.071-.223.25-.195.383.031.143.157.288.353.407.105.063.112.072.117.136.004.038-.01.146-.029.243-.02.094-.036.194-.036.222.002.074.07.195.143.253.064.052.076.054.255.059.164.005.198.001.264-.03.169-.082.212-.234.15-.525-.052-.243-.042-.28.087-.355.137-.08.281-.219.324-.314a.365.365 0 0 0-.175-.48.394.394 0 0 0-.181-.033c-.126 0-.207.03-.355.124l-.085.053-.053-.032c-.219-.13-.259-.145-.391-.143a.396.396 0 0 0-.193.032zm.39-2.195c-.373.036-.475.05-.654.086-.291.06-.68.195-.951.328-.94.46-1.589 1.226-1.787 2.114-.04.176-.045.234-.045.53 0 .294.005.357.043.524.264 1.16 1.332 2.017 2.714 2.173.3.033 1.596.033 1.896 0 1.11-.125 2.064-.727 2.493-1.571.114-.226.169-.372.22-.602.039-.167.044-.23.044-.523 0-.297-.005-.355-.045-.531-.288-1.29-1.539-2.304-3.072-2.497a6.873 6.873 0 0 0-.855-.031zm.645.937a3.283 3.283 0 0 1 1.44.514c.223.148.537.458.671.662.166.251.26.508.303.82.02.143.01.251-.043.482-.08.345-.332.705-.672.957a3.115 3.115 0 0 1-.689.348c-.382.122-.632.144-1.525.138-.582-.006-.686-.01-.853-.042-.57-.107-1.022-.334-1.35-.68-.264-.28-.385-.535-.45-.946-.03-.192.025-.509.137-.776.136-.326.488-.73.836-.963.403-.269.934-.46 1.422-.512.187-.02.586-.02.773-.002zm-5.503-11a1.653 1.653 0 0 0-.683.298C5.617.74 5.173 1.666 4.985 2.819c-.07.436-.119 1.04-.119 1.503 0 .544.064 1.24.155 1.721.02.107.031.202.023.208a8.12 8.12 0 0 1-.187.152 5.324 5.324 0 0 0-.949 1.02 5.49 5.49 0 0 0-.94 2.339 6.625 6.625 0 0 0-.023 1.357c.091.78.325 1.438.727 2.04l.13.195-.037.064c-.269.452-.498 1.105-.605 1.732-.084.496-.095.629-.095 1.294 0 .67.009.803.088 1.266.095.555.288 1.143.503 1.534.071.128.243.393.264.407.007.003-.014.067-.046.141a7.405 7.405 0 0 0-.548 1.873c-.062.417-.071.552-.071.991 0 .56.031.832.148 1.279L3.42 24h1.478l-.05-.091c-.297-.552-.325-1.575-.068-2.597.117-.472.25-.819.498-1.296l.148-.29v-.177c0-.165-.003-.184-.057-.293a.915.915 0 0 0-.194-.25 1.74 1.74 0 0 1-.385-.543c-.424-.92-.506-2.286-.208-3.451.124-.486.329-.918.544-1.154a.787.787 0 0 0 .223-.531c0-.195-.07-.355-.224-.522a3.136 3.136 0 0 1-.817-1.729c-.14-.96.114-2.005.69-2.834.563-.814 1.353-1.336 2.237-1.475.199-.033.57-.028.776.01.226.04.367.028.512-.041.179-.085.268-.19.374-.431.093-.215.165-.333.36-.576.234-.29.46-.489.822-.729.413-.27.884-.467 1.352-.561.17-.035.25-.04.569-.04.319 0 .398.005.569.04a4.07 4.07 0 0 1 1.914.997c.117.109.398.457.488.602.034.057.095.177.132.267.105.241.195.346.374.43.14.068.286.082.503.045.343-.058.607-.053.943.016 1.144.23 2.14 1.173 2.581 2.437.385 1.108.276 2.267-.296 3.153-.097.15-.193.27-.333.419-.301.322-.301.722-.001 1.053.493.539.801 1.866.708 3.036-.062.772-.26 1.463-.533 1.854a2.096 2.096 0 0 1-.224.258.916.916 0 0 0-.194.25c-.054.109-.057.128-.057.293v.178l.148.29c.248.476.38.823.498 1.295.253 1.008.231 2.01-.059 2.581a.845.845 0 0 0-.044.098c0 .006.329.009.732.009h.73l.02-.074.036-.134c.019-.076.057-.3.088-.516.029-.217.029-1.016 0-1.258-.11-.875-.295-1.57-.597-2.226-.032-.074-.053-.138-.046-.141.008-.005.057-.074.108-.152.376-.569.607-1.284.724-2.228.031-.26.031-1.378 0-1.628-.083-.645-.182-1.082-.348-1.525a6.083 6.083 0 0 0-.329-.7l-.038-.064.131-.194c.402-.604.636-1.262.727-2.04a6.625 6.625 0 0 0-.024-1.358 5.512 5.512 0 0 0-.939-2.339 5.325 5.325 0 0 0-.95-1.02 8.097 8.097 0 0 1-.186-.152.692.692 0 0 1 .023-.208c.208-1.087.201-2.443-.017-3.503-.19-.924-.535-1.658-.98-2.082-.354-.338-.716-.482-1.15-.455-.996.059-1.8 1.205-2.116 3.01a6.805 6.805 0 0 0-.097.726c0 .036-.007.066-.015.066a.96.96 0 0 1-.149-.078A4.857 4.857 0 0 0 12 3.03c-.832 0-1.687.243-2.456.698a.958.958 0 0 1-.148.078c-.008 0-.015-.03-.015-.066a6.71 6.71 0 0 0-.097-.725C8.997 1.392 8.337.319 7.46.048a2.096 2.096 0 0 0-.585-.041Zm.293 1.402c.248.197.523.759.682 1.388.03.113.06.244.069.292.007.047.026.152.041.233.067.365.098.76.102 1.24l.002.475-.12.175-.118.178h-.278c-.324 0-.646.041-.954.124l-.238.06c-.033.007-.038-.003-.057-.144a8.438 8.438 0 0 1 .016-2.323c.124-.788.413-1.501.696-1.711.067-.05.079-.049.157.013zm9.825-.012c.17.126.358.46.498.888.28.854.36 2.028.212 3.145-.019.14-.024.151-.057.144l-.238-.06a3.693 3.693 0 0 0-.954-.124h-.278l-.119-.178-.119-.175.002-.474c.004-.669.066-1.19.214-1.772.157-.623.434-1.185.68-1.382.078-.062.09-.063.159-.012z"
+};
+const PV = {
+  claude: {n:'Claude', svg:`<svg class="pv claude" viewBox="0 0 256 257"><path fill="currentColor" d="${D.claude}"/></svg>`},
+  codex:  {n:'Codex',  svg:`<svg class="pv codex" viewBox="100 100 411 411"><path fill="currentColor" fill-rule="evenodd" d="${D.openai}"/></svg>`},
+  gemini: {n:'Gemini', svg:`<svg class="pv gemini" viewBox="0 0 24 24"><path fill="url(#g-gem)" d="M12 1.5C12.8 7.6 16.4 11.2 22.5 12C16.4 12.8 12.8 16.4 12 22.5C11.2 16.4 7.6 12.8 1.5 12C7.6 11.2 11.2 7.6 12 1.5Z"/></svg>`},
+  grok:   {n:'Grok',   svg:`<svg class="pv grok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11.2" cy="12.8" r="7.1"/><path d="M5.6 21.2 20.6 2.8"/></svg>`},
+  ollama: {n:'Ollama', svg:`<svg class="pv ollama" viewBox="0 0 24 24"><path fill="currentColor" d="${D.ollama}"/></svg>`}
+};
+const LV = ['低','中','高','超高','极限'];           // 与 星尘 推理强度滑块一致的 5 档
+const LVC = ['#8e8e93','#FF9F0A','#FF5A36','#64D2FF','#BF5AF2'];
+const star = (cx)=>`M${cx} 0l1.9 3.7 4.1.6-3 2.9.7 4.1-3.7-1.9-3.7 1.9.7-4.1-3-2.9 4.1-.6z`;
+const VARS = {
+  cur:{id:'cur',t:'现状',d:'19px 瓷砖 · 13px 图标 · 12px 角标(7px 字) · Claude 前缀 · 色点+文字药丸'},
+  a:{id:'a',t:'A · 数字角标 + 柱状',d:'22px 图标瓷砖 + 墨色数字角标（9.5px / 环形镂空）；强度＝5 根迷你柱，无文字'},
+  b:{id:'b',t:'B · 色环 + 弧',d:'图标外圈色环＝账号（灰/紫），环上弧长＝强度；数字仅悬停出现'},
+  c:{id:'c',t:'C · 分段胶囊 + 星',d:'[图标｜2] 分段胶囊，数字 11px 独立可读；强度＝5 颗星，与星尘滑块同语'},
+  d:{id:'d',t:'D · 角标 + 零宽强度轨',d:'A 的角标 + 强度轨叠在模型名正下方（不占横向宽度）'}
+};
+const initial = pv => PV[pv].n[0];
+
+/* ---------------------------------------------------------------- chip 构造 */
+function bars(lv){ if(!lv) return ''; let r='';
+  for(let i=0;i<5;i++){const h=2+i*2; r+=`<rect class="${i<lv?'on':''}" x="${i*3}" y="${10-h}" width="2" height="${h}"/>`;}
+  return `<svg class="bars" viewBox="0 0 14 10" aria-hidden="true">${r}</svg>`; }
+function stars(lv){ if(!lv) return ''; let r='';
+  for(let i=0;i<5;i++) r+=`<path class="${i<lv?'on':''}" d="${star(i*6.4)}" transform="translate(0 .2) scale(.5)" style="transform-box:fill-box"/>`;
+  // 手动排布：每颗 6.4 宽
+  let p=''; for(let i=0;i<5;i++){ p+=`<g transform="translate(${i*6.5} 0) scale(.54)"><path class="${i<lv?'on':''}" d="M6 0l1.9 3.9 4.2.6-3.1 3 .8 4.2L6 9.6 2.2 11.7 3 7.5-.1 4.5l4.2-.6z"/></g>`; }
+  return `<svg class="stars" viewBox="0 0 32.5 6.5" aria-hidden="true">${p}</svg>`; }
+function ring(lv,acct){ const r=12.25,C=2*Math.PI*r; const col = acct>=2 ? 'var(--acc-thin)' : 'var(--fg3)';
+  const arc = lv? `<circle cx="14" cy="14" r="${r}" fill="none" stroke="${col}" stroke-width="1.75" stroke-linecap="round" stroke-dasharray="${(C*lv/5-1).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 14 14)"/>`:'';
+  return `<svg class="ring" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="${r}" fill="none" stroke="var(--hair)" stroke-width="1.75"/>${arc}</svg>`; }
+function tipText(o){ const who = o.acct? `${PV[o.pv].n} ${o.acct} 号` : PV[o.pv].n;
+  return {who, full: `${who} · ${o.full||o.m}${o.lv?` · 推理强度 ${LV[o.lv-1]}`:''}`}; }
+
+function chip(v,o){ // o:{pv,m,cur,acct,lv,hov,id,w}
+  const {full}=tipText(o), cls=`chip ${v==='cur'?'cur':'v-'+v}${o.hov?' hov':''}`;
+  const at=`aria-label="${full}" data-chip="${o.id||''}"`;
+  if(v==='cur'){
+    const b = o.acct? `<i class="cbdg">${initial(o.pv)}${o.acct}</i>`:'';
+    const tier = o.lv? `<span class="tier"><i style="background:${LVC[o.lv-1]};box-shadow:0 0 5px ${LVC[o.lv-1]}"></i>${LV[o.lv-1]}</span>`:'';
+    return `<span class="${cls}" ${at}><span class="ctile">${PV[o.pv].svg}${b}</span><span class="nm">${o.cur||o.m}</span>${tier}</span>`; }
+  const badge = o.acct? `<i class="bdg">${o.acct}</i>`:'';
+  const nm = `<span class="nm"${o.nmw?` style="--nmw:${o.nmw}px"`:''}>${o.m}</span>`;
+  if(v==='a') return `<span class="${cls}" ${at}><span class="tile">${PV[o.pv].svg}${badge}</span>${nm}${bars(o.lv)}</span>`;
+  if(v==='b') return `<span class="${cls}" ${at}><span class="rw">${ring(o.lv,o.acct)}<span class="tile">${PV[o.pv].svg}</span>${o.acct?`<i class="bdg">${o.acct}</i>`:''}</span>${nm}</span>`;
+  if(v==='c'){ const head = o.acct? `<span class="seg">${PV[o.pv].svg}<i class="sep"></i><b>${o.acct}</b></span>` : `<span class="tile">${PV[o.pv].svg}</span>`;
+    return `<span class="${cls}" ${at}>${head}${nm}${stars(o.lv)}</span>`; }
+  if(v==='d'){ let r=''; if(o.lv){ for(let i=0;i<5;i++) r+=`<i class="${i<o.lv?'on':''}"></i>`; }
+    return `<span class="${cls}" ${at}><span class="tile">${PV[o.pv].svg}${badge}</span><span class="tx">${nm}${o.lv?`<span class="rail">${r}</span>`:''}</span></span>`; }
+}
+function tipHTML(v,o,stat){ const t=tipText(o);
+  const g = o.lv? `<span style="display:inline-flex;gap:6px;align-items:center">推理强度 <b style="color:var(--fg)">${LV[o.lv-1]}</b> <span class="mono" style="color:var(--fg3)">${o.lv}/5</span> ${bars(o.lv)}</span>` : `<span>该模型无推理强度选项</span>`;
+  return `<div class="tip${stat?' stat':''}"><div><b>${t.who}</b> · ${o.full||o.m}</div><div class="r2">${g}</div><div class="sub">点击切换模型与账号</div></div>`; }
+
+/* ---------------------------------------------------------------- composer */
+const IC = {
+ shield:'<svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>',
+ plus:'<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg>',
+ mic:'<svg viewBox="0 0 24 24"><path d="M12 19v3M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="13" rx="3"/></svg>',
+ up:'<svg viewBox="0 0 24 24"><path d="m5 12 7-7 7 7M12 19V5"/></svg>'
+};
+function composer(v,o){ return `<div class="comp"><div class="ed">问点什么… @ 文件、$ 技能、/ 命令</div><div class="cf">
+  <span class="sfb">${IC.plus}</span><span class="sp"></span><span class="perm">${IC.shield}自动</span>${chip(v,o)}<span class="sfb">${IC.mic}</span><span class="send">${IC.up}</span></div></div>`; }
+
+/* ---------------------------------------------------------------- 页面各节 */
+const BASE = {pv:'claude',m:'Opus 5.5',cur:'Claude Opus 5.5',full:'Opus 5.5',lv:3};
+const ORDER=['cur','a','b','c','d'];
+const MODELS = [
+  {k:'opus', pv:'claude', m:'Opus 5.5',  cur:'Claude Opus 5.5', lv:3, label:'Claude Opus 5.5 · 高'},
+  {k:'gpt',  pv:'codex',  m:'GPT-6.2',   cur:'GPT-6.2',         lv:3, label:'Codex GPT-6.2 · 高'},
+  {k:'gem',  pv:'gemini', m:'Gemini 3.1 Pro', cur:'Gemini 3.1 Pro Preview', full:'Gemini 3.1 Pro Preview', lv:2, label:'Gemini 3.1 Pro Preview · 中'},
+  {k:'grok', pv:'grok',   m:'Grok 4.2',  cur:'Grok 4.2',        lv:3, label:'Grok 4.2 · 高'},
+  {k:'qwen', pv:'ollama', m:'Qwen3-Coder-480B', cur:'Qwen3-Coder-480B', lv:0, label:'Qwen3-Coder-480B（本地 · 无强度）'}
+];
+
+function secMatrix(){
+  let h=`<div class="sec" id="s1"><h2>① 现状 vs 四个紧凑方案（chip 本体）</h2>
+  <p>同一个 Claude Opus 5.5（强度「高」）。左：账号数＝1（单账号，不显示任何账号标记）；右：账号数＝2（Claude 2 号）。每格浅色 / 深色各一份。宽度为浏览器实测。</p>
+  <div class="grid-m"><div class="hd"></div><div class="hd">浅色 · 1 个账号 ／ 2 个账号</div><div class="hd">深色 · 1 个账号 ／ 2 个账号</div><div class="hd">实测宽度（2 账号）</div>`;
+  for(const v of ORDER){ const V=VARS[v];
+    h+=`<div class="vname"><b>${V.t.replace(/^(.) · /,(m,a)=>`<span class="star">${a}</span> · `)}</b><span>${V.d}</span></div>`;
+    for(const th of ['light','dark']){
+      h+=`<div class="stage th-${th}"><div class="pair">${chip(v,{...BASE,id:`${v}-${th}-1`})}</div><div class="pair" style="margin-left:auto">${chip(v,{...BASE,acct:2,id:`${v}-${th}-2`})}</div></div>`; }
+    h+=`<div class="wcell" data-w="${v}"></div>`; }
+  h+=`</div>
+  <h3 style="margin-top:26px">强度 5 档（低 · 中 · 高 · 超高 · 极限），Claude 2 号</h3>
+  <div class="grid-m" style="grid-template-columns:230px 1fr 1fr"><div class="hd"></div><div class="hd">浅色</div><div class="hd">深色</div>`;
+  for(const v of ORDER){ h+=`<div class="vname"><b>${VARS[v].t}</b></div>`;
+    for(const th of ['light','dark']){ h+=`<div class="stage th-${th} pad" style="gap:12px;flex-wrap:wrap">${[1,2,3,4,5].map(l=>chip(v,{...BASE,acct:2,lv:l})).join('')}</div>`; } }
+  h+=`</div></div>`; return h; }
+
+function secWidthTable(){
+  let h=`<div class="sec" id="s1b"><h2>② 宽度对比（浏览器实测，px）</h2><p>5 种典型模型 × 2 账号状态。去掉厂商前缀（Claude Opus 5.5 → Opus 5.5）、去掉强度文字。表中为 <b>2 个账号</b> 的宽度；括号为相对现状的变化。</p>
+  <div class="card" style="padding:14px 18px"><table id="wtable" style="width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums"><thead><tr style="text-align:left;color:#6b7080;font-size:12px"><th style="padding:6px 8px">模型</th>`;
+  for(const v of ORDER) h+=`<th style="padding:6px 8px">${VARS[v].t.split(' · ')[0]==='现状'?'现状':VARS[v].t.split(' · ')[0]+' · '+VARS[v].t.split(' · ')[1].split(' ')[0]}</th>`;
+  h+=`</tr></thead><tbody>`;
+  for(const m of MODELS){ h+=`<tr style="border-top:.5px solid #e4e4ea"><td style="padding:7px 8px">${m.label}</td>`; for(const v of ORDER) h+=`<td style="padding:7px 8px" data-wt="${m.k}-${v}"></td>`; h+=`</tr>`; }
+  h+=`</tbody></table></div>
+  <div style="position:absolute;left:-9999px;top:0" class="th-light" id="measure"></div></div>`; return h; }
+
+function secTips(){
+  let h=`<div class="sec" id="s2"><h2>③ 悬停提示（完整信息都放这里）</h2>
+  <p>chip 上只保留「图标 + 型号 + 微标记」；账号、完整型号名、推理强度（含数字 n/5）全部进 tooltip，同一句式：<b>「Claude 2 号 · Opus 5.5 · 推理强度 高」</b>。同时作为 aria-label 供读屏。B 方案悬停时账号数字从色环角上弹出。</p>
+  <div class="grid-l" style="grid-template-columns:190px 1fr 1fr">`;
+  for(const v of ORDER){ h+=`<div class="vname"><b>${VARS[v].t}</b><span>悬停态</span></div>`;
+    for(const th of ['light','dark']){ const o={...BASE,acct:2,hov:true};
+      h+=`<div class="stage th-${th}" style="padding:14px 18px 14px;min-height:128px;align-items:flex-end"><span class="tipw">${tipHTML(v,o)}${chip(v,o)}</span></div>`; } }
+  h+=`</div></div>`; return h; }
+
+function secLong(){
+  const NAMES=[
+   {m:'Gemini 3.1 Pro',cur:'Gemini 3.1 Pro Preview',pv:'gemini',lv:2,full:'Gemini 3.1 Pro Preview',t:'Gemini 3.1 Pro Preview',s:'去掉 Preview / Latest 等修饰词进 tooltip'},
+   {m:'Qwen3-Coder-480B',cur:'Qwen3-Coder-480B',pv:'ollama',lv:0,t:'Qwen3-Coder-480B（本地）',s:'无强度；≤ 16 字符原样显示'},
+   {m:'deepseek-r1…-70b',cur:'deepseek-r1-distill-llama-70b',pv:'ollama',lv:0,full:'deepseek-r1-distill-llama-70b',t:'deepseek-r1-distill-llama-70b',s:'slug 超长 → 中间省略，保留首 11 + 尾 4'},
+   {m:'Opus 5.5 (1M context)',cur:'Claude Opus 5.5 (1M context)',pv:'claude',lv:4,full:'Opus 5.5 (1M context)',t:'Claude Opus 5.5 (1M context)',s:'括号附注超出 128px → 末尾省略'}];
+  let h=`<div class="sec" id="s3"><h2>④ 超长模型名与截断规则</h2><p>统一在 <code>.nm</code> 上加 <code>max-width: 128px</code>（≈ 17 个半角字符）。账号角标、图标、强度标记<b>永不被挤掉</b>，只截断名字。</p>
+  <div class="grid-n"><div class="hd"></div>${ORDER.map(v=>`<div class="hd">${VARS[v].t.split(' ·')[0]==='现状'?'现状':VARS[v].t.split(' ')[0]+' '+VARS[v].t.split(' · ')[1].split(' ')[0]}</div>`).join('')}`;
+  for(const n of NAMES){ h+=`<div class="rn"><b>${n.t}</b><small>${n.s}</small></div>`;
+    for(const v of ORDER){ h+=`<div class="stage th-light">${chip(v,{pv:n.pv,m:n.m,cur:n.cur,full:n.full||n.m,acct:v==='cur'?2:2,lv:n.lv})}</div>`; } }
+  h+=`</div>
+  <div class="rules">
+   <div class="card"><h3>规则 1 · 先瘦身，再截断</h3>去厂商前缀（图标已表达厂商）→ 去 <code>Preview / Latest / Experimental</code> 后缀（进 tooltip）→ 仍 &gt; 16 字符才截断。</div>
+   <div class="card"><h3>规则 2 · slug 型名字中间省略</h3>含 <code>-</code> 或 <code>:</code> 的本地 / 开源模型（尾部＝参数量，信息量大）：首 11 + <code>…</code> + 尾 4。自然语言名字末尾省略。</div>
+   <div class="card"><h3>规则 3 · 窄 composer 的退让顺序</h3>先收强度标记 → 再把名字压到 72px → 最后才隐藏图标瓷砖；<b>账号角标跟随图标，永远最后消失</b>。</div></div></div>`; return h; }
+
+function secLegib(){
+  return `<div class="sec" id="s4"><h2>⑤ 真实像素下的可读性（1x / 2x）</h2>
+  <p>下图是用 <b>deviceScaleFactor=1 / 2</b> 真实渲染出的 PNG（不是矢量放大）。1x 图按原始像素显示，右侧同一张图 <b>最近邻 ×3</b> 放大，便于检查角标数字是否糊成一团。每行：现状 / A / B / C / D（Claude 2 号 · Opus 5.5 · 高）；左浅右深。</p>
+  <div class="card"><h3>1x（普通外接屏）</h3><div class="pxbox"><figure><img class="nat" src="legibility-1x.png" id="i1"><figcaption>原始像素 100%</figcaption></figure><figure><img class="px" src="legibility-1x.png" id="i1z"><figcaption>最近邻 ×3</figcaption></figure></div></div>
+  <div class="card" style="margin-top:14px"><h3>2x（Retina，物理像素显示）</h3><div class="pxbox"><figure><img class="nat" src="legibility-2x.png" id="i2" style="image-rendering:auto"><figcaption>按 1 CSS px ＝ 2 物理 px 显示（本页在 Retina 屏上即真实效果）</figcaption></figure><figure><img class="px" src="legibility-2x.png" id="i2z"><figcaption>最近邻 ×2（相对 2x 原图）</figcaption></figure></div></div>
+  <div class="card" style="margin-top:14px"><h3>结论（肉眼逐项判读）</h3><ul class="tight">
+   <li><b>现状</b>：角标 12px 圆里塞 7px 字（「C2」），1x 下是一团灰点，且和 Codex 的「C」撞首字母；压在图标上，图标被盖掉一半。</li>
+   <li><b>A / D</b>：角标 13px 墨色圆 + 9.5px 粗体单个数字，1x 下数字清晰；环形镂空让它在浅/深底上都不糊。</li>
+   <li><b>B</b>：1x 下色环 + 弧可辨，但「灰环 vs 紫环」只靠颜色；数字不在场时不满足「账号一眼可读」。</li>
+   <li><b>C</b>：数字 11px 独立成段，是所有方案里最清晰的；代价是横向多 ~14px，且 5 颗 6.5px 的星在 1x 下偏糊（柱/轨更利）。</li></ul></div></div>`; }
+
+function secComposer(){
+  let h=`<div class="sec" id="s5"><h2>⑥ 放进完整 composer 复刻：前 / 后</h2><p>底部右侧：「自动」权限 chip · 模型 chip · 麦克风 · 发送。每个方案上面一条是「现状」，下面一条是「之后」，浅色（Apple-neutral）与深色（夜紫）并排。Claude 2 号 · Opus 5.5 · 强度「高」。</p>`;
+  for(const v of ['a','b','c','d']){ h+=`<div class="cmpcard"><div class="vname"><b>${VARS[v].t}</b><span>${VARS[v].d}</span></div>`;
+    for(const th of ['light','dark']){ h+=`<div class="thbox th-${th}"><div class="tg"><span>${th==='light'?'浅色 · Apple-neutral':'深色 · 夜紫'}</span><span class="mono" data-cw="${v}-${th}"></span></div>
+      <div><div class="tg" style="margin-bottom:4px"><b>之前</b></div>${composer('cur',{...BASE,acct:2})}</div>
+      <div><div class="tg" style="margin-bottom:4px"><b>之后</b></div>${composer(v,{...BASE,acct:2})}</div></div>`; }
+    h+=`</div>`; }
+  return h+`</div>`; }
+
+function icoRow(k, label){
+  const p=PV[k].svg;
+  const sizes=(s)=>`<span class="bare" style="--s:${s}px">${p}</span>`;
+  const tile=(ts,gs)=>`<span class="tile" style="width:${ts}px;height:${ts}px;border-radius:${Math.round(ts*.32)}px"><span style="--s:${gs}px" class="bare">${p}</span></span>`;
+  const tints={claude:'rgba(217,119,87,.14)',codex:'var(--tile)',gemini:'rgba(66,133,244,.11)',grok:'var(--tile)',ollama:'var(--tile)'};
+  const tint=`<span class="tint" style="--tt:${tints[k]}"><span class="bare" style="--s:15px">${p}</span></span>`;
+  const cur=`<span class="ctile cur" style="position:relative;width:19px;height:19px;border-radius:6px;background:var(--logo);box-shadow:inset 0 0 0 .5px var(--hair);display:grid;place-items:center"><span class="bare" style="--s:13px">${p}</span></span>`;
+  const cells=[cur, sizes(16), sizes(18), tile(22,15)+tile(24,16), tint];
+  return `<div class="rn">${label}</div>`+['light','dark'].map(th=>'').join('')+cells.map(c=>`<div class="icc th-light">${c}</div>`).join('')+
+     `<div></div>`+cells.map(c=>`<div class="icc th-dark">${c}</div>`).join(''); }
+function secIcons(){
+  return `<div class="sec" id="s6"><h2>⑦ 厂商图标集（16px 可读性 + 「更醒目」处理）</h2>
+  <p>目标：图标自己就能认出厂商（因为不再有文字前缀），所以要「更大一点、更托得住」，但不能吵。建议 <b>glyph 15px / 瓷砖 22px / 圆角 7px，纯白（深色用夜紫抬亮）+ 0.5px 描边 + 极轻阴影</b>：比现状（13px / 19px）面积 +34%，仍然安静。「品牌淡染」瓷砖列为可选（仅 Claude/Gemini 有品牌色，其余无色可染，会导致不一致）。</p>
+  <div class="icgrid"><div class="hd"></div><div class="hd">现状<br>13px / 19px 瓷砖</div><div class="hd">裸 16px</div><div class="hd">裸 18px</div><div class="hd"><b>推荐</b> 15/22 · 对比 16/24</div><div class="hd">可选：品牌淡染 15/22</div>
+   ${icoRow('claude','Claude')}${icoRow('codex','OpenAI / Codex')}${icoRow('gemini','Gemini')}${icoRow('grok','Grok')}${icoRow('ollama','本地 · Ollama')}
+  </div>
+  <div class="card" style="margin-top:16px"><h3>真实像素 · 推荐规格 15px/22px 瓷砖（1x、2x）</h3><div class="pxbox">
+   <figure><img class="nat" src="icons-1x.png" id="ic1"><figcaption>1x 原始像素</figcaption></figure><figure><img class="px" src="icons-1x.png" id="ic1z"><figcaption>1x 最近邻 ×3</figcaption></figure>
+   <figure><img class="nat" src="icons-2x.png" id="ic2" style="image-rendering:auto"><figcaption>2x（物理像素）</figcaption></figure></div>
+   <ul class="tight" style="margin-top:12px"><li><b>Claude</b>：橙色放射星，16px 下最醒目，无需额外处理。</li><li><b>OpenAI / Codex</b>：六瓣结在 15px 仍是实心，OK；深色模式反白。</li><li><b>Gemini</b>：蓝紫粉渐变四角星（示意稿；app 当前无 Gemini 品牌图标，会回退首字母）。</li><li><b>Grok</b>：圆 + 斜杠（示意稿，同上；演示站目前用「×」）。2.3px 描边在 16px 下不糊。</li><li><b>Ollama</b>：羊驼线稿细节最多：15px 仍可辨认轮廓，但 ≤13px（现状）耳朵/眼鼻会糊成块 → <b>需要瓷砖托底 + 不低于 15px</b>。</li></ul></div></div>`; }
+
+function secReco(){
+  return `<div class="card reco"><div><h2 style="margin-bottom:6px"><b class="tag">推荐</b> 方案 D · 角标 + 零宽强度轨</h2>
+  <p class="lead">一句话：<b>图标说「谁」、角标说「第几个账号」、紫色小轨说「想多深」，名字只剩型号本身。</b></p>
+  <ul class="tight"><li><b>最省宽</b>：强度轨叠在名字下方，不占横向像素；Claude 2 号 · Opus 5.5 · 高 实测 <span id="rw-d"></span>（现状 <span id="rw-c"></span>）。</li>
+  <li><b>账号最清晰</b>：13px 墨色圆 + 9.5px 粗体数字 + 环形镂空，1x 下也清楚；单账号时完全不出现。</li>
+  <li><b>图标更醒目</b>：22px 白瓷砖托 15px 图标，不再被角标盖住。</li>
+  <li><b>克制</b>：整颗 chip 只有一处紫（强度轨），其余为中性灰。</li></ul></div>
+  <div><div class="stage th-light pad" style="justify-content:space-around">${chip('cur',{...BASE,acct:2})}<span style="color:var(--fg3)">→</span>${chip('d',{...BASE,acct:2})}</div>
+  <div class="stage th-dark pad" style="margin-top:10px;justify-content:space-around">${chip('cur',{...BASE,acct:2})}<span style="color:var(--fg3)">→</span>${chip('d',{...BASE,acct:2})}</div>
+  <p class="muted" style="font-size:12.5px;margin:10px 2px 0"><b>备选</b>：若觉得「叠在名字下的轨」像下划线，回退到 <b>A</b>（柱状放名字后，沿用 app 现有 EffortGlyph，改动最小，+14px 宽）。B 不建议（账号靠颜色、悬停才见数字）；C 数字最清晰但最宽，星在 1x 偏糊。</p></div></div>`; }
+
+function secImpl(){ return `<div class="sec"><h2>⑧ 落地对照（供 Codex 实现参考，本稿未改任何代码）</h2><div class="card"><ul class="tight">
+ <li><code>ProviderModelPicker.tsx</code> 触发器：不再拼 provider 前缀（<code>getTriggerDisplayModelName</code> 已有 shortName 逻辑，Claude 需补一条去前缀）；瓷砖 19→22px、图标 13→15px，<code>composerV9.css [data-v9-logo-chip][data-size="trigger"]</code>。</li>
+ <li><code>ProviderInstanceIcon.tsx</code> 的 <code>showBadge</code>：<code>providerInstanceInitials()</code>（「C2」）改为<b>只输出账号序号</b>；字号 5xs(7px) → 9.5px 粗体；badge 12→13px，墨色底 + <code>box-shadow: 0 0 0 1.75px var(--chip)</code> 镂空；仅在该厂商 ≥2 个实例时显示。</li>
+ <li><code>ComposerModelEffort.tsx</code> <code>describeComposerEffort</code>：把 <code>CosmicTierPill</code>（色点＋文字）换成 5 档轨/柱；<code>effortDisplay</code> 设置项的「label」模式保留给偏好文字的用户。</li>
+ <li>tooltip 文案：<code>「{实例名} · {完整型号} · 推理强度 {档位}」</code>，与 aria-label 相同。</li></ul></div></div>`; }
+
+/* ---------------------------------------------------------------- 导出视图 */
+function viewStrip(){
+  const cols=['light','dark'].map(th=>`<div class="stripcol th-${th}">${ORDER.map(v=>chip(v,{...BASE,acct:2})).join('')}</div>`).join('');
+  return `<div class="stripwrap"><div class="striprow">${cols}</div></div>`; }
+function viewIcons(){
+  const mk=th=>`<div class="stripcol th-${th}" style="flex-direction:row;gap:12px;align-items:center">`+Object.keys(PV).map(k=>`<span class="tile" style="width:22px;height:22px;border-radius:7px"><span class="bare" style="--s:15px">${PV[k].svg}</span>${k==='claude'?'<i class="bdg">2</i>':''}</span>`).join('')+`</div>`;
+  return `<div class="stripwrap"><div class="striprow">${mk('light')}${mk('dark')}</div></div>`; }
+function viewSheet(){
+  const rows=th=>ORDER.map(v=>`<div class="row"><div class="vname"><b>${VARS[v].t.replace(/ · .*/,' ').trim()==='现状'?'现状':VARS[v].t.split(' · ')[0]+(v==='d'?' ★':'')}</b><span>${v==='cur'?'Claude Opus 5.5 · 高':VARS[v].t.split(' · ')[1]}</span><span class="mono" data-sw="${v}-${th}"></span></div>${composer(v,{...BASE,acct:2})}</div>`).join('');
+  return `<div class="sheet"><h1>星尘 · 模型 chip 更紧凑：去前缀 · 账号角标 · 强度微标</h1>
+  <div class="sub">Claude 2 号 · Opus 5.5 · 推理强度「高」 — 现状 vs 4 个方案（浅色 Apple-neutral / 深色夜紫，composer 复刻）</div>
+  <div class="cols"><div class="col th-light"><div class="ch"><b>浅色</b><span>chip 宽度（含账号角标）见左侧</span></div>${rows('light')}</div>
+  <div class="col th-dark"><div class="ch"><b>深色</b><span>1 CSS px ＝ 1 px</span></div>${rows('dark')}</div></div>
+  <div class="fcard" style="margin:2px 0 14px"><h3>方案 D · 各厂商 / 长名字（Claude 2 号 · Codex · Gemini · Grok · 本地模型；超长名中间省略）</h3><div class="others">${['light','dark'].map(th=>`<div class="stage th-${th}">${[
+   {pv:'claude',m:'Opus 5.5',acct:2,lv:3},{pv:'codex',m:'GPT-6.2',lv:4},{pv:'gemini',m:'Gemini 3.1 Pro',full:'Gemini 3.1 Pro Preview',lv:2},{pv:'grok',m:'Grok 4.2',lv:3},{pv:'ollama',m:'Qwen3-Coder-480B',lv:0},{pv:'ollama',m:'deepseek-r1…-70b',full:'deepseek-r1-distill-llama-70b',lv:0}
+  ].map(o=>chip('d',o)).join('')}</div>`).join('')}</div></div>
+  <div class="foot"><div class="fcard"><h3>厂商图标 · 15px 图标 / 22px 瓷砖</h3><div class="iconrow">${['light','dark'].map(th=>`<div class="th-${th}">${Object.keys(PV).map(k=>`<span class="tile" style="width:22px;height:22px;border-radius:7px"><span class="bare" style="--s:15px">${PV[k].svg}</span></span>`).join('')}</div>`).join('')}</div>
+   <div style="font-size:12px;color:#666;margin-top:8px">Claude · OpenAI · Gemini · Grok · Ollama</div></div>
+  <div class="fcard"><h3>账号角标放大 ×2.6（D · 浅 / 深）</h3><div class="zoom"><div class="th-light stage" style="padding:12px 18px"><span class="zoomwrap">${chip('d',{...BASE,acct:2})}</span></div><div class="th-dark stage" style="padding:12px 18px"><span class="zoomwrap">${chip('d',{...BASE,acct:2})}</span></div></div></div>
+  <div class="reco2"><b>推荐：方案 D</b><span>图标＝谁，角标＝第几个账号，紫色小轨＝强度。<br>Claude 2 号 · Opus 5.5 · 高：<span id="sw-d"></span></span></div></div></div>`; }
+
+/* ---------------------------------------------------------------- 渲染 + 实测 */
+const view=new URLSearchParams(location.search).get('view')||'page';
+document.body.dataset.view=view;
+const root=document.getElementById('root');
+if(view==='strip') root.innerHTML=viewStrip();
+else if(view==='icons') root.innerHTML=viewIcons();
+else if(view==='sheet'){ root.className=''; root.style.width='auto'; root.style.padding=0; root.innerHTML=viewSheet(); }
+else root.innerHTML = `<h1>星尘 · 模型 chip 更紧凑（设计稿）</h1><p class="lead">现状：<span class="mono">[厂商图标+C2角标] Claude Opus 5.5 [● 高]</span> —— 前缀冗余、角标 7px 不可读、强度占一整颗药丸。目标：<b>图标＝厂商、角标＝账号、微标＝强度、名字只剩型号</b>。纯视觉稿 · 未改动 app 仓库 · 复刻参数来自真实源码（<code>ProviderInstanceIcon.tsx</code> / <code>ProviderModelPicker.tsx</code> / <code>composerV9.css</code> / <code>ComposerModelEffort.tsx</code>）。</p>
+  <div style="margin-top:22px">${secReco()}</div>${secMatrix()}${secWidthTable()}${secTips()}${secLong()}${secLegib()}${secComposer()}${secIcons()}${secImpl()}`;
+
+function measure(){
+  const w=(html)=>{const m=document.getElementById('measure')||(()=>{const d=document.createElement('div');d.id='measure';d.className='th-light';d.style.cssText='position:absolute;left:-9999px;top:0';document.body.appendChild(d);return d})();
+    m.innerHTML=html;const e=m.firstElementChild;const r=e.getBoundingClientRect().width;return Math.round(r*10)/10;};
+  const cw={}; for(const v of ORDER) cw[v]=w(chip(v,{...BASE,acct:2}));
+  document.querySelectorAll('[data-w]').forEach(el=>{const v=el.dataset.w;const a1=w(chip(v,{...BASE})),a2=cw[v];
+    const d=v==='cur'?'':` <span class="neg">${Math.round((a2/cw.cur-1)*100)}%</span>`;
+    el.innerHTML=`<span>1 账号 <b>${a1}</b> px</span><span>2 账号 <b>${a2}</b> px${d}</span>`;});
+  document.querySelectorAll('[data-wt]').forEach(el=>{const [k,v]=el.dataset.wt.split('-');const m=MODELS.find(x=>x.k===k);
+    const a=w(chip(v,{...m,acct:2,full:m.full||m.m})),c=w(chip('cur',{...m,acct:2}));
+    el.innerHTML=v==='cur'?`<b>${a}</b>`:`<b>${a}</b> <span class="${a>c?"pos":"neg"}">(${a>c?"+":""}${Math.round((a/c-1)*100)}%)</span>`;});
+  document.querySelectorAll('[data-cw]').forEach(el=>{const [v]=el.dataset.cw.split('-');el.textContent=`chip ${cw.cur}px → ${cw[v]}px (${Math.round((cw[v]/cw.cur-1)*100)}%)`;});
+  document.querySelectorAll('[data-sw]').forEach(el=>{const [v]=el.dataset.sw.split('-');el.textContent=v==='cur'?`${cw.cur}px`:`${cw[v]}px · ${Math.round((cw[v]/cw.cur-1)*100)}%`;});
+  const set=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};
+  set('rw-d',`${cw.d}px（${Math.round((cw.d/cw.cur-1)*100)}%）`);set('rw-c',`${cw.cur}px`);set('sw-d',`${cw.cur}px → ${cw.d}px（${Math.round((cw.d/cw.cur-1)*100)}%）`);
+  window.__cw=cw; window.__ready=true; }
+function zoomImgs(){
+  const set=(id,f)=>{const e=document.getElementById(id);if(!e)return;const g=()=>{e.style.width=(e.naturalWidth*f)+'px'};e.complete&&e.naturalWidth?g():e.addEventListener('load',g)};
+  set('i1',1);set('i1z',3);set('i2',.5);set('i2z',1);set('ic1',1);set('ic1z',3);set('ic2',.5);
+}
+(document.fonts&&document.fonts.ready||Promise.resolve()).then(()=>{measure();zoomImgs();});
+</script>
+</body>
+</html>

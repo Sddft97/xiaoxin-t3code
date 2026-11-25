@@ -1,0 +1,34 @@
+/* Stardust motion tokens (MIT, Stardust project). Drop into your global CSS and use ONLY these in transitions/animations.
+ * One language: every state change picks one row; nothing invents its own curve.
+ *   press   80ms  standard  pressed rows and buttons
+ *   hover  120ms  standard  hover reveals, colour and tint changes, menus opening/closing
+ *   swap   160ms  standard  a mark changing meaning (status glyph to another)
+ *   exit   180ms  exit      departures and collapses; leaving is quicker than arriving
+ *   enter  220ms  standard  arrivals and rows making room (FLIP)
+ *   expand 240ms  standard  disclosures opening, chevrons turning, progress advancing
+ *   pop    240ms  pop       two-frame scale-ins only
+ */
+:root {
+  --motion-scale: 1;               /* review aid: set to 4 in DevTools for 4x slower motion */
+  --motion-ease-standard: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-ease-exit: cubic-bezier(0.4, 0, 0.85, 0.6);
+  --motion-ease-pop: cubic-bezier(0.22, 1.16, 0.36, 1);
+  --motion-press: calc(80ms * var(--motion-scale));
+  --motion-hover: calc(120ms * var(--motion-scale));
+  --motion-swap: calc(160ms * var(--motion-scale));
+  --motion-exit: calc(180ms * var(--motion-scale));
+  --motion-enter: calc(220ms * var(--motion-scale));
+  --motion-expand: calc(240ms * var(--motion-scale));
+  --motion-pop: calc(240ms * var(--motion-scale));
+}
+
+/* Usage */
+.example-button { transition: background-color var(--motion-hover) var(--motion-ease-standard), transform var(--motion-press) var(--motion-ease-standard); }
+.example-button:active { transform: scale(0.97); }
+.example-panel[data-state="closed"] { transition: opacity var(--motion-exit) var(--motion-ease-exit), transform var(--motion-exit) var(--motion-ease-exit); }
+
+/* Reduced motion: keep the state change, drop the travel. Transform-based entrances become instant opacity swaps. */
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-press: 0.01ms; --motion-hover: 0.01ms; --motion-swap: 0.01ms; --motion-exit: 0.01ms;
+          --motion-enter: 0.01ms; --motion-expand: 0.01ms; --motion-pop: 0.01ms; }
+}

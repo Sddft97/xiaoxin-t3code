@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>星尘 · 推理强度滑块皮肤 · 4 个概念</title>
+<style>
+:root{--ease:cubic-bezier(.3,.7,.2,1);--d:200ms;--sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:13px/1.55 var(--sans);background:#f2f2f5;color:#1d1d1f;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+
+/* ---------- 主题变量（与 composerV9 的 --v9-* 对齐，叠加星尘紫） ---------- */
+.th-light{
+  --surface:#fff;--surface2:#f5f5f8;--glass:rgba(255,255,255,.96);
+  --fg:#1d1d1f;--fg2:#6e6e73;--fg3:#9a9aa1;
+  --hair:rgba(0,0,0,.055);--line:rgba(0,0,0,.085);--fill:rgba(118,118,128,.095);--sel:rgba(0,0,0,.048);
+  --ac:#5B4BE0;--glow:#8D7DFF;--ac-soft:rgba(91,75,224,.10);
+  --off:rgba(70,70,105,.20);--hov:rgba(91,75,224,.42);--rail:rgba(60,60,95,.17);
+  --sa:#cfc8ff;--sb:#9d90ff;--sc:#6a5af0;--edge:rgba(70,55,200,.55);--eye:#1d2a9c;--spark:#6c5df0;
+  --dust:rgba(91,75,224,.34);--dustc:#5B4BE0;
+  --float:0 0 0 .5px rgba(0,0,0,.09),0 16px 40px -8px rgba(0,0,0,.16),0 4px 12px rgba(0,0,0,.05);
+  color:var(--fg)
+}
+.th-dark{
+  --surface:#1b1a22;--surface2:#24232d;--glass:rgba(30,29,38,.96);
+  --fg:#f5f5f7;--fg2:#a1a1a6;--fg3:#76767d;
+  --hair:rgba(255,255,255,.07);--line:rgba(255,255,255,.11);--fill:rgba(255,255,255,.085);--sel:rgba(255,255,255,.08);
+  --ac:#7D6EF8;--glow:#8D7DFF;--ac-soft:rgba(125,110,248,.16);
+  --off:rgba(255,255,255,.17);--hov:rgba(160,148,255,.5);--rail:rgba(255,255,255,.13);
+  --sa:#fff;--sb:#e6e1ff;--sc:#a99cff;--edge:rgba(255,255,255,.0);--eye:#2f3cc4;--spark:#e8e4ff;
+  --dust:rgba(190,180,255,.42);--dustc:#b9b0ff;
+  --float:0 0 0 .5px rgba(255,255,255,.14),0 20px 50px rgba(0,0,0,.65);
+  color:var(--fg)
+}
+
+/* ---------- 页面外壳（仅设计稿用） ---------- */
+.bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:10px 28px;background:rgba(242,242,245,.86);backdrop-filter:blur(14px);border-bottom:.5px solid rgba(0,0,0,.09)}
+.bar h1{font-size:15px;margin:0;font-weight:700;letter-spacing:.2px}
+.bar h1 small{font-weight:500;color:#6e6e73;margin-left:8px}
+.bar .grp{display:flex;align-items:center;gap:8px;font-size:12px;color:#6e6e73}
+.seg{display:inline-flex;background:rgba(118,118,128,.12);border-radius:9px;padding:2px}
+.seg button{padding:3px 10px;border-radius:7px;font-size:12px;color:#6e6e73}
+.seg button[aria-pressed=true]{background:#fff;color:#1d1d1f;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.tg{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:9px;background:rgba(118,118,128,.12);font-size:12px;color:#6e6e73}
+.tg[aria-pressed=true]{background:#1d1d1f;color:#fff}
+main{max-width:1760px;margin:0 auto;padding:22px 28px 60px}
+h2{font-size:16px;margin:26px 0 4px}
+.sub{color:#6e6e73;margin:0 0 14px;font-size:12.5px}
+.ov{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-radius:18px;overflow:hidden;box-shadow:0 0 0 .5px rgba(0,0,0,.1)}
+.ov .col{padding:18px 20px;display:flex;flex-direction:column;gap:14px;align-items:center}
+.ov .col.th-light{background:#fff}
+.ov .col.th-dark{background:#0f0e15}
+.ov .cell{width:362px;max-width:100%}
+.cap{font-size:11px;color:var(--fg3);margin:0 0 5px 3px;display:flex;gap:8px}
+.cap b{color:var(--fg2);font-weight:650}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(860px,1fr));gap:20px}
+.card{background:#fff;border-radius:20px;padding:20px 22px 18px;box-shadow:0 0 0 .5px rgba(0,0,0,.08),0 8px 24px -12px rgba(0,0,0,.12)}
+.card h3{margin:0 0 6px;font-size:16px;display:flex;align-items:baseline;gap:10px}
+.card h3 i{font-style:normal;font-size:11px;font-weight:600;color:#5B4BE0;background:rgba(91,75,224,.1);padding:1px 8px;border-radius:99px}
+.card p{margin:0 0 12px;color:#3a3a3f;font-size:12.8px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.well2{border-radius:16px;padding:16px 10px;display:flex;justify-content:center}
+.well2.th-light{background:#ecebf2}
+.well2.th-dark{background:#0f0e15}
+.pop{width:386px;max-width:100%;padding:12px;border-radius:20px;background:var(--glass);box-shadow:var(--float);border:.5px solid var(--line);color:var(--fg)}
+.facts{margin:12px 0 0;display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:12px;color:#55555a}
+.facts dt{color:#8a8a90;white-space:nowrap}.facts dd{margin:0}
+.rec{margin-top:26px;padding:16px 20px;border-radius:16px;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.08)}
+.rec h3{margin:0 0 6px;font-size:14px}.rec p,.rec li{font-size:12.8px;margin:3px 0}
+code{font:11.5px ui-monospace,Menlo,monospace;background:rgba(0,0,0,.06);padding:0 5px;border-radius:5px}
+
+/* ---------- 复刻 .cos 盒（尺寸取自 composerV9.css [data-cosmic-effort-slider]） ---------- */
+.cos{padding:10px 11px 9px;border-radius:14px;background:var(--surface2);border:.5px solid var(--hair);color:var(--fg)}
+.cos .eh{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11.8px;line-height:1.4;margin-bottom:5px}
+.cos .eh b{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-weight:700}
+.cos .hs{width:11px;height:11px;flex:none;fill:var(--ac);opacity:var(--lv,.6);transition:opacity var(--d) var(--ease)}
+.cos .sr{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;line-height:1.4;color:var(--fg2);margin-bottom:2px}
+.cos .stage{position:relative;height:var(--sh,40px);margin:2px 0 0;border-radius:10px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;outline:none}
+.cos .stage.drag{cursor:grabbing}
+.cos .stage:focus-visible,.cos .stage.ff{box-shadow:0 0 0 2px var(--surface2),0 0 0 3.5px var(--ac)}
+.cos .stage svg{display:block;width:100%;height:100%;overflow:visible}
+.cos .tiers{position:relative;height:22px;margin-top:1px;font-size:11px;color:var(--fg3)}
+.cos .tiers button{position:absolute;top:0;transform:translateX(-50%);padding:2px 6px;border-radius:6px;font-size:10.8px;line-height:1.35;color:var(--fg3);white-space:nowrap;transition:color 160ms ease,background 160ms ease}
+.cos .tiers button.hv{color:var(--fg);background:var(--fill)}
+.cos .tiers button.on{color:var(--fg);font-weight:700;background:var(--fill)}
+
+/* ---------- 共用 SVG 语义 ---------- */
+.rail{stroke:var(--rail);stroke-width:1;fill:none;stroke-linecap:round}
+.halo{pointer-events:none}
+.spark{fill:var(--spark);pointer-events:none}
+.base{fill:var(--off);transition:fill var(--d) var(--ease),opacity var(--d) var(--ease)}
+.top{stroke:var(--edge);stroke-width:.9;opacity:0;transition:opacity var(--d) var(--ease)}
+
+/* 1 星点渐亮 */
+.s1 .st .sc{transform:scale(.68);transition:transform var(--d) var(--ease)}
+.s1 .st .base{opacity:1}
+.s1 .st.lit .base{fill:var(--ac);opacity:var(--b,.6)}
+.s1 .st.lit .sc{transform:scale(.86)}
+.s1 .st.act .sc{transform:scale(1.14)}
+.s1 .st.hv:not(.act) .sc{transform:scale(.98)}
+.s1 .st.hv:not(.lit) .base{fill:var(--hov)}
+.s1 .st .halo{opacity:0;transition:opacity var(--d) var(--ease)}
+.s1 .st.act .halo{opacity:.55;animation:breathe 3.6s ease-in-out infinite}
+.s1 .st.act .top{opacity:1}
+.s1 .st .spark{opacity:0;transform:translate(8px,-8px) scale(.3);transition:opacity var(--d) var(--ease),transform var(--d) var(--ease)}
+.s1 .st.act .spark{opacity:.85;transform:translate(8px,-8px) scale(1);animation:twinkle 3.4s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.4}50%{opacity:.7}}
+@keyframes twinkle{0%,62%,100%{opacity:.85;transform:translate(8px,-8px) scale(1)}78%{opacity:.15;transform:translate(8px,-8px) scale(.55)}}
+
+/* 2 星尘凝聚 */
+.s2 .tick{fill:var(--off);transition:transform var(--d) var(--ease),fill var(--d) var(--ease)}
+.s2 .tick.hv{transform:scale(1.9);fill:var(--hov)}
+.s2 .dust{fill:var(--dust);transition:transform 210ms var(--ease),fill var(--d) var(--ease)}
+.s2 .dust.in{fill:var(--dustc)}
+.s2 .th{transition:transform 220ms var(--ease)}
+.s2 .th .sc{transition:transform var(--d) var(--ease)}
+.s2 .th .halo{opacity:var(--ho,.3);transition:opacity var(--d) var(--ease);animation:breathe2 4s ease-in-out infinite}
+.s2 .th .base{fill:var(--ac)}
+.s2 .th .top{opacity:1}
+.s2 .eyes{opacity:0;transition:opacity var(--d) var(--ease)}
+.s2 .th.max .eyes{opacity:1}
+.s2 .eye{fill:var(--eye);transform-box:fill-box;transform-origin:center}
+.s2 .th.max .eye.r{animation:wink 460ms 380ms ease-in-out 1}
+@keyframes breathe2{0%,100%{transform:scale(.96)}50%{transform:scale(1.06)}}
+@keyframes wink{0%,100%{transform:scaleY(1)}45%{transform:scaleY(.12)}}
+
+/* 3 星轨 */
+.s3 .ringbase{fill:none;stroke:var(--rail);stroke-width:1}
+.s3 .backlit{fill:none;stroke:var(--ac);stroke-linecap:round;stroke-width:1.3;opacity:.55}
+.s3 .trail{fill:none;stroke-linecap:round}
+.s3 .tick{fill:var(--off);transition:fill var(--d) var(--ease),transform var(--d) var(--ease)}
+.s3 .tick.lit{fill:var(--ac)}
+.s3 .tick.hv{fill:var(--hov);transform:scale(1.8)}
+.s3 .ghost{fill:none;stroke:var(--hov);stroke-width:1;opacity:0;transition:opacity var(--d) var(--ease)}
+.s3 .ghost.on{opacity:1}
+.s3 .th .halo{opacity:var(--ho,.5);animation:breathe 3.6s ease-in-out infinite}
+.s3 .th .base{fill:var(--ac)}
+.s3 .th .top{opacity:1}
+
+/* 4 星座连线 */
+.s4 .ghostln{stroke:var(--rail);stroke-width:1;stroke-dasharray:1.5 3;stroke-linecap:round}
+.s4 .seg{stroke:var(--ac);stroke-width:1.4;stroke-linecap:round;fill:none;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 170ms var(--ease)}
+.s4 .seg.lit{stroke-dashoffset:0}
+.s4 .bg4{fill:var(--rail);opacity:.8}
+.s4 .dot{fill:var(--off);transition:fill var(--d) var(--ease),transform var(--d) var(--ease),opacity 140ms ease}
+.s4 .cs.lit .dot{fill:var(--ac);transform:scale(1.12)}
+.s4 .cs.hv:not(.act) .dot{transform:scale(1.7)}
+.s4 .cs.hv:not(.lit) .dot{fill:var(--hov)}
+.s4 .cs.act .dot{opacity:0}
+.s4 .big{opacity:0;transform:scale(.4);transition:opacity var(--d) var(--ease),transform var(--d) var(--ease)}
+.s4 .cs.act .big{opacity:1;transform:scale(1)}
+.s4 .big .halo{opacity:.5;animation:breathe 3.6s ease-in-out infinite}
+.s4 .big .base{fill:var(--ac)}
+.s4 .big .top{opacity:1}
+
+/* ---------- 减少动态：不动画，状态一致 ---------- */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+html.rm *,html.rm *::before,html.rm *::after{animation:none!important;transition:none!important}
+
+/* ---------- 工具模式（截图 / 视频） ---------- */
+.m-only{display:none}
+body.mode .bar,body.mode main>*:not(.m-only){display:none}
+body.mode .m-only{display:block}
+body.mode main{max-width:none;padding:0}
+.sheet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;width:1640px}
+.sheet .col{padding:22px 24px 12px}
+.sheet .col.th-light{background:#fff}.sheet .col.th-dark{background:#0f0e15}
+.sheet h4{margin:0 0 12px;font-size:13px;color:var(--fg2);font-weight:650}
+.sheet .grid{display:grid;grid-template-columns:repeat(2,362px);gap:12px 22px}
+.vid{display:grid;grid-template-columns:1fr 1fr;width:900px;height:236px}
+.vid .col{display:flex;align-items:center;justify-content:center}
+.vid .col.th-light{background:#ecebf2}.vid .col.th-dark{background:#0f0e15}
+.vid .ttl{position:absolute;left:12px;top:8px;font-size:11px;color:#8a8a90}
+.popwrap{display:grid;grid-template-columns:1fr 1fr;width:1000px}
+.popwrap .col{padding:28px 0;display:flex;justify-content:center}
+.popwrap .col.th-light{background:#ecebf2}.popwrap .col.th-dark{background:#0f0e15}
+/* 复刻模型弹窗内容 */
+.mps{display:flex;align-items:center;gap:7px;height:34px;padding:0 10px;border-radius:10px;background:var(--fill);margin-bottom:8px;font-size:12.5px;color:var(--fg3)}
+.mps span:last-child{margin-left:auto;font-size:10.5px}
+.mtabs{display:flex;gap:3px;padding-bottom:7px;margin-bottom:6px;border-bottom:.5px solid var(--hair)}
+.mtabs span{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:550;line-height:1.35;color:var(--fg2);white-space:nowrap}
+.mtabs span.on{background:var(--fg);color:var(--surface)}
+.mlist{display:flex;flex-direction:column;gap:2px;margin-bottom:9px}
+.mi{display:flex;align-items:center;gap:8px;min-height:33px;padding:6.5px 9px;border-radius:10px;font-size:12.2px;line-height:1.35}
+.mi.on{background:var(--sel);font-weight:600}
+.mi .nm{flex:1}.mi .mt{font-size:11px;color:var(--fg3)}
+.mi .ck{color:var(--ac);font-weight:700}
+.prow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px;margin-top:8px;border-top:.5px solid var(--hair);font-size:11.2px;color:var(--fg2)}
+.segc{display:inline-flex;background:var(--fill);border-radius:10px;padding:2px}
+.segc span{padding:3px 7px;font-size:11px;font-weight:500;border-radius:7.5px;color:var(--fg2)}
+.segc span.on{background:var(--surface);color:var(--fg);box-shadow:0 2px 8px rgba(0,0,0,.08),0 .5px 1.5px rgba(0,0,0,.12)}
+</style>
+<script>
+addEventListener('DOMContentLoaded', () => {
+  if ("slider-concept-constellation" === 'slider-r4-q') document.querySelector('#vSeg [data-l="Q"]').click();
+  const component = document.querySelector("#modeRoot .th-dark .cos");
+  if (!component) throw new Error('Missing original workshop component: ' + "#modeRoot .th-dark .cos");
+  const stage = document.createElement('div');
+  stage.id = 'workshop-original';
+  document.body.insertBefore(stage, document.body.firstChild);
+  let branch = component;
+  while (branch.parentElement !== document.body) {
+    const parent = branch.parentElement;
+    for (const sibling of parent.children) {
+      if (sibling === branch) continue;
+      if ("slider-concept-constellation" === 'v16-stardust-observatory' && sibling.matches('.card')) {
+        sibling.inert = true;
+        sibling.style.cssText += ';position:fixed;left:0;top:0;width:min(280px,100vw);visibility:hidden;pointer-events:none';
+      } else sibling.style.setProperty('display', 'none', 'important');
+    }
+    branch = parent;
+  }
+  for (const child of document.body.children) {
+    if (child !== stage && child !== branch && !child.matches('svg,script,style')) {
+      child.style.setProperty('display', 'none', 'important');
+    }
+  }
+  stage.append(branch);
+  for (let el = branch; el !== component; el = [...el.children].find(n => n.contains(component))) {
+    el.style.cssText += ';display:block!important;width:100%;min-width:0;max-width:none;margin:0;padding:0;min-height:0;background:transparent;border:0;box-shadow:none';
+  }
+  document.body.style.cssText += ';width:auto;max-width:none;margin:0;padding:0;background:#111025;min-height:0';
+  document.documentElement.style.background = '#111025';
+  if (component.matches('.gx,.cos')) {
+    const row = () => {
+      stage.style.width = '360px';
+      stage.style.marginInline = 'auto';
+      stage.style.zoom = Math.min(1, document.documentElement.clientWidth / 360);
+    };
+    row();
+    addEventListener('resize', row);
+  }
+});
+</script></head>
+<body>
+
+<!-- 共用星形符号：取自品牌图标的柔角五角星（brand-t2/svg/stardust-icon.svg） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="sd-star" viewBox="260 265 504 480">
+    <path vector-effect="non-scaling-stroke" d="M475.4 324.7 Q512.0 265.0 548.6 324.7 L581.3 378.0 Q600.2 408.6 635.2 417.1 L696.0 431.7 Q764.0 448.1 718.6 501.4 L678.0 549.0 Q654.7 576.4 657.5 612.2 L662.3 674.6 Q667.8 744.4 603.1 717.6 L545.3 693.8 Q512.0 680.0 478.7 693.8 L420.9 717.6 Q356.2 744.4 361.7 674.6 L366.5 612.2 Q369.3 576.4 346.0 549.0 L305.4 501.4 Q260.0 448.1 328.0 431.7 L388.8 417.1 Q423.8 408.6 442.7 378.0 Z"/>
+  </symbol>
+</svg>
+
+<div class="bar">
+  <h1>星尘 · 推理强度滑块皮肤<small>4 个概念 · 设计稿（仅 HTML/SVG/CSS）</small></h1>
+  <div class="grp">档位数<div class="seg" id="nSeg"><button data-n="3" aria-pressed="false">3</button><button data-n="4" aria-pressed="false">4</button><button data-n="5" aria-pressed="true">5</button></div></div>
+  <div class="grp">总览同步<div class="seg" id="syncSeg"></div></div>
+  <button class="tg" id="rmBtn" aria-pressed="false" title="模拟 prefers-reduced-motion: reduce">减少动态效果（模拟）</button>
+  <span class="grp">键盘：聚焦滑块后 ← → ↑ ↓ Home End</span>
+</div>
+
+<main>
+  <h2>总览 · 同一档位、4 种皮肤</h2>
+  <p class="sub">左亮右暗，全部可交互（悬停预览 / 拖动 / 点击 / 键盘）。顶部「总览同步」可一键让 4 条一起跳到某一档。</p>
+  <div class="ov" id="overview"></div>
+
+  <h2>逐个概念</h2>
+  <p class="sub">每张卡片放在 386px 宽的模型弹窗里（真实宽度），滑块盒内宽 340px。</p>
+  <div class="cards" id="cards"></div>
+
+  <div class="rec" id="recbox"></div>
+  <div class="m-only" id="modeRoot"></div>
+</main>
+
+<script>
+/* =========================================================================
+   星尘推理强度滑块 · 设计稿运行时（无依赖）
+   结构：Slider 负责盒子/头/档位标签/指针+键盘；skin 只负责「舞台」里的 SVG。
+   ========================================================================= */
+const NS='http://www.w3.org/2000/svg';
+const $=(s,r=document)=>r.querySelector(s);
+const el=(tag,attrs={},parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.classList.contains('rm');
+const LABELS={5:['低','中','高','超高','极限'],4:['低','中','高','极限'],3:['低','中','高']};
+const DESC={'低':'快速回答','中':'均衡思考','高':'深入推理','超高':'更久更深','极限':'全力思考'};
+const PADX=24;
+let UID=0;
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* 每个实例私有的渐变（颜色走 CSS 变量，随所在主题变化） */
+function defs(c){
+  const d=el('defs',{},c.svg),u=c.uid;
+  const g=el('linearGradient',{id:'gb'+u,x1:'.2',y1:'0',x2:'.8',y2:'1'},d);
+  el('stop',{offset:0,style:'stop-color:var(--sa)'},g);el('stop',{offset:.55,style:'stop-color:var(--sb)'},g);el('stop',{offset:1,style:'stop-color:var(--sc)'},g);
+  const r=el('radialGradient',{id:'gh'+u},d);
+  el('stop',{offset:0,style:'stop-color:var(--glow);stop-opacity:.85'},r);el('stop',{offset:1,style:'stop-color:var(--glow);stop-opacity:0'},r);
+  c.fillTop=`url(#gb${u})`;c.fillHalo=`url(#gh${u})`;
+  return d;
+}
+function useStar(parent,size,cls,fill){
+  const u=el('use',{href:'#sd-star',x:-size/2,y:-size/2,width:size,height:size,class:cls},parent);
+  if(fill)u.style.fill=fill;return u;
+}
+const SPARK='M0-4.2 L.95-.95 L4.2 0 L.95.95 L0 4.2 L-.95.95 L-4.2 0 L-.95-.95Z';
+
+/* ---------------- 概念 1 · 星点渐亮 ---------------- */
+function skin1(c){
+  const {svg,H,n,xs}=c,cy=H/2;defs(c);
+  el('line',{x1:xs[0],x2:xs[n-1],y1:cy,y2:cy,class:'rail'},svg);
+  const items=xs.map(x=>{
+    const g=el('g',{class:'st',transform:`translate(${x} ${cy})`},svg),sc=el('g',{class:'sc'},g);
+    el('circle',{class:'halo',r:15,fill:c.fillHalo},sc);
+    useStar(sc,15,'base');useStar(sc,15,'top',c.fillTop);
+    el('path',{class:'spark',d:SPARK},sc);
+    return g});
+  return{
+    set(v){items.forEach((g,i)=>{g.classList.toggle('lit',i<=v);g.classList.toggle('act',i===v);
+      g.style.setProperty('--b',(.5+.5*(i+1)/(v+1)).toFixed(2))})},
+    hover(h){items.forEach((g,i)=>g.classList.toggle('hv',i===h))}
+  };
+}
+
+/* ---------------- 概念 2 · 星尘凝聚 ---------------- */
+function skin2(c){
+  const {svg,W,H,n,xs}=c,cy=H/2+1;defs(c);
+  el('line',{x1:xs[0],x2:xs[n-1],y1:cy,y2:cy,class:'rail'},svg);
+  const ticks=xs.map(x=>{const g=el('circle',{class:'tick',cx:x,cy:cy,r:1.5},svg);g.style.transformOrigin=`${x}px ${cy}px`;return g});
+  const R=rng(11),N=26,order=[...Array(N).keys()].sort(()=>R()-.5);
+  const parts=order.map((slot,j)=>({
+    bx:xs[0]-8+R()*(xs[n-1]-xs[0]+16),by:H*(.16+.68*R()),r:.7+R()*.85,
+    th:(slot+1)/N,ang:R()*Math.PI*2,rad:.75+R()*.5,dl:Math.round(R()*40)}));
+  const dust=parts.map(p=>{const e=el('circle',{class:'dust',r:p.r},svg);e.style.transitionDelay=p.dl+'ms';e.style.transform=`translate(${p.bx}px,${p.by}px)`;return e});
+  const th=el('g',{class:'th'},svg),sc=el('g',{class:'sc'},th);
+  el('circle',{class:'halo',r:30,fill:c.fillHalo},sc);
+  useStar(sc,28,'base');useStar(sc,28,'top',c.fillTop);
+  const eyes=el('g',{class:'eyes'},sc);
+  el('rect',{class:'eye l',x:-2.44-.95,y:-1.9,width:1.9,height:4.1,rx:.95},eyes);
+  el('rect',{class:'eye r',x:2.44-.95,y:-1.9,width:1.9,height:4.1,rx:.95},eyes);
+  return{
+    set(v){
+      const f=v/(n-1),k=.5+.5*f,x=xs[v];
+      th.style.transform=`translate(${x}px,${cy}px)`;
+      sc.style.transform=`scale(${k.toFixed(3)})`;
+      th.style.setProperty('--ho',(.22+.62*f).toFixed(2));
+      th.classList.toggle('max',v===n-1&&n>1);
+      parts.forEach((p,j)=>{
+        const inn=v>0&&f>=p.th-1e-6,e=dust[j];
+        e.classList.toggle('in',inn);
+        if(inn){const rr=(14+10*p.rad)*(.6+.4*k);e.style.transform=`translate(${(x+Math.cos(p.ang)*rr*1.1).toFixed(1)}px,${(cy+Math.sin(p.ang)*rr*.52).toFixed(1)}px)`}
+        else e.style.transform=`translate(${p.bx}px,${p.by}px)`;
+      });
+    },
+    hover(h){ticks.forEach((t,i)=>t.classList.toggle('hv',i===h))}
+  };
+}
+
+/* ---------------- 概念 3 · 星轨（rAF 只在移动的 ~250ms 内运行） ---------------- */
+function skin3(c){
+  const {svg,H,n,xs}=c,x0=xs[0],x1=xs[n-1],cx=(x0+x1)/2,rx=(x1-x0)/2,ry=7.5,cy=H/2-5;defs(c);
+  const yAt=x=>cy+ry*Math.sqrt(Math.max(0,1-((x-cx)/rx)**2));
+  const tg=el('linearGradient',{id:'tg'+c.uid,gradientUnits:'userSpaceOnUse',x1:x0,x2:x1,y1:0,y2:0},c.svg.querySelector('defs'));
+  el('stop',{offset:0,style:'stop-color:var(--ac);stop-opacity:.05'},tg);el('stop',{offset:1,style:'stop-color:var(--ac);stop-opacity:1'},tg);
+  el('ellipse',{class:'ringbase',cx:cx,cy:cy,rx:rx,ry:ry},svg);
+  const back=el('path',{class:'backlit',d:`M ${x1} ${cy} A ${rx} ${ry} 0 0 0 ${x0} ${cy}`,pathLength:1},svg);
+  const trail=el('path',{class:'trail',stroke:`url(#tg${c.uid})`},svg);
+  const ticks=xs.map(x=>{const t=el('circle',{class:'tick',cx:x,cy:yAt(x),r:1.5},svg);t.style.transformOrigin=`${x}px ${yAt(x)}px`;return t});
+  const ghost=el('circle',{class:'ghost',r:6.5},svg);
+  const th=el('g',{class:'th'},svg);
+  el('circle',{class:'halo',r:17,fill:c.fillHalo},th);
+  useStar(th,15,'base');useStar(th,15,'top',c.fillTop);
+  let u=0,t=0,raf=0,last=0,cv=0,dragging=false;
+  function draw(u){
+    const x=x0+u*(x1-x0),y=yAt(x);
+    th.style.transform=`translate(${x.toFixed(2)}px,${y.toFixed(2)}px)`;
+    trail.setAttribute('d',x-x0<.6?'':`M ${x0} ${cy} A ${rx} ${ry} 0 0 0 ${x.toFixed(2)} ${y.toFixed(2)}`);
+    trail.setAttribute('stroke-width',(1.1+.9*u).toFixed(2));
+    back.style.strokeDasharray=`${u.toFixed(3)} 2`;
+    th.style.setProperty('--ho',(.35+.5*u).toFixed(2));
+  }
+  function tick(ts){const dt=Math.min(40,ts-last);last=ts;u+=(t-u)*(1-Math.exp(-dt/55));
+    if(Math.abs(t-u)<.0006){u=t;raf=0}else raf=requestAnimationFrame(tick);draw(u)}
+  function go(nt,instant){t=clamp(nt,0,1);if(instant||RM()){cancelAnimationFrame(raf);raf=0;u=t;draw(u);return}
+    if(!raf){last=performance.now();raf=requestAnimationFrame(tick)}}
+  draw(0);
+  return{
+    set(v,_,instant){cv=v;ticks.forEach((tk,i)=>tk.classList.toggle('lit',i<=v));if(!dragging)go(v/(n-1),instant)},
+    drag(uu){dragging=true;go(uu)},
+    release(){dragging=false;go(cv/(n-1))},
+    hover(h){ticks.forEach((tk,i)=>tk.classList.toggle('hv',i===h));
+      if(h>=0&&h!==cv){ghost.setAttribute('cx',xs[h]);ghost.setAttribute('cy',yAt(xs[h]));ghost.classList.add('on')}else ghost.classList.remove('on')},
+    initInstant(v){u=t=v/(n-1);draw(u)}
+  };
+}
+
+/* ---------------- 概念 4 · 星座连线 ---------------- */
+function skin4(c){
+  const {svg,n,xs}=c;defs(c);
+  const Y={5:[27,13,24,11,19],4:[26,12,23,14],3:[25,12,20]}[n]||[20,20];
+  const P=xs.map((x,i)=>[x,Y[i]]);
+  const trim=(a,b,d)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);return[a[0]+dx/L*d,a[1]+dy/L*d]};
+  const lines=[],segs=[];
+  for(let i=0;i<n-1;i++){
+    const a=trim(P[i],P[i+1],5),b=trim(P[i+1],P[i],5);
+    el('line',{class:'ghostln',x1:a[0],y1:a[1],x2:b[0],y2:b[1]},svg);
+    segs.push(el('path',{class:'seg',d:`M ${a[0]} ${a[1]} L ${b[0]} ${b[1]}`,pathLength:1},svg));
+  }
+  const R4=rng(5);for(let i=0;i<5;i++){const bx=xs[0]-6+R4()*(xs[n-1]-xs[0]+12),by=5+R4()*28;el('circle',{class:'bg4',cx:bx.toFixed(1),cy:by.toFixed(1),r:(.5+R4()*.5).toFixed(2)},svg)}
+  const cs=P.map(([x,y],i)=>{
+    const g=el('g',{class:'cs',transform:`translate(${x} ${y})`},svg);
+    el('circle',{class:'dot',r:[2.1,2.7,2.0,2.5,2.2][i%5]},g).style.transformOrigin='0 0';
+    const big=el('g',{class:'big'},g);
+    el('circle',{class:'halo',r:15,fill:c.fillHalo},big);useStar(big,14,'base');useStar(big,14,'top',c.fillTop);
+    return g});
+  let prev=0;
+  return{
+    set(v,p,instant){
+      const from=p==null?v:p,up=v>from;
+      segs.forEach((s,i)=>{
+        const want=i<v,was=s.classList.contains('lit');
+        s.style.transitionDelay=instant||RM()||want===was?'0ms':((up?(i-from):(from-1-i))*40)+'ms';
+        s.classList.toggle('lit',want);
+      });
+      cs.forEach((g,i)=>{g.classList.toggle('lit',i<=v);g.classList.toggle('act',i===v)});
+    },
+    hover(h){cs.forEach((g,i)=>g.classList.toggle('hv',i===h))}
+  };
+}
+const SKINS={1:{fn:skin1,h:34,cls:'s1'},2:{fn:skin2,h:40,cls:'s2'},3:{fn:skin3,h:38,cls:'s3'},4:{fn:skin4,h:38,cls:'s4'}};
+
+/* ---------------- Slider ---------------- */
+const ALL=[];
+class Slider{
+  constructor(host,{skin=1,n=5,v=1,instant=false}={}){
+    this.host=host;this.skinId=skin;this.n=n;this.v=clamp(v,0,n-1);this.id=++UID;this.peers=[];this.hoverIdx=-1;this.dragging=false;this.firstBuild=true;this.initial=instant;
+    const S=SKINS[skin];
+    host.classList.add('cos',S.cls);
+    host.innerHTML=`<div class="eh"><b><svg class="hs"><use href="#sd-star"/></svg><span>推理强度 · <span class="cur"></span></span></b><span class="fx"></span></div>
+      <div class="sr"><span class="story"></span><span class="cnt"></span></div>
+      <div class="stage" role="slider" tabindex="0" aria-label="推理强度" style="--sh:${S.h}px"><svg></svg></div>
+      <div class="tiers"></div>`;
+    this.stage=$('.stage',host);this.svg=$('.stage svg',host);this.tiers=$('.tiers',host);
+    this.bindPointer();this.bindKeys();
+    this.ro=new ResizeObserver(()=>{const w=Math.round(this.stage.clientWidth);if(w&&w!==this.W)this.build()});
+    this.ro.observe(this.stage);
+    this.build();ALL.push(this);
+  }
+  setN(n){this.v=Math.round(this.v/(this.n-1)*(n-1));this.n=n;this.build()}
+  build(){
+    const S=SKINS[this.skinId],W=Math.round(this.stage.clientWidth)||340,H=S.h,n=this.n;
+    this.W=W;this.svg.innerHTML='';this.svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    const xs=[...Array(n).keys()].map(i=>PADX+i*(W-2*PADX)/(n-1));this.xs=xs;
+    this.ctx={svg:this.svg,W,H,n,xs,uid:this.id+'_'+(++UID)};
+    this.skin=S.fn(this.ctx);
+    // 档位标签：与星位对齐
+    this.tiers.innerHTML='';this.btns=LABELS[n].map((lab,i)=>{
+      const b=document.createElement('button');b.type='button';b.tabIndex=-1;b.textContent=lab;b.style.left=xs[i]+'px';
+      b.addEventListener('click',()=>this.setValue(i,true));
+      b.addEventListener('pointerenter',()=>this.setHover(i));b.addEventListener('pointerleave',()=>this.setHover(-1));
+      this.tiers.appendChild(b);return b});
+    $('.cnt',this.host).textContent=n+' 档';
+    this.stage.setAttribute('aria-valuemin',0);this.stage.setAttribute('aria-valuemax',n-1);
+    this.render(null,true);
+    this.firstBuild=false;
+  }
+  render(prev,instant){
+    const n=this.n,v=this.v,lab=LABELS[n][v];
+    $('.cur',this.host).textContent=lab;
+    const sr=$('.story',this.host),was=sr.textContent;sr.textContent=DESC[lab];
+    if(was&&was!==DESC[lab]&&!RM()&&sr.animate)sr.animate([{opacity:.35},{opacity:1}],{duration:200,easing:'ease'});
+    this.host.style.setProperty('--lv',(.45+.55*v/(n-1)).toFixed(2));
+    this.stage.setAttribute('aria-valuenow',v);this.stage.setAttribute('aria-valuetext',lab);
+    this.btns.forEach((b,i)=>{b.classList.toggle('on',i===v);b.setAttribute('aria-pressed',i===v)});
+    if(instant&&this.skin.initInstant)this.skin.initInstant(v);
+    this.skin.set(v,prev,instant);
+    this.skin.hover&&this.skin.hover(this.hoverIdx);
+  }
+  setValue(v,fromUser,quiet){
+    v=clamp(v,0,this.n-1);if(v===this.v)return;
+    const prev=this.v;this.v=v;this.render(prev,false);
+    if(!quiet)this.peers.forEach(p=>p.setValue(v,false,true));
+  }
+  setHover(i){this.hoverIdx=i;this.btns&&this.btns.forEach((b,k)=>b.classList.toggle('hv',k===i&&i!==this.v));this.skin.hover&&this.skin.hover(i)}
+  idxAt(px){return clamp(Math.round((px-PADX)/(this.W-2*PADX)*(this.n-1)),0,this.n-1)}
+  uAt(px){return clamp((px-PADX)/(this.W-2*PADX),0,1)}
+  bindPointer(){
+    const st=this.stage;
+    const move=e=>{const x=e.clientX-st.getBoundingClientRect().left,u=this.uAt(x);
+      this.setValue(this.idxAt(x),true);
+      if(this.skin.drag){this.skin.drag(u);this.peers.forEach(p=>p.skin.drag&&p.skin.drag(u))}};
+    st.addEventListener('pointerdown',e=>{if(e.button!==0)return;st.setPointerCapture(e.pointerId);this.dragging=true;st.classList.add('drag');this.setHover(-1);move(e)});
+    st.addEventListener('pointermove',e=>{if(this.dragging)move(e);else this.setHover(this.idxAt(e.clientX-st.getBoundingClientRect().left))});
+    const up=()=>{if(!this.dragging)return;this.dragging=false;st.classList.remove('drag');
+      this.skin.release&&this.skin.release();this.peers.forEach(p=>p.skin.release&&p.skin.release())};
+    st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);
+    st.addEventListener('pointerleave',()=>{if(!this.dragging)this.setHover(-1)});
+  }
+  bindKeys(){
+    this.stage.addEventListener('keydown',e=>{
+      const k=e.key;let nv=null;
+      if(k==='ArrowRight'||k==='ArrowUp')nv=this.v+1;else if(k==='ArrowLeft'||k==='ArrowDown')nv=this.v-1;
+      else if(k==='Home')nv=0;else if(k==='End')nv=this.n-1;
+      if(nv==null)return;e.preventDefault();this.setValue(nv,true);
+    });
+  }
+}
+
+/* ---------------- 页面装配 ---------------- */
+const CONCEPTS=[
+ {id:1,name:'星点渐亮',en:'Starlight Row',
+  pitch:'每一档就是一颗星：低档只亮一颗，每升一档多点亮一颗，已亮的星亮度逐级递增，当前这颗额外带一圈柔光和一个缓慢闪烁的小星芒。没有轨道、没有粒子，「数亮着的星」就是读档位，星位和下方标签一一对齐。最克制、最好读，也是最贴近原有圆点状态指示的一个。',
+  facts:[['舞台高度','34px（现有星舰 56px）'],['常驻动画','仅当前星：光晕呼吸 3.6s + 星芒闪烁 3.4s'],['切换','缩放/填色 200ms，缓动同 --v9-spring'],['低/中/高…','3–5 档均为「每档一颗星」，天然适配']]},
+ {id:2,name:'星尘凝聚',en:'Dust Condenses',
+  pitch:'轨道上散落着 26 粒微光星尘；档位越高，越多的星尘被吸向滑块、在它周围聚成一圈椭圆光晕，同时中间那颗星从一个小亮点长成完整的白紫星。到「极限」时星星睁开那两只小竖眼并眨一次右眼——对吉祥物的一个彩蛋。故事最完整，也最「星尘」，但低档时满轨散点会比其他方案略「碎」。',
+  facts:[['舞台高度','40px'],['常驻动画','仅滑块光晕缓慢呼吸 4s（缩放 .96–1.06）'],['切换','26 粒错峰 0–40ms，每粒 210ms 位移；星 220ms'],['极限彩蛋','竖眼淡入 200ms + 右眼眨一次 460ms；减少动态时静态睁眼']]},
+ {id:3,name:'星轨',en:'Orbit',
+  pitch:'一条扁平的细轨道椭圆（呼应图标里环绕星星的光环），小星沿近侧弧线滑行；走过的弧线留下由淡到亮的尾迹，档位越高尾迹越粗越亮，同时远侧弧线从右端逐段点亮——到「极限」整圈闭合，一个完整的轨道。拖动时小星顺滑跟手、松手吸附到档位。弧线有一点高低起伏，辨识度最高，横向位置仍与标签严格对齐。',
+  facts:[['舞台高度','38px'],['常驻动画','仅光晕呼吸 3.6s；移动时 rAF 约 250ms，静止即停'],['切换','指数缓动 τ=55ms（≈250ms 到位），拖动即时跟手'],['闭合','远侧弧线亮起比例 = 档位比例，极限=整圈']]},
+ {id:4,name:'星座连线',en:'Constellation',
+  pitch:'每个档位是一个小星座的节点，错落排布像一个极简星座；升一档就把相邻两颗星之间的细线「画」出来（多档跳转时逐段依次出现，每段 170ms），当前档的节点变成带光晕的白紫星，已连接的节点转为紫色小点。读起来像进度，又有「连成星座」的小满足；最克制的动效，只有线段描边与节点变化。',
+  facts:[['舞台高度','38px'],['常驻动画','仅当前星光晕呼吸 3.6s'],['切换','线段 stroke-dashoffset 170ms，多档跳转每段错峰 40ms'],['适配','3/4/5 档各有一套节点高度，排布不重复']]}
+];
+
+const COST={"1":{"nodes":39,"idle":0.07},"2":{"nodes":48,"idle":0.1},"3":{"nodes":24,"idle":0.14},"4":{"nodes":51,"idle":0.11}};  /* 由 verify.mjs 实测后写入 */
+
+function mkTheme(cls,child){const d=document.createElement('div');d.className=cls;d.appendChild(child);return d}
+function box(){return document.createElement('div')}
+
+function buildMain(){
+  /* 总览 */
+  const ov=$('#overview');
+  ['th-light','th-dark'].forEach(th=>{
+    const col=document.createElement('div');col.className='col '+th;
+    CONCEPTS.forEach(c=>{
+      const cell=document.createElement('div');cell.className='cell';
+      cell.innerHTML=`<div class="cap"><b>${c.id} · ${c.name}</b><span>${c.en}</span></div>`;
+      const b=box();cell.appendChild(b);col.appendChild(cell);
+      new Slider(b,{skin:c.id,n:5,v:1}).ovGroup=true;
+    });
+    ov.appendChild(col);
+  });
+  /* 卡片 */
+  const cards=$('#cards');
+  CONCEPTS.forEach(c=>{
+    const card=document.createElement('div');card.className='card';
+    const cost=COST[c.id];
+    card.innerHTML=`<h3>${c.id} · ${c.name}<i>${c.en}</i></h3><p>${c.pitch}</p><div class="pair"></div>
+      <dl class="facts">${c.facts.map(f=>`<dt>${f[0]}</dt><dd>${f[1]}</dd>`).join('')}
+      <dt>渲染成本</dt><dd class="costline" data-c="${c.id}">${cost?costText(cost):'—'}</dd></dl>`;
+    const pair=$('.pair',card);
+    ['th-light','th-dark'].forEach(th=>{
+      const w=document.createElement('div');w.className='well2 '+th;
+      const pop=document.createElement('div');pop.className='pop';const b=box();pop.appendChild(b);w.appendChild(pop);pair.appendChild(w);
+      new Slider(b,{skin:c.id,n:5,v:2});
+    });
+    cards.appendChild(card);
+  });
+  /* 工具条 */
+  $('#nSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const n=+b.dataset.n;
+    [...$('#nSeg').children].forEach(x=>x.setAttribute('aria-pressed',x===b));
+    ALL.forEach(s=>s.setN(n));buildSync(n);fillNodeCounts()});
+  $('#rmBtn').addEventListener('click',e=>{const on=document.documentElement.classList.toggle('rm');e.currentTarget.setAttribute('aria-pressed',on)});
+  buildSync(5);
+  /* 总览同步 */
+  function buildSync(n){
+    const sy=$('#syncSeg');sy.innerHTML='';
+    LABELS[n].forEach((l,i)=>{const b=document.createElement('button');b.textContent=l;b.setAttribute('aria-pressed','false');
+      b.onclick=()=>{ALL.filter(s=>s.ovGroup).forEach(s=>s.setValue(i,true));[...sy.children].forEach(x=>x.setAttribute('aria-pressed',x===b))};sy.appendChild(b)});
+  }
+  /* 结论 */
+  $('#recbox').innerHTML=`<h3>推荐与取舍</h3>
+   <p><b>首选：4 · 星座连线</b>（备选 1 · 星点渐亮）。最克制、读数最直接，且「连线」让档位是「走了几步」一目了然；3/4/5 档都不用重画；只有线段与节点在变，最不抢输入框注意力。</p>
+   <p><b>想要品牌记忆点：2 · 星尘凝聚</b>——「极限」睁眼是唯一的彩蛋，但低档的满轨散点最碎，建议降到 14–16 粒或只在 hover 时显现。<b>3 · 星轨</b>最漂亮，也最容易让人把注意力放在小星上；若要用，建议把椭圆高度再压到 ry≈6。</p>
+   <p>落地建议：保留现有 <code>role="radiogroup"</code> 档位按钮作为无障碍路径；新舞台作为指针/视觉层，沿用 <code>data-cosmic-stage-well</code> 的容器尺寸（宽 340、高降到 34–40，比星舰省约 30% 高度）。所有动画使用 CSS/SVG，无 canvas、无 filter；概念 3 的 rAF 仅在位移的 ~250ms 内运行。</p>`;
+}
+function costText(c){return `SVG 节点 ≈ ${c.nodes}；常驻空闲（动画开启）主线程占用 ≈ ${c.idle}%（Chrome 实测，弹窗打开状态）；减少动态时 0%`}
+function fillNodeCounts(){}
+
+/* ---------------- 工具模式 ---------------- */
+const Q=new URLSearchParams(`mode=pop&c=4&${location.search.slice(1)}`),MODE=Q.get('mode');
+if(Q.get('rm')==='1')document.documentElement.classList.add('rm');
+function popReplica(b){
+  const w=document.createElement('div');w.className='pop';
+  w.innerHTML=`<div class="mps"><span>⌕</span><span style="color:var(--fg3)">搜索模型</span><span>⌘K</span></div>
+    <div class="mtabs"><span>★ 常用</span><span class="on">Claude</span><span>Codex</span><span>本地</span></div>
+    <div class="mlist"><div class="mi"><span class="nm">Opus 5.5</span><span class="mt">1M</span></div><div class="mi on"><span class="nm">Sonnet 5.5</span><span class="mt">200K</span><span class="ck">✓</span></div><div class="mi"><span class="nm">Haiku 5.5</span><span class="mt">200K</span></div></div>`;
+  w.appendChild(b);
+  const pr=document.createElement('div');pr.className='prow';
+  pr.innerHTML=`<span>权限</span><span class="segc"><span>询问</span><span class="on">自动</span><span>完全访问</span></span>`;
+  w.appendChild(pr);return w;
+}
+if(MODE){
+  document.body.classList.add('mode');
+  const root=$('#modeRoot'),sk=+Q.get('c')||1,nq=+Q.get('n')||5;
+  if(MODE==='sheet'){
+    const cells=[];
+    for(let v=0;v<5;v++)cells.push({n:5,v,cap:`5 档 · ${LABELS[5][v]}`});
+    cells.push({n:4,v:3,cap:'4 档 · 极限（最高档）'},{n:3,v:2,cap:'3 档 · 高（最高档）'},{n:5,v:1,cap:'悬停预览 · 当前「中」，鼠标悬停「超高」',hover:3},{n:5,v:2,cap:'键盘焦点环 · 当前「高」',focus:true});
+    const sheet=document.createElement('div');sheet.className='sheet';
+    ['th-light','th-dark'].forEach(th=>{
+      const col=document.createElement('div');col.className='col '+th;
+      col.innerHTML=`<h4>${sk} · ${CONCEPTS[sk-1].name} · ${th==='th-light'?'亮色':'暗色'}</h4>`;
+      const g=document.createElement('div');g.className='grid';
+      cells.forEach(cl=>{const w=document.createElement('div');w.innerHTML=`<div class="cap"><b>${cl.cap}</b></div>`;const b=box();w.appendChild(b);g.appendChild(w);
+        const s=new Slider(b,{skin:sk,n:cl.n,v:cl.v,instant:true});
+        if(cl.hover!=null)s.setHover(cl.hover);if(cl.focus)s.stage.classList.add('ff');});
+      col.appendChild(g);sheet.appendChild(col)});
+    root.appendChild(sheet);
+  }else if(MODE==='pop'){
+    const wrap=document.createElement('div');wrap.className='popwrap';
+    const bs=[];
+    ['th-light','th-dark'].forEach(th=>{const col=document.createElement('div');col.className='col '+th;const b=box();col.appendChild(popReplica(b));wrap.appendChild(col);bs.push(b)});
+    root.appendChild(wrap);
+    bs.forEach((b,i)=>new Slider(b,{skin:sk,n:5,v:i?4:3,instant:true}));
+  }else if(MODE==='video'){
+    const vid=document.createElement('div');vid.className='vid';
+    const ss=[];
+    ['th-light','th-dark'].forEach(th=>{const col=document.createElement('div');col.className='col '+th;
+      col.style.position='relative';col.innerHTML=`<div class="ttl">${sk} · ${CONCEPTS[sk-1].name} · ${th==='th-light'?'亮':'暗'}</div>`;
+      const pop=document.createElement('div');pop.className='pop';pop.style.width='386px';const b=box();pop.appendChild(b);col.appendChild(pop);vid.appendChild(col);
+      ss.push([b,th])});
+    root.appendChild(vid);
+    const sl=ss.map(([b])=>new Slider(b,{skin:sk,n:nq,v:0,instant:true}));
+    sl[0].peers=[sl[1]];
+    window.__vid=sl;
+  }
+}else buildMain();
+function $$(s,r=document){return[...r.querySelectorAll(s)]}
+window.__ALL=ALL;window.__COST=COST;
+requestAnimationFrame(()=>requestAnimationFrame(()=>{window.__ready=true}));
+</script>
+</body>
+</html>

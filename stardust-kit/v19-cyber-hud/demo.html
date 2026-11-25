@@ -185,7 +185,48 @@
     color: var(--primary-foreground, #fff);
   }
 </style>
-</head>
+<script>
+addEventListener('DOMContentLoaded', () => {
+  if ("v19-cyber-hud" === 'slider-r4-q') document.querySelector('#vSeg [data-l="Q"]').click();
+  const component = document.querySelector("#panelCyber [data-well]");
+  if (!component) throw new Error('Missing original workshop component: ' + "#panelCyber [data-well]");
+  const stage = document.createElement('div');
+  stage.id = 'workshop-original';
+  document.body.insertBefore(stage, document.body.firstChild);
+  let branch = component;
+  while (branch.parentElement !== document.body) {
+    const parent = branch.parentElement;
+    for (const sibling of parent.children) {
+      if (sibling === branch) continue;
+      if ("v19-cyber-hud" === 'v16-stardust-observatory' && sibling.matches('.card')) {
+        sibling.inert = true;
+        sibling.style.cssText += ';position:fixed;left:0;top:0;width:min(280px,100vw);visibility:hidden;pointer-events:none';
+      } else sibling.style.setProperty('display', 'none', 'important');
+    }
+    branch = parent;
+  }
+  for (const child of document.body.children) {
+    if (child !== stage && child !== branch && !child.matches('svg,script,style')) {
+      child.style.setProperty('display', 'none', 'important');
+    }
+  }
+  stage.append(branch);
+  for (let el = branch; el !== component; el = [...el.children].find(n => n.contains(component))) {
+    el.style.cssText += ';display:block!important;width:100%;min-width:0;max-width:none;margin:0;padding:0;min-height:0;background:transparent;border:0;box-shadow:none';
+  }
+  document.body.style.cssText += ';width:auto;max-width:none;margin:0;padding:0;background:#111025;min-height:0';
+  document.documentElement.style.background = '#111025';
+  if (component.matches('.gx,.cos')) {
+    const row = () => {
+      stage.style.width = '360px';
+      stage.style.marginInline = 'auto';
+      stage.style.zoom = Math.min(1, document.documentElement.clientWidth / 360);
+    };
+    row();
+    addEventListener('resize', row);
+  }
+});
+</script></head>
 <body>
 <p class="lead">保留同样爽快的 5 档星舰发射弧线，另外做出两套截然不同的高完成度风格供你对比：<b>风格 1「16-Bit 街机高精像素风」</b>（合金弹头/宇宙巡航机级像素火箭、圆润火焰烟球与星海）与 <b>风格 2「赛博机甲 HUD 霓虹风」</b>（高达/EVA 遥测网格、流体光带尾迹与曲速能量护盾）。每张卡下方都带 5 档实景动态条，可直接拖动或点下方连升演示。</p>
 

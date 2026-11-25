@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>星尘 · 推理强度滑块 · 第 4 轮 · 银河带（更高、更短）</title>
+<link rel="stylesheet" href="gx.css">
+<style>
+.live{display:grid;grid-template-columns:1fr 1fr;border-radius:20px;overflow:hidden;box-shadow:0 0 0 .5px rgba(0,0,0,.1)}
+.live .col{padding:26px 0;display:flex;justify-content:center}
+.live .col.th-light{background:#ecebf2}.live .col.th-dark{background:#0f0e15}
+.hbars{background:#fff;border-radius:18px;padding:18px 22px;box-shadow:0 0 0 .5px rgba(0,0,0,.08);display:grid;grid-template-columns:230px 1fr 330px;gap:8px 14px;align-items:center;font-size:12.5px}
+.hbars .bar1{height:16px;border-radius:5px;background:linear-gradient(90deg,#5B4BE0,#8D7DFF)}
+.hbars .bar1.cur{background:#b9b9c4}.hbars .bar1.old{background:#cfcfd8}
+.hbars .n{font-variant-numeric:tabular-nums;color:#55555a}.hbars .n b{color:#1d1d1f}
+.hbars .neg{color:#1f9d55;font-weight:700}
+.mx{display:grid;grid-template-columns:150px 1fr 1fr;border-radius:18px;overflow:hidden;box-shadow:0 0 0 .5px rgba(0,0,0,.1)}
+.mx .rl{background:#fff;padding:18px 14px;font-weight:650;font-size:13px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.mx .rl small{font-weight:500;color:#8a8a90;font-size:11px}
+.mx .col{padding:16px 22px;display:flex;justify-content:center;align-items:center}
+.mx .col.th-light{background:#fff}.mx .col.th-dark{background:#0f0e15}
+.mx .cell{width:362px;max-width:100%}
+.mx .gx{border-top:0}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.gal .card{padding:14px 16px}
+.gal h3{font-size:14px}
+.gal video{width:100%;border-radius:10px;background:#111}
+.gal p{margin:8px 0 0;font-size:12px;color:#6e6e73}
+.gal a{color:#5B4BE0}
+table.t{border-collapse:collapse;font-size:12.5px}table.t td,table.t th{padding:3px 18px 3px 0;text-align:left}table.t th{color:#6e6e73;font-weight:600}
+
+/* X 成片画布 640×360（×3 = 1920×1080）：亮 / 暗上下叠放，只放推理强度区，保持真实 386px 弹窗宽度 */
+.xc{width:640px;height:360px;background:#101014;color:#f5f5f7;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:0 24px;font-family:var(--sans)}
+.xc .xt{display:flex;align-items:baseline;gap:10px;padding:0 2px 2px}
+.xc .xt b{font-size:14px}.xc .xt span{font-size:11px;color:#9a9aa6}
+.xc .xb{border-radius:14px;padding:8px 0 6px;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative}
+.xc .xb.th-light{background:#ecebf2}.xc .xb.th-dark{background:#0b0a12}
+.xc .xb .ttl{position:absolute;left:14px;top:9px;font-size:10px;color:var(--fg3)}
+.xc .pop{padding:5px 12px 6px}
+.xc .gx{border-top:0;padding-top:4px}
+.xc .gx[data-l=Q]{padding-top:6px;padding-bottom:6px}
+.xc .evt{font:600 10.5px/1.2 var(--sans);color:var(--fg2);height:13px;display:flex;gap:8px;align-items:center}
+.xc .evt .bar2{display:inline-flex;gap:2px}.xc .evt .bar2 i{width:12px;height:4px;border-radius:2px;background:var(--fill)}.xc .evt .bar2 i.on{background:var(--ac)}
+.cmp{display:grid;grid-template-columns:repeat(5,560px);width:2800px}
+.cmp .cell{padding:34px 0 40px;display:flex;justify-content:center;align-items:flex-start;position:relative}
+.cmp .cell.th-light{background:#ecebf2}.cmp .cell.th-dark{background:#0f0e15}
+.cmp .lbl{position:absolute;left:14px;top:10px;font:650 12px/1 var(--sans);color:var(--fg2)}
+.cmp .cell .pop{margin-top:6px}
+.cmp .cell .gx{border-top-color:var(--hair)}
+.cmp .ann{position:absolute;font:700 11px/12px var(--sans);color:#ff3b30;white-space:nowrap}
+</style>
+<script>
+addEventListener('DOMContentLoaded', () => {
+  if ("slider-r4-q" === 'slider-r4-q') document.querySelector('#vSeg [data-l="Q"]').click();
+  const component = document.querySelector("#live .th-dark .gx");
+  if (!component) throw new Error('Missing original workshop component: ' + "#live .th-dark .gx");
+  const stage = document.createElement('div');
+  stage.id = 'workshop-original';
+  document.body.insertBefore(stage, document.body.firstChild);
+  let branch = component;
+  while (branch.parentElement !== document.body) {
+    const parent = branch.parentElement;
+    for (const sibling of parent.children) {
+      if (sibling === branch) continue;
+      if ("slider-r4-q" === 'v16-stardust-observatory' && sibling.matches('.card')) {
+        sibling.inert = true;
+        sibling.style.cssText += ';position:fixed;left:0;top:0;width:min(280px,100vw);visibility:hidden;pointer-events:none';
+      } else sibling.style.setProperty('display', 'none', 'important');
+    }
+    branch = parent;
+  }
+  for (const child of document.body.children) {
+    if (child !== stage && child !== branch && !child.matches('svg,script,style')) {
+      child.style.setProperty('display', 'none', 'important');
+    }
+  }
+  stage.append(branch);
+  for (let el = branch; el !== component; el = [...el.children].find(n => n.contains(component))) {
+    el.style.cssText += ';display:block!important;width:100%;min-width:0;max-width:none;margin:0;padding:0;min-height:0;background:transparent;border:0;box-shadow:none';
+  }
+  document.body.style.cssText += ';width:auto;max-width:none;margin:0;padding:0;background:#111025;min-height:0';
+  document.documentElement.style.background = '#111025';
+  if (component.matches('.gx,.cos')) {
+    const row = () => {
+      stage.style.width = '360px';
+      stage.style.marginInline = 'auto';
+      stage.style.zoom = Math.min(1, document.documentElement.clientWidth / 360);
+    };
+    row();
+    addEventListener('resize', row);
+  }
+});
+</script></head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sd-star" viewBox="260 265 504 480"><path d="M475.4 324.7 Q512.0 265.0 548.6 324.7 L581.3 378.0 Q600.2 408.6 635.2 417.1 L696.0 431.7 Q764.0 448.1 718.6 501.4 L678.0 549.0 Q654.7 576.4 657.5 612.2 L662.3 674.6 Q667.8 744.4 603.1 717.6 L545.3 693.8 Q512.0 680.0 478.7 693.8 L420.9 717.6 Q356.2 744.4 361.7 674.6 L366.5 612.2 Q369.3 576.4 346.0 549.0 L305.4 501.4 Q260.0 448.1 328.0 431.7 L388.8 417.1 Q423.8 408.6 442.7 378.0 Z"/></symbol></svg>
+
+<div class="bar">
+  <h1>星尘 · 推理强度滑块 · 第 4 轮<small>银河带 · 更高、更短 · 设计稿（canvas + CSS，无依赖）</small></h1>
+  <div class="grp">变体<div class="seg" id="vSeg"><button data-l="P" aria-pressed="true">P 28px</button><button data-l="Q" aria-pressed="false">Q 32px</button><button data-l="R" aria-pressed="false">R 36px</button></div></div>
+  <div class="grp">全部同步<div class="seg" id="syncSeg"></div></div>
+  <button class="tg go" id="demoBtn">▶ 自动演示</button>
+  <button class="tg" id="slowBtn" aria-pressed="false">慢放 0.25×</button>
+  <button class="tg" id="hazeBtn" aria-pressed="true">星场漂移</button>
+  <button class="tg" id="rmBtn" aria-pressed="false" title="模拟 prefers-reduced-motion: reduce">减少动态（模拟）</button>
+</div>
+
+<main>
+  <h2>1 · 实时预览（顶栏切换变体）</h2>
+  <p class="sub">与 r3 同一个模型弹窗（内容宽 362px）。点击、拖动、键盘 ← → ↑ ↓ Home End 都可用；「慢放 0.25×」最适合看每档冲击差异。</p>
+  <div class="live" id="live"></div>
+
+  <h2>2 · 高度：现状 vs r3 vs P / Q / R</h2>
+  <p class="sub" id="hSub"></p>
+  <div class="hbars" id="hbars"></div>
+
+  <h2>3 · 三个变体 × 亮 / 暗</h2>
+  <p class="sub">每个单元都是可交互的完整推理强度区（不含弹窗其它部分）。</p>
+  <div class="mx" id="matrix"></div>
+
+  <h2>4 · 产出物</h2>
+  <div class="gal" id="gal"></div>
+  <div class="rec" id="recbox"></div>
+  <div class="m-only" id="modeRoot"></div>
+</main>
+
+<script src="gx-engine.js"></script>
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const G=GXG,LAB=GX_LABELS[5],CFG=GX_CFG;
+const Q=new URLSearchParams(location.search),MODE=Q.get('mode');
+if(Q.get('rm')==='1')document.documentElement.classList.add('rm');
+if(MODE||Q.get('manual')==='1')G.manual=true;
+const ALL=[];const box=()=>document.createElement('div');
+const NM={P:'P · 28px 轨道 · 60% 宽',Q:'Q · 32px 轨道 · 单行',R:'R · 36px 轨道 · 档位标签',F:'r3 · 18px 通栏'};
+function mk(host,l,o={}){const s=new GX(host,{layout:l,n:5,...o});ALL.push(s);return s}
+
+/* ---------- 现状复刻（逐字取自 composerV9.css 的 [data-cosmic-*] 规则，同 r3） ---------- */
+function curBox(){const w=document.createElement('div');w.className='cur-box';
+  w.innerHTML=`<div class="cur-head"><b><span class="cur-dot"></span><span>推理强度 · 中 Medium</span></b><span class="tagc">V18 Starship Launch Stack</span></div>
+  <div class="cur-sub"><span>猛禽点火 · 夹钳弹开</span><span>5 档连续流体演进</span></div>
+  <div class="cur-well"><div class="cur-track"><i></i><b></b></div></div>
+  <div class="cur-scale"><span>低 Low</span><span class="on">中 Med</span><span>高 High</span><span>超高 XHigh</span><span>Max</span></div>`;return w}
+function popReplica(sec){
+  const w=document.createElement('div');w.className='pop';
+  w.innerHTML=`<div class="mps"><span>⌕</span><span style="color:var(--fg3)">搜索模型</span><span>⌘K</span></div>
+    <div class="mtabs"><span>★ 常用</span><span class="on">Claude</span><span>Codex</span><span>本地</span></div>
+    <div class="mlist"><div class="mi"><span class="nm">Opus 5.5</span><span class="mt">1M</span></div><div class="mi on"><span class="nm">Sonnet 5.5</span><span class="mt">200K</span><span class="ck">✓</span></div><div class="mi"><span class="nm">Haiku 5.5</span><span class="mt">200K</span></div></div>`;
+  w.appendChild(sec);
+  const pr=document.createElement('div');pr.className='prow';pr.innerHTML=`<span>权限</span><span class="segc"><span>询问</span><span class="on">自动</span><span>完全访问</span></span>`;w.appendChild(pr);return w}
+
+/* ---------- 高度测量 ---------- */
+const H={},TR={};
+function measure(){
+  const t=document.createElement('div');t.className='th-light';t.style.cssText='position:absolute;left:-9999px;top:0;width:362px';
+  const cb=curBox();t.appendChild(cb);document.body.appendChild(t);H.cur=cb.getBoundingClientRect().height;TR.cur=cb.querySelector('.cur-track').getBoundingClientRect().height;
+  ['F','P','Q','R'].forEach(l=>{const b=box();t.appendChild(b);const g=new GX(b,{layout:l,n:5});H[l]=b.getBoundingClientRect().height;TR[l]=b.querySelector('.gx-ch').getBoundingClientRect().height;TR[l+'w']=b.querySelector('.gx-stage').getBoundingClientRect().width;g.ro.disconnect();G.all.delete(g)});
+  t.remove()}
+
+/* ================= 主页面 ================= */
+let curL='P',live=[];
+function buildMain(){
+  measure();
+  const lv=$('#live');
+  ['th-light','th-dark'].forEach((th,i)=>{const col=document.createElement('div');col.className='col '+th;const b=box();col.appendChild(popReplica(b));lv.appendChild(col);live.push(mk(b,curL,{v:i?4:3}))});
+  const mx=Math.max(H.cur,150);
+  const pc=px=>((1-px/H.cur)*100).toFixed(0);
+  const bar=(label,px,cls,neg,note)=>`<div>${label}</div><div class="bar1 ${cls}" style="width:${(px/mx*100).toFixed(1)}%"></div><div class="n"><b>${px.toFixed(0)} px</b> ${neg?`<span class="neg">−${neg}%</span>`:''} <span style="color:#8a8a90">${note||''}</span></div>`;
+  $('#hSub').innerHTML=`整块推理强度区的总高度（含头一行、轨道、内边距）。现状用真实 <code>composerV9.css</code> 复刻后实测 <b>${H.cur.toFixed(0)}px</b>；r3 18px 通栏 <b>${H.F.toFixed(0)}px</b>（太扁）。r4 的目标：落在两者之间，并让带本身更高、横向更短。`;
+  $('#hbars').innerHTML=bar('现状（真实 CSS 复刻）',H.cur,'cur','',`轨道 ${TR.cur.toFixed(0)}px · 通栏`)
+    +bar('r3 · 18px 通栏',H.F,'old',pc(H.F),`轨道 ${TR.F.toFixed(0)}px · ${TR.Fw.toFixed(0)}px 宽（≈ 通栏）`)
+    +['P','Q','R'].map(l=>bar(NM[l],H[l],'',pc(H[l]),`轨道 ${TR[l].toFixed(0)}px · ${TR[l+'w'].toFixed(0)}px 宽（${(TR[l+'w']/362*100).toFixed(0)}%）`)).join('');
+  const m=$('#matrix');
+  ['P','Q','R'].forEach(l=>{const rl=document.createElement('div');rl.className='rl';rl.innerHTML=`${l}<small>总高 ${H[l].toFixed(0)}px</small><small>轨道 ${TR[l].toFixed(0)}px</small><small>−${pc(H[l])}%</small>`;m.appendChild(rl);
+    ['th-light','th-dark'].forEach((th,i)=>{const col=document.createElement('div');col.className='col '+th;const cell=document.createElement('div');cell.className='cell';const b=box();cell.appendChild(b);col.appendChild(cell);m.appendChild(col);mk(b,l,{v:i?4:3})})});
+  const gal=$('#gal');
+  ['P','Q','R'].forEach(l=>{const c=document.createElement('div');c.className='card';
+    c.innerHTML=`<h3>${NM[l]}</h3><video data-review-src="video/${l}.mp4" controls loop muted playsinline preload="metadata"></video>
+    <p>低 → 极限 → 低 · 60fps · <a href="png/${l}-contact-sheet.png">联系表（5 档放大）</a> · <a href="video/x/${l}-1920x1080.mp4">X 版 1920×1080</a> · <a href="video/x/cover-${l}.png">封面</a></p>`;gal.appendChild(c)});
+  const extra=document.createElement('div');extra.className='card';extra.style.gridColumn='1/-1';
+  extra.innerHTML=`<h3>现状 vs r3 vs P / Q / R</h3><p style="margin:0 0 8px"><a href="png/compare.png">png/compare.png</a>（含红色高度标注）</p><img data-review-src="png/compare.png" style="width:100%;border-radius:12px" alt="">`;gal.appendChild(extra);
+  const seg=(id,cb)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;[...b.parentNode.children].forEach(x=>x.setAttribute('aria-pressed',x===b));cb(b)});
+  seg('#vSeg',b=>{curL=b.dataset.l;live.forEach((s,i)=>{const host=s.host;G.all.delete(s);s.ro.disconnect();const k=ALL.indexOf(s);host.className='';host.removeAttribute('data-l');const n=mk(host,curL,{v:s.v});live[i]=n;ALL.splice(k,1)})});
+  const tgl=(id,fn)=>$(id).addEventListener('click',e=>{const on=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',on);fn(on)});
+  tgl('#rmBtn',on=>document.documentElement.classList.toggle('rm',on));
+  tgl('#hazeBtn',on=>document.documentElement.classList.toggle('nohaze',!on));
+  tgl('#slowBtn',on=>{G.scale=on?.25:1});
+  $('#demoBtn').addEventListener('click',()=>demo());
+  const sy=$('#syncSeg');LAB.forEach((l,i)=>{const b=document.createElement('button');b.textContent=l;b.setAttribute('aria-pressed','false');b.onclick=()=>{ALL.forEach(s=>s.setValue(i));[...sy.children].forEach(x=>x.setAttribute('aria-pressed',x===b))};sy.appendChild(b)});
+  let tm=null;
+  function demo(){clearTimeout(tm);const seq=[0,1,2,3,4],down=[3,2,1,0];let i=0;ALL.forEach(s=>s.jump(0));
+    const run=()=>{const up=i<seq.length,v=up?seq[i]:down[i-seq.length];if(v===undefined)return;ALL.forEach(s=>s.setValue(v));i++;tm=setTimeout(run,up?800:520)};tm=setTimeout(run,250)}
+  $('#recbox').innerHTML=recHtml(pc);
+}
+function recHtml(pc){
+  return `<h3>推荐与取舍</h3>
+  <p><b>推荐：Q 32px 单行。</b>总高 ${H.Q.toFixed(0)}px（比现状 −${pc(H.Q)}%），比 r3 只多 ${(H.Q-H.F).toFixed(0)}px，但带本身高了 ${(TR.Q-TR.F).toFixed(0)}px，能看见星在带里漂；一行放下「标签 · 带 · 档位」，横向也只占 58%。想要更强的「星河」存在感且能接受再高一点，选 P（${H.P.toFixed(0)}px）；R（${H.R.toFixed(0)}px）有全部档位标签，信息最全，但最高、最抢输入框。</p>
+  <p><b>材质</b>：亮色 = 磨砂薰衣草灰玻璃，暗色 = 夜紫内壁；带内三层视差星场（远 3.5 / 中 7 / 近 12 px/s，纯 CSS transform，合成器线程，可暂停，减少动态时静止）+ 两层星雾；点亮段随档位变亮。</p>
+  <p><b>修复</b>：画布 = 轨道舞台，所有光晕 / 冲击环 / 星芒都被舞台矩形裁住（冲击环改成沿带展开的扁椭圆，竖向封顶），不会压到上方「推理强度 · 超高」或下方档位标签。</p>
+  <p style="color:#6e6e73">1 个 canvas；rAF 只在换档后 ~0.4–0.6s 内运行；静止时只有 CSS 星场在慢动。</p>`;
+}
+
+/* ================= 工具模式 ================= */
+const L_=Q.get('l')||'P';
+const EV=[[250,1],[800,2],[1350,3],[1900,4],[2900,3],[3150,2],[3400,1],[3650,0]];
+if(MODE){
+  document.body.classList.add('mode');
+  const root=$('#modeRoot');
+  const evtHtml=(txt,e)=>txt?`<span>${txt}</span><span class="bar2">${[0,1,2,3,4].map(i=>`<i class="${i<Math.round(e*5)?'on':''}"></i>`).join('')}</span>`:'';
+  if(MODE==='sheet'){
+    const sheet=document.createElement('div');sheet.className='sheet';sheet.style.width='1700px';root.appendChild(sheet);
+    ['th-light','th-dark'].forEach(th=>{
+      const col=document.createElement('div');col.className='col '+th;col.innerHTML=`<h4>${NM[L_]} · ${th==='th-light'?'亮色':'暗色'}　（左：静止　右：到达瞬间的冲击，越高越猛）</h4>`;sheet.appendChild(col);
+      const g=document.createElement('div');g.className='grid';g.style.gridTemplateColumns='repeat(2,362px)';g.style.gap='6px 40px';col.appendChild(g);
+      const cell=(cap,opt)=>{const w=document.createElement('div');w.className='cell';w.innerHTML=`<div class="cap">${cap}</div>`;const b=box();w.appendChild(b);g.appendChild(w);const s=mk(b,L_,{v:opt.v});if(opt.from!=null){s.jump(opt.from);s.setValue(opt.v);s.simulate(opt.ms)}};
+      for(let v=0;v<5;v++){
+        cell(`静止 · ${LAB[v]}（第 ${v+1}/5 档）`,{v});
+        if(v===0)cell(`降档 中 → 低 · +90ms · 轻柔`,{from:1,v:0,ms:90});
+        else cell(`升档 ${LAB[v-1]} → ${LAB[v]} · +${v===4?150:120}ms · 冲击 ${Math.round(gxLadder(v/4,true,0).e*100)}%`,{from:v-1,v,ms:v===4?150:120});
+      }
+    });
+  }else if(MODE==='cmp'){
+    const wrap=document.createElement('div');wrap.className='cmp';root.appendChild(wrap);
+    measure();
+    ['th-light','th-dark'].forEach(th=>{
+      const defs=[['现状（144px 版，真实 CSS 复刻）',null],['r3 · 18px 通栏','F'],['P · 28px 轨道 · 60% 宽','P'],['Q · 32px 轨道 · 单行','Q'],['R · 36px 轨道 · 档位标签','R']];
+      defs.forEach(([lbl,l])=>{const c=document.createElement('div');c.className='cell '+th;c.innerHTML=`<div class="lbl">${lbl}</div>`;
+        if(!l)c.appendChild(popReplica(curBox()));else{const b=box();c.appendChild(popReplica(b));mk(b,l,{v:3})}wrap.appendChild(c)})});
+    requestAnimationFrame(()=>{wrap.querySelectorAll('.cell').forEach(cell=>{
+      const t=cell.querySelector('.cur-box,.gx'),band=cell.querySelector('.cur-track,.gx-ch'),pop=cell.querySelector('.pop');
+      const cr=cell.getBoundingClientRect(),r=t.getBoundingClientRect(),b=band.getBoundingClientRect(),p=pop.getBoundingClientRect();
+      const add=(css,txt)=>{const d=document.createElement('div');d.style.cssText='position:absolute;'+css;if(txt!=null){d.className='ann';d.textContent=txt}cell.appendChild(d);return d};
+      // 整块推理强度区高度（左侧红括号）
+      add(`left:${r.left-cr.left-9}px;width:7px;top:${r.top-cr.top}px;height:${r.height}px;border:1.5px solid #ff3b30;border-right:0;border-radius:3px 0 0 3px`);
+      add(`left:${r.left-cr.left-52}px;top:${r.top-cr.top+r.height/2-6}px`,Math.round(r.height)+'px').style.textAlign='right';
+      // 轨道高度（右侧：两条虚线 + 红括号）
+      const bx=p.right-cr.left+9;
+      [b.top,b.bottom].forEach(y=>add(`left:${b.right-cr.left+2}px;width:${bx-(b.right-cr.left)-2}px;top:${y-cr.top-.5}px;border-top:1px dashed rgba(255,59,48,.75)`));
+      add(`left:${bx}px;width:7px;top:${b.top-cr.top}px;height:${b.height}px;border:1.5px solid #ff3b30;border-left:0;border-radius:0 3px 3px 0`);
+      add(`left:${bx+11}px;top:${b.top-cr.top+b.height/2-6}px`,'轨道 '+Math.round(b.height)+'px');
+      add(`left:${p.left-cr.left}px;top:${p.bottom-cr.top+8}px;font-weight:600;color:var(--fg3)`,`弹窗总高 ${p.height.toFixed(0)}px`);
+    });window.__cmpDone=true});
+  }else if(MODE==='vid'){
+    const vid=document.createElement('div');vid.className='vid';vid.style.width='900px';const sl=[];window.__vevt=[];
+    ['th-light','th-dark'].forEach(th=>{const col=document.createElement('div');col.className='col '+th;
+      col.innerHTML=`<div class="ttl">${NM[L_]} · ${th==='th-light'?'亮':'暗'}</div>`;
+      const b=box();col.appendChild(popReplica(b));
+      const ev=document.createElement('div');ev.className='evt';col.appendChild(ev);window.__vevt.push(ev);vid.appendChild(col);
+      sl.push(mk(b,L_,{v:0}))});
+    root.appendChild(vid);window.__vid=sl;
+    window.__setEvt=(txt,e)=>window.__vevt.forEach(ev=>{ev.innerHTML=evtHtml(txt,e)});
+  }else if(MODE==='xcard'){
+    const xc=document.createElement('div');xc.className='xc';
+    xc.innerHTML=`<div class="xt"><b>星尘 · 推理强度 · 银河带 ${NM[L_]}</b></div>`;
+    const sl=[];window.__vevt=[];
+    ['th-light','th-dark'].forEach(th=>{const blk=document.createElement('div');blk.className='xb '+th;
+      blk.innerHTML=`<div class="ttl">${th==='th-light'?'亮色':'暗色'}</div>`;
+      const pop=document.createElement('div');pop.className='pop';const b=box();pop.appendChild(b);blk.appendChild(pop);
+      const ev=document.createElement('div');ev.className='evt';blk.appendChild(ev);window.__vevt.push(ev);xc.appendChild(blk);
+      sl.push(mk(b,L_,{v:0}))});
+    root.appendChild(xc);window.__vid=sl;
+    window.__setEvt=(txt,e)=>window.__vevt.forEach(ev=>{ev.innerHTML=evtHtml(txt,e)});
+  }
+}else buildMain();
+window.__ALL=ALL;window.__H=H;window.__TR=TR;
+requestAnimationFrame(()=>requestAnimationFrame(()=>{G.syncCss();window.__ready=true}));
+</script>
+</body>
+</html>

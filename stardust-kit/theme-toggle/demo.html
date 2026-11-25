@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>星尘 Agent · 主题开关 3 方案 Mockup</title>
+<style>
+@property --p{syntax:"<number>";inherits:true;initial-value:0}
+:root{--e:cubic-bezier(.16,1,.3,1);--font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC","Hiragino Sans GB","Helvetica Neue",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:#eceaf6;color:#1B1940;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+a{color:inherit;text-decoration:none}
+
+/* ===== mock chrome (not part of the site) ===== */
+.mockbar{position:sticky;top:0;z-index:99;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:10px 24px;background:rgba(255,255,255,.86);backdrop-filter:blur(14px);border-bottom:1px solid #d9d5ee;font-size:13px}
+.mockbar b{font-size:14px}
+.mockbar label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.mockbar .seg{display:inline-flex;border:1px solid #cfc9ea;border-radius:8px;overflow:hidden}
+.mockbar .seg button{padding:4px 11px;font-size:12.5px}
+.mockbar .seg button[aria-pressed=true]{background:#5B4BE0;color:#fff}
+.mockbar .go{padding:5px 12px;border-radius:8px;background:#1B1940;color:#fff;font-size:12.5px}
+.page{max-width:1040px;margin:0 auto;padding:28px 24px 80px}
+.page h1{font-size:26px;letter-spacing:-.02em}
+.page .sub{color:#5a5680;font-size:14px;margin:6px 0 22px;max-width:760px}
+.opt{margin-top:40px}
+.opt h2{font-size:20px;letter-spacing:-.01em;display:flex;gap:10px;align-items:baseline}
+.opt h2 small{font-size:13px;font-weight:500;color:#6a6690}
+.opt p.d{font-size:13.5px;color:#4d4975;margin:6px 0 14px;max-width:820px}
+.cap{font-size:11.5px;color:#6a6690;margin:6px 4px 0;font-family:ui-monospace,Menlo,monospace}
+.row{display:grid;gap:14px}
+.mrow{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;align-items:flex-start}
+.mrow .mcol{flex:0 0 auto}
+.show-hit .tt::after{outline:1px dashed #ff4d94;outline-offset:0;background:rgba(255,77,148,.10)}
+
+/* ===== site tokens (copied from the preview build) ===== */
+.scope{--p:0;position:relative;transition:--p .24s var(--e);border-radius:22px;padding:26px 22px;overflow:hidden;
+  --bg:#07061a;--bg2:#0b0a24;--fg:#F2F0FF;--mut:rgba(212,204,255,.74);--card:#14123A;--line:rgba(212,204,255,.12);--accent:#5B4BE0;--brand2:#8D7DFF;--ring:#8D7DFF;
+  background:radial-gradient(1.2px 1.2px at 12% 30%,#fff9,transparent),radial-gradient(1px 1px at 38% 70%,#cfc8ff99,transparent),radial-gradient(1.2px 1.2px at 71% 24%,#fff8,transparent),radial-gradient(1px 1px at 90% 66%,#cfc8ff88,transparent),linear-gradient(180deg,#07061a,#1c1840);color:var(--fg)}
+.scope[data-theme=light]{--p:1;--bg:#F8F7FD;--bg2:#F1EFFB;--fg:#1B1940;--mut:rgba(43,38,104,.72);--card:#ffffff;--line:rgba(64,52,160,.12);--ring:#5B4BE0;
+  background:linear-gradient(180deg,#fbfaff,#f3f1fc)}
+.scope.is-mid{--p:.5;transition:none}
+.scope.nomotion,.rm .scope{transition:none}
+
+/* ===== nav pill (copy of .nav / .nav .wrap / .brand / .lang from the preview) ===== */
+.pill{position:relative;width:min(880px,100%);margin:0 auto;border:1px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--bg) 70%,transparent);box-shadow:0 8px 28px -16px #281e784d;backdrop-filter:saturate(180%) blur(22px)}
+.pill .wrap{display:flex;align-items:center;gap:20px;height:52px;padding:0 8px 0 18px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:650;letter-spacing:-.01em;font-size:17px}
+.brand img{width:28px;height:28px;border-radius:7px}
+.brand span{white-space:nowrap}
+.nav-links{display:flex;gap:26px;margin-left:auto;font-size:14px;color:var(--mut)}
+.nav-links a:hover{color:var(--fg)}
+.nav-r{display:flex;align-items:center;gap:10px;margin-left:12px}
+.lang{display:inline-flex;background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:2px;font-size:12.5px}
+.lang a{display:grid;place-items:center;padding:4px 11px;border-radius:999px;color:var(--mut);font-weight:550;min-height:26px;cursor:pointer}
+.lang a[aria-current=page]{background:var(--card);color:var(--fg);box-shadow:0 1px 3px #0000002e}
+.mob .nav-links{display:none}.mob .nav-r{margin-left:auto}.mob .pill{width:100%}.mob .pill .wrap{gap:10px}.mob .brand small{display:none}
+.mob{width:370px;padding:20px 10px}
+.mob .tt::after{inset:-4px}
+
+/* ===== theme toggle: shared structure ===== */
+.tt{position:relative;display:grid;place-items:center;flex:none;width:36px;height:36px;padding:0;border-radius:var(--r);isolation:isolate;
+  transition:transform .18s var(--e),box-shadow .2s;--gl:0}
+.tt::after{content:"";position:absolute;inset:0;border-radius:inherit}          /* hit area: 36px desktop, inset:-4px => 44px on touch */
+@media (pointer:coarse){.tt::after{inset:-4px}}
+.tt .skin{position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;transition:filter .2s,box-shadow .25s,background .25s}
+.tt .skin.d{opacity:calc(1 - var(--p))}
+.tt .skin.l{opacity:var(--p)}
+.tt .gl{width:18px;height:18px;overflow:visible;filter:drop-shadow(0 0 calc(var(--gl)*6px) var(--gc,transparent));transition:filter .25s}
+.tt:focus-visible,.tt.is-focus{outline:2px solid var(--ring);outline-offset:3px}
+.tt:focus:not(:focus-visible){outline:none}
+.tt .cut{transform:translate(calc(22px - var(--p)*5.6px),calc(2px + var(--p)*5.6px))}
+.tt .core{transform-origin:12px 12px;transform:translate(calc(var(--p)*-.3px),calc(var(--p)*.2px)) scale(calc(1 + var(--p)*.75))}
+.tt .rays{transform-origin:12px 12px;transform:rotate(calc(var(--p)*-90deg)) scale(calc(1 - var(--p)*.55));opacity:calc(1 - var(--p)*1.9)}
+.tt .stars{opacity:calc(var(--p)*2.2 - 1.2)}
+.tt .stars g{transform-box:fill-box;transform-origin:center;transform:scale(calc(.3 + var(--p)*.7)) rotate(calc(var(--p)*45deg - 45deg))}
+.tt .gl stop:first-child{stop-color:color-mix(in oklab,var(--g1d) calc((1 - var(--p))*100%),var(--g1l))}
+.tt .gl stop:last-child{stop-color:color-mix(in oklab,var(--g2d) calc((1 - var(--p))*100%),var(--g2l))}
+.tt:is(:hover,.is-hover){--gl:1}
+.tt:is(:active,.is-active){transform:scale(.92);--gl:.5}
+.tt:is(:active,.is-active) .gl{transform:scale(.94)}
+@media (prefers-reduced-motion:reduce){.scope{transition:none}.tt,.tt .skin,.tt .gl,.tt .orbit{transition:none}}
+.rm .tt,.rm .tt .skin,.rm .tt .gl,.rm .tt .orbit{transition:none}
+
+/* ===== Option A · Frosted glass squircle (quiet) ===== */
+.tt-a{--r:12px;--g1d:#FFFFFF;--g2d:#B3A8FF;--g1l:#7566F2;--g2l:#3A2FB0;--gc:color-mix(in srgb,#B3A8FF calc((1 - var(--p))*100%),#5B4BE0)}
+.tt-a .skin.d{background:linear-gradient(155deg,rgba(255,255,255,.17),rgba(255,255,255,.04) 55%,rgba(141,125,255,.12)),#0b0a24;border:1px solid rgba(212,204,255,.17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(0,0,0,.28),0 8px 16px -10px rgba(91,75,224,.85);backdrop-filter:blur(12px)}
+.tt-a .skin.l{background:linear-gradient(155deg,#ffffff,#EEEAFF);border:1px solid rgba(64,52,160,.14);
+  box-shadow:inset 0 1px 0 #fff,0 1px 2px rgba(40,30,120,.08),0 8px 16px -10px rgba(91,75,224,.5)}
+.tt-a:is(:hover,.is-hover){transform:translateY(-1px)}
+.tt-a:is(:hover,.is-hover) .skin.d{filter:brightness(1.22) saturate(1.1);border-color:rgba(212,204,255,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.28),0 10px 20px -10px rgba(110,92,255,1)}
+.tt-a:is(:hover,.is-hover) .skin.l{filter:brightness(1.02);border-color:rgba(91,75,224,.3);box-shadow:inset 0 1px 0 #fff,0 10px 20px -10px rgba(91,75,224,.7)}
+.tt-a:is(:active,.is-active) .skin.d{filter:brightness(.85);box-shadow:inset 0 2px 5px rgba(0,0,0,.45),0 2px 6px -4px rgba(91,75,224,.8)}
+.tt-a:is(:active,.is-active) .skin.l{filter:brightness(.96);box-shadow:inset 0 2px 5px rgba(40,30,120,.2),0 2px 6px -4px rgba(91,75,224,.5)}
+
+/* ===== Option B · App-icon tile (logoicon style, two-tone) ===== */
+.tt-b{--r:11px;--g1d:#FFFFFF;--g2d:#FFEFC8;--g1l:#FFFFFF;--g2l:#D3CBFF;--gc:color-mix(in srgb,#FFEFC8 calc((1 - var(--p))*100%),#C9BFFF)}
+.tt-b .skin.d{background:radial-gradient(120% 70% at 30% -5%,rgba(255,255,255,.38),transparent 58%),linear-gradient(180deg,#8174F8 0%,#6454E8 48%,#4636C4 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 3px rgba(25,12,110,.38),0 0 0 1px rgba(26,14,110,.55),0 8px 18px -6px rgba(110,92,255,.8)}
+.tt-b .skin.l{background:radial-gradient(120% 70% at 30% -5%,rgba(255,255,255,.26),transparent 58%),linear-gradient(180deg,#4338A6 0%,#2A2270 55%,#1B1647 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -2px 3px rgba(0,0,0,.38),0 0 0 1px rgba(20,14,80,.7),0 8px 16px -8px rgba(40,30,140,.7)}
+.tt-b .gl{filter:drop-shadow(0 1px 1px rgba(25,12,110,.45)) drop-shadow(0 0 calc(var(--gl)*6px) var(--gc))}
+.tt-b:is(:hover,.is-hover){transform:translateY(-1px)}
+.tt-b:is(:hover,.is-hover) .skin.d{filter:brightness(1.1) saturate(1.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(25,12,110,.38),0 0 0 1px rgba(26,14,110,.55),0 11px 22px -6px rgba(120,102,255,.95)}
+.tt-b:is(:hover,.is-hover) .skin.l{filter:brightness(1.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -2px 3px rgba(0,0,0,.38),0 0 0 1px rgba(20,14,80,.7),0 11px 20px -8px rgba(60,44,190,.8)}
+.tt-b:is(:active,.is-active) .skin.d{filter:brightness(.88);box-shadow:inset 0 2px 5px rgba(25,12,110,.6),0 0 0 1px rgba(26,14,110,.55),0 2px 6px -3px rgba(110,92,255,.8)}
+.tt-b:is(:active,.is-active) .skin.l{filter:brightness(.9);box-shadow:inset 0 2px 5px rgba(0,0,0,.55),0 0 0 1px rgba(20,14,80,.7),0 2px 6px -3px rgba(40,30,140,.7)}
+
+/* ===== Option C · Orbit ring (echoes the app icon's orbit) ===== */
+.tt-c{--r:50%;--g1d:#F2EFFF;--g2d:#A99CFF;--g1l:#7A6BF2;--g2l:#4636C4;--gc:color-mix(in srgb,#8D7DFF calc((1 - var(--p))*100%),#5B4BE0)}
+.tt-c .skin.d{background:radial-gradient(90% 90% at 50% 0%,rgba(141,125,255,.26),transparent 70%),#0b0a24;box-shadow:inset 0 0 12px rgba(141,125,255,.14),0 0 16px -3px rgba(110,92,255,.38)}
+.tt-c .skin.l{background:linear-gradient(180deg,#ffffff,#F1EEFF);box-shadow:inset 0 1px 0 #fff,0 1px 2px rgba(40,30,120,.08),0 6px 14px -8px rgba(91,75,224,.5)}
+.tt-c .orbit{position:absolute;inset:0;border-radius:50%;pointer-events:none;transform:rotate(calc(var(--p)*180deg));rotate:0deg;transition:rotate .7s var(--e),filter .25s}
+.tt-c .orbit::before{content:"";position:absolute;inset:0;border-radius:50%;padding:1px;
+  background:conic-gradient(from 20deg,color-mix(in srgb,#C3B9FF calc((1 - var(--p))*100%),#5B4BE0),color-mix(in srgb,rgba(91,75,224,.12) calc((1 - var(--p))*100%),rgba(91,75,224,.16)) 38%,color-mix(in srgb,#8D7DFF calc((1 - var(--p))*100%),#8D7DFF) 62%,rgba(91,75,224,.12) 86%,color-mix(in srgb,#C3B9FF calc((1 - var(--p))*100%),#5B4BE0));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.tt-c .orbit::after{content:"";position:absolute;width:3px;height:3px;border-radius:50%;left:calc(50% - 1.5px);top:-1.5px;opacity:.9;background:color-mix(in srgb,#fff calc((1 - var(--p))*100%),#5B4BE0);
+  box-shadow:0 0 6px 1px color-mix(in srgb,#B3A8FF calc((1 - var(--p))*100%),rgba(91,75,224,.6))}
+.tt-c:is(:hover,.is-hover){--gl:1}
+.tt-c:is(:hover,.is-hover) .orbit{rotate:110deg;filter:brightness(1.25)}
+.tt-c:is(:hover,.is-hover) .skin.d{box-shadow:inset 0 0 14px rgba(141,125,255,.26),0 0 20px -2px rgba(130,112,255,.6)}
+.tt-c:is(:hover,.is-hover) .skin.l{box-shadow:inset 0 1px 0 #fff,0 8px 18px -8px rgba(91,75,224,.75)}
+.tt-c:is(:active,.is-active) .skin.d{filter:brightness(.85);box-shadow:inset 0 0 12px rgba(0,0,0,.5)}
+.tt-c:is(:active,.is-active) .skin.l{filter:brightness(.95);box-shadow:inset 0 2px 5px rgba(40,30,120,.2)}
+.tt-c:is(:active,.is-active) .orbit{rotate:40deg}
+
+/* ===== readout ===== */
+.readout{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+.readout .cap b{color:#1B1940}
+
+/* ===== states matrix ===== */
+.matrix{display:grid;grid-template-columns:96px repeat(5,minmax(0,1fr));gap:10px 10px;align-items:center;margin-top:16px}
+.matrix .h{font-size:12px;font-weight:600;color:#4d4975;text-align:center}
+.matrix .rl{font-size:12px;font-weight:600;color:#1B1940;line-height:1.3}
+.matrix .rl small{display:block;font-weight:500;color:#6a6690}
+.cell.scope{padding:14px 10px;border-radius:16px;display:grid;place-items:center}
+.cell .pill{width:auto;display:inline-flex}
+.cell .pill .wrap{gap:10px;padding:0 8px 0 10px;height:52px}
+.cell .nav-r{margin:0}
+.matrix-wrap{padding:24px;background:#f6f5fc;border-radius:24px;border:1px solid #dcd8f0}
+body.gallery .mockbar,body.gallery .page>*:not(#all){display:none}
+body.gallery{background:#f6f5fc}
+body.gallery .page{max-width:none;padding:0}
+body.gallery #all{margin:0;padding:24px;width:1300px}
+.fullpage{margin-top:18px}
+.fullpage .scope{padding:18px 18px 40px;border-radius:26px}
+.hero{text-align:center;padding:48px 0 12px}
+.hero-ic img{width:84px;height:84px;border-radius:20px;margin:0 auto 10px;filter:drop-shadow(0 14px 24px rgba(60,40,200,.25))}
+.wm{font-size:22px;font-weight:650;letter-spacing:-.025em;color:var(--mut)}
+.hero h1{font-size:44px;line-height:1.06;letter-spacing:-.045em;font-weight:700;max-width:760px;margin:14px auto 0}
+.hero h1 .g{background:linear-gradient(100deg,#5b4be0 10%,#7a6bf2 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.scope[data-theme=dark] .hero h1 .g{background-image:linear-gradient(100deg,#b3a8ff 10%,#8d7dff 90%);-webkit-background-clip:text;background-clip:text}
+.hero p{font-size:16px;color:var(--mut);max-width:560px;margin:14px auto 0}
+.cta{display:flex;gap:12px;justify-content:center;margin-top:22px}
+.btn{display:inline-flex;align-items:center;font-weight:600;border-radius:999px;padding:11px 22px;font-size:15px}
+.btn-p{background:#5B4BE0;color:#fff;box-shadow:0 6px 18px -8px rgba(91,75,224,.7)}
+.btn-g{background:color-mix(in srgb,var(--card) 60%,transparent);border:1px solid var(--line)}
+.pick{display:inline-flex;gap:8px;margin:0 0 10px}
+.note{font-size:12.5px;color:#5a5680;margin-top:10px}
+</style>
+<script>
+addEventListener('DOMContentLoaded', () => {
+  if ("theme-toggle" === 'slider-r4-q') document.querySelector('#vSeg [data-l="Q"]').click();
+  const component = document.querySelector("#opt-b .row .scope");
+  if (!component) throw new Error('Missing original workshop component: ' + "#opt-b .row .scope");
+  const stage = document.createElement('div');
+  stage.id = 'workshop-original';
+  document.body.insertBefore(stage, document.body.firstChild);
+  let branch = component;
+  while (branch.parentElement !== document.body) {
+    const parent = branch.parentElement;
+    for (const sibling of parent.children) {
+      if (sibling === branch) continue;
+      if ("theme-toggle" === 'v16-stardust-observatory' && sibling.matches('.card')) {
+        sibling.inert = true;
+        sibling.style.cssText += ';position:fixed;left:0;top:0;width:min(280px,100vw);visibility:hidden;pointer-events:none';
+      } else sibling.style.setProperty('display', 'none', 'important');
+    }
+    branch = parent;
+  }
+  for (const child of document.body.children) {
+    if (child !== stage && child !== branch && !child.matches('svg,script,style')) {
+      child.style.setProperty('display', 'none', 'important');
+    }
+  }
+  stage.append(branch);
+  for (let el = branch; el !== component; el = [...el.children].find(n => n.contains(component))) {
+    el.style.cssText += ';display:block!important;width:100%;min-width:0;max-width:none;margin:0;padding:0;min-height:0;background:transparent;border:0;box-shadow:none';
+  }
+  document.body.style.cssText += ';width:auto;max-width:none;margin:0;padding:0;background:#111025;min-height:0';
+  document.documentElement.style.background = '#111025';
+  if (component.matches('.gx,.cos')) {
+    const row = () => {
+      stage.style.width = '360px';
+      stage.style.marginInline = 'auto';
+      stage.style.zoom = Math.min(1, document.documentElement.clientWidth / 360);
+    };
+    row();
+    addEventListener('resize', row);
+  }
+});
+</script></head>
+<body>
+<div class="mockbar">
+  <b>主题开关 Mockup</b>
+  <span class="seg" id="langSeg"><button data-l="zh" aria-pressed="true">中</button><button data-l="en" aria-pressed="false">EN</button></span>
+  <button class="go" id="flipAll">全部切换 深/浅</button>
+  <label><input type="checkbox" id="hit"> 显示点击热区（移动端 44px）</label>
+  <label><input type="checkbox" id="rm"> 模拟 prefers-reduced-motion</label>
+  <span style="color:#6a6690">点击任一导航胶囊里的开关即可实时切换；键盘 Tab 可看焦点环。</span>
+</div>
+<div class="page">
+  <h1>星尘 Agent · 主题开关 3 方案</h1>
+  <p class="sub">仅开关本身为新设计；导航胶囊其余部分与 v124 预览一致（52px 高、中/EN 分段、品牌图标）。每个方案左深右浅各一枚胶囊，另附 390px 移动端。深色显示 ☀（点击→浅色），浅色显示 ☾（点击→深色）。</p>
+  <div id="opts"></div>
+
+  <section class="opt" id="full">
+    <h2>整页观感 <small>放进真实 hero 里看克制程度</small></h2>
+    <div class="pick" id="pick"></div>
+    <div class="fullpage" id="fullpage"></div>
+  </section>
+
+  <section class="opt" id="all">
+    <h2>全部状态 <small>每格 = 导航胶囊右端截取（中/EN + 开关）；变形列为 50% 帧</small></h2>
+    <div class="matrix-wrap"><div class="matrix" id="matrix"></div></div>
+  </section>
+</div>
+
+<script>
+const ICON56="data:image/webp;base64,UklGRqIDAABXRUJQVlA4WAoAAAAQAAAANwAANwAAQUxQSKkAAAABcFtt2/G8/59MwBGsOdhmEtuaQK09nJ2ve78vTxUVETEB9BY1B5PNjvJmMmhW5Z7txYv3U5cKPXMRgJe0LmXoCdCuQSYvYHMSnivO1c0bCuAhy7RF2po4YQEd4iSw4pwGVoPTxmr/I2pgNTgJrDgnihXhmHdIWxOHhkhDYtvPOGc7jxI4cZI0DFD6Bhkylm8I17KBFAY2h1cd1gFSbIsVWh3lrULMRm9RAFZQOCDSAgAAcA0AnQEqOAA4AD5FHoxEoqGhEgaQKAREoBIgXKKHUUk7zL/sfNmzS/To/LO7sF3M+77uW7YK/3FTU+jxHKKSfXPQxhXDUQ51U96KFcoPLWawbPc+c840yjR6258KzkIcag4kK1UjXY0qXbkldsO/6H9nFYAA/v9M7Jr+DGNIRG5fJZ6O90ZDk15Wx50kWK4RoHdSvtB9jqLRkx/0kG5hOW7XMea1+xPql9mP8U61o2D65bv6gmOyf/fWGP4xf07qX8/U6xgyx+v58OvP//qvCi8EQaW/aLu3GsuT4AIUmdK3x2vZ0PQJ+luxWCw0SjULv//Df1XJ4E2Gf1tYzsvCohG8hxkK6FMCzXX/ygP/lM9Tvb3+v8OSw/v+atLywvA9V4oXI70/FSr5uSXyj5qG025rJktq5+Gonqpn+j/FGfwjUHdnX1ugLtqhR3TxdRCWcMBPRh9FrFzaIA/s+sgNMv8f418k2mCi5/lxVuz/2/tgawTjGkIsW6BuGSKP3/yo35dz3ekuiuNDPf6ipLT+l7I3LrOGql/TFGB8J0PE2fddFJP14O9qBIccD7cMVU+Gye02QS3lbdh+N8XocnuOn9jgMJ9ZIWDOF/SjPoDrlC19nYia7jfw9oWDiWUg1eNo/UkUJvILHyZ4Ii9wBd93YQRzhAtAtODSLXEFRBonVw8l1/yBO1V7mhDeQ9d8axt8bbMRtSJkENxXjjCSRPSPvdZLBpMsF8054ppiClIbTvHQfneptlviM5HVoxEKuMlIv5OlR8IXA+ePcJ3S0akjIJ7lZk74WGd+ASUKTYQznkNzmLdXfQUZAMTbgS/ai8aNIWayoGwTLiOwbJ6j8rSSbvxStZNDAf/+pGgtrC6p0+k5HoiBFifHkQS7K3e8116owsGjp05+TysVBW66Y6c/n6PFB0vrEU2SL2GMJIrc6nlJkIxx+h1BnAlv/2XPbkW8AAA=", ICON192="data:image/webp;base64,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";
+const T={
+  zh:{brand:"星尘 Agent",nav:["演示","功能","全部能力","隐私","FAQ"],toLight:"切换到浅色",toDark:"切换到深色",lang:"语言 / Language",
+      states:["默认","悬停","按下","键盘焦点","变形中 50%"],dark:"深色",light:"浅色"},
+  en:{brand:"Stardust Agent",nav:["Demo","Features","Everything","Privacy","FAQ"],toLight:"Switch to light",toDark:"Switch to dark",lang:"语言 / Language",
+      states:["Idle","Hover","Pressed","Focus-visible","Morph 50%"],dark:"Dark",light:"Light"}
+};
+let L="zh", uid=0;
+const OPTS=[
+ {k:"a",short:"玻璃方块",name:"A · 磨砂玻璃圆角方块",en:"Frosted glass squircle",tag:"最克制",
+  d:"36px 圆角方块（12px）。顶部提亮的渐变玻璃 + 1px 内描边 + 紫色柔影；图标为 白→淡紫（深色）/ 靛紫（浅色）渐变填充。悬停：玻璃提亮 + 图标柔光；按下：内凹；与 中/EN 分段在同一「玻璃」语汇里。"},
+ {k:"b",short:"图标瓦片",name:"B · 迷你 App 图标瓦片",en:"App-icon tile (two-tone)",tag:"最像 logoicon",
+  d:"36px 渐变瓦片（11px）。深色：紫罗兰瓦片 #8174F8→#4636C4 + 暖白太阳；浅色：深靛瓦片 #4338A6→#1B1647 + 淡紫月亮。顶光高光 + 底部暗边 + 彩色长影，冷/暖配对是 logoicon 配色的核心手法。"},
+ {k:"c",short:"轨道环",name:"C · 轨道环",en:"Orbit ring",tag:"最有星尘味",
+  d:"保持现有圆形 36px。1px 锥形渐变细环 + 一颗小卫星点，呼应应用图标上的轨道环；悬停时环旋转 110° 并提亮，切换时环转半圈。深色内部带一丝紫色顶光。"}
+];
+const SUN_RAYS=[0,45,90,135,180,225,270,315].map(a=>`<line x1="12" y1="2.6" x2="12" y2="4.6" transform="rotate(${a} 12 12)"/>`).join("");
+const STAR='<path d="M0-2Q.3-.3 2 0Q.3.3 0 2Q-.3.3-2 0Q-.3-.3 0-2Z"/>';
+function tt(k,{cls="",label=true}={}){
+  const i=++uid;
+  const skins=`<span class="skin d"></span><span class="skin l"></span>`+(k==="c"?`<span class="orbit"></span>`:"");
+  return `<button class="tt tt-${k} ${cls}" type="button" data-lbl="1">${skins}
+  <svg class="gl" viewBox="0 0 24 24" aria-hidden="true"><defs>
+   <linearGradient id="g${i}" gradientUnits="userSpaceOnUse" x1="0" y1="3" x2="0" y2="21"><stop offset="0"/><stop offset="1"/></linearGradient>
+   <mask id="m${i}" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24"><rect width="24" height="24" fill="#fff"/><circle class="cut" cx="0" cy="0" r="6.6" fill="#000"/></mask></defs>
+   <g class="rays" stroke="url(#g${i})" stroke-width="1.8" stroke-linecap="round">${SUN_RAYS}</g>
+   <g mask="url(#m${i})"><circle class="core" cx="12" cy="12" r="4.6" fill="url(#g${i})"/></g>
+   <g class="stars" fill="url(#g${i})"><g transform="translate(18.9 5.3)"><g>${STAR}</g></g><g transform="translate(21 10.4) scale(.6)"><g>${STAR}</g></g></g>
+  </svg></button>`;
+}
+function pill(k,{mobile=false}={}){
+  return `<div class="pill"><div class="wrap">
+   <a class="brand"><img src="${ICON56}" alt="" width="28" height="28"><span data-t="brand"></span></a>
+   <nav class="nav-links">${[0,1,2,3,4].map(n=>`<a data-nav="${n}"></a>`).join("")}</nav>
+   <div class="nav-r"><nav class="lang" aria-label="语言 / Language"><a data-l="zh" aria-current="page">中</a><a data-l="en">EN</a></nav>${tt(k)}</div>
+  </div></div>`;
+}
+function scope(theme,inner,extra=""){return `<div class="scope ${extra}" data-theme="${theme}">${inner}</div>`}
+function build(){
+  document.getElementById("opts").innerHTML=OPTS.map(o=>`
+  <section class="opt" id="opt-${o.k}">
+    <h2>${o.name} <small>${o.en} · ${o.tag}</small></h2>
+    <p class="d">${o.d}</p>
+    <div class="row">
+      <div>${scope("dark",pill(o.k))}<div class="readout"><span class="cap">深色 · aria-label = <b data-ro></b></span></div></div>
+      <div>${scope("light",pill(o.k))}<div class="readout"><span class="cap">浅色 · aria-label = <b data-ro></b></span></div></div>
+    </div>
+    <div class="mrow">
+      <div class="mcol">${scope("dark",pill(o.k),"mob")}<div class="cap">390px 移动端 · 深</div></div>
+      <div class="mcol">${scope("light",pill(o.k),"mob")}<div class="cap">390px 移动端 · 浅</div></div>
+    </div>
+  </section>`).join("");
+  // matrix
+  const cols=["","is-hover","is-active","is-focus","mid"];
+  let m=`<div></div>`+[0,1,2,3,4].map(i=>`<div class="h" data-st="${i}"></div>`).join("");
+  OPTS.forEach(o=>["dark","light"].forEach(th=>{
+    m+=`<div class="rl">${o.k.toUpperCase()} · ${o.short}<small data-th="${th}"></small></div>`;
+    cols.forEach(c=>{
+      const mid=c==="mid";
+      m+=scope(th,`<div class="pill"><div class="wrap"><nav class="lang"><a data-l="zh" aria-current="page">中</a><a data-l="en">EN</a></nav>${tt(o.k,{cls:mid?"":c})}</div></div>`,`cell ${mid?"is-mid":""}`);
+    });
+  }));
+  document.getElementById("matrix").innerHTML=m;
+  // full page
+  document.getElementById("pick").innerHTML=OPTS.map((o,i)=>`<span class="seg"><button data-pick="${o.k}" aria-pressed="${i===1}" style="padding:4px 11px;font-size:12.5px;${i===1?'background:#5B4BE0;color:#fff':''}">${o.name.split(" ")[0]}</button></span>`).join("");
+  renderFull("b");
+}
+function renderFull(k){
+  document.getElementById("fullpage").innerHTML=scope("dark",`${pill(k)}<div class="hero"><div class="hero-ic"><img src="${ICON192}" alt=""></div><div class="wm" data-t="brand"></div>
+   <h1 data-h1></h1><p data-sub></p><div class="cta"><span class="btn btn-p" data-dl></span><span class="btn btn-g" data-dlw></span></div></div>`);
+  apply();
+}
+function apply(){
+  const t=T[L];
+  document.documentElement.lang=L==="zh"?"zh-CN":"en";
+  document.querySelectorAll("[data-t=brand]").forEach(e=>e.textContent=t.brand);
+  document.querySelectorAll("[data-nav]").forEach(e=>e.textContent=t.nav[e.dataset.nav]);
+  document.querySelectorAll(".lang a").forEach(a=>{a.toggleAttribute("aria-current",a.dataset.l===L);if(a.dataset.l===L)a.setAttribute("aria-current","page")});
+  document.querySelectorAll("[data-st]").forEach(e=>e.textContent=t.states[e.dataset.st]);
+  document.querySelectorAll("[data-th]").forEach(e=>e.textContent=t[e.dataset.th]+" / "+(e.dataset.th==="dark"?"Dark":"Light"));
+  document.querySelectorAll(".scope .tt").forEach(b=>{
+    const th=b.closest(".scope").dataset.theme;
+    b.setAttribute("aria-label",th==="dark"?t.toLight:t.toDark);b.title=th==="dark"?t.toLight:t.toDark;
+  });
+  document.querySelectorAll(".opt .row > div").forEach(w=>{const b=w.querySelector(".tt");w.querySelector("[data-ro]").textContent="「"+b.getAttribute("aria-label")+"」"});
+  document.querySelectorAll("[data-h1]").forEach(e=>e.innerHTML=L==="zh"?'把所有 AI 编程助手，<br><span class="g">装进一扇安静的窗。</span>':'Every AI coding agent,<br><span class="g">in one quiet window.</span>');
+  document.querySelectorAll("[data-sub]").forEach(e=>e.textContent=L==="zh"?"星尘 Agent 是面向 Mac 和 Windows 的桌面工作台。审批、推理强度、用量与限额，都在手边。":"Stardust Agent is a desktop workbench for Mac and Windows. Approvals, reasoning controls, usage and limits — all at hand.");
+  document.querySelectorAll("[data-dl]").forEach(e=>e.textContent=L==="zh"?"下载 Mac 版":"Download for Mac");
+  document.querySelectorAll("[data-dlw]").forEach(e=>e.textContent=L==="zh"?"下载 Windows 测试版":"Windows beta");
+  document.querySelectorAll("#langSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===L));
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".tt");
+  if(b&&!b.closest(".cell")){const s=b.closest(".scope");s.dataset.theme=s.dataset.theme==="dark"?"light":"dark";apply();return}
+  const la=e.target.closest(".lang a[data-l]");if(la){L=la.dataset.l;apply();return}
+  const lb=e.target.closest("#langSeg button");if(lb){L=lb.dataset.l;apply();return}
+  const pk=e.target.closest("[data-pick]");if(pk){document.querySelectorAll("[data-pick]").forEach(x=>{const on=x===pk;x.setAttribute("aria-pressed",on);x.style.cssText="padding:4px 11px;font-size:12.5px;"+(on?"background:#5B4BE0;color:#fff":"")});renderFull(pk.dataset.pick);return}
+});
+document.getElementById("flipAll").onclick=()=>{document.querySelectorAll(".scope:not(.cell)").forEach(s=>s.dataset.theme=s.dataset.theme==="dark"?"light":"dark");apply()};
+document.getElementById("hit").onchange=e=>document.body.classList.toggle("show-hit",e.target.checked);
+document.getElementById("rm").onchange=e=>document.body.classList.toggle("rm",e.target.checked);
+if(location.hash==="#gallery")document.body.classList.add("gallery");
+build();apply();
+</script>
+</body>
+</html>

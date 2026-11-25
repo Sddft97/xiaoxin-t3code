@@ -226,7 +226,48 @@
     border: 1px solid rgba(255,255,255,0.13);
   }
 </style>
-</head>
+<script>
+addEventListener('DOMContentLoaded', () => {
+  if ("v18-starship-fluid" === 'slider-r4-q') document.querySelector('#vSeg [data-l="Q"]').click();
+  const component = document.querySelector("#cardDark [data-well]");
+  if (!component) throw new Error('Missing original workshop component: ' + "#cardDark [data-well]");
+  const stage = document.createElement('div');
+  stage.id = 'workshop-original';
+  document.body.insertBefore(stage, document.body.firstChild);
+  let branch = component;
+  while (branch.parentElement !== document.body) {
+    const parent = branch.parentElement;
+    for (const sibling of parent.children) {
+      if (sibling === branch) continue;
+      if ("v18-starship-fluid" === 'v16-stardust-observatory' && sibling.matches('.card')) {
+        sibling.inert = true;
+        sibling.style.cssText += ';position:fixed;left:0;top:0;width:min(280px,100vw);visibility:hidden;pointer-events:none';
+      } else sibling.style.setProperty('display', 'none', 'important');
+    }
+    branch = parent;
+  }
+  for (const child of document.body.children) {
+    if (child !== stage && child !== branch && !child.matches('svg,script,style')) {
+      child.style.setProperty('display', 'none', 'important');
+    }
+  }
+  stage.append(branch);
+  for (let el = branch; el !== component; el = [...el.children].find(n => n.contains(component))) {
+    el.style.cssText += ';display:block!important;width:100%;min-width:0;max-width:none;margin:0;padding:0;min-height:0;background:transparent;border:0;box-shadow:none';
+  }
+  document.body.style.cssText += ';width:auto;max-width:none;margin:0;padding:0;background:#111025;min-height:0';
+  document.documentElement.style.background = '#111025';
+  if (component.matches('.gx,.cos')) {
+    const row = () => {
+      stage.style.width = '360px';
+      stage.style.marginInline = 'auto';
+      stage.style.zoom = Math.min(1, document.documentElement.clientWidth / 360);
+    };
+    row();
+    addEventListener('resize', row);
+  }
+});
+</script></head>
 <body>
 <p class="lead">按你的 4 条反馈重做了 <b>V18「星舰发射栈」</b>：同一艘高辨识度不锈钢星舰，从 <b>发射台冷态待命 → 点火起飞 → Max-Q 破云 → 地球弧线真空羽流 → 深空曲速任务</b> 连续俯仰演进；彻底移除梯形硬边，改用体积柔光羽流 + 真实物理粒子流。点下方任意一档或「连升演示」检视每一帧。</p>
 

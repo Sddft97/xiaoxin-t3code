@@ -37,7 +37,48 @@
   .notes li { margin:3px 0; }
   .tag { display:inline-block; font-size:11px; padding:1px 6px; border-radius:6px; background:#eef; color:#446; margin-left:6px; }
 </style>
-</head>
+<script>
+addEventListener('DOMContentLoaded', () => {
+  if ("v16-stardust-observatory" === 'slider-r4-q') document.querySelector('#vSeg [data-l="Q"]').click();
+  const component = document.querySelector(".card.dark [data-track]");
+  if (!component) throw new Error('Missing original workshop component: ' + ".card.dark [data-track]");
+  const stage = document.createElement('div');
+  stage.id = 'workshop-original';
+  document.body.insertBefore(stage, document.body.firstChild);
+  let branch = component;
+  while (branch.parentElement !== document.body) {
+    const parent = branch.parentElement;
+    for (const sibling of parent.children) {
+      if (sibling === branch) continue;
+      if ("v16-stardust-observatory" === 'v16-stardust-observatory' && sibling.matches('.card')) {
+        sibling.inert = true;
+        sibling.style.cssText += ';position:fixed;left:0;top:0;width:min(280px,100vw);visibility:hidden;pointer-events:none';
+      } else sibling.style.setProperty('display', 'none', 'important');
+    }
+    branch = parent;
+  }
+  for (const child of document.body.children) {
+    if (child !== stage && child !== branch && !child.matches('svg,script,style')) {
+      child.style.setProperty('display', 'none', 'important');
+    }
+  }
+  stage.append(branch);
+  for (let el = branch; el !== component; el = [...el.children].find(n => n.contains(component))) {
+    el.style.cssText += ';display:block!important;width:100%;min-width:0;max-width:none;margin:0;padding:0;min-height:0;background:transparent;border:0;box-shadow:none';
+  }
+  document.body.style.cssText += ';width:auto;max-width:none;margin:0;padding:0;background:#111025;min-height:0';
+  document.documentElement.style.background = '#111025';
+  if (component.matches('.gx,.cos')) {
+    const row = () => {
+      stage.style.width = '360px';
+      stage.style.marginInline = 'auto';
+      stage.style.zoom = Math.min(1, document.documentElement.clientWidth / 360);
+    };
+    row();
+    addEventListener('resize', row);
+  }
+});
+</script></head>
 <body>
 <h1>推理强度 V16 · 「星尘观测站」<span class="tag">只保留这一个动画，去掉 C1–C4</span></h1>
 <p class="lead">一个小机器人守着一间夜里的观测站。强度越高，它想得越用力：玻璃滑块往右走，经过的东西一件件「醒过来」——台灯亮、机器人醒、黑板写满推演、齿轮转动、星尘瓶发光、望远镜抬头，到 Max 时屋顶外划过一颗流星。滑块右边的部分还在沉睡。下面两张卡可以直接拖动或点档位。</p>
