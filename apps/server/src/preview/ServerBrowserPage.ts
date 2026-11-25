@@ -905,12 +905,11 @@ type FocusCandidate = {
 };
 
 // Serialized into the page's main world, so it must not reference module scope.
-const focusTextTarget = (target: HTMLElement | SVGElement | null) => {
+const focusTextTarget = (target: FocusCandidate | null) => {
   let element =
-    target === null
-      ? (globalThis as unknown as { document: { activeElement: FocusCandidate | null } }).document
-          .activeElement
-      : (target as unknown as FocusCandidate);
+    target ??
+    (globalThis as unknown as { document: { activeElement: FocusCandidate | null } }).document
+      .activeElement;
   if (target === null) {
     while (element?.shadowRoot?.activeElement) element = element.shadowRoot.activeElement;
     // Focus inside a frame cannot be checked from here, and an editable frame would pass as contentEditable.
@@ -973,7 +972,9 @@ export const type = async (page: Page, input: PreviewAutomationTypeInput) => {
   const focused =
     locator === null
       ? await focusedTextField(page, timeout)
-      : await locator.evaluate(focusTextTarget, undefined, { timeout });
+      : await locator.evaluate(focusTextTarget as (target: never) => boolean, undefined, {
+          timeout,
+        });
   if (focused !== true) {
     throw new ServerBrowserOperationError({
       tag: "PreviewAutomationTargetNotEditableError",

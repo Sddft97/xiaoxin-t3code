@@ -204,9 +204,13 @@ jobs:
   # The web suite is the largest outside the server. In the shared Test job it
   # started last and ran alone for about 40s after everything else finished.
   test_web:
-    name: Test Web
+    name: Test Web ${{ matrix.shard }}
     runs-on: ${{ github.repository == 'pingdotgg/t3code' && 'blacksmith-8vcpu-ubuntu-2404' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.repository == 'pingdotgg/t3code' && 10 || 20 }}
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -227,7 +231,7 @@ jobs:
         run: node apps/web/node_modules/playwright/cli.js install --with-deps --only-shell chromium
 
       - name: Test
-        run: vp run --filter @t3tools/web test
+        run: vp -C apps/web test run --passWithNoTests --project unit --project browser --shard=${{ matrix.shard }}/2
         env:
           VITEST_MAX_WORKERS: 1
 
