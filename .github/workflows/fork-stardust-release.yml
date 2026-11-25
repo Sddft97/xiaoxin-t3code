@@ -123,8 +123,8 @@ jobs:
           cache: true
           run-install: false
 
-      - name: Install desktop dependencies
-        run: vp install --filter=@t3tools/desktop... --filter=t3... --filter=@t3tools/scripts...
+      - name: Install workspace dependencies
+        run: vp install
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable
