@@ -62,7 +62,6 @@ it("V12 hover actions settle a finished thread without opening it (folder rows)"
     );
     expect(actions).toEqual(["settle", "pin", "archive", "more"]);
     await vi.waitFor(() => expect(getComputedStyle(strip!.parentElement!).opacity).toBe("1"));
-    const sidebar = document.querySelector<HTMLElement>('[data-slot="sidebar"]') ?? document.body;
     const before = dispatchedCommands().length;
     await userEvent.click(
       strip!.querySelector<HTMLButtonElement>('[data-sidebar-quick-action="settle"]')!,
