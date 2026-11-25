@@ -143,9 +143,9 @@ jobs:
 
       - name: Test the retained T3 Connect configuration
         run: |
-          vp test run scripts/lib/public-config.test.ts --root .
-          vp -C apps/web test run src/cloud/publicConfig.test.ts src/cloud/t3ConnectState.test.ts src/cloud/linkEnvironment.test.ts
-          vp -C apps/server test run src/cloud/CloudLink.test.ts src/cloud/ConnectReachability.test.ts src/cli/connect.test.ts
+          vp test run scripts/lib/public-config.test.ts --root . --config vite.config.ts
+          vp -C apps/web test run src/cloud/publicConfig.test.ts src/cloud/t3ConnectState.test.ts src/cloud/linkEnvironment.test.ts --config vite.config.ts
+          vp -C apps/server test run src/cloud/CloudLink.test.ts src/cloud/ConnectReachability.test.ts src/cli/connect.test.ts --config vite.config.ts
 
       - name: Build the update package from merged source
         run: vp run dist:desktop:dmg:arm64 --build-version "${{ needs.sync.outputs.tag }}-nightly.fork" --output-dir release/fork
