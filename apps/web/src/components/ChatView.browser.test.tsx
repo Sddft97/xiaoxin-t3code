@@ -35,6 +35,7 @@ import { environmentContextRecord } from "~/lib/composerContextRecords";
 import { startWorkspaceFocus } from "~/lib/workspaceFocus";
 import { usePromptStashStore } from "~/promptStashStore";
 import { useRightPanelStore } from "~/rightPanelStore";
+import { useUiStateStore } from "~/uiStateStore";
 import { getRouter } from "~/router";
 import { serverEnvironment } from "~/state/server";
 import { appAtomRegistry } from "~/rpc/atomRegistry";
@@ -223,6 +224,11 @@ it("opens a linked Linear issue from an inactive thread's sidebar badge", async 
     onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
   });
   await page.viewport(1400, 900);
+  const previousExpansion = useUiStateStore.getState().projectExpandedById;
+  using _expansion = {
+    [Symbol.dispose]: () => useUiStateStore.setState({ projectExpandedById: previousExpansion }),
+  };
+  useUiStateStore.getState().setProjectExpanded("thread-category:unsorted", true);
   const router = getRouter(
     createMemoryHistory({ initialEntries: [`/${ENVIRONMENT_ID}/${first.id}`] }),
   );
@@ -260,9 +266,12 @@ it("opens a linked Linear issue from an inactive thread's sidebar badge", async 
   expect(router.history.location.pathname).toBe(`/${ENVIRONMENT_ID}/${linked.id}`);
   await expect.element(page.getByRole("heading", { name: liveTitle })).toBeVisible();
   await act(() => useRightPanelStore.getState().close(scopeThreadRef(ENVIRONMENT_ID, linked.id)));
+  await act(() =>
+    useRightPanelStore.getState().open(scopeThreadRef(ENVIRONMENT_ID, linked.id), "pull-requests"),
+  );
   await expect
     .element(
-      page.getByRole("region", { name: "Thread details" }).getByRole("link", {
+      page.getByRole("region", { name: "Linked issues" }).getByRole("link", {
         name: issueName,
         exact: true,
       }),

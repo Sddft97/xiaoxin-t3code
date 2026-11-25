@@ -323,6 +323,10 @@ import {
   useThreadMove,
 } from "./sidebar/ThreadMoveProvider";
 import { PullRequestGlyph } from "~/components/pullRequest/pullRequestIcons";
+import { ThreadDetailsIssueRows } from "./chat/ThreadDetailsIssueRows";
+import { IssueGlyph, issueStatePresentation } from "./issue/issuePresentation";
+import { useSidebarLinkedIssueState } from "../state/issues";
+import { useRightPanelStore } from "../rightPanelStore";
 
 import {
   type SidebarRouteReveal,
@@ -636,6 +640,65 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
     ? resolveThreadCurrentPullRequestLink(thread.pullRequests)
     : null;
   const prStatus = prStatusIndicator(pr, linkedPullRequestStatus?.sourceControlProvider);
+  const firstIssue = thread.issues?.[0];
+  const issueCount = thread.issues?.length ?? 0;
+  const issueState = useSidebarLinkedIssueState(
+    thread.environmentId,
+    leaseLiveStatus ? thread.issues : undefined,
+  );
+  const issueStatus = issueState === null ? null : issueStatePresentation(issueState);
+  const IssueIcon = issueStatus?.Icon ?? IssueGlyph.issue;
+  const issueLabel =
+    issueCount === 1 && firstIssue
+      ? issueStatus
+        ? uiText("Issue {key}: {title}, {state}", {
+            key: firstIssue.displayKey,
+            title: firstIssue.title,
+            state: issueStatus.label,
+          })
+        : uiText("Issue {key}: {title}", { key: firstIssue.displayKey, title: firstIssue.title })
+      : issueCount === 1
+        ? uiText("{count} linked issue", { count: issueCount })
+        : uiText("{count} linked issues", { count: issueCount });
+  const issueBadge = firstIssue ? (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <button
+            type="button"
+            aria-label={issueLabel}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              useRightPanelStore.getState().open(threadRef, "pull-requests");
+              if (!isActive) navigateToThread(threadRef);
+            }}
+          />
+        }
+      >
+        <IssueIcon aria-hidden className={cn("size-3 shrink-0", issueStatus?.toneClassName)} />
+        <span className="max-w-16 truncate text-xs font-normal text-secondary-label tabular-nums">
+          {issueCount === 1 ? firstIssue.displayKey : issueCount}
+        </span>
+      </TooltipTrigger>
+      <TooltipPopup
+        side="top"
+        sideOffset={0}
+        variant="glass"
+        className="pointer-events-auto w-80 max-w-[calc(100vw-2rem)] text-left whitespace-normal"
+        onContextMenu={(event) => event.stopPropagation()}
+      >
+        <div className="-mx-1 max-h-[calc(var(--available-height)-0.5rem-2px)] overflow-y-auto overscroll-contain">
+          <ThreadDetailsIssueRows
+            links={thread.issues ?? []}
+            threadRef={threadRef}
+            compact={false}
+            mountScope="sidebar-tooltip"
+          />
+        </div>
+      </TooltipPopup>
+    </Tooltip>
+  ) : null;
   const isConfirmingArchive =
     canOperateThread && confirmingArchiveThreadKey === threadKey && !isThreadRunning;
   const threadMetaClassName = isConfirmingArchive
@@ -895,6 +958,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
               <PullRequestGlyph.pullRequest className="size-3" />
             </a>
           ) : null}
+          {issueBadge}
           <TaskBoardDot cwd={thread.worktreePath ?? originalWorkspace} threadId={thread.id} />
           {urgentRowReason ? (
             <InboxStatusMark reason={urgentRowReason} />
