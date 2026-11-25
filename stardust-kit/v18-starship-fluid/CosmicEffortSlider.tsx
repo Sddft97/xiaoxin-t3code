@@ -152,7 +152,6 @@ export function CosmicEffortSlider(props: {
   const wakeLoopRef = useRef<(() => void) | null>(null);
 
   // Sync external selection changes into the spring target & upshift juice.
-  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- drives imperative Canvas 2D spring & shift juice when selection prop changes
   useEffect(() => {
     const st = stateRef.current;
     if (!st.dragging) {
@@ -165,7 +164,6 @@ export function CosmicEffortSlider(props: {
     }
   }, [selectedIndex, targetRatio]);
 
-  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- owns imperative Canvas 2D render loop & resize/visibility listeners
   useEffect(() => {
     const canvas = canvasRef.current;
     const wrap = wrapRef.current;

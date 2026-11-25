@@ -8,6 +8,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "~/components/ui/in
 import type { RightPanelSurface } from "~/rightPanelStore";
 import { render, stubGlobal } from "../../test/render";
 import { HistorySwipeNavigation } from "./HistorySwipeNavigation";
+import { DEFAULT_CLIENT_SETTINGS } from "@t3tools/contracts/settings";
 import { RightPanelTabs, type RightPanelTabsProps } from "./RightPanelTabs";
 import { subscribePreviewAction } from "./preview/previewActionBus";
 
@@ -29,6 +30,9 @@ function trackpad() {
       onTrackpadScrollBegin: subscribe(begin),
       onTrackpadScrollEnd: subscribe(end),
       onMenuAction: () => () => {},
+      getLocalEnvironmentBootstraps: () => [],
+      getClientSettings: async () => DEFAULT_CLIENT_SETTINGS,
+      setClientSettings: async () => {},
     },
     scroll(target: Element, deltas: readonly number[]) {
       let scroller: Element | null = target;

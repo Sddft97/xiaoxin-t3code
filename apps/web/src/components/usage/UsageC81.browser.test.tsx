@@ -158,7 +158,7 @@ it("fits 720 and 560 analysis panels without horizontal scrolling and keeps mode
       ...panel.querySelectorAll<HTMLElement>(".usage-sheet-content,.usage-model-bars"),
     ])
       expect(element.scrollWidth).toBeLessThanOrEqual(element.clientWidth);
-    const target = page.getByRole("dialog").getByRole("img", { name: /13:00/ });
+    const target = page.getByRole("dialog").getByRole("img", { name: /13:52/ });
     await userEvent.hover(target);
     const read = panel.querySelector("[data-usage-readout]")!.getBoundingClientRect(),
       svg = panel.querySelector("svg")!.getBoundingClientRect();

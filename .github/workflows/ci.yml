@@ -82,7 +82,8 @@ jobs:
         run: vp run --filter @t3tools/desktop ensure:electron
 
       - name: Typecheck
-        run: vpr typecheck
+        # The full Effect/TS graph can exceed the fork runner's memory at four workers.
+        run: vp run -r --cache --concurrency-limit 2 typecheck
 
   build:
     name: Build
