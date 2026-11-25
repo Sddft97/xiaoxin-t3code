@@ -210,7 +210,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -231,7 +231,7 @@ jobs:
         run: node apps/web/node_modules/playwright/cli.js install --with-deps --only-shell chromium
 
       - name: Test
-        run: vp -C apps/web test run --passWithNoTests --project unit --project browser --shard=${{ matrix.shard }}/4
+        run: vp -C apps/web test run --passWithNoTests --project unit --project browser --shard=${{ matrix.shard }}/8
         env:
           VITEST_MAX_WORKERS: 1
 
