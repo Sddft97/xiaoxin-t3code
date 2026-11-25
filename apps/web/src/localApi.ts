@@ -69,13 +69,13 @@ export function createLocalApi(): LocalApi {
     persistence: {
       getClientSettings: async () => {
         if (window.desktopBridge) {
-          return window.desktopBridge.getClientSettings();
+          return window.desktopBridge.getClientSettings?.() ?? readBrowserClientSettings();
         }
         return readBrowserClientSettings();
       },
       setClientSettings: async (settings) => {
         if (window.desktopBridge) {
-          return window.desktopBridge.setClientSettings(settings);
+          return window.desktopBridge.setClientSettings?.(settings);
         }
         writeBrowserClientSettings(settings);
       },

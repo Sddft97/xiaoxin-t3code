@@ -3002,7 +3002,7 @@ function OpenCommandPaletteDialog(props: {
       try {
         primaryRunningDistro =
           window.desktopBridge
-            ?.getLocalEnvironmentBootstraps()
+            ?.getLocalEnvironmentBootstraps?.()
             .find((bootstrap) => bootstrap.id === PRIMARY_LOCAL_ENVIRONMENT_ID)?.runningDistro ??
           null;
       } catch {}

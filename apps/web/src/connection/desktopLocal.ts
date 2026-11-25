@@ -54,9 +54,9 @@ export function createDesktopSecondaryBootstrapsReader(
       return { _tag: "Success", bootstraps: snapshot };
     }
     try {
-      const next = bridge
-        .getLocalEnvironmentBootstraps()
-        .filter((entry) => entry.id !== PRIMARY_LOCAL_ENVIRONMENT_ID);
+      const next = (bridge.getLocalEnvironmentBootstraps?.() ?? []).filter(
+        (entry) => entry.id !== PRIMARY_LOCAL_ENVIRONMENT_ID,
+      );
       if (
         next.length !== snapshot.length ||
         next.some((entry, index) => {

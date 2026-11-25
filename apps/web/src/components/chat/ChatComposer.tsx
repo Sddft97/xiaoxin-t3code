@@ -2942,7 +2942,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       isDesktopRenderer: window.desktopBridge !== undefined,
       primaryRunsInWsl:
         window.desktopBridge
-          ?.getLocalEnvironmentBootstraps()
+          ?.getLocalEnvironmentBootstraps?.()
           .some(
             (bootstrap) =>
               bootstrap.id === PRIMARY_LOCAL_ENVIRONMENT_ID &&
