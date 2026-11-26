@@ -16,52 +16,25 @@ const sourceZip = NodeFS.readdirSync(directory).find((name) =>
 if (!sourceZip) throw new Error(`No packaged arm64 ZIP found in ${directory}`);
 
 const fileName = `T3-Stardust-${releaseVersion}-macOS-arm64.zip`;
-const upstreamExtract = NodeFS.mkdtempSync(
-  NodePath.join(NodePath.dirname(directory), "fork-shell-"),
-);
 const extracted = NodeFS.mkdtempSync(NodePath.join(NodePath.dirname(directory), "fork-package-"));
 try {
-  const shellZip = NodePath.join(upstreamExtract, `Stardust-${upstreamTag}-macOS-arm64.zip`);
-  download(
-    `https://github.com/zds-xiaoxin/stardust/releases/download/${upstreamTag}/Stardust-${upstreamTag}-macOS-arm64.zip`,
-    shellZip,
-  );
-  run("/usr/bin/ditto", ["-x", "-k", shellZip, upstreamExtract]);
-  const shellName = NodeFS.readdirSync(upstreamExtract).find((name) => name.endsWith(".app"));
-  if (!shellName) throw new Error("Upstream Stardust release has no .app shell");
-  const app = NodePath.join(extracted, "T3 Stardust.app");
-  copy(NodePath.join(upstreamExtract, shellName), app);
   run("/usr/bin/ditto", ["-x", "-k", NodePath.join(directory, sourceZip), extracted]);
-  const packagedName = NodeFS.readdirSync(extracted).find(
-    (name) => name.endsWith(".app") && name !== "T3 Stardust.app",
-  );
-  if (!packagedName) throw new Error("No built app found");
-  const packagedApp = NodePath.join(extracted, packagedName);
+  const bundles = NodeFS.readdirSync(extracted).filter((name) => name.endsWith(".app"));
+  if (bundles.length !== 1) throw new Error(`Expected one built app, found ${bundles.length}`);
+  const app = NodePath.join(extracted, "T3 Stardust.app");
+  NodeFS.renameSync(NodePath.join(extracted, bundles[0]), app);
   const plist = NodePath.join(app, "Contents/Info.plist");
+  if (
+    run("/usr/bin/plutil", ["-extract", "CFBundleIdentifier", "raw", plist]).trim() !==
+    "com.t3tools.t3code"
+  ) {
+    throw new Error("The built app bundle identifier does not match installed T3 Stardust apps");
+  }
   for (const [key, value] of [
     ["CFBundleDisplayName", "T3 Stardust"],
-    ["CFBundleName", "T3 Stardust"],
     ["CFBundleShortVersionString", releaseVersion],
-    ["CFBundleVersion", expectedTag],
   ])
     run("/usr/bin/plutil", ["-replace", key, "-string", value, plist]);
-  for (const resource of [
-    "app.asar",
-    "app.asar.unpacked",
-    "node_modules",
-    "apple-speech",
-    "resource-monitor",
-    "server-compile-cache",
-    "LICENSE",
-    "NOTICE",
-    "third-party-licenses.json",
-  ]) {
-    const source = NodePath.join(packagedApp, "Contents/Resources", resource);
-    if (!NodeFS.existsSync(source)) continue;
-    const destination = NodePath.join(app, "Contents/Resources", resource);
-    NodeFS.rmSync(destination, { recursive: true, force: true });
-    copy(source, destination);
-  }
   NodeFS.writeFileSync(
     NodePath.join(app, "Contents/Resources/stardust-build.json"),
     `${JSON.stringify(
@@ -101,19 +74,10 @@ try {
   console.log(`Prepared ${fileName}`);
 } finally {
   NodeFS.rmSync(extracted, { recursive: true, force: true });
-  NodeFS.rmSync(upstreamExtract, { recursive: true, force: true });
-}
-
-function copy(source, destination) {
-  run("/usr/bin/ditto", [source, destination]);
 }
 
 function run(command, args) {
   const result = NodeChildProcess.spawnSync(command, args, { encoding: "utf8" });
   if (result.status !== 0) throw new Error(`${command} ${args.join(" ")} failed: ${result.stderr}`);
   return result.stdout;
-}
-
-function download(url, destination) {
-  run("curl", ["-fL", "--retry", "3", "--connect-timeout", "30", url, "-o", destination]);
 }
