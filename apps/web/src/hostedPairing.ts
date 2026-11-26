@@ -1,3 +1,4 @@
+import { DEFAULT_HOSTED_APP_URL } from "@t3tools/shared/connectAuth";
 import { getPairingTokenFromUrl, setPairingTokenOnUrl } from "@t3tools/shared/remote";
 
 export interface HostedPairingRequest {
@@ -9,11 +10,22 @@ export interface HostedPairingRequest {
 export type HostedAppChannel = "latest" | "nightly";
 
 export function configuredHostedAppUrl(): string {
-  return typeof window === "undefined" ? "http://127.0.0.1" : window.location.origin;
+  return import.meta.env.VITE_HOSTED_APP_URL?.trim() || DEFAULT_HOSTED_APP_URL;
 }
 
-export function isHostedStaticApp(_url?: URL): boolean {
-  return false;
+export function isHostedStaticApp(url?: URL): boolean {
+  if (import.meta.env.VITE_HTTP_URL?.trim() || import.meta.env.VITE_WS_URL?.trim()) return false;
+
+  const channel = import.meta.env.VITE_HOSTED_APP_CHANNEL?.trim().toLowerCase();
+  if (channel === "latest" || channel === "nightly") return true;
+
+  const origin =
+    url?.origin ?? (typeof window === "undefined" ? undefined : window.location.origin);
+  try {
+    return origin !== undefined && origin === new URL(configuredHostedAppUrl()).origin;
+  } catch {
+    return false;
+  }
 }
 
 export function readHostedPairingRequest(url: URL = new URL(window.location.href)) {

@@ -3,12 +3,21 @@ import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import {
   buildHostedPairingUrl,
   hasHostedPairingRequest,
+  isHostedStaticApp,
   readHostedPairingRequest,
 } from "./hostedPairing";
 
 describe("hostedPairing", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
+  });
+
+  it("enables hosted approval on the Connect app and keeps local servers local", () => {
+    const hosted = new URL("https://app.t3.codes/approve-agent");
+    expect(isHostedStaticApp(hosted)).toBe(true);
+    expect(isHostedStaticApp(new URL("http://127.0.0.1:3773/approve-agent"))).toBe(false);
+    vi.stubEnv("VITE_HTTP_URL", "http://127.0.0.1:3773");
+    expect(isHostedStaticApp(hosted)).toBe(false);
   });
 
   it("reads hosted pairing host and query token parameters", () => {
