@@ -20,7 +20,7 @@ export function isHostedStaticApp(url?: URL): boolean {
   if (channel === "latest" || channel === "nightly") return true;
 
   const origin =
-    url?.origin ?? (typeof window === "undefined" ? undefined : window.location.origin);
+    url?.origin ?? (typeof window === "undefined" ? undefined : window.location?.origin);
   try {
     return origin !== undefined && origin === new URL(configuredHostedAppUrl()).origin;
   } catch {
