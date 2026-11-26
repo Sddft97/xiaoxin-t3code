@@ -13,6 +13,14 @@ import { makeCodexChatGptAuth } from "./CodexChatGptAuth.ts";
 import { COMMAND_TIMEOUT_MS } from "./CodexManagedTokenProtocol.ts";
 import { materializeCodexShadowHome } from "./Drivers/CodexHomeLayout.ts";
 
+export const CODEX_SHARING_CONFIG_REVISION = "sharing-v2";
+
+export const CODEX_SHARING_FEATURE_OVERRIDES = {
+  "features.multi_agent": false,
+  "features.multi_agent_v2": false,
+  "agents.enabled": false,
+} as const;
+
 export interface CodexEffectiveRuntime {
   readonly config: CodexSettings;
   readonly environment: NodeJS.ProcessEnv;
@@ -25,8 +33,7 @@ const managedCodexLaunchArgs = (command: string, args: ReadonlyArray<string>) =>
     // Codex persists this provider ID in rollouts and needs it unchanged to resume.
     `model_providers.openai_token_sharing={name="OpenAI Token Sharing",base_url="https://api.openai.com/v1",model_catalog_url="https://api.openai.com/v1/models",wire_api="responses",requires_openai_auth=false,supports_websockets=false,auth={command=${JSON.stringify(command)},args=${JSON.stringify(args)},timeout_ms=${COMMAND_TIMEOUT_MS},refresh_interval_ms=0}}`,
     "features.api_key_model_discovery=true",
-    "features.multi_agent=false",
-    "features.multi_agent_v2=false",
+    ...Object.keys(CODEX_SHARING_FEATURE_OVERRIDES).map((key) => `${key}=false`),
   ]
     .map((value) => `-c ${JSON.stringify(value)}`)
     .join(" ");

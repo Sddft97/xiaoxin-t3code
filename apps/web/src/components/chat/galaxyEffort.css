@@ -1,0 +1,796 @@
+@property --gx-b1 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #05050b;
+}
+@property --gx-b2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #0b0b1d;
+}
+@property --gx-b3 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #11122c;
+}
+@property --gx-n1 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --gx-n2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --gx-sfc {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #fff;
+}
+@property --gx-au1 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --gx-au2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --gx-ig {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --gx-rc {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #fff;
+}
+@property --gx-o1 {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --gx-o2 {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --gx-o3 {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --gx-o4 {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --gx-o5 {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --gx-auo {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --gx-ro {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+.gx {
+  position: relative;
+  color: var(--foreground);
+  user-select: none;
+  -webkit-user-select: none;
+  border-top: 0.5px solid var(--border);
+  padding: 9px 1px 9px;
+  transition:
+    --gx-b1 0.6s,
+    --gx-b2 0.6s,
+    --gx-b3 0.6s,
+    --gx-n1 0.6s,
+    --gx-n2 0.6s,
+    --gx-sfc 0.6s,
+    --gx-au1 0.6s,
+    --gx-au2 0.6s,
+    --gx-ig 0.6s,
+    --gx-rc 0.6s,
+    --gx-o1 0.5s,
+    --gx-o2 0.5s,
+    --gx-o3 0.5s,
+    --gx-o4 0.5s,
+    --gx-o5 0.5s,
+    --gx-auo 0.6s,
+    --gx-ro 0.6s;
+}
+.gx-row {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.gx-t {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.gx-ico {
+  width: 10px;
+  height: 10px;
+  fill: var(--ring);
+  opacity: 0.9;
+}
+.gx-v {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: 0.1px;
+  display: inline-block;
+  flex: 1 1 0;
+  text-align: right;
+  min-width: 0;
+}
+.gx-stage {
+  height: 44px;
+  --gx-bh: 32px;
+  position: relative;
+  flex: none;
+  width: var(--gx-tw, 58%);
+  min-width: 0;
+  cursor: pointer;
+  touch-action: none;
+  outline: none;
+}
+.gx-stage[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+.gx-stage:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--popover),
+    0 0 0 3.5px var(--ring);
+  border-radius: 99px;
+}
+.gx-stage canvas {
+  position: absolute;
+  pointer-events: none;
+  display: block;
+}
+.gx-ch {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: var(--gx-bh);
+  margin-top: calc(var(--gx-bh)/-2);
+  border-radius: 999px;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--gx-b1) 0%, var(--gx-b2) 52%, var(--gx-b3) 100%);
+  box-shadow:
+    var(--gx-ch-shade),
+    inset 0 0 11px var(--gx-ig);
+}
+.gx[data-mode="light"] .gx-ch {
+  --gx-ch-shade:
+    inset 0 1.5px 3px rgba(40, 30, 110, 0.28), inset 0 0 0 0.5px rgba(60, 50, 130, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.gx[data-mode="dark"] .gx-ch {
+  --gx-ch-shade:
+    inset 0 2px 5px rgba(0, 0, 0, 0.7), inset 0 0 0 0.5px rgba(255, 255, 255, 0.085),
+    0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.gx-ch::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 55%);
+  pointer-events: none;
+}
+.gx[data-mode="light"][data-lv="0"] .gx-ch::after,
+.gx[data-mode="light"][data-lv="1"] .gx-ch::after {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 58%);
+}
+/* 星云：两层极慢横漂（rate = aur） */
+.gx-nb {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(100% + 480px);
+  will-change: transform;
+}
+.gx-nb.nb1 {
+  background: radial-gradient(ellipse 120px 80% at 50% 50%, var(--gx-n1), transparent 72%) 0 0/240px
+    100% repeat-x;
+  animation: gx-drift1 90s linear infinite;
+}
+.gx-nb.nb2 {
+  background: radial-gradient(ellipse 76px 60% at 38% 56%, var(--gx-n2), transparent 70%) 0 0/160px
+    100% repeat-x;
+  animation: gx-drift2 140s linear infinite;
+}
+@keyframes gx-drift1 {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-480px);
+  }
+}
+@keyframes gx-drift2 {
+  from {
+    transform: translateX(-480px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.gx-sf {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  will-change: transform;
+} /* 5 层星场的 background / animation 由 gx5-engine.js 注入 */
+/* 极光电流（中档起）：两条反向流动的色带，竖向被软遮罩收在带中线 */
+.gx-auw {
+  position: absolute;
+  inset: 0;
+  opacity: var(--gx-auo);
+  -webkit-mask-image: linear-gradient(180deg, transparent 4%, #000 36%, #000 64%, transparent 96%);
+  mask-image: linear-gradient(180deg, transparent 4%, #000 36%, #000 64%, transparent 96%);
+}
+.gx-aur {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(100% + 360px);
+  will-change: transform;
+}
+.gx-aur.au1 {
+  background: linear-gradient(
+      90deg,
+      transparent 0,
+      var(--gx-au1) 22%,
+      transparent 46%,
+      var(--gx-au2) 70%,
+      transparent 100%
+    )
+    0 0/360px 100% repeat-x;
+  animation: gx-au1 16s linear infinite;
+}
+.gx-aur.au2 {
+  background: linear-gradient(
+      90deg,
+      var(--gx-au2) 0,
+      transparent 30%,
+      var(--gx-au1) 58%,
+      transparent 84%,
+      var(--gx-au2) 100%
+    )
+    0 0/250px 100% repeat-x;
+  animation: gx-au2 11s linear infinite;
+  opacity: 0.65;
+}
+@keyframes gx-au1 {
+  to {
+    transform: translateX(-360px);
+  }
+}
+@keyframes gx-au2 {
+  from {
+    transform: translateX(-250px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+/* 边缘流光（超高起）：沿带内缘跑一道亮光 */
+.gx-rimw {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  opacity: var(--gx-ro);
+  overflow: hidden;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+.gx-rim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(100% + 320px);
+  background: linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 40%,
+      var(--gx-rc) 50%,
+      transparent 60%,
+      transparent 100%
+    )
+    0 0/320px 100% repeat-x;
+  opacity: 0.95;
+  animation: gx-rim 2.6s linear infinite;
+}
+@keyframes gx-rim {
+  to {
+    transform: translateX(-320px);
+  }
+}
+.gx.gx-paused * {
+  animation-play-state: paused !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gx * {
+    animation: none !important;
+  }
+  .gx {
+    transition: none !important;
+  }
+}
+
+.gx .gx-t {
+  padding-right: 3px;
+}
+.gx .gx-v {
+  white-space: nowrap;
+}
+
+.gx[data-mode="dark"][data-lv="0"] {
+  --gx-b1: #05050b;
+  --gx-b2: #0b0b1d;
+  --gx-b3: #11122c;
+  --gx-n1: rgba(70, 84, 200, 0.16);
+  --gx-n2: rgba(60, 70, 160, 0.1);
+  --gx-sfc: rgb(200, 205, 255);
+  --gx-au1: rgba(90, 100, 230, 0);
+  --gx-au2: rgba(80, 100, 200, 0);
+  --gx-auo: 0;
+  --gx-ig: rgba(80, 90, 220, 0.2);
+  --gx-ro: 0;
+  --gx-rc: rgb(200, 205, 255);
+  --gx-o1: 0.3;
+  --gx-o2: 0.55;
+  --gx-o3: 0;
+  --gx-o4: 0;
+  --gx-o5: 0;
+}
+.gx[data-mode="dark"][data-lv="1"] {
+  --gx-b1: #070716;
+  --gx-b2: #15133a;
+  --gx-b3: #1d1b52;
+  --gx-n1: rgba(100, 100, 240, 0.28);
+  --gx-n2: rgba(70, 110, 230, 0.2);
+  --gx-sfc: rgb(215, 215, 255);
+  --gx-au1: rgba(110, 110, 255, 0.4);
+  --gx-au2: rgba(80, 130, 255, 0.28);
+  --gx-auo: 0.4;
+  --gx-ig: rgba(110, 100, 255, 0.32);
+  --gx-ro: 0;
+  --gx-rc: rgb(215, 215, 255);
+  --gx-o1: 0.6;
+  --gx-o2: 0.7;
+  --gx-o3: 0.55;
+  --gx-o4: 0;
+  --gx-o5: 0;
+}
+.gx[data-mode="dark"][data-lv="2"] {
+  --gx-b1: #0b0620;
+  --gx-b2: #241072;
+  --gx-b3: #35208f;
+  --gx-n1: rgba(150, 100, 255, 0.44);
+  --gx-n2: rgba(90, 130, 255, 0.34);
+  --gx-sfc: rgb(235, 228, 255);
+  --gx-au1: rgba(175, 120, 255, 0.62);
+  --gx-au2: rgba(90, 150, 255, 0.5);
+  --gx-auo: 0.75;
+  --gx-ig: rgba(150, 110, 255, 0.5);
+  --gx-ro: 0.15;
+  --gx-rc: rgb(220, 205, 255);
+  --gx-o1: 0.8;
+  --gx-o2: 0.85;
+  --gx-o3: 0.8;
+  --gx-o4: 0.6;
+  --gx-o5: 0;
+}
+.gx[data-mode="dark"][data-lv="3"] {
+  --gx-b1: #12062e;
+  --gx-b2: #3b1496;
+  --gx-b3: #5b23bb;
+  --gx-n1: rgba(205, 100, 255, 0.55);
+  --gx-n2: rgba(90, 150, 255, 0.46);
+  --gx-sfc: rgb(245, 238, 255);
+  --gx-au1: rgba(225, 110, 255, 0.72);
+  --gx-au2: rgba(100, 170, 255, 0.6);
+  --gx-auo: 0.95;
+  --gx-ig: rgba(190, 120, 255, 0.64);
+  --gx-ro: 0.85;
+  --gx-rc: rgb(238, 220, 255);
+  --gx-o1: 0.9;
+  --gx-o2: 0.9;
+  --gx-o3: 0.9;
+  --gx-o4: 0.8;
+  --gx-o5: 0.7;
+}
+.gx[data-mode="dark"][data-lv="4"] {
+  --gx-b1: #240a54;
+  --gx-b2: #6c27d4;
+  --gx-b3: #a550f2;
+  --gx-n1: rgba(255, 190, 255, 0.66);
+  --gx-n2: rgba(150, 170, 255, 0.56);
+  --gx-sfc: rgb(255, 255, 255);
+  --gx-au1: rgba(255, 185, 255, 0.8);
+  --gx-au2: rgba(190, 205, 255, 0.7);
+  --gx-auo: 1;
+  --gx-ig: rgba(240, 200, 255, 0.8);
+  --gx-ro: 1;
+  --gx-rc: rgb(255, 255, 255);
+  --gx-o1: 0.5;
+  --gx-o2: 0.5;
+  --gx-o3: 0.5;
+  --gx-o4: 0.5;
+  --gx-o5: 0.4;
+}
+.gx[data-mode="light"][data-lv="0"] {
+  --gx-b1: #cfd3ee;
+  --gx-b2: #dcdff3;
+  --gx-b3: #e8eaf8;
+  --gx-n1: rgba(120, 130, 230, 0.3);
+  --gx-n2: rgba(130, 140, 210, 0.2);
+  --gx-sfc: rgb(76, 72, 140);
+  --gx-au1: rgba(110, 110, 230, 0);
+  --gx-au2: rgba(110, 120, 220, 0);
+  --gx-auo: 0;
+  --gx-ig: rgba(110, 110, 210, 0.34);
+  --gx-ro: 0;
+  --gx-rc: rgb(255, 255, 255);
+  --gx-o1: 0.3;
+  --gx-o2: 0.55;
+  --gx-o3: 0;
+  --gx-o4: 0;
+  --gx-o5: 0;
+}
+.gx[data-mode="light"][data-lv="1"] {
+  --gx-b1: #b4baf0;
+  --gx-b2: #c6c5f6;
+  --gx-b3: #d6d1fa;
+  --gx-n1: rgba(110, 110, 240, 0.42);
+  --gx-n2: rgba(100, 130, 235, 0.3);
+  --gx-sfc: rgb(62, 52, 170);
+  --gx-au1: rgba(100, 100, 240, 0.42);
+  --gx-au2: rgba(90, 140, 240, 0.3);
+  --gx-auo: 0.4;
+  --gx-ig: rgba(100, 90, 240, 0.4);
+  --gx-ro: 0;
+  --gx-rc: rgb(255, 255, 255);
+  --gx-o1: 0.6;
+  --gx-o2: 0.7;
+  --gx-o3: 0.55;
+  --gx-o4: 0;
+  --gx-o5: 0;
+}
+.gx[data-mode="light"][data-lv="2"] {
+  --gx-b1: #6c63e4;
+  --gx-b2: #8a76f2;
+  --gx-b3: #a58ef8;
+  --gx-n1: rgba(190, 150, 255, 0.5);
+  --gx-n2: rgba(110, 150, 255, 0.4);
+  --gx-sfc: rgb(255, 255, 255);
+  --gx-au1: rgba(235, 205, 255, 0.62);
+  --gx-au2: rgba(150, 200, 255, 0.52);
+  --gx-auo: 0.75;
+  --gx-ig: rgba(235, 225, 255, 0.5);
+  --gx-ro: 0.2;
+  --gx-rc: rgb(255, 255, 255);
+  --gx-o1: 0.8;
+  --gx-o2: 0.85;
+  --gx-o3: 0.8;
+  --gx-o4: 0.6;
+  --gx-o5: 0;
+}
+.gx[data-mode="light"][data-lv="3"] {
+  --gx-b1: #341ba8;
+  --gx-b2: #5a2ed6;
+  --gx-b3: #7a47ee;
+  --gx-n1: rgba(235, 130, 255, 0.55);
+  --gx-n2: rgba(110, 160, 255, 0.48);
+  --gx-sfc: rgb(255, 255, 255);
+  --gx-au1: rgba(245, 140, 255, 0.72);
+  --gx-au2: rgba(120, 190, 255, 0.62);
+  --gx-auo: 0.95;
+  --gx-ig: rgba(225, 170, 255, 0.62);
+  --gx-ro: 0.85;
+  --gx-rc: rgb(255, 240, 255);
+  --gx-o1: 0.9;
+  --gx-o2: 0.9;
+  --gx-o3: 0.9;
+  --gx-o4: 0.8;
+  --gx-o5: 0.7;
+}
+.gx[data-mode="light"][data-lv="4"] {
+  --gx-b1: #2a0f8c;
+  --gx-b2: #6a2ad8;
+  --gx-b3: #b45cf2;
+  --gx-n1: rgba(255, 200, 255, 0.68);
+  --gx-n2: rgba(160, 180, 255, 0.58);
+  --gx-sfc: rgb(255, 255, 255);
+  --gx-au1: rgba(255, 190, 255, 0.82);
+  --gx-au2: rgba(200, 210, 255, 0.72);
+  --gx-auo: 1;
+  --gx-ig: rgba(255, 215, 255, 0.8);
+  --gx-ro: 1;
+  --gx-rc: rgb(255, 255, 255);
+  --gx-o1: 0.5;
+  --gx-o2: 0.5;
+  --gx-o3: 0.5;
+  --gx-o4: 0.5;
+  --gx-o5: 0.4;
+}
+.gx-sf.sf1 {
+  width: calc(100% + 97px);
+  background:
+    radial-gradient(
+      circle at 8.4% 52.2%,
+      color-mix(in srgb, var(--gx-sfc) 82%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 82%, transparent) 0.51px,
+      transparent 1.18px
+    ),
+    radial-gradient(
+      circle at 28.5% 52.7%,
+      color-mix(in srgb, var(--gx-sfc) 79%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 79%, transparent) 0.4px,
+      transparent 0.91px
+    ),
+    radial-gradient(
+      circle at 42.7% 46.4%,
+      color-mix(in srgb, var(--gx-sfc) 93%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 93%, transparent) 0.49px,
+      transparent 1.12px
+    ),
+    radial-gradient(
+      circle at 57.5% 62.3%,
+      color-mix(in srgb, var(--gx-sfc) 62%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 62%, transparent) 0.53px,
+      transparent 1.22px
+    ),
+    radial-gradient(
+      circle at 71.8% 33.9%,
+      color-mix(in srgb, var(--gx-sfc) 72%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 72%, transparent) 0.47px,
+      transparent 1.07px
+    ),
+    radial-gradient(
+      circle at 92.5% 23.2%,
+      color-mix(in srgb, var(--gx-sfc) 81%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 81%, transparent) 0.51px,
+      transparent 1.18px
+    );
+  background-size: 97px 100%;
+  background-repeat: repeat-x;
+  opacity: var(--gx-o1);
+  animation: gx-sf1 27.7s linear -2s infinite;
+}
+@keyframes gx-sf1 {
+  to {
+    transform: translateX(-97px);
+  }
+}
+.gx-sf.sf2 {
+  width: calc(100% + 131px);
+  background:
+    radial-gradient(
+      circle at 5.1% 18.9%,
+      color-mix(in srgb, var(--gx-sfc) 69%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 69%, transparent) 0.66px,
+      transparent 1.51px
+    ),
+    radial-gradient(
+      circle at 27.9% 29.4%,
+      color-mix(in srgb, var(--gx-sfc) 98%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 98%, transparent) 0.63px,
+      transparent 1.44px
+    ),
+    radial-gradient(
+      circle at 53.9% 14.6%,
+      color-mix(in srgb, var(--gx-sfc) 64%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 64%, transparent) 0.68px,
+      transparent 1.56px
+    ),
+    radial-gradient(
+      circle at 65% 85%,
+      color-mix(in srgb, var(--gx-sfc) 76%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 76%, transparent) 0.71px,
+      transparent 1.63px
+    ),
+    radial-gradient(
+      circle at 92.9% 18%,
+      color-mix(in srgb, var(--gx-sfc) 84%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 84%, transparent) 0.61px,
+      transparent 1.41px
+    );
+  background-size: 131px 100%;
+  background-repeat: repeat-x;
+  opacity: var(--gx-o2);
+  animation: gx-sf2 18.7s linear -5s infinite;
+}
+@keyframes gx-sf2 {
+  to {
+    transform: translateX(-131px);
+  }
+}
+.gx-sf.sf3 {
+  width: calc(100% + 173px);
+  background:
+    radial-gradient(
+      circle at 12.7% 85.8%,
+      color-mix(in srgb, var(--gx-sfc) 88%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 88%, transparent) 0.76px,
+      transparent 1.74px
+    ),
+    radial-gradient(
+      circle at 33% 56.4%,
+      color-mix(in srgb, var(--gx-sfc) 98%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 98%, transparent) 0.8px,
+      transparent 1.85px
+    ),
+    radial-gradient(
+      circle at 64.6% 49.7%,
+      color-mix(in srgb, var(--gx-sfc) 91%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 91%, transparent) 0.93px,
+      transparent 2.14px
+    ),
+    radial-gradient(
+      circle at 83.3% 67.6%,
+      color-mix(in srgb, var(--gx-sfc) 95%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 95%, transparent) 1.03px,
+      transparent 2.36px
+    );
+  background-size: 173px 100%;
+  background-repeat: repeat-x;
+  opacity: var(--gx-o3);
+  animation: gx-sf3 14.4s linear -1s infinite;
+}
+@keyframes gx-sf3 {
+  to {
+    transform: translateX(-173px);
+  }
+}
+.gx-sf.sf4 {
+  width: calc(100% + 71px);
+  background:
+    radial-gradient(
+      circle at 10.2% 50.6%,
+      color-mix(in srgb, var(--gx-sfc) 79%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 79%, transparent) 0.48px,
+      transparent 1.1px
+    ),
+    radial-gradient(
+      circle at 24.4% 49.4%,
+      color-mix(in srgb, var(--gx-sfc) 75%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 75%, transparent) 0.53px,
+      transparent 1.23px
+    ),
+    radial-gradient(
+      circle at 31.9% 65.1%,
+      color-mix(in srgb, var(--gx-sfc) 70%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 70%, transparent) 0.52px,
+      transparent 1.19px
+    ),
+    radial-gradient(
+      circle at 48.6% 82.9%,
+      color-mix(in srgb, var(--gx-sfc) 65%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 65%, transparent) 0.43px,
+      transparent 0.99px
+    ),
+    radial-gradient(
+      circle at 62.3% 65.4%,
+      color-mix(in srgb, var(--gx-sfc) 69%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 69%, transparent) 0.51px,
+      transparent 1.18px
+    ),
+    radial-gradient(
+      circle at 76.6% 52.9%,
+      color-mix(in srgb, var(--gx-sfc) 72%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 72%, transparent) 0.39px,
+      transparent 0.9px
+    ),
+    radial-gradient(
+      circle at 89.9% 48.4%,
+      color-mix(in srgb, var(--gx-sfc) 57%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 57%, transparent) 0.41px,
+      transparent 0.94px
+    );
+  background-size: 71px 100%;
+  background-repeat: repeat-x;
+  opacity: var(--gx-o4);
+  animation: gx-sf4 3.95s linear -5s infinite;
+}
+@keyframes gx-sf4 {
+  to {
+    transform: translateX(-71px);
+  }
+}
+.gx-sf.sf5 {
+  width: calc(100% + 113px);
+  background:
+    radial-gradient(
+      circle at 3% 73.1%,
+      color-mix(in srgb, var(--gx-sfc) 98%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 98%, transparent) 0.41px,
+      transparent 0.95px
+    ),
+    radial-gradient(
+      circle at 15.6% 52.4%,
+      color-mix(in srgb, var(--gx-sfc) 90%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 90%, transparent) 0.42px,
+      transparent 0.96px
+    ),
+    radial-gradient(
+      circle at 31.5% 82.7%,
+      color-mix(in srgb, var(--gx-sfc) 97%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 97%, transparent) 0.54px,
+      transparent 1.25px
+    ),
+    radial-gradient(
+      circle at 45.5% 73.8%,
+      color-mix(in srgb, var(--gx-sfc) 81%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 81%, transparent) 0.62px,
+      transparent 1.42px
+    ),
+    radial-gradient(
+      circle at 53.6% 73.7%,
+      color-mix(in srgb, var(--gx-sfc) 79%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 79%, transparent) 0.42px,
+      transparent 0.97px
+    ),
+    radial-gradient(
+      circle at 68.7% 82.1%,
+      color-mix(in srgb, var(--gx-sfc) 91%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 91%, transparent) 0.58px,
+      transparent 1.32px
+    ),
+    radial-gradient(
+      circle at 79.2% 62.9%,
+      color-mix(in srgb, var(--gx-sfc) 61%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 61%, transparent) 0.5px,
+      transparent 1.14px
+    ),
+    radial-gradient(
+      circle at 90.5% 60%,
+      color-mix(in srgb, var(--gx-sfc) 61%, transparent) 0,
+      color-mix(in srgb, var(--gx-sfc) 61%, transparent) 0.44px,
+      transparent 1.01px
+    );
+  background-size: 113px 100%;
+  background-repeat: repeat-x;
+  opacity: var(--gx-o5);
+  animation: gx-sf5 4.35s linear -8s infinite;
+}
+@keyframes gx-sf5 {
+  to {
+    transform: translateX(-113px);
+  }
+}

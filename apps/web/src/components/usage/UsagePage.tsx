@@ -3,7 +3,7 @@ import { UsageSkeleton } from "./UsageLoadingLayout";
 import { scopeUsageEnvironments, mergeUsageEnvironments, tokenPeriodTotals } from "./usageAnalysis";
 import { MALFORMED_USAGE_WARNING_TEMPLATE } from "@t3tools/shared/usageFormat";
 import { UsageRefreshButton } from "./UsageRefreshButton";
-import { useTheme } from "../../hooks/useTheme";
+import { useAppleMaterialTheme } from "../../hooks/useTheme";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import * as Schema from "effect/Schema";
 import { previousUsageWindow } from "./usagePreviousWindow";
@@ -188,7 +188,7 @@ function UsageModelDialogHost({
   );
 }
 export function UsagePage() {
-  const { theme } = useTheme();
+  const apple = useAppleMaterialTheme();
   const uiText = useUiText();
   const { formatDateTimeShort, formatDayShort } = useUsageDateFormat();
   const [preferences, setPreferences] = useState(readUsagePagePreferences);
@@ -422,7 +422,7 @@ export function UsagePage() {
         {diskEnvironmentId ? <UsageDiskChip environmentId={diskEnvironmentId} /> : null}
         {/* Limits are always current, so they have no period. The period sits before the metric
             tabs so dropping it never moves them. */}
-        {showingLimits || theme === "apple" ? null : (
+        {showingLimits || apple ? null : (
           <ToggleGroup
             aria-label={uiText("Usage period")}
             variant="segmented"
@@ -462,7 +462,7 @@ export function UsagePage() {
             </Toggle>
           ))}
         </ToggleGroup>
-        {theme === "apple" ? (
+        {apple ? (
           <UsageRefreshButton
             iconOnly
             busy={isRefreshing}
@@ -540,7 +540,7 @@ export function UsagePage() {
             ))}
           </SelectPopup>
         </Select>
-        {theme === "apple" ? (
+        {apple ? (
           <UsageRefreshButton
             busy={isRefreshing}
             disabled={isRefreshing || (!showingLimits && !canReadDiagnostics)}
@@ -579,7 +579,7 @@ export function UsagePage() {
           ) : null}
           <AppRouteModalClose />
         </header>
-        <ScrollArea className="min-h-0 flex-1">
+        <ScrollArea className="min-h-0 flex-1" observeContent>
           <WorkspacePageContainer width="wide" data-slot="workspace-page-container">
             <UsageMotion
               replay={usageReplayKey(metric, 0)}
@@ -588,12 +588,12 @@ export function UsagePage() {
               {selectedEnvironments.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
                   {environments.length === 0
-                    ? uiText("Connect an environment to see {0}.", {
-                        "0": showingLimits ? "limits" : "usage",
-                      })
-                    : uiText("Select an environment to see {0}.", {
-                        "0": showingLimits ? "limits" : "usage",
-                      })}
+                    ? showingLimits
+                      ? uiText("Connect an environment to see limits.")
+                      : uiText("Connect an environment to see usage.")
+                    : showingLimits
+                      ? uiText("Select an environment to see limits.")
+                      : uiText("Select an environment to see usage.")}
                 </p>
               ) : showingLimits ? (
                 <UsageLimitsSection
@@ -607,8 +607,12 @@ export function UsagePage() {
                 <div className="space-y-2 py-12 text-center text-sm text-muted-foreground">
                   {selectedEnvironments.map((environment) => (
                     <p key={environment.environmentId}>
-                      {selectedEnvironments.length > 1 ? `${environment.label}: ` : null}
-                      {environment.error}
+                      {selectedEnvironments.length > 1
+                        ? uiText("{environment}: {error}", {
+                            environment: environment.label,
+                            error: environment.error,
+                          })
+                        : environment.error}
                     </p>
                   ))}
                 </div>
@@ -641,7 +645,7 @@ export function UsagePage() {
           </WorkspacePageContainer>
         </ScrollArea>
       </div>
-      {showingLimits || theme === "apple" ? null : (
+      {showingLimits || apple ? null : (
         <UsageModelDialogHost
           models={merged.models}
           environments={selectedEnvironments}
@@ -706,8 +710,7 @@ function UsageOverview({
   readonly onSelectModel: (key: string) => void;
 }) {
   const uiText = useUiText();
-  const { theme } = useTheme();
-  const apple = theme === "apple";
+  const apple = useAppleMaterialTheme();
   const { formatDayShort, formatHourShort } = useUsageDateFormat();
   const [selectedProvider, setSelectedProvider] = useState<UsageProviderKind | null>(null);
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
@@ -1387,7 +1390,7 @@ function UsageOverview({
                           {project.kind === "project"
                             ? project.title
                             : project.kind === "unlinked"
-                              ? uiText("Not in a T3 thread")
+                              ? uiText("Not in a Stardust thread")
                               : uiText("Not reported by this server")}
                         </span>
                         {project.kind === "project" && selectedEnvironments.length > 1 ? (

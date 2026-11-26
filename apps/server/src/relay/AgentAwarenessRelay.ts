@@ -1005,3 +1005,10 @@ export const make = Effect.gen(function* () {
 });
 
 export const layer = Layer.effect(AgentAwarenessRelay, make);
+
+export const layerDisabled = Layer.succeed(AgentAwarenessRelay, {
+  publishThread: Effect.fn("AgentAwarenessRelay.publishThread.disabled")(() => Effect.void),
+  drain: Effect.void,
+  requestCatchUp: Effect.fn("AgentAwarenessRelay.requestCatchUp.disabled")(() => Effect.void),
+  start: Effect.fn("AgentAwarenessRelay.start.disabled")(() => Effect.void),
+});

@@ -1,7 +1,7 @@
-import { T, msg, useGT, useMessages } from "gt-react";
+import { T, msg, useGT, useLocale, useMessages } from "gt-react";
 
 import { uiText } from "~/i18n";
-import { BUILT_IN_THEMES, SKIN_THEMES } from "@t3tools/shared/themePalettes";
+import { DESKTOP_THEMES } from "@t3tools/shared/themePalettes";
 import { MonitorIcon, MoonIcon, PaletteIcon, SunIcon } from "lucide-react";
 
 import { m } from "../i18n/messages";
@@ -16,11 +16,7 @@ import {
   type CommandPaletteSubmenuItem,
 } from "./CommandPalette.logic";
 import { toggleThemeEditorForTheme } from "./settings/themeEditorStore";
-import {
-  STANDARD_THEME_CARDS,
-  getThemeCardDefinition,
-  ThemePreviewCircle,
-} from "./settings/ThemePreviewCircles";
+import { getThemeCardDefinition, ThemePreviewCircle } from "./settings/ThemePreviewCircles";
 import { stackedThreadToast, toastManager } from "./ui/toast";
 
 export const APPEARANCE_OPTIONS = [
@@ -60,19 +56,17 @@ export function notifyThemeSaveFailure(): void {
 // Reads its own source hooks so the compiler caches the cards on them. Taking the
 // sources as arguments would leave it hook-free, and the compiler would cache nothing.
 function useThemeCards() {
+  const locale = useLocale();
   const customThemes = useCustomThemes();
   const environmentThemes = useEnvironmentThemeDefinitions();
   const seen = new Set<string>();
-  return [
-    ...STANDARD_THEME_CARDS.map((card) => ({ ...card, id: null })),
-    ...[...SKIN_THEMES, ...BUILT_IN_THEMES, ...customThemes, ...environmentThemes]
-      .filter((definition) => {
-        if (seen.has(definition.id)) return false;
-        seen.add(definition.id);
-        return true;
-      })
-      .map(getThemeCardDefinition),
-  ];
+  return [...DESKTOP_THEMES, ...customThemes, ...environmentThemes]
+    .filter((definition) => {
+      if (seen.has(definition.id)) return false;
+      seen.add(definition.id);
+      return true;
+    })
+    .map((theme) => getThemeCardDefinition(theme, locale));
 }
 
 export function useCommandPaletteThemeItems() {
@@ -103,7 +97,7 @@ export function useCommandPaletteThemeItems() {
         label: gt("Change theme"),
         items: themeCards.map(({ id, label, previews }) => ({
           kind: "action",
-          value: id === null ? "theme:standard" : `theme:palette:${id}`,
+          value: `theme:palette:${id}`,
           title: label,
           description:
             previews.length === 1
@@ -134,9 +128,7 @@ export function useCommandPaletteThemeItems() {
           ),
           run: async () => {
             const saved =
-              previews.length === 1 && id !== null
-                ? setThemeHalf(previews[0]!.mode, id)
-                : setTheme(id ?? appearanceMode);
+              previews.length === 1 ? setThemeHalf(previews[0]!.mode, id) : setTheme(id);
             if (!saved) notifyThemeSaveFailure();
           },
         })),

@@ -8,8 +8,13 @@ import { msg } from "gt-react";
 import "culori/css";
 import { converter, parse } from "culori/fn";
 import {
-  BUILT_IN_THEMES,
-  SKIN_THEMES,
+  DESKTOP_THEMES,
+  ENABLE_STARDUST_THEME_MIGRATION,
+  LEGACY_DESKTOP_THEMES,
+  HIDDEN_DESKTOP_THEMES,
+  normalizeBuiltInThemeId,
+  STARDUST_THEME,
+  STARDUST_THEME_ID,
   HARBOR_THEME,
   MIST_THEME,
   EMBER_THEME,
@@ -47,15 +52,11 @@ export {
   IRIS_THEME,
   OCEAN_THEME,
   T3_CHAT_THEME,
+  STARDUST_THEME,
   THEME_COLOR_ROLES,
 };
 export type { ThemeAppearance, ThemeColorRole, ThemeColors, ThemeDefinition, ThemeVariants };
 
-const T3_CHAT_THEME_ID = "t3-chat" as const;
-const GROVE_THEME_ID = "grove" as const;
-const OCEAN_THEME_ID = "ocean" as const;
-const EMBER_THEME_ID = "ember" as const;
-const IRIS_THEME_ID = "iris" as const;
 export const THEME_FILE_VERSION = 1 as const;
 export const CUSTOM_THEMES_STORAGE_KEY = "t3code:themes:v1";
 export const THEME_FOLLOW_SYSTEM_STORAGE_KEY = "t3code:theme-follow-system";
@@ -418,30 +419,22 @@ export function subscribeToCustomThemes(listener: () => void): () => void {
   };
 }
 
-const LEGACY_THEME_ID_ALIASES: Readonly<Record<string, string>> = {
-  [LEGACY_T3_CHAT_DARK_THEME_ID]: T3_CHAT_THEME_ID,
-  "t3-grove": GROVE_THEME_ID,
-  "t3-ocean": OCEAN_THEME_ID,
-  "t3-ember": EMBER_THEME_ID,
-  "t3-iris": IRIS_THEME_ID,
-};
-
-function normalizeThemeId(themeId: string): string {
-  return Object.hasOwn(LEGACY_THEME_ID_ALIASES, themeId)
-    ? (LEGACY_THEME_ID_ALIASES[themeId] ?? themeId)
-    : themeId;
-}
-
 export function canonicalThemePreference(theme: string): string {
-  return theme === LEGACY_T3_CHAT_DARK_THEME_ID ? theme : normalizeThemeId(theme);
+  // Preserve the implicit dark preference until the user explicitly picks a mode.
+  if (theme === LEGACY_T3_CHAT_DARK_THEME_ID || theme === "darkroom") return theme;
+  if (theme === "t3-code") return "system";
+  return normalizeBuiltInThemeId(theme);
 }
 
 function themeIdFromPreference(theme: ThemePreference): string {
-  return normalizeThemeId(theme);
+  if (["system", "light", "dark"].includes(theme)) {
+    return ENABLE_STARDUST_THEME_MIGRATION ? STARDUST_THEME_ID : theme;
+  }
+  return normalizeBuiltInThemeId(theme);
 }
 
 function legacyThemeMode(theme: ThemePreference): ThemeAppearance | null {
-  return theme === LEGACY_T3_CHAT_DARK_THEME_ID ? "dark" : null;
+  return theme === LEGACY_T3_CHAT_DARK_THEME_ID || theme === "darkroom" ? "dark" : null;
 }
 
 export function getStandardThemeColors(appearance: ThemeAppearance): ThemeColors {
@@ -1239,8 +1232,9 @@ export function updateThemeColorFamily(
 }
 
 const BUILT_IN_THEME_DEFINITIONS: ReadonlyArray<ThemeDefinition> = [
-  ...BUILT_IN_THEMES,
-  ...SKIN_THEMES,
+  ...DESKTOP_THEMES,
+  ...HIDDEN_DESKTOP_THEMES,
+  ...(ENABLE_STARDUST_THEME_MIGRATION ? [] : LEGACY_DESKTOP_THEMES),
 ];
 
 export function getThemeDefinition(theme: ThemePreference): ThemeDefinition | null {
@@ -1838,7 +1832,7 @@ export function resolveDesktopTheme(
 }
 
 export function isKnownThemePreference(theme: string): boolean {
-  if (theme === "light" || theme === "dark" || theme === "system") return true;
+  if (["light", "dark", "system", "t3-code"].includes(theme)) return true;
   return getThemeDefinition(theme) !== null;
 }
 

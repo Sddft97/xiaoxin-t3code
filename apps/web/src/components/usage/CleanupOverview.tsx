@@ -2,7 +2,7 @@ import { serverCopy } from "~/i18n/serverCopy";
 import { uiText } from "../../i18n";
 import { UsageDetailsSheet } from "./UsageDetailsSheet";
 import { cleanupRisk } from "./cleanupModel";
-import { useTheme } from "../../hooks/useTheme";
+import { useAppleMaterialTheme } from "../../hooks/useTheme";
 import { CleanupDashboard, CleanupHistory } from "./CleanupDashboard";
 import { UsageCount } from "./UsageMotion";
 import { HardDriveIcon, LockKeyholeIcon, FolderArchiveIcon, ArrowRightIcon } from "lucide-react";
@@ -95,8 +95,7 @@ export function CleanupOverview({
   completed: StorageOperation | undefined;
   previewPlan: StorageOperation | null;
 }) {
-  const { theme } = useTheme();
-  const apple = theme === "apple";
+  const apple = useAppleMaterialTheme();
   const selectionName = useId();
   const [diskPath, setDiskPath] = useState("/");
   const [detailEntry, setDetailEntry] = useState<StorageEntry | null>(null);
@@ -120,7 +119,7 @@ export function CleanupOverview({
   const titleFor = (g: (typeof suggestions)[number]) =>
     g.entries.length === 1
       ? g.entries[0]!.name
-      : `${g.category === "rollback-apps" ? uiText("Old T3 rollback apps") : g.category === "old-builds" ? uiText("Build staging") : uiText("Cold backups")} ×${g.entries.length}`;
+      : `${g.category === "rollback-apps" ? uiText("Old Stardust rollback apps") : g.category === "old-builds" ? uiText("Build staging") : uiText("Cold backups")} ×${g.entries.length}`;
   const renderSuggestion = (g: (typeof suggestions)[number]) =>
     apple ? (
       <div key={g.id}>

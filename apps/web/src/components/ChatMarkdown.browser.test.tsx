@@ -90,6 +90,17 @@ vi.mock(import("../state/filesystem"), async (original) => {
         : actual.useFilesystemReadAccess(environmentId)) as never,
   };
 });
+const threadWorktrees = vi.hoisted(() => new Map<string, string>());
+vi.mock(import("../state/entities"), async (original) => {
+  const actual = await original();
+  return {
+    ...actual,
+    readThreadShell: ((ref: { threadId: string }) => {
+      const worktreePath = threadWorktrees.get(ref.threadId);
+      return worktreePath === undefined ? actual.readThreadShell(ref as never) : { worktreePath };
+    }) as never,
+  };
+});
 vi.mock(import("../remoteOpen"), async (original) => ({
   ...(await original()),
   useRemoteOpenResolution: () => ({ state: { mode: "local-exec" }, isResolved: true }) as never,
@@ -170,6 +181,7 @@ function setup() {
   parsedSources.length = 0;
   settingsOverrides.mathRenderingEnabled = false;
   renderDiagram.mockReset();
+  threadWorktrees.clear();
   workspaceSearch.mockReset().mockResolvedValue(AsyncResult.success({ entries: [] }));
   filesystemMetadata.mockReset().mockResolvedValue(AsyncResult.success({ entries: [null] }));
 }
@@ -214,6 +226,23 @@ it("keeps decimal markers in nested user lists while documents keep their counte
   expect(
     [...preview!.querySelectorAll("ol")].map((list) => getComputedStyle(list).listStyleType),
   ).toEqual(["decimal", "lower-alpha", "lower-roman"]);
+});
+
+it("renders formulas and preserves ordinary dollar amounts", async () => {
+  setup();
+  settingsOverrides.mathRenderingEnabled = true;
+  await using screen = await renderText(
+    "Inline formula: $x^2 + y^2 = z^2$.\n\n$$\n\\int_0^1 x^2\\,dx = \\frac{1}{3}\n$$\n\nPrices: $5 and $10.",
+  );
+  await expect.element(screen.getByText("Prices: $5 and $10.", { exact: true })).toBeVisible();
+  expect(screen.container.querySelector('[data-markdown-math="display"]')).not.toBeNull();
+  expect(screen.container.querySelectorAll("[data-markdown-math]")).toHaveLength(2);
+  if (import.meta.env.VITE_STARDUST_FIX_SHOTS) {
+    await page.screenshot({
+      path: `${import.meta.env.VITE_STARDUST_FIX_SHOTS}/05-formulas-and-currency.png`,
+      element: screen.locator,
+    });
+  }
 });
 
 it("shows unavailable audio when a workspace embed has no thread", async () => {
@@ -557,6 +586,27 @@ describe("ChatMarkdown workspace file opens", () => {
 
     expect(openFile).toHaveBeenCalledExactlyOnceWith(threadRef, "/elsewhere/b.md", 9);
     expect(workspaceSearch).toHaveBeenCalledOnce();
+  });
+
+  it("opens a path from markdown rendered in another checkout under that checkout", async () => {
+    setup();
+    const scratchThread = { ...threadRef, threadId: ThreadId.make("scratch-thread") };
+    threadWorktrees.set(scratchThread.threadId, "/scratch/thread");
+    filesystemMetadata.mockResolvedValue(AsyncResult.success({ entries: [{ kind: "file" }] }));
+    using openFile = vi.spyOn(useRightPanelStore.getState(), "openFile");
+    await using screen = await renderText("[State](packages/state/filesystem.ts)", {
+      cwd: "/repo-a",
+      threadRef: scratchThread,
+    });
+    await act(async () => screen.container.querySelector("a")!.click());
+
+    await vi.waitFor(() =>
+      expect(openFile).toHaveBeenCalledExactlyOnceWith(
+        scratchThread,
+        "/repo-a/packages/state/filesystem.ts",
+        undefined,
+      ),
+    );
   });
 
   it.each([

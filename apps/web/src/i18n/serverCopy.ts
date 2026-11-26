@@ -63,7 +63,7 @@ const serverMessages = new Map([
     "其他 AI 工具缓存；先核对所属软件，本工具不直接删除",
     "Cache from another AI tool. Verify which tool owns it before cleaning up.",
   ],
-  ["T3 浏览器缓存；运行中的缓存保留", "T3 browser cache. In-use cache is protected."],
+  ["星尘浏览器缓存；运行中的缓存保留", "Stardust browser cache. In-use cache is protected."],
   [
     "应用备份或回滚包；未核对当前安装引用前保留",
     "App backup or rollback. Verify references from the current installation first.",
@@ -203,7 +203,7 @@ const serverMessages = new Map([
   ],
   [
     "仅处理清单内超过30天的轮转日志。先保留压缩归档，校验后删除原日志；归档可恢复到新目录。",
-    "Only listed rotated logs older than 30 days are included. T3 verifies a compressed archive before removing originals. Restore the archive to a new folder.",
+    "Only listed rotated logs older than 30 days are included. Stardust verifies a compressed archive before removing originals. Restore the archive to a new folder.",
   ],
   ["日志根目录已变化", "The log root changed."],
   ["日志归档路径异常，原件保留", "The log archive path is invalid. The originals are retained."],
@@ -260,11 +260,11 @@ const serverMessages = new Map([
   ],
   [
     "仅白名单内可重建内容会永久删除；执行前再次检查路径、内容、占用和所有卷保护线。",
-    "Only rebuildable items in approved locations are permanently deleted. T3 checks paths, contents, usage, and volume reserves again before cleanup.",
+    "Only rebuildable items in approved locations are permanently deleted. Stardust checks paths, contents, usage, and volume reserves again before cleanup.",
   ],
   [
-    "移入同卷废纸篓，不立即释放空间。T3不自动清空；至少保留7天，期间可从记录恢复。手动清空系统废纸篓会使恢复失效。",
-    "Moves items to Trash on the same volume. Space stays occupied. T3 keeps the files for at least 7 days and provides recovery from history. Emptying system Trash makes recovery unavailable.",
+    "移入同卷废纸篓，不立即释放空间。星尘不自动清空；至少保留7天，期间可从记录恢复。手动清空系统废纸篓会使恢复失效。",
+    "Moves items to Trash on the same volume. Space stays occupied. Stardust keeps the files for at least 7 days and provides recovery from history. Emptying system Trash makes recovery unavailable.",
   ],
   [
     "同卷废纸篓不可用；原件保留，不回退永久删除",
@@ -311,7 +311,7 @@ const serverMessages = new Map([
   ],
   [
     "本机系统来源/访问标记保留在归档记录中，不重写至新文件；数据、权限与ACL会校验恢复。",
-    "System provenance and access tags are kept in the archive. T3 verifies restored data, permissions, and ACLs.",
+    "System provenance and access tags are kept in the archive. Stardust verifies restored data, permissions, and ACLs.",
   ],
   ["恢复目标卷已离线", "The restore destination is offline."],
   [
@@ -397,7 +397,7 @@ const serverMessages = new Map([
   ["目录过大，保留原件", "Folder exceeds the size limit. It was kept."],
   [
     "可重建缓存；执行前检查占用和内容变化",
-    "Rebuildable cache. T3 checks that it is unchanged and unused before cleanup.",
+    "Rebuildable cache. Stardust checks that it is unchanged and unused before cleanup.",
   ],
   ["npm 下载缓存", "npm download cache"],
   ["pip 下载缓存", "pip download cache"],
@@ -433,7 +433,7 @@ const serverMessages = new Map([
   ["最近两份冷备加锁", "The two latest cold backups are locked."],
   [
     "预览及执行时完整读取校验最新两份冷备后，旧备份仅进废纸篓",
-    "T3 verifies both current cold backups before moving older ones to Trash.",
+    "Stardust verifies both current cold backups before moving older ones to Trash.",
   ],
   ["冷备校验回执；与归档一同保留", "Cold backup verification receipt. Kept with the archive."],
   [

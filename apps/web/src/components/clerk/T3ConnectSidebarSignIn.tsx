@@ -1,3 +1,4 @@
+import { useUiText } from "~/i18n/useUiText";
 import { UserButton, useAuth } from "@clerk/react";
 import { T, useMessages } from "gt-react";
 import { LogInIcon, RotateCwIcon } from "lucide-react";
@@ -51,6 +52,7 @@ function ConfiguredT3ConnectSidebarAvatar() {
 }
 
 function ConfiguredT3ConnectSidebarSignIn() {
+  const connectText = useUiText();
   const { isLoaded, isSignedIn } = useAuth();
   const loadFailed = useClerkLoadFailed();
   const { openAuthPrompt } = useT3ConnectAuthPrompt();
@@ -77,7 +79,7 @@ function ConfiguredT3ConnectSidebarSignIn() {
         <SidebarMenuButton onClick={openAuthPrompt}>
           <LogInIcon />
           <span>
-            <T>Sign in to T3 Connect</T>
+            {connectText("T3 Connect (third-party service operated by the upstream project)")}
           </span>
         </SidebarMenuButton>
       </SidebarMenuItem>

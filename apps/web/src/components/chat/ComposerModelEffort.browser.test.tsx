@@ -93,14 +93,24 @@ it("draws an agent's reasoning as bars and keeps its mode out of the levels", as
   expect(status.element().querySelector("[data-composer-effort-glyph]")).not.toBeNull();
   await expect.element(status).toHaveTextContent("");
 
-  const levels = screen.getByRole("radiogroup", { name: "Thinking" });
-  await expect.element(levels.getByRole("radio")).toHaveLength(3);
+  const slider = screen.getByRole("slider", { name: "Reasoning effort" });
+  await expect.element(slider).toHaveAttribute("aria-valuemax", "2");
+  const band = slider.element().querySelector(".gx-ch")!;
+  const row = slider.element().closest(".gx")!;
+  expect(band.getBoundingClientRect().height).toBe(32);
+  expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(62);
+  expect(row.getBoundingClientRect().height).toBeLessThanOrEqual(64);
+  expect(band.getBoundingClientRect().width / row.getBoundingClientRect().width).toBeCloseTo(
+    0.58,
+    1,
+  );
   await expect.element(screen.getByRole("radio", { name: "Plan" })).not.toBeInTheDocument();
 
-  // Up and Down walk from the levels through the option rows without opening their menus.
   await userEvent.tab();
-  await expect.element(screen.getByRole("radio", { name: "Medium" })).toHaveFocus();
-  await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}");
+  await expect.element(slider).toHaveFocus();
+  const firstOther = screen.getByRole("button", { name: "Session Mode: Bypass Permissions" });
+  (firstOther.element() as HTMLElement).focus();
+  await userEvent.keyboard("{ArrowDown}");
   const speed = screen.getByRole("button", { name: "Speed: Standard" });
   await expect.element(speed).toHaveFocus();
   await expect.element(page.getByRole("menuitemradio")).not.toBeInTheDocument();
@@ -121,4 +131,22 @@ it("draws an agent's reasoning as bars and keeps its mode out of the levels", as
     .element(screen.getByRole("button", { name: "Session Mode: Plan" }))
     .toBeInTheDocument();
   await expect.element(page.getByRole("menuitemradio")).not.toBeInTheDocument();
+});
+
+it("selects reasoning levels with keyboard arrows and Home and End", async () => {
+  await using screen = await render(<Column />, { router: false });
+  const slider = screen.getByRole("slider", { name: "Reasoning effort" });
+  await userEvent.tab();
+  await expect.element(slider).toHaveFocus();
+  await expect.element(slider).toHaveAttribute("aria-valuetext", "Medium");
+
+  await userEvent.keyboard("{ArrowDown}");
+  await expect.element(slider).toHaveAttribute("aria-valuetext", "Low");
+  await userEvent.keyboard("{ArrowRight}");
+  await expect.element(slider).toHaveAttribute("aria-valuetext", "Medium");
+  await userEvent.keyboard("{End}");
+  await expect.element(slider).toHaveAttribute("aria-valuetext", "High");
+  await userEvent.keyboard("{Home}");
+  await expect.element(slider).toHaveAttribute("aria-valuetext", "Low");
+  await expect.element(slider).toHaveFocus();
 });

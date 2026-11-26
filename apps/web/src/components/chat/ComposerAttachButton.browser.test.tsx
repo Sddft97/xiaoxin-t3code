@@ -1,9 +1,27 @@
 import { GTProvider } from "gt-react";
+import { useRef, type ComponentProps } from "react";
 import { describe, expect, it, vi } from "vite-plus/test";
 import zh from "../../i18n/translations/zh.json";
 import { render } from "../../../test/render";
 import { TooltipProvider } from "../ui/tooltip";
 import { ComposerAttachButton } from "./ComposerAttachButton";
+import { ComposerAttachInput } from "./ComposerAttachmentStrip";
+
+function AttachmentPicker({
+  disabled,
+  ...inputProps
+}: Omit<ComponentProps<typeof ComposerAttachInput>, "ref"> & { disabled?: boolean }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  return (
+    <>
+      <ComposerAttachInput ref={inputRef} {...inputProps} />
+      <ComposerAttachButton
+        onOpenPicker={() => inputRef.current?.click()}
+        disabled={disabled ?? false}
+      />
+    </>
+  );
+}
 
 describe("ComposerAttachButton", () => {
   it("renders V9 30x30 circular '+' button with aria-label and no native title", async () => {
@@ -13,7 +31,7 @@ describe("ComposerAttachButton", () => {
     await using screen = await render(
       <GTProvider locale="zh" translations={{ zh, en: {} } as never}>
         <TooltipProvider>
-          <ComposerAttachButton
+          <AttachmentPicker
             addComposerAttachments={addComposerAttachments}
             focusComposer={focusComposer}
           />
@@ -41,7 +59,7 @@ describe("ComposerAttachButton", () => {
     await using screen = await render(
       <GTProvider locale="zh" translations={{ zh, en: {} } as never}>
         <TooltipProvider>
-          <ComposerAttachButton
+          <AttachmentPicker
             addComposerAttachments={addComposerAttachments}
             focusComposer={focusComposer}
           />
@@ -82,7 +100,7 @@ describe("ComposerAttachButton", () => {
     await using screen = await render(
       <GTProvider locale="zh" translations={{ zh, en: {} } as never}>
         <TooltipProvider>
-          <ComposerAttachButton
+          <AttachmentPicker
             addComposerAttachments={addComposerAttachments}
             focusComposer={focusComposer}
           />
@@ -103,7 +121,7 @@ describe("ComposerAttachButton", () => {
     await screen.rerender(
       <GTProvider locale="zh" translations={{ zh, en: {} } as never}>
         <TooltipProvider>
-          <ComposerAttachButton
+          <AttachmentPicker
             addComposerAttachments={addComposerAttachments}
             focusComposer={focusComposer}
             disabled

@@ -1,5 +1,19 @@
 // Adapted from ZhiweiXiao98/t3code b604575 (MIT). Application UI copy only.
 export const zhCN: Readonly<Record<string, string>> = {
+  "Check GitHub Releases for Stardust updates.": "可在 GitHub 发布页查看星尘更新。",
+  "The latest release has no verifiable Windows x64 build.":
+    "最新版本没有可校验的 Windows x64 安装包。",
+  "WSL and voice input are currently unavailable on Windows.": "Windows 暂不支持 WSL 和语音输入。",
+  "WSL is currently unavailable on Windows.": "Windows 暂不支持 WSL。",
+  "Stardust licenses": "星尘许可",
+  "Stardust’s MIT license, NOTICE, and third-party notices.":
+    "星尘的 MIT 许可证、NOTICE 和第三方声明。",
+  "Stardust background animation": "背景星尘动效",
+  "Animates the dark Stardust background while the window is active and plugged in.":
+    "星尘深色模式在窗口活跃且接通电源时播放。",
+  "Extra high": "超高",
+  Extreme: "极限",
+  "Account {number}": "{number} 号账号",
   "Quota not reported": "未上报额度",
   "Gemini quota not reported": "Gemini 未上报额度",
   "about {days} days earlier": "提前约 {days} 天",
@@ -56,19 +70,20 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Room for one more model": "这里还能放一个模型",
   "Flip to see what to connect next": "翻开看看推荐接哪个",
   "Click to flip": "点击翻开",
-  "Collapse recommendation": "收起",
+  "Collapse recommendation": "收起推荐",
   "OpenAI-compatible endpoints, local models and ACP agents": "OpenAI 兼容接口、本地模型、ACP 代理",
   "Have an API key or a local model? Ask AI to help configure it and check the limits.":
     "有自己的 API 密钥或本地模型？让 AI 帮你配好并检测额度。",
   "Connect this supported provider and check its available limits.":
-    "接入这家 T3 支持的提供方，配好后检测可用额度。",
+    "接入这家星尘支持的提供方，配好后检测可用额度。",
   "Help me connect {provider}, then check its usage limits.":
     "帮我接入 {provider}，配好后检测一下额度。",
   "a custom model": "自定义模型",
   "Ask AI to connect it": "让 AI 帮我接入",
   "Try another": "换一个",
   "Claude/GPT-OSS shared": "Claude/GPT-OSS 共用",
-  "T3 does not use this": "T3 未使用",
+  "T3 does not use this": "星尘未使用",
+  "Stardust does not use this": "星尘未使用",
   "It's a little early to use this": "现在用有点早",
   "Choose a reset credit": "选择要用的重置卡",
   "Use one reset credit to refill {provider}?": "用 1 次重置机会，让 {provider} 额度回满？",
@@ -246,7 +261,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   按小时: "按小时",
   把鼠标移到格子上看那一小时: "把鼠标移到格子上看那一小时",
   未定价: "未定价",
-  "不在 T3 会话里": "不在 T3 会话里",
+  "不在 T3 会话里": "不在星尘会话里",
+  "不在 Stardust 会话里": "不在星尘会话里",
   此服务器未上报: "此服务器未上报",
   按模型: "按模型",
   按项目: "按项目",
@@ -427,7 +443,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Cursor usage is not included · Sign in to Cursor CLI using this Mac's keychain":
     "Cursor 的用量还没算进来 · 需要在本机钥匙串里登录一次 Cursor 命令行",
   "Run this command in your own terminal, then enable keychain usage. T3 will not run a login command for you.":
-    "在本机终端运行下方命令，登录后再启用用量读取。T3 不会自动执行登录命令。",
+    "在本机终端运行下方命令，登录后再启用用量读取。星尘不会自动执行登录命令。",
+  "Run this command in your own terminal, then enable keychain usage. Stardust will not run a login command for you.":
+    "在本机终端运行下方命令，登录后再启用用量读取。星尘不会自动执行登录命令。",
   "I signed in · Enable usage": "已登录 · 启用用量读取",
   "Resets in ": "重置剩余 ",
   "Used {used}%": "已用 {used}%",
@@ -450,7 +468,6 @@ export const zhCN: Readonly<Record<string, string>> = {
     "根据本项目最近 12 个会话的用户消息统计",
   "Used {count} times": "使用过 {count} 次",
   "Use skill": "使用技能",
-  "T3 Stardust": "T3 星尘版",
   "Good morning": "上午好",
   "Good afternoon": "下午好",
   "Good evening": "晚上好",
@@ -469,12 +486,13 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Could not find the latest {0} release in this environment's npm registry.":
     "在此环境的 npm 仓库中找不到最新的{0}版本。",
   "Could not write a review guide": "无法生成审阅指南",
-  "Side chat": "旁聊",
+  "Side chat": "侧聊",
   "Side chats": "旁聊",
   "It's no longer on your T3 Connect account.": "它已不在你的 T3 Connect 账号中。",
   "This doesn't change your T3 Connect account. To deregister it there, use":
     "此操作不会更改你的 T3 Connect 账号。如需在账号中注销，请使用",
-  "On the computer with your code, start T3 Code or run": "在存放代码的电脑上启动 T3 Code，或运行",
+  "On the computer with your code, start T3 Code or run": "在存放代码的电脑上启动星尘，或运行",
+  "On the computer with your code, start Stardust or run": "在存放代码的电脑上启动星尘，或运行",
   ", then run:": "，然后运行：",
   "On a tailnet, run": "如使用 Tailscale 网络，请改为运行",
   "instead.": "。",
@@ -515,7 +533,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "This environment did not accept your session. Reconnect to try again.":
     "此环境未接受当前连接。请重新连接后重试。",
   "Could not verify your permissions. Retrying automatically.": "无法核验权限，正在自动重试。",
-  "T3 Code home": "T3 Code 首页",
+  "T3 Code home": "星尘首页",
+  "Stardust home": "星尘首页",
   "{label} source": "{label}来源",
   "{label} reference": "{label}引用",
   "Enter a valid secret reference.": "请输入有效的密钥引用。",
@@ -530,7 +549,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "The name needs at least one letter or digit.": "名称至少需要包含一个英文字母或数字。",
   "A secret provider with this name exists.": "已存在同名密钥提供方。",
   "Update T3 Code on {environment} to manage its secret providers.":
-    "更新{environment}上的 T3 Code，以管理密钥提供方。",
+    "更新{environment}上的星尘，以管理密钥提供方。",
+  "Update Stardust on {environment} to manage its secret providers.":
+    "更新{environment}上的星尘，以管理密钥提供方。",
   "Connect an environment to manage the secret providers its provider variables read from.":
     "连接环境后，可管理模型通道变量读取的密钥提供方。",
   "Environment-wide setting. Select an environment to change it.":
@@ -567,7 +588,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "A verified compressed copy is kept for recovery.": "保留已校验压缩副本，可恢复。",
   "Files in this plan": "本次文件清单",
   "The overview covers T3 data directories and Codex history. Other detected caches and registered archives are listed below; this is not a whole-disk scan.":
-    "概览统计 T3 数据目录和 Codex 历史；其他已识别缓存及登记归档列在下方，未进行全盘扫描。",
+    "概览统计星尘数据目录和 Codex 历史；其他已识别缓存及登记归档列在下方，未进行全盘扫描。",
+  "The overview covers Stardust data directories and Codex history. Other detected caches and registered archives are listed below; this is not a whole-disk scan.":
+    "概览统计星尘数据目录和 Codex 历史；其他已识别缓存及登记归档列在下方，未进行全盘扫描。",
   "Storage breakdown and measurement scope": "占用分布与统计范围",
   "Free-space change": "余量变化",
   "Measuring…": "测量中…",
@@ -617,7 +640,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Cleanup rules and run": "清理规则与执行",
   "Measure sizes": "测量容量",
   "Refresh sizes": "刷新容量",
-  "T3 data volume": "T3 数据所在磁盘",
+  "T3 data volume": "星尘数据所在磁盘",
+  "Stardust data volume": "星尘数据所在磁盘",
   "All inspected volumes": "全部已检查磁盘",
   "Storage volume": "所在磁盘",
   "Inspecting storage…": "正在检查存储…",
@@ -712,7 +736,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Fast mode on": "已开启快速模式",
   Ultrafast: "极速",
   "Install T3 Code on your phone and sign in to T3 Connect to get push notifications and Live Activities.":
-    "在手机上安装 T3 Code 并登录 T3 Connect，即可接收推送通知和实时活动。",
+    "在手机上安装星尘并登录 T3 Connect，即可接收推送通知和实时活动。",
+  "Install Stardust on your phone and sign in to T3 Connect to get push notifications and Live Activities.":
+    "在手机上安装星尘并登录 T3 Connect，即可接收推送通知和实时活动。",
   "Mobile devices that get notifications from your environments.":
     "接收来自你的环境的通知的移动设备。",
   "Prompt font preview": "输入区字体预览",
@@ -830,7 +856,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Settings search results": "设置搜索结果",
   Language: "语言",
   "Choose the language used by T3 Code. Follow system uses your browser or operating system language.":
-    "选择 T3 Code 的界面语言。跟随系统时，将使用浏览器或操作系统的语言。",
+    "选择星尘的界面语言。跟随系统时，将使用浏览器或操作系统的语言。",
+  "Choose the language used by Stardust. Follow system uses your browser or operating system language.":
+    "选择星尘的界面语言。跟随系统时，将使用浏览器或操作系统的语言。",
   "App language": "应用语言",
   "Follow system": "跟随系统",
   English: "English",
@@ -1201,7 +1229,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   Average: "平均值",
   Current: "当前",
   Peak: "峰值",
-  "T3 system footprint": "T3 系统资源占用",
+  "T3 system footprint": "星尘系统资源占用",
+  "Stardust system footprint": "星尘系统资源占用",
   "Live native counters for the server, providers, terminals, desktop processes, and the monitor itself.":
     "实时显示服务器、服务提供方、终端、桌面进程及监控器自身的原生资源数据。",
   "Sampling every {interval}": "每 {interval} 采样一次",
@@ -1225,7 +1254,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Identity: PID + start time": "标识：PID + 启动时间",
   "Logical bytes by operation": "按操作统计的逻辑字节数",
   "Native counters identify which process is reading or writing. These application-level counters identify known T3 operations so process spikes can be correlated with specific persistence and logging paths.":
-    "原生计数器用于识别具体读写进程；应用级计数器用于识别已知的 T3 操作，以便将资源波动关联到具体的持久化和日志路径。",
+    "原生计数器用于识别具体读写进程；应用级计数器用于识别已知的星尘操作，以便将资源波动关联到具体的持久化和日志路径。",
+  "Native counters identify which process is reading or writing. These application-level counters identify known Stardust operations so process spikes can be correlated with specific persistence and logging paths.":
+    "原生计数器用于识别具体读写进程；应用级计数器用于识别已知的星尘操作，以便将资源波动关联到具体的持久化和日志路径。",
   "{count} process": "{count} 个进程",
   "{count} processes": "{count} 个进程",
   Native: "原生监控",
@@ -1256,7 +1287,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   GPU: "GPU",
   "Electron utility": "Electron 工具进程",
   Monitor: "监控器",
-  "T3 process": "T3 进程",
+  "T3 process": "星尘进程",
+  "Stardust process": "星尘进程",
   "Storage bytes": "存储字节数",
   "Logical bytes": "逻辑字节数",
   "All I/O bytes": "全部 I/O 字节数",
@@ -1266,7 +1298,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Total resident memory across live child processes of the current server process. The desktop shell and other parent processes are not included.":
     "当前服务器进程的所有实时子进程常驻内存总量，不含桌面外壳及其他父进程。",
   "Approximate active CPU time for the T3 server root process and its descendants during the selected window.":
-    "所选时间范围内，T3 服务器根进程及其子进程的近似活跃 CPU 时间。",
+    "所选时间范围内，星尘服务器根进程及其子进程的近似活跃 CPU 时间。",
+  "Approximate active CPU time for the Stardust server root process and its descendants during the selected window.":
+    "所选时间范围内，星尘服务器根进程及其子进程的近似活跃 CPU 时间。",
   "In-memory process samples retained by the server. This resets when the server restarts.":
     "服务器内存中保留的进程样本，服务器重启后会清空。",
   "{label} details": "查看{label}详情",
@@ -1280,7 +1314,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Could not send {signal}": "无法发送 {signal}",
   "Process already exited": "进程已退出",
   "The process is not a child of the T3 Server. It might already have exited.":
-    "此进程已不再是 T3 服务器的子进程，可能已经退出。",
+    "此进程已不再是星尘服务器的子进程，可能已经退出。",
+  "The process is not a child of the Stardust Server. It might already have exited.":
+    "此进程已不再是星尘服务器的子进程，可能已经退出。",
   "No available editors found.": "未找到可用的编辑器。",
   "No environment is selected.": "尚未选择环境。",
   "Unable to open logs folder.": "无法打开日志文件夹。",
@@ -1299,7 +1335,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Brings back the original sidebar with per-project thread trees. The default sidebar shows one flat list: active work as rich cards, settled threads as compact rows.":
     "恢复按项目显示任务树的原版侧栏。默认侧栏使用一个扁平列表：活跃工作显示为详细卡片，已收起任务显示为紧凑行。",
   "Choose how T3 Code looks. Use a built-in theme or make your own.":
-    "选择 T3 Code 的显示方式。使用内置主题，或创建自己的主题。",
+    "选择星尘的显示方式。使用内置主题，或创建自己的主题。",
+  "Choose how Stardust looks. Use a built-in theme or make your own.":
+    "选择星尘的显示方式。使用内置主题，或创建自己的主题。",
   "Appearance mode": "外观模式",
   "Follow the system appearance": "跟随系统外观",
   "Use {mode} mode": "使用{mode}模式",
@@ -1381,7 +1419,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Update existing": "更新现有主题",
   "Keep both": "全部保留",
   "Theme file": "主题文件",
-  "Drop T3 Code or VS Code .json files": "将 T3 Code 或 VS Code 的 .json 文件拖到此处",
+  "Drop T3 Code or VS Code .json files": "将星尘或 VS Code 的 .json 文件拖到此处",
+  "Drop Stardust or VS Code .json files": "将星尘或 VS Code 的 .json 文件拖到此处",
   "Add theme": "添加主题",
   "Search community themes": "搜索社区主题",
   "Find open-source themes from Open VSX.": "从 Open VSX 查找开源主题。",
@@ -1562,8 +1601,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "API endpoint": "API 地址",
   "Override the Cursor API endpoint for this instance.": "覆盖此实例使用的 Cursor API 地址。",
   "Server URL": "服务器 URL",
-  "Leave blank to let T3 Code spawn the server when needed.":
-    "留空时，由 T3 Code 在需要时启动服务器。",
+  "Leave blank to let T3 Code spawn the server when needed.": "留空时，由星尘在需要时启动服务器。",
+  "Leave blank to let Stardust spawn the server when needed.": "留空时，由星尘在需要时启动服务器。",
   "Server password": "服务器密码",
   "Stored in plain text on disk.": "以明文形式保存在磁盘上。",
   "Auto-compact after": "达到以下用量后自动压缩",
@@ -1585,6 +1624,8 @@ export const zhCN: Readonly<Record<string, string>> = {
     "正在等待服务器返回安装和认证信息。",
   "This provider is installed but disabled for new sessions in T3 Code.":
     "此服务提供方已安装，但不会用于新会话。",
+  "This provider is installed but disabled for new sessions in Stardust.":
+    "此服务提供方已安装，但不会用于新会话。",
   "Not found": "未找到",
   "CLI not detected on PATH.": "未在 PATH 中检测到 CLI。",
   Authenticated: "已认证",
@@ -1598,7 +1639,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   Available: "可用",
   "Installed and ready, but authentication could not be verified.":
     "已安装并可使用，但无法验证认证状态。",
-  "{provider} is disabled in T3 Code settings.": "已在 T3 Code 设置中禁用 {provider}。",
+  "{provider} is disabled in T3 Code settings.": "已在星尘设置中禁用 {provider}。",
+  "{provider} is disabled in Stardust settings.": "已在星尘设置中禁用 {provider}。",
   "{provider} CLI ({command}) is not installed or not on PATH.":
     "未安装 {provider} CLI（{command}），或其不在 PATH 中。",
   "{provider} {current} is too old for {model}. Upgrade to {required} or newer to access it.":
@@ -1837,9 +1879,13 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Enable network access?": "启用网络访问？",
   "Disable network access?": "停用网络访问？",
   "T3 Code will restart to expose this environment over the network.":
-    "T3 Code 将重新启动，并允许通过网络访问此环境。",
+    "星尘将重新启动，并允许通过网络访问此环境。",
+  "Stardust will restart to expose this environment over the network.":
+    "星尘将重新启动，并允许通过网络访问此环境。",
   "T3 Code will restart and limit this environment back to this machine.":
-    "T3 Code 将重新启动，并把此环境限制为仅本机可访问。",
+    "星尘将重新启动，并把此环境限制为仅本机可访问。",
+  "Stardust will restart and limit this environment back to this machine.":
+    "星尘将重新启动，并把此环境限制为仅本机可访问。",
   "Restarting...": "正在重新启动...",
   "Restart and enable": "重新启动并启用",
   "Restart and disable": "重启并禁用",
@@ -1850,17 +1896,27 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Run only the WSL backend?": "仅运行 WSL 后端？",
   "Re-enable the Windows backend?": "重新启用 Windows 后端？",
   "T3 Code will restart on the Windows backend. Threads and projects opened against WSL stay safe inside the distro and become available again when you re-enable WSL.":
-    "T3 Code 将在 Windows 后端上重新启动。通过 WSL 打开的任务和项目会安全保留在发行版中，重新启用 WSL 后即可再次使用。",
+    "星尘将在 Windows 后端上重新启动。通过 WSL 打开的任务和项目会安全保留在发行版中，重新启用 WSL 后即可再次使用。",
+  "Stardust will restart on the Windows backend. Threads and projects opened against WSL stay safe inside the distro and become available again when you re-enable WSL.":
+    "星尘将在 Windows 后端上重新启动。通过 WSL 打开的任务和项目会安全保留在发行版中，重新启用 WSL 后即可再次使用。",
   "The WSL backend will stop. Threads and projects opened against WSL stay safe inside the distro, but they'll be unavailable in T3 Code until you re-enable WSL.":
-    "WSL 后端将停止。通过 WSL 打开的任务和项目会安全保留在发行版中，但在重新启用 WSL 前无法在 T3 Code 中访问。",
+    "WSL 后端将停止。通过 WSL 打开的任务和项目会安全保留在发行版中，但在重新启用 WSL 前无法在星尘中访问。",
+  "The WSL backend will stop. Threads and projects opened against WSL stay safe inside the distro, but they'll be unavailable in Stardust until you re-enable WSL.":
+    "WSL 后端将停止。通过 WSL 打开的任务和项目会安全保留在发行版中，但在重新启用 WSL 前无法在星尘中访问。",
   "T3 Code will restart the WSL backend on the new distro. Sessions still running on the current distro will be interrupted.":
-    "T3 Code 将在新的发行版上重新启动 WSL 后端。当前发行版中仍在运行的会话会被中断。",
+    "星尘将在新的发行版上重新启动 WSL 后端。当前发行版中仍在运行的会话会被中断。",
+  "Stardust will restart the WSL backend on the new distro. Sessions still running on the current distro will be interrupted.":
+    "星尘将在新的发行版上重新启动 WSL 后端。当前发行版中仍在运行的会话会被中断。",
   "Run the WSL backend alongside the Windows one, or stop the Windows backend and use only WSL? You can change this later from Settings.":
     "可以让 WSL 与 Windows 后端同时运行，也可以停止 Windows 后端并仅使用 WSL。之后仍可在设置中更改。",
   "T3 Code will restart and start only the WSL backend. Your Windows-side projects won't be accessible until you turn this off again.":
-    "T3 Code 将重新启动并仅运行 WSL 后端。再次关闭此选项前，Windows 侧的项目将无法访问。",
+    "星尘将重新启动并仅运行 WSL 后端。再次关闭此选项前，Windows 侧的项目将无法访问。",
+  "Stardust will restart and start only the WSL backend. Your Windows-side projects won't be accessible until you turn this off again.":
+    "星尘将重新启动并仅运行 WSL 后端。再次关闭此选项前，Windows 侧的项目将无法访问。",
   "T3 Code will restart and bring the Windows backend back up alongside WSL.":
-    "T3 Code 将重新启动，并在 WSL 之外恢复 Windows 后端。",
+    "星尘将重新启动，并在 WSL 之外恢复 Windows 后端。",
+  "Stardust will restart and bring the Windows backend back up alongside WSL.":
+    "星尘将重新启动，并在 WSL 之外恢复 Windows 后端。",
   "Applying...": "正在应用...",
   "Use only WSL": "仅使用 WSL",
   "Run both backends": "同时运行两个后端",
@@ -1956,7 +2012,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Default distro": "默认发行版",
   "WSL only": "仅使用 WSL",
   "Stop the Windows backend and run only the WSL backend. Useful if you develop entirely inside WSL and don't want a second backend process. T3 Code restarts when you change this.":
-    "停止 Windows 后端，仅运行 WSL 后端。适合完全在 WSL 中开发且不需要第二个后端进程的情况。修改后 T3 Code 会重启。",
+    "停止 Windows 后端，仅运行 WSL 后端。适合完全在 WSL 中开发且不需要第二个后端进程的情况。修改后星尘会重启。",
+  "Stop the Windows backend and run only the WSL backend. Useful if you develop entirely inside WSL and don't want a second backend process. Stardust restarts when you change this.":
+    "停止 Windows 后端，仅运行 WSL 后端。适合完全在 WSL 中开发且不需要第二个后端进程的情况。修改后星尘会重启。",
   "Run WSL only": "仅运行 WSL 后端",
   "Tailscale HTTPS": "Tailscale HTTPS",
   "Enable Tailscale HTTPS": "启用 Tailscale HTTPS",
@@ -1970,10 +2028,14 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Pending MagicDNS endpoint": "等待生成 MagicDNS 地址",
   "Disable Tailscale HTTPS?": "禁用 Tailscale HTTPS？",
   "T3 Code will restart the local backend without Tailscale Serve.":
-    "T3 Code 将重启本地后端，并停止使用 Tailscale Serve。",
+    "星尘将重启本地后端，并停止使用 Tailscale Serve。",
+  "Stardust will restart the local backend without Tailscale Serve.":
+    "星尘将重启本地后端，并停止使用 Tailscale Serve。",
   "Set up Tailscale HTTPS?": "设置 Tailscale HTTPS？",
   "T3 Code will restart the local backend with Tailscale Serve enabled and ask Tailscale to proxy HTTPS traffic to this backend.":
-    "T3 Code 将重启本地后端、启用 Tailscale Serve，并让 Tailscale 将 HTTPS 流量转发到此后端。",
+    "星尘将重启本地后端、启用 Tailscale Serve，并让 Tailscale 将 HTTPS 流量转发到此后端。",
+  "Stardust will restart the local backend with Tailscale Serve enabled and ask Tailscale to proxy HTTPS traffic to this backend.":
+    "星尘将重启本地后端、启用 Tailscale Serve，并让 Tailscale 将 HTTPS 流量转发到此后端。",
   "Administrative access": "管理权限",
   "Pairing links and client-session management require the access:write scope for this backend.":
     "管理配对链接和客户端会话需要此后端的 access:write 权限。",
@@ -2042,7 +2104,9 @@ export const zhCN: Readonly<Record<string, string>> = {
     "请在服务器上安装 Git，并按工作区需要添加可选的托管服务集成或凭据，然后重新扫描。",
   Scan: "扫描",
   "Some shortcuts may be claimed by the browser before T3 Code sees them. Use the desktop app for better keybinding support.":
-    "部分快捷键可能会先被浏览器占用，T3 Code 无法接收。使用桌面应用可获得更完整的快捷键支持。",
+    "部分快捷键可能会先被浏览器占用，星尘无法接收。使用桌面应用可获得更完整的快捷键支持。",
+  "Some shortcuts may be claimed by the browser before Stardust sees them. Use the desktop app for better keybinding support.":
+    "部分快捷键可能会先被浏览器占用，星尘无法接收。使用桌面应用可获得更完整的快捷键支持。",
   Keybinding: "快捷键",
   When: "生效条件",
   Status: "状态",
@@ -2083,7 +2147,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Unknown condition: {condition}": "未知条件：{condition}",
   "Unknown conditions: {conditions}": "未知条件：{conditions}",
   "T3 Code does not recognize this condition yet. It can still be saved, but it may not match unless the runtime provides it.":
-    "T3 Code 暂时无法识别此条件。仍可保存，但只有运行时提供该条件时才可能匹配。",
+    "星尘暂时无法识别此条件。仍可保存，但只有运行时提供该条件时才可能匹配。",
+  "Stardust does not recognize this condition yet. It can still be saved, but it may not match unless the runtime provides it.":
+    "星尘暂时无法识别此条件。仍可保存，但只有运行时提供该条件时才可能匹配。",
   "Conflicts with {binding}.": "与 {binding} 冲突。",
   "Conflicts with {bindings}{more}.": "与 {bindings}{more} 冲突。",
   ", and more": "等更多快捷键",
@@ -2497,9 +2563,12 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Add a reachable backend manually to start working from this browser.":
     "手动添加可访问的后端，即可在此浏览器中开始工作。",
   "Open Connections": "打开连接设置",
-  "Connect to a computer running T3 Code": "连接运行 T3 Code 的设备",
+  "Connect to a computer running T3 Code": "连接运行星尘的设备",
+  "Connect to a computer running Stardust": "连接运行星尘的设备",
   "This browser connects to T3 Code running on your computer or a server. Start the T3 Code desktop app or command-line server on that machine and keep it running.":
-    "此浏览器会连接到电脑或服务器上运行的 T3 Code。请在该设备上启动 T3 Code 桌面客户端或命令行服务器，并保持其运行。",
+    "此浏览器会连接到电脑或服务器上运行的星尘。请在该设备上启动星尘桌面客户端或命令行服务器，并保持其运行。",
+  "This browser connects to Stardust running on your computer or a server. Start the Stardust desktop app or command-line server on that machine and keep it running.":
+    "此浏览器会连接到电脑或服务器上运行的星尘。请在该设备上启动星尘桌面客户端或命令行服务器，并保持其运行。",
   "Enable T3 Connect on that machine, then open Connections here to sign in with the same account. You can also add the machine using a pairing link.":
     "请在该设备上启用 T3 Connect，再在此处打开“连接”并使用同一账号登录；也可以使用配对链接添加设备。",
   "Open Connections and add that machine using its pairing link. This browser must be able to reach it.":
@@ -2595,7 +2664,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Loading...": "正在加载...",
   "Load more pull requests": "加载更多拉取请求",
   "Pull requests unavailable": "拉取请求不可用",
-  "Update your T3 Code servers to browse pull requests.": "请更新 T3 Code 服务器后再浏览拉取请求。",
+  "Update your T3 Code servers to browse pull requests.": "请更新星尘服务器后再浏览拉取请求。",
+  "Update your Stardust servers to browse pull requests.": "请更新星尘服务器后再浏览拉取请求。",
   "This host could not be read.": "无法读取此托管服务。",
   "The latest request failed. Showing the last pull requests loaded.":
     "最近一次请求失败，当前显示上次已加载的拉取请求。",
@@ -3120,20 +3190,28 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Activating installation": "正在启用安装",
   "Install relay client?": "安装中继客户端？",
   "T3 Code is preparing this environment for secure access through T3 Connect.":
-    "T3 Code 正在为此环境配置通过 T3 Connect 的安全访问。",
+    "星尘正在为此环境配置通过 T3 Connect 的安全访问。",
+  "Stardust is preparing this environment for secure access through T3 Connect.":
+    "星尘正在为此环境配置通过 T3 Connect 的安全访问。",
   "T3 Code needs the relay client to make this environment available through T3 Connect.":
-    "T3 Code 需要安装中继客户端，才能通过 T3 Connect 访问此环境。",
+    "星尘需要安装中继客户端，才能通过 T3 Connect 访问此环境。",
+  "Stardust needs the relay client to make this environment available through T3 Connect.":
+    "星尘需要安装中继客户端，才能通过 T3 Connect 访问此环境。",
   "{current} of {total}": "第 {current} 项，共 {total} 项",
   "Relay client installation progress": "中继客户端安装进度",
-  "Keep T3 Code open while the relay client is installed.":
-    "安装中继客户端期间请保持 T3 Code 运行。",
+  "Keep T3 Code open while the relay client is installed.": "安装中继客户端期间请保持星尘运行。",
+  "Keep Stardust open while the relay client is installed.": "安装中继客户端期间请保持星尘运行。",
   "Managed relay client": "托管中继客户端",
   "T3 Code will download and install version {version} locally.":
-    "T3 Code 将在本机下载并安装版本 {version}。",
+    "星尘将在本机下载并安装版本 {version}。",
+  "Stardust will download and install version {version} locally.":
+    "星尘将在本机下载并安装版本 {version}。",
   "Download and install": "下载并安装",
   "SSH Password Required": "需要 SSH 密码",
   "T3 needs your SSH password to connect to {target}. The password is passed to the local SSH process for this connection attempt and is not saved by T3 Code.":
-    "T3 需要使用 SSH 密码连接到 {target}。密码只会传递给本机 SSH 进程完成本次连接，T3 Code 不会保存该密码。",
+    "星尘需要使用 SSH 密码连接到 {target}。密码只会传递给本机 SSH 进程完成本次连接，星尘不会保存该密码。",
+  "Stardust needs your SSH password to connect to {target}. The password is passed to the local SSH process for this connection attempt and is not saved by Stardust.":
+    "星尘需要使用 SSH 密码连接到 {target}。密码只会传递给本机 SSH 进程完成本次连接，星尘不会保存该密码。",
   Password: "密码",
   Expired: "已过期",
   "This SSH password prompt expired. Try connecting again.": "此 SSH 密码请求已过期，请重新连接。",
@@ -3493,7 +3571,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Could not start implementation thread": "无法启动实施任务",
   "An error occurred while creating the new thread.": "创建新任务时发生错误。",
   "Update this environment's T3 Code server to browse pull requests.":
-    "请更新此环境的 T3 Code 服务端以浏览拉取请求。",
+    "请更新此环境的星尘服务端以浏览拉取请求。",
+  "Update this environment's Stardust server to browse pull requests.":
+    "请更新此环境的星尘服务端以浏览拉取请求。",
   "Scroll to end": "滚动到底部",
   "Connecting to {environment}": "正在连接到{environment}",
   "Reconnecting to {environment}": "正在重新连接到{environment}",
@@ -3657,7 +3737,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "ChatGPT shared usage": "ChatGPT 共享用量",
   Unpriced: "未定价",
   "This app connects to T3 Code running on your computer or a server. Start the T3 Code desktop app or command-line server on that machine and keep it running.":
-    "此应用连接到你电脑或服务器上运行的 T3 Code。请在该设备上启动 T3 Code 桌面应用或命令行服务器，并保持运行。",
+    "此应用连接到你电脑或服务器上运行的星尘。请在该设备上启动星尘桌面应用或命令行服务器，并保持运行。",
+  "This app connects to Stardust running on your computer or a server. Start the Stardust desktop app or command-line server on that machine and keep it running.":
+    "此应用连接到你电脑或服务器上运行的星尘。请在该设备上启动星尘桌面应用或命令行服务器，并保持运行。",
   "Filter by provider": "按提供商筛选",
   "Restore device defaults": "恢复此设备的默认设置",
   "to change its settings.": "以更改其设置。",
@@ -3938,10 +4020,11 @@ export const zhCN: Readonly<Record<string, string>> = {
     "没有自定义选项，输入区将使用服务提供方的默认选项。",
   "Custom option": "自定义选项",
   value: "值",
-  Agents: "Agent",
+  Agents: "智能体",
   "Could not finish setup": "无法完成设置",
   "Your settings could not be saved. Try again.": "无法保存设置，请重试。",
-  "Set up T3 Code": "设置 T3 Code",
+  "Set up T3 Code": "设置星尘",
+  "Set up Stardust": "设置星尘",
   "Connect your computers": "连接你的设备",
   "Choose one or more computers. We’ll set up agents and projects on each.":
     "选择一台或多台设备，我们会在每台设备上设置 Agent 和项目。",
@@ -3952,12 +4035,15 @@ export const zhCN: Readonly<Record<string, string>> = {
   "No computers linked yet.": "尚未关联设备。",
   "Run this on each computer you want to connect.": "请在每台要连接的设备上运行此命令。",
   "Keep T3 Code running. Select the computers you want to set up above.":
-    "请保持 T3 Code 运行，并在上方选择要设置的设备。",
+    "请保持星尘运行，并在上方选择要设置的设备。",
+  "Keep Stardust running. Select the computers you want to set up above.":
+    "请保持星尘运行，并在上方选择要设置的设备。",
   "Pairing failed.": "配对失败。",
   "Need a pairing link?": "需要配对链接？",
   Pair: "配对",
   "Run this on the computer with your code.": "请在存放代码的设备上运行此命令。",
-  "Start T3 Code first, or run": "请先启动 T3 Code，或运行",
+  "Start T3 Code first, or run": "请先启动星尘，或运行",
+  "Start Stardust first, or run": "请先启动星尘，或运行",
   "Add --tailscale to use your tailnet.": "如需使用 Tailnet，请添加 --tailscale。",
   "Your agents": "你的 Agent",
   "Agents available on your selected computers.": "所选设备上可用的 Agent。",
@@ -4005,7 +4091,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Select an environment to see and change its model prices.": "选择一个环境以查看和修改模型价格。",
   "Model ID": "模型标识",
   "Cache read": "缓存读取",
-  "Not in a T3 thread": "未关联 T3 会话",
+  "Not in a T3 thread": "未关联星尘会话",
+  "Not in a Stardust thread": "未关联星尘会话",
   "Not reported by this server": "此服务器未提供项目归属",
   "Cache write": "缓存写入",
   "Reference cost": "参考费用",
@@ -4047,7 +4134,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Could not read settings": "无法读取设置",
   "Still connecting": "仍在连接",
   "Your saved settings could not be loaded.": "无法加载已保存的设置。",
-  "T3 Code could not confirm this workspace.": "T3 Code 无法确认此工作区。",
+  "T3 Code could not confirm this workspace.": "星尘无法确认此工作区。",
+  "Stardust could not confirm this workspace.": "星尘无法确认此工作区。",
   Reload: "重新加载",
   "No actions configured.": "尚未配置操作。",
   "This project has no checkout on this machine.": "此项目在当前设备上没有检出目录。",
@@ -4436,7 +4524,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Restoring your threads…": "正在恢复你的会话…",
   "Nightly needs the beta mobile app": "夜间版需要测试版移动应用",
   "Nightly uses the new orchestrator. The App Store and Google Play versions of T3 Code cannot connect to it.":
-    "夜间版使用新的编排器。App Store 和 Google Play 上的 T3 Code 无法连接它。",
+    "夜间版使用新的编排器。App Store 和 Google Play 上的星尘无法连接它。",
+  "Nightly uses the new orchestrator. The App Store and Google Play versions of Stardust cannot connect to it.":
+    "夜间版使用新的编排器。App Store 和 Google Play 上的星尘无法连接它。",
   "Mobile app": "移动应用",
   "Nightly needs the beta app. The App Store and Google Play versions cannot connect.":
     "夜间版需要测试版应用。App Store 和 Google Play 版本无法连接。",
@@ -4553,9 +4643,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "The quoted text has changed": "引用的文本已变化",
   "Showing the source response. The saved quote is unchanged.":
     "正在显示源回复。已保存的引用未改动。",
-  "Selection is too long to cite": "所选内容过长，无法引用",
-  "Cite selection in composer": "在输入框中引用所选内容",
-  "Shorten selection": "缩短所选内容",
+  "Selection is too long to cite": "选中文字太长，无法引用",
+  "Cite selection in composer": "在输入框引用选中文字",
+  "Shorten selection": "缩短选区",
   Cite: "引用",
   "changed file": "个已更改文件",
   "Still bringing attached context into this message.": "仍在把附加上下文载入此消息。",
@@ -4631,7 +4721,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Loading earlier turns…": "正在加载更早的回合…",
   "User message": "用户消息",
   "Sent by automation": "由自动化发送",
-  "Sent by T3 Code": "由 T3 Code 发送",
+  "Sent by T3 Code": "由星尘发送",
+  "Sent by Stardust": "由星尘发送",
   "Open sending thread": "打开发送方会话",
   "Sent by another agent": "由另一个智能体发送",
   You: "你",
@@ -4842,7 +4933,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Sign in": "去登录",
   "Don&apos;t show this again": "不再显示",
   "Enabling…": "正在启用…",
-  "T3 Code will download and install version": "T3 Code 将下载并安装版本",
+  "T3 Code will download and install version": "星尘将下载并安装版本",
+  "Stardust will download and install version": "星尘将下载并安装版本",
   "locally.": "（本地）。",
   "Reconnecting…": "正在重新连接…",
   "This context is no longer available. Remove it or attach it again.":
@@ -4851,7 +4943,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Snapshot taken, but no project is available": "已拍摄快照，但没有可用项目",
   "Add a project, then capture the window again.": "请添加项目，然后重新捕获该窗口。",
   "Snapshot failed": "快照失败",
-  "T3 needs your SSH password to connect to": "T3 需要你的 SSH 密码才能连接到",
+  "T3 needs your SSH password to connect to": "星尘需要你的 SSH 密码才能连接到",
+  "Stardust needs your SSH password to connect to": "星尘需要你的 SSH 密码才能连接到",
   "Unable to open release notes": "无法打开发行说明",
   "Read more": "阅读更多",
   "Update downloaded": "更新已下载",
@@ -5063,7 +5156,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   them: "它们",
   "up later from Settings.": "稍后可在设置中配置。",
   "T3 Code collects anonymous usage data to help us improve it. To read more about how your data is used and how to opt out, see our":
-    "T3 Code 会收集匿名用量数据，以帮助我们改进产品。若要了解数据如何使用以及如何退出，请参阅我们的",
+    "星尘会收集匿名用量数据，以帮助我们改进产品。若要了解数据如何使用以及如何退出，请参阅我们的",
+  "Stardust collects anonymous usage data to help us improve it. To read more about how your data is used and how to opt out, see our":
+    "星尘会收集匿名用量数据，以帮助我们改进产品。若要了解数据如何使用以及如何退出，请参阅我们的",
   "privacy policy": "隐私政策",
   "npx t3 serve": "npx t3 serve",
   "--tailscale": "--tailscale",
@@ -5096,7 +5191,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Profile:": "配置文件：",
   "Clear cookies": "清除 Cookie",
   "Clear cache": "清除缓存",
-  "Preview is only available in the T3 Code desktop app.": "预览仅在 T3 Code 桌面应用中可用。",
+  "Preview is only available in the T3 Code desktop app.": "预览仅在星尘桌面应用中可用。",
+  "Preview is only available in the Stardust desktop app.": "预览仅在星尘桌面应用中可用。",
   "Pair this client again with preview access to control browser previews.":
     "请重新配对此客户端并授予预览权限，才能控制浏览器预览。",
   "This file can&rsquo;t be shown here": "此文件无法在这里显示",
@@ -5121,7 +5217,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Unable to capture screenshot": "无法截取屏幕",
   "Could not capture the picked element": "无法捕获所选元素",
   "The annotation was kept without the screenshot.": "标注已保留，但没有截图。",
-  "This tab is open in the T3 Code desktop app.": "此标签页在 T3 Code 桌面应用中打开。",
+  "This tab is open in the T3 Code desktop app.": "此标签页在星尘桌面应用中打开。",
+  "This tab is open in the Stardust desktop app.": "此标签页在星尘桌面应用中打开。",
   "Recording preview": "录制预览",
   "Open in right panel": "在右侧面板中打开",
   "Press a shortcut. Use": "按下快捷键。使用",
@@ -5134,12 +5231,14 @@ export const zhCN: Readonly<Record<string, string>> = {
   "It opens as a draft. Nothing runs until you press Send.":
     "它会作为草稿打开。按下发送之前不会运行。",
   "This prompt had hidden characters, it may be malicious": "此提示含有隐藏字符，可能是恶意内容",
-  "T3 Code removed": "T3 Code 已移除",
+  "T3 Code removed": "星尘已移除",
+  "Stardust removed": "星尘已移除",
   "hidden character": "个隐藏字符",
   "Open in app": "在应用中打开",
   "Open in desktop app": "在桌面应用中打开",
   "Continue here": "在此继续",
-  "Get T3 Code": "获取 T3 Code",
+  "Get T3 Code": "获取星尘",
+  "Get Stardust": "获取星尘",
   "Remember my choice": "记住我的选择",
   "Opening the link...": "正在打开链接…",
   "This link is open": "此链接已打开",
@@ -5336,7 +5435,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "ACP provider disabled": "ACP 模型通道已禁用",
   "Logged out of ACP agent": "已退出 ACP 智能体",
   "Native sessions": "原生会话",
-  "Resume agent-owned conversations as T3 threads.": "把智能体自己的对话作为 T3 会话继续。",
+  "Resume agent-owned conversations as T3 threads.": "把智能体自己的对话作为星尘会话继续。",
+  "Resume agent-owned conversations as Stardust threads.": "把智能体自己的对话作为星尘会话继续。",
   "Logging out": "正在退出登录",
   "Log out": "退出登录",
   "Project for ACP sessions": "ACP 会话所属项目",
@@ -5398,17 +5498,25 @@ export const zhCN: Readonly<Record<string, string>> = {
   "is open, so its cookies can&rsquo;t be read yet. Quit it, then continue.":
     "正打开着，因此还不能读取其 Cookie。请退出它，然后继续。",
   "I&rsquo;ve quit it": "我已退出",
-  "Let T3 Code read": "允许 T3 Code 读取",
+  "Let T3 Code read": "允许星尘读取",
+  "Let Stardust read": "允许星尘读取",
   "&rsquo;s cookies": "的 Cookie",
   "To import cookies from": "要从以下来源导入 Cookie：",
   // oxlint-disable-next-line t3code/no-em-dash-copy -- Exact upstream strings are translation lookup keys.
   ", T3 Code needs Full Disk Access. Turn it on in System Settings, then come back to finish the import — you can revoke it again once the import is done.":
-    "，T3 Code 需要完全磁盘访问权限。请在系统设置中开启，然后返回完成导入，导入完成后可以再次关闭。",
+    "，星尘需要完全磁盘访问权限。请在系统设置中开启，然后返回完成导入，导入完成后可以再次关闭。",
+  // oxlint-disable-next-line t3code/no-em-dash-copy -- This key matches the desktop permission copy.
+  ", Stardust needs Full Disk Access. Turn it on in System Settings, then come back to finish the import — you can revoke it again once the import is done.":
+    "，星尘需要完全磁盘访问权限。请在系统设置中开启，然后返回完成导入，导入完成后可以再次关闭。",
   "Full Disk Access": "完全磁盘访问权限",
   "Access is still required. Quit and reopen T3 Code if you just allowed it, then retry the import.":
-    "仍需要访问权限。若刚刚允许，请退出并重新打开 T3 Code，然后重试导入。",
+    "仍需要访问权限。若刚刚允许，请退出并重新打开星尘，然后重试导入。",
+  "Access is still required. Quit and reopen Stardust if you just allowed it, then retry the import.":
+    "仍需要访问权限。若刚刚允许，请退出并重新打开星尘，然后重试导入。",
   "If access doesn't update after you allow it, quit and reopen T3 Code, then retry the import.":
-    "若允许后访问权限没有更新，请退出并重新打开 T3 Code，然后重试导入。",
+    "若允许后访问权限没有更新，请退出并重新打开星尘，然后重试导入。",
+  "If access doesn't update after you allow it, quit and reopen Stardust, then retry the import.":
+    "若允许后访问权限没有更新，请退出并重新打开星尘，然后重试导入。",
   "Choose which cookies to import for": "选择要为以下对象导入哪些 Cookie：",
   "Checking Full Disk Access.": "正在检查完全磁盘访问权限。",
   "Checking access…": "正在检查访问权限…",
@@ -5429,15 +5537,20 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Save shortcut": "保存快捷键",
   "Remove shortcut": "移除快捷键",
   "Allow T3 Code to read your desktop settings. You'll review any changes here before saving.":
-    "允许 T3 Code 读取你的桌面设置。保存前，你可以在这里查看任何更改。",
+    "允许星尘读取你的桌面设置。保存前，你可以在这里查看任何更改。",
+  "Allow Stardust to read your desktop settings. You'll review any changes here before saving.":
+    "允许星尘读取你的桌面设置。保存前，你可以在这里查看任何更改。",
   "Preparing changes…": "正在准备更改…",
   "Review changes": "查看更改",
-  "Update T3 Code to finish setting up your shortcut.": "请更新 T3 Code，以完成快捷键设置。",
+  "Update T3 Code to finish setting up your shortcut.": "请更新星尘，以完成快捷键设置。",
+  "Update Stardust to finish setting up your shortcut.": "请更新星尘，以完成快捷键设置。",
   "Connecting to your desktop…": "正在连接你的桌面…",
-  "Restart T3 Code to finish connecting your shortcut.": "请重启 T3 Code，以完成快捷键连接。",
+  "Restart T3 Code to finish connecting your shortcut.": "请重启星尘，以完成快捷键连接。",
+  "Restart Stardust to finish connecting your shortcut.": "请重启星尘，以完成快捷键连接。",
   Troubleshooting: "故障排除",
   "Settings file": "设置文件",
-  "T3 Code also reads any files included by this file.": "T3 Code 也会读取此文件包含的所有文件。",
+  "T3 Code also reads any files included by this file.": "星尘也会读取此文件包含的所有文件。",
+  "Stardust also reads any files included by this file.": "星尘也会读取此文件包含的所有文件。",
   "Linked to": "已链接到",
   "Choose a different file…": "选择其他文件…",
   "Remove shortcut…": "移除快捷键…",
@@ -5455,7 +5568,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Change the keys if needed.": "需要的话可以改键。",
   "Copy shortcut": "复制快捷键",
   "Turn capture off in T3 Code to stop it. Remove the shortcut from":
-    "在 T3 Code 中关闭捕获即可停止。请从",
+    "在星尘中关闭捕获即可停止。请从",
+  "Turn capture off in Stardust to stop it. Remove the shortcut from":
+    "在星尘中关闭捕获即可停止。请从",
   "to free up the keys.": "中移除该快捷键以释放按键。",
   "I've added the shortcut": "我已添加快捷键",
   "Reconnect ChatGPT": "重新连接 ChatGPT",
@@ -5466,7 +5581,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Continue with ChatGPT": "使用 ChatGPT 继续",
   "Your ChatGPT plan is connected": "你的 ChatGPT 套餐已连接",
   "Eligible usage in T3 Code uses your ChatGPT plan. Manage your shared usage and any credit settings in ChatGPT.":
-    "T3 Code 中符合条件的用量会计入你的 ChatGPT 套餐。共享用量和积分设置请在 ChatGPT 中管理。",
+    "星尘中符合条件的用量会计入你的 ChatGPT 套餐。共享用量和积分设置请在 ChatGPT 中管理。",
+  "Eligible usage in Stardust uses your ChatGPT plan. Manage your shared usage and any credit settings in ChatGPT.":
+    "星尘中符合条件的用量会计入你的 ChatGPT 套餐。共享用量和积分设置请在 ChatGPT 中管理。",
   "Signed in as": "登录身份",
   "Connected with your Codex CLI.": "已通过你的 Codex CLI 连接。",
   "Checking your Codex CLI...": "正在检查你的 Codex CLI…",
@@ -5478,12 +5595,15 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Open ChatGPT sign-in": "打开 ChatGPT 登录",
   "Signing in...": "正在登录…",
   "If sign-in doesn't return to T3 Code, paste the URL from the final localhost page.":
-    "若登录没有回到 T3 Code，请粘贴最终 localhost 页面上的 URL。",
+    "若登录没有回到星尘，请粘贴最终 localhost 页面上的 URL。",
+  "If sign-in doesn't return to Stardust, paste the URL from the final localhost page.":
+    "若登录没有回到星尘，请粘贴最终 localhost 页面上的 URL。",
   "ChatGPT sign-in redirect URL": "ChatGPT 登录重定向 URL",
   "Paste the URL from the sign-in tab": "粘贴登录标签页中的 URL",
   "Try sign-in in your browser": "尝试在浏览器中登录",
   "Other ways to connect": "其他连接方式",
-  "Use T3 desktop for automatic return": "使用 T3 桌面版以自动返回",
+  "Use T3 desktop for automatic return": "使用星尘桌面版以自动返回",
+  "Use Stardust desktop for automatic return": "使用星尘桌面版以自动返回",
   "Having trouble signing in?": "登录遇到问题？",
   "Connected to ChatGPT.": "已连接到 ChatGPT。",
   "Setting up...": "正在设置…",
@@ -5492,7 +5612,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Change account": "更改账户",
   "Could not read Codex setup status. Reconnect and try again.":
     "无法读取 Codex 设置状态。请重新连接后再试。",
-  "Selected by T3 Code.": "由 T3 Code 选择。",
+  "Selected by T3 Code.": "由星尘选择。",
+  "Selected by Stardust.": "由星尘选择。",
   "Codex binary path": "Codex 二进制路径",
   "Could not read runtime path": "无法读取运行时路径",
   "Shared Codex config, sessions, and state.": "共享的 Codex 配置、会话和状态。",
@@ -5558,7 +5679,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "WSL backend couldn't start:": "WSL 后端无法启动：",
   "(default)": "（默认）",
   "Run only the WSL backend. T3 Code restarts when this changes.":
-    "只运行 WSL 后端。更改后 T3 Code 会重启。",
+    "只运行 WSL 后端。更改后星尘会重启。",
+  "Run only the WSL backend. Stardust restarts when this changes.":
+    "只运行 WSL 后端。更改后星尘会重启。",
   "This connection cannot view or change network exposure.": "此连接无法查看或更改网络暴露。",
   "Remote access is already configured. Change network exposure where the server starts.":
     "远程访问已经配置。请在服务器启动处更改网络暴露。",
@@ -5573,9 +5696,13 @@ export const zhCN: Readonly<Record<string, string>> = {
   "This connection can create access links but cannot view authorized clients.":
     "此连接可以创建访问链接，但不能查看已授权的客户端。",
   "Let your other devices connect to T3 Code over the network. Pair devices to give them access. T3 Code will restart.":
-    "让其他设备通过网络连接到 T3 Code。配对设备以授予访问权限。T3 Code 将会重启。",
+    "让其他设备通过网络连接到星尘。配对设备以授予访问权限。星尘将会重启。",
+  "Let your other devices connect to Stardust over the network. Pair devices to give them access. Stardust will restart.":
+    "让其他设备通过网络连接到星尘。配对设备以授予访问权限。星尘将会重启。",
   "Devices connected over your local network will disconnect. Existing tunnels, such as T3 Connect or Tailscale HTTPS, keep working. T3 Code will restart.":
-    "通过本地网络连接的设备将会断开。现有隧道（如 T3 Connect 或 Tailscale HTTPS）会继续工作。T3 Code 将会重启。",
+    "通过本地网络连接的设备将会断开。现有隧道（如 T3 Connect 或 Tailscale HTTPS）会继续工作。星尘将会重启。",
+  "Devices connected over your local network will disconnect. Existing tunnels, such as T3 Connect or Tailscale HTTPS, keep working. Stardust will restart.":
+    "通过本地网络连接的设备将会断开。现有隧道（如 T3 Connect 或 Tailscale HTTPS）会继续工作。星尘将会重启。",
   "Applying…": "正在应用…",
   "No environment selected": "未选择环境",
   "Connect an environment to view its settings and access.": "连接环境后即可查看其设置和访问权限。",
@@ -5614,7 +5741,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Connect an environment to see diagnostics.": "连接环境后即可查看诊断。",
   "Checking diagnostics access…": "正在检查诊断访问…",
   "Approximate active CPU time for the T3 server root process and its descendants during the selected window. It grows only while sampled processes use CPU and older samples leave as the window moves.":
-    "所选时间窗口内，T3 服务器根进程及其子进程的大致活跃 CPU 时间。只有被采样的进程使用 CPU 时它才会增加，窗口移动后较旧的样本会离开。",
+    "所选时间窗口内，星尘服务器根进程及其子进程的大致活跃 CPU 时间。只有被采样的进程使用 CPU 时它才会增加，窗口移动后较旧的样本会离开。",
+  "Approximate active CPU time for the Stardust server root process and its descendants during the selected window. It grows only while sampled processes use CPU and older samples leave as the window moves.":
+    "所选时间窗口内，星尘服务器根进程及其子进程的大致活跃 CPU 时间。只有被采样的进程使用 CPU 时它才会增加，窗口移动后较旧的样本会离开。",
   "In-memory process samples retained by the server. The server samples only while diagnostics is open, and this resets when the server restarts.":
     "服务器保留的内存中进程样本。只有打开诊断时服务器才会采样，服务器重启后会清零。",
   "In use": "使用中",
@@ -5673,9 +5802,13 @@ export const zhCN: Readonly<Record<string, string>> = {
     "对话和终端中的链接在哪里打开。无论此设置如何，按住 ⌘ 或 Ctrl 点击链接都会用默认浏览器打开。",
   "link target": "链接目标",
   "Clicking a pull request link opens it in T3 Code. Turn off to open pull request links like any other link, on GitHub or your git host.":
-    "点击拉取请求链接会在 T3 Code 中打开。关闭后，拉取请求链接会像其他链接一样，在 GitHub 或你的 Git 托管上打开。",
-  "open pull requests in T3 Code": "在 T3 Code 中打开拉取请求",
-  "Open pull requests in T3 Code": "在 T3 Code 中打开拉取请求",
+    "点击拉取请求链接会在星尘中打开。关闭后，拉取请求链接会像其他链接一样，在 GitHub 或你的 Git 托管上打开。",
+  "Clicking a pull request link opens it in Stardust. Turn off to open pull request links like any other link, on GitHub or your git host.":
+    "点击拉取请求链接会在星尘中打开。关闭后，拉取请求链接会像其他链接一样，在 GitHub 或你的 Git 托管上打开。",
+  "open pull requests in T3 Code": "在星尘中打开拉取请求",
+  "open pull requests in Stardust": "在星尘中打开拉取请求",
+  "Open pull requests in T3 Code": "在星尘中打开拉取请求",
+  "Open pull requests in Stardust": "在星尘中打开拉取请求",
   "Device settings not saved on all environments": "设备设置未在所有环境上保存",
   "Check versions": "检查版本",
   "Device hub": "设备中心",
@@ -5707,19 +5840,27 @@ export const zhCN: Readonly<Record<string, string>> = {
   "New threads in shared projects start on the machine with the most free CPU and memory, weighted by each machine's preference.":
     "共享项目中的新会话会在空闲 CPU 和内存最多的机器上启动，并按每台机器的偏好加权。",
   "Run agents on this computer. Turn off to use T3 Code only with remote environments.":
-    "在这台计算机上运行智能体。关闭后，T3 Code 只使用远程环境。",
+    "在这台计算机上运行智能体。关闭后，星尘只使用远程环境。",
+  "Run agents on this computer. Turn off to use Stardust only with remote environments.":
+    "在这台计算机上运行智能体。关闭后，星尘只使用远程环境。",
   "Turned off. Agents only run in remote environments.": "已关闭。智能体只在远程环境中运行。",
   "Local environment": "本地环境",
   "Turn off local environment?": "关闭本地环境？",
   "Turn on local environment?": "打开本地环境？",
   "T3 Code will restart without running a server on this computer. Any agents and terminals running here will stop, and other devices will no longer be able to connect to this computer. Your projects, history, and remote environments are unaffected.":
-    "T3 Code 将重启，并且不再在这台计算机上运行服务器。这里正在运行的智能体和终端会停止，其他设备也将无法再连接到这台计算机。你的项目、历史和远程环境不受影响。",
+    "星尘将重启，并且不再在这台计算机上运行服务器。这里正在运行的智能体和终端会停止，其他设备也将无法再连接到这台计算机。你的项目、历史和远程环境不受影响。",
+  "Stardust will restart without running a server on this computer. Any agents and terminals running here will stop, and other devices will no longer be able to connect to this computer. Your projects, history, and remote environments are unaffected.":
+    "星尘将重启，并且不再在这台计算机上运行服务器。这里正在运行的智能体和终端会停止，其他设备也将无法再连接到这台计算机。你的项目、历史和远程环境不受影响。",
   "T3 Code will restart and start running a server on this computer again.":
-    "T3 Code 将重启，并再次在这台计算机上运行服务器。",
+    "星尘将重启，并再次在这台计算机上运行服务器。",
+  "Stardust will restart and start running a server on this computer again.":
+    "星尘将重启，并再次在这台计算机上运行服务器。",
   "Restart and turn off": "重启并关闭",
   "Restart and turn on": "重启并打开",
   "System alerts when a thread finishes, fails, or needs input or approval. Applies to this device while T3 Code is open.":
-    "会话完成、失败或需要输入或批准时发出系统提醒。仅当 T3 Code 在此设备上打开时生效。",
+    "会话完成、失败或需要输入或批准时发出系统提醒。仅当星尘在此设备上打开时生效。",
+  "System alerts when a thread finishes, fails, or needs input or approval. Applies to this device while Stardust is open.":
+    "会话完成、失败或需要输入或批准时发出系统提醒。仅当星尘在此设备上打开时生效。",
   "Thread notifications": "会话通知",
   "Project source": "项目来源",
   "Search open-source licenses": "搜索开源许可证",
@@ -6082,14 +6223,18 @@ export const zhCN: Readonly<Record<string, string>> = {
     "连接环境后才能选择其文本生成模型。",
   "Text generation model not saved": "文本生成模型未保存",
   "How we handle your data, including the anonymous usage data T3 Code collects.":
-    "我们如何处理你的数据，包括 T3 Code 收集的匿名用量数据。",
+    "我们如何处理你的数据，包括星尘收集的匿名用量数据。",
+  "How we handle your data, including the anonymous usage data Stardust collects.":
+    "我们如何处理你的数据，包括星尘收集的匿名用量数据。",
   "View policy": "查看政策",
   "Inspect processes, resource use, and logs on this environment.":
     "查看此环境上的进程、资源使用和日志。",
   "Inspect processes, resource use, and logs on one environment at a time.":
     "一次查看一个环境上的进程、资源使用和日志。",
   "Notices for dependencies, assets, and optional tools used by T3 Code.":
-    "T3 Code 所用依赖、资源和可选工具的声明。",
+    "星尘所用依赖、资源和可选工具的声明。",
+  "Notices for dependencies, assets, and optional tools used by Stardust.":
+    "星尘所用依赖、资源和可选工具的声明。",
   "View licenses": "查看许可证",
   Archived: "已归档",
   "· Created": "· 创建于",
@@ -6118,7 +6263,7 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Animate snapshots": "为快照加上动画",
   "Install the extension": "安装扩展",
   "The T3 Code GNOME extension lets you capture other windows and bring them into your draft. Sign out once after installing.":
-    "T3 Code 的 GNOME 扩展可以捕获其他窗口并带入草稿。安装后请退出登录一次。",
+    "星尘的 GNOME 扩展可以捕获其他窗口并带入草稿。安装后请退出登录一次。",
   "Extension installed": "扩展已安装",
   "Save your work, then sign out and back in. Your setup will be waiting here.":
     "请保存工作，然后退出登录再登录。你的设置会留在这里。",
@@ -6145,7 +6290,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Try reinstalling the capture helper, then check again.":
     "请尝试重新安装捕获助手，然后再次检查。",
   "T3 Code's capture helper lets you capture other apps and return to your draft. It's included with T3 Code.":
-    "T3 Code 的捕获助手可以捕获其他应用并返回草稿。它随 T3 Code 一起提供。",
+    "星尘的捕获助手可以捕获其他应用并返回草稿。它随星尘一起提供。",
+  "Stardust's capture helper lets you capture other apps and return to your draft. It's included with Stardust.":
+    "星尘的捕获助手可以捕获其他应用并返回草稿。它随星尘一起提供。",
   "Choose a window each time": "每次选择一个窗口",
   "Your desktop doesn't support automatic capture. You'll choose the window to capture instead.":
     "你的桌面不支持自动捕获。你将改为选择要捕获的窗口。",
@@ -6157,7 +6304,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Capture needs attention. Go back to check access.": "捕获需要处理。请返回检查访问权限。",
   "Couldn't finish this step. Try again or check Advanced for help.":
     "无法完成此步骤。请重试，或查看高级选项中的帮助。",
-  "Included with T3 Code. No download needed.": "随 T3 Code 提供。无需下载。",
+  "Included with T3 Code. No download needed.": "随星尘提供。无需下载。",
+  "Included with Stardust. No download needed.": "随星尘提供。无需下载。",
   "Disable extension": "禁用扩展",
   "Remove capture helper": "移除捕获助手",
   "Update helper": "更新助手",
@@ -6212,7 +6360,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Show service interfaces before implementations. Skip test files unless they change behavior. Keep summaries to two sentences.":
     "先展示服务接口，再展示实现。除非测试文件改变了行为，否则跳过它们。摘要保持两句话。",
   "Folder where new worktrees are created, on any drive, such as D:\\worktrees or ~/worktrees. Existing worktrees stay where they are. Leave empty to use the T3 home folder.":
-    "新工作树的创建文件夹，可以在任意磁盘上，例如 D:\\worktrees 或 ~/worktrees。已有工作树留在原处。留空则使用 T3 主文件夹。",
+    "新工作树的创建文件夹，可以在任意磁盘上，例如 D:\\worktrees 或 ~/worktrees。已有工作树留在原处。留空则使用星尘主文件夹。",
+  "Folder where new worktrees are created, on any drive, such as D:\\worktrees or ~/worktrees. Existing worktrees stay where they are. Leave empty to use the Stardust home folder.":
+    "新工作树的创建文件夹，可以在任意磁盘上，例如 D:\\worktrees 或 ~/worktrees。已有工作树留在原处。留空则使用星尘主文件夹。",
   "worktree location": "工作树位置",
   "Worktree location": "工作树位置",
   days: "天",
@@ -6413,8 +6563,10 @@ export const zhCN: Readonly<Record<string, string>> = {
   TypeScript: "TypeScript",
   Vue: "Vue",
   Zig: "Zig",
-  "T3 Code Desktop": "T3 Code 桌面版",
-  "T3 Code Web": "T3 Code 网页版",
+  "T3 Code Desktop": "星尘桌面版",
+  "Stardust Desktop": "星尘桌面版",
+  "T3 Code Web": "星尘网页版",
+  "Stardust Web": "星尘网页版",
   "Open with": "打开方式",
   "Failed to remove project": "移除项目失败",
   "Model preferences not saved": "模型偏好未保存",
@@ -6486,7 +6638,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Failed to copy PR link": "复制拉取请求链接失败",
   "Preview is desktop-only": "预览仅限桌面端",
   "Open T3 Code in the desktop app to use the in-app preview.":
-    "请在桌面应用中打开 T3 Code 以使用应用内预览。",
+    "请在桌面应用中打开星尘以使用应用内预览。",
+  "Open Stardust in the desktop app to use the in-app preview.":
+    "请在桌面应用中打开星尘以使用应用内预览。",
   "Connect an environment to set up its providers.": "连接环境后才能设置其模型通道。",
   "environment-data:agent-sessions:scan": "environment-data:agent-sessions:scan",
   "environment-data:agent-sessions:import": "environment-data:agent-sessions:import",
@@ -6664,7 +6818,7 @@ export const zhCN: Readonly<Record<string, string>> = {
   "{0} additions, {1} deletions": "新增 {0}，删除 {1}",
   "{0} app": "{0} 应用",
   "Jump to message: {0}": "跳转到消息：{0}",
-  "T3 Code": "T3 Code",
+  "T3 Code": "星尘",
   "{0} is still running. Show setup progress.": "{0} 仍在运行。显示准备进度。",
   "{0}{1}, tool call failed": "{0}{1}，工具调用失败",
   "{0}, tool call failed": "{0}，工具调用失败",
@@ -6725,7 +6879,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "You don't have {0}": "你还没有 {0}",
   "Check out {0}/{1}#{2}?": "检出 {0}/{1}#{2}？",
   "T3 Code removed {0} hidden character{1}. Read the prompt before you send it.":
-    "T3 Code 已移除 {0} 个隐藏字符{1}。发送前请先阅读这段提示词。",
+    "星尘已移除 {0} 个隐藏字符{1}。发送前请先阅读这段提示词。",
+  "Stardust removed {0} hidden character{1}. Read the prompt before you send it.":
+    "星尘已移除 {0} 个隐藏字符{1}。发送前请先阅读这段提示词。",
   "Open checks: {0}": "打开检查：{0}",
   "viewed in {0}": "在 {0} 中已查看",
   "Review pull request, {0} {1} pending": "评审拉取请求，{0} 条{1}待提交",
@@ -6881,7 +7037,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "{0} of {1} updated": "已更新 {0}/{1}",
   "Downloading{0}": "正在下载{0}",
   "T3 Code is still on {0}. Install {1} again from the update button.":
-    "T3 Code 仍是 {0}。请通过更新按钮再次安装 {1}。",
+    "星尘仍是 {0}。请通过更新按钮再次安装 {1}。",
+  "Stardust is still on {0}. Install {1} again from the update button.":
+    "星尘仍是 {0}。请通过更新按钮再次安装 {1}。",
   "text-primary": "text-primary",
   "{0} saturation and brightness": "{0}的饱和度与亮度",
   "{0}, step {1}{2}": "{0}，第 {1} 步{2}",
@@ -6955,11 +7113,17 @@ export const zhCN: Readonly<Record<string, string>> = {
     "输入超过 {2} 字符上限，多出 {0} {1}。请缩短或拆分后发送。",
   "This install is using the correct architecture.": "当前安装版本与设备架构匹配。",
   "This Mac has Apple Silicon, but T3 Code is still running the Intel build under Rosetta. Download the available update to switch to the native Apple Silicon build.":
-    "此 Mac 使用 Apple Silicon，但 T3 Code 正通过 Rosetta 运行 Intel 版本。下载更新可切换到原生 Apple Silicon 版本。",
+    "此 Mac 使用 Apple Silicon，但星尘正通过 Rosetta 运行 Intel 版本。下载更新可切换到原生 Apple Silicon 版本。",
+  "This Mac has Apple Silicon, but Stardust is still running the Intel build under Rosetta. Download the available update to switch to the native Apple Silicon build.":
+    "此 Mac 使用 Apple Silicon，但星尘正通过 Rosetta 运行 Intel 版本。下载更新可切换到原生 Apple Silicon 版本。",
   "This Mac has Apple Silicon, but T3 Code is still running the Intel build under Rosetta. Restart to install the downloaded Apple Silicon build.":
-    "此 Mac 使用 Apple Silicon，但 T3 Code 正通过 Rosetta 运行 Intel 版本。重新启动以安装已下载的 Apple Silicon 版本。",
+    "此 Mac 使用 Apple Silicon，但星尘正通过 Rosetta 运行 Intel 版本。重新启动以安装已下载的 Apple Silicon 版本。",
+  "This Mac has Apple Silicon, but Stardust is still running the Intel build under Rosetta. Restart to install the downloaded Apple Silicon build.":
+    "此 Mac 使用 Apple Silicon，但星尘正通过 Rosetta 运行 Intel 版本。重新启动以安装已下载的 Apple Silicon 版本。",
   "This Mac has Apple Silicon, but T3 Code is still running the Intel build under Rosetta. The next app update will replace it with the native Apple Silicon build.":
-    "此 Mac 使用 Apple Silicon，但 T3 Code 正通过 Rosetta 运行 Intel 版本。下次应用更新将切换到原生 Apple Silicon 版本。",
+    "此 Mac 使用 Apple Silicon，但星尘正通过 Rosetta 运行 Intel 版本。下次应用更新将切换到原生 Apple Silicon 版本。",
+  "This Mac has Apple Silicon, but Stardust is still running the Intel build under Rosetta. The next app update will replace it with the native Apple Silicon build.":
+    "此 Mac 使用 Apple Silicon，但星尘正通过 Rosetta 运行 Intel 版本。下次应用更新将切换到原生 Apple Silicon 版本。",
   "Update {0} did not apply. Click to retry.": "更新 {0} 未生效，点击重试。",
   "Update {0} ready to download": "更新 {0} 已可下载",
   "Downloading update{0}": "正在下载更新{0}",
@@ -6967,7 +7131,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Download failed for {0}. Click to retry.": "{0} 下载失败，点击重试。",
   "Install failed for {0}. Click to retry.": "{0} 安装失败，点击重试。",
   "Install update{0} and restart T3 Code?\n\nAny running tasks will be interrupted. Make sure you're ready before continuing.":
-    "安装更新{0}并重启 T3 Code？\n\n正在运行的任务将被中断，请准备好后继续。",
+    "安装更新{0}并重启星尘？\n\n正在运行的任务将被中断，请准备好后继续。",
+  "Install update{0} and restart Stardust?\n\nAny running tasks will be interrupted. Make sure you're ready before continuing.":
+    "安装更新{0}并重启星尘？\n\n正在运行的任务将被中断，请准备好后继续。",
   "Enable this environment to open simulators and emulators, whether they run here or on a remote device host.":
     "启用此环境以打开本地或远程设备主机上的模拟器。",
   "Allow new agent sessions in this environment to start and control local and remote devices, with required tools set up automatically.":
@@ -7112,7 +7278,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Custom search URL": "自定义搜索网址",
   "Use %s where the search terms go.": "用 %s 标记搜索词的位置。",
   "Clicking a pull request link opens it in T3 Code. Turn off to open pull request links like any other link, on your git host.":
-    "点击拉取请求链接时在 T3 Code 内打开。关闭后，会像其他链接一样在代码托管平台打开。",
+    "点击拉取请求链接时在星尘内打开。关闭后，会像其他链接一样在代码托管平台打开。",
+  "Clicking a pull request link opens it in Stardust. Turn off to open pull request links like any other link, on your git host.":
+    "点击拉取请求链接时在星尘内打开。关闭后，会像其他链接一样在代码托管平台打开。",
   "Open simulators and emulators in the Device panel. Hub:": "在设备面板中打开模拟器。设备中心：",
   "New agent sessions can open and drive these devices. agent-device:":
     "新智能体会话可以打开并操作这些设备。agent-device：",
@@ -7141,7 +7309,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Loading linked environments…": "正在加载关联环境…",
   "No linked environments": "暂无关联环境",
   "Link another machine running T3 Code, such as a VPS, so agents here can launch and drive threads there.":
-    "关联另一台运行 T3 Code 的机器（例如 VPS），让本机智能体在对方创建并执行会话。",
+    "关联另一台运行星尘的机器（例如 VPS），让本机智能体在对方创建并执行会话。",
+  "Link another machine running Stardust, such as a VPS, so agents here can launch and drive threads there.":
+    "关联另一台运行星尘的机器（例如 VPS），让本机智能体在对方创建并执行会话。",
   "unlink environment": "解除环境关联",
   "link environment": "关联环境",
   "Link an environment": "关联环境",
@@ -7265,9 +7435,12 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Quit {0} to import": "退出 {0} 后导入",
   "{0} is open, so its cookies can't be read yet. Quit it, then continue.":
     "{0} 正在运行，暂时无法读取其 Cookie。请退出后继续。",
-  "Let T3 Code read {0}'s cookies": "允许 T3 Code 读取 {0} 的 Cookie",
+  "Let T3 Code read {0}'s cookies": "允许星尘读取 {0} 的 Cookie",
+  "Let Stardust read {0}'s cookies": "允许星尘读取 {0} 的 Cookie",
   "To import cookies from {0}, T3 Code needs Full Disk Access. Turn it on in System Settings, then come back to finish the import. You can revoke it again once the import is done.":
-    "从 {0} 导入 Cookie 需要为 T3 Code 开启“完全磁盘访问权限”。请前往系统设置开启，再返回完成导入；完成后可撤销该权限。",
+    "从 {0} 导入 Cookie 需要为星尘开启“完全磁盘访问权限”。请前往系统设置开启，再返回完成导入；完成后可撤销该权限。",
+  "To import cookies from {0}, Stardust needs Full Disk Access. Turn it on in System Settings, then come back to finish the import. You can revoke it again once the import is done.":
+    "从 {0} 导入 Cookie 需要为星尘开启“完全磁盘访问权限”。请前往系统设置开启，再返回完成导入；完成后可撤销该权限。",
   "Import from {0}": "从 {0} 导入",
   "Choose which cookies to import for {0}.": "选择要为 {0} 导入的 Cookie。",
   "Checking {0}": "正在检查 {0}",
@@ -7279,13 +7452,17 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Let agents here work on your other machines, and theirs here. Turn it on for each machine, then link them in {0}. While it is off, nothing new starts over a link; tasks already running finish.":
     "允许本机智能体在其他机器上工作，也允许对方在本机工作。请在各机器开启，再前往{0}进行关联。关闭后，不再通过关联启动新任务；已运行的任务会继续完成。",
   "Let the Device panel lease simulators and emulators from your own {0} pool, added in {1}. An alpha that may change or break. T3 Code never installs Simlock.":
-    "允许设备面板从你在{1}中添加的 {0} 设备池租用模拟器。这是早期测试功能，可能变化或失效。T3 Code 不会安装 Simlock。",
+    "允许设备面板从你在{1}中添加的 {0} 设备池租用模拟器。这是早期测试功能，可能变化或失效。星尘不会安装 Simlock。",
+  "Let the Device panel lease simulators and emulators from your own {0} pool, added in {1}. An alpha that may change or break. Stardust never installs Simlock.":
+    "允许设备面板从你在{1}中添加的 {0} 设备池租用模拟器。这是早期测试功能，可能变化或失效。星尘不会安装 Simlock。",
   "This app has no address for {0} that another machine can reach. Enter its https or Tailscale address.":
     "此应用没有可供其他机器访问 {0} 的地址。请输入其 HTTPS 或 Tailscale 地址。",
   "Create a link on {0}: Settings → Connections → Create link, then paste its code here.":
     "在 {0} 上打开“设置 → 连接 → 创建关联”，再将关联码粘贴到这里。",
   "We do not recommend managing multiple {0} accounts in T3 Code. {1}":
-    "不建议在 T3 Code 中管理多个 {0} 账号。{1}",
+    "不建议在星尘中管理多个 {0} 账号。{1}",
+  "We do not recommend managing multiple {0} accounts in Stardust. {1}":
+    "不建议在星尘中管理多个 {0} 账号。{1}",
   "This instance uses {0}, which is not available in this build. Its configuration is preserved.":
     "此实例使用 {0}，当前版本不支持该服务商。其配置已保留。",
   "Checked {0} {1}": "检查于 {0} {1}",
@@ -7369,7 +7546,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Agent token · {0}": "智能体令牌 · {0}",
   "Using this machine's agent-device token ({0}).": "正在使用本机 agent-device 令牌（{0}）。",
   "Accepted as {0}.": "已接受为 {0}。",
-  'T3 Code already uses this for "{0}".': "T3 Code 已将此快捷键用于“{0}”。",
+  'T3 Code already uses this for "{0}".': "星尘已将此快捷键用于“{0}”。",
+  'Stardust already uses this for "{0}".': "星尘已将此快捷键用于“{0}”。",
   "Snooze option {0}": "稍后处理选项 {0}",
   "Remove snooze option {0}": "移除稍后处理选项 {0}",
   "Menu now: {0}": "当前菜单：{0}",
@@ -7459,7 +7637,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Full access skips approvals, but an ask rule in the agent's own settings matches this action, so it still asks. Remove or narrow that rule to stop these prompts.":
     "完全访问通常会跳过授权，但智能体自身设置中的询问规则匹配了此操作，因此仍需确认。移除该规则或缩小其范围后，可减少这类提示。",
   "Full access skips approvals, but the agent still stops for a few safety checks of its own that no setting can skip, such as a delete whose path it can't verify. T3 Code can't turn these off, so check the request and approve it if it's what you expect.":
-    "完全访问通常会跳过授权，但智能体自身仍有少量无法通过设置跳过的安全检查，例如无法核实删除目标路径时。T3 Code 无法关闭这些检查，请核对实际操作，符合预期后再批准。",
+    "完全访问通常会跳过授权，但智能体自身仍有少量无法通过设置跳过的安全检查，例如无法核实删除目标路径时。星尘无法关闭这些检查，请核对实际操作，符合预期后再批准。",
+  "Full access skips approvals, but the agent still stops for a few safety checks of its own that no setting can skip, such as a delete whose path it can't verify. Stardust can't turn these off, so check the request and approve it if it's what you expect.":
+    "完全访问通常会跳过授权，但智能体自身仍有少量无法通过设置跳过的安全检查，例如无法核实删除目标路径时。星尘无法关闭这些检查，请核对实际操作，符合预期后再批准。",
   "Provider process is gone. Interrupt or restart the run to respond.":
     "模型通道进程已退出，请中断或重启任务后再处理此请求。",
   "Allow {server} to run {tool}?": "允许 {server} 运行 {tool}？",
@@ -7555,7 +7735,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Cursor quota is unavailable · Sign in to Cursor CLI on its environment":
     "Cursor 额度暂不可用 · 请在对应机器登录 Cursor CLI",
   "Run this command in your own terminal, then refresh usage. T3 will not run a login command for you.":
-    "在你自己的终端运行这条命令，然后刷新用量。T3 不会替你执行登录命令。",
+    "在你自己的终端运行这条命令，然后刷新用量。星尘不会替你执行登录命令。",
+  "Run this command in your own terminal, then refresh usage. Stardust will not run a login command for you.":
+    "在你自己的终端运行这条命令，然后刷新用量。星尘不会替你执行登录命令。",
   "Got it": "好了",
   "View artifacts": "查看产物",
   "Have another idea? Tell me, for example “Make the title shorter”.":
@@ -7709,7 +7891,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Suggested categories": "分类建议",
   "Suggestion model": "建议模型",
   "T3 Code collects anonymous usage data to improve the app.":
-    "T3 Code 收集匿名用量数据，用于改进应用。",
+    "星尘收集匿名用量数据，用于改进应用。",
+  "Stardust collects anonymous usage data to improve the app.":
+    "星尘收集匿名用量数据，用于改进应用。",
   "Technical details": "技术详情",
   "Temporary thread · Each task has its own folder": "临时会话 · 每个任务一个独立文件夹",
   "This connection cannot manage agents.": "当前连接没有管理模型工具的权限。",
@@ -7723,7 +7907,7 @@ export const zhCN: Readonly<Record<string, string>> = {
   Unsorted: "待归类",
   "Usage statistics are disabled for this workspace.": "此工作区已关闭使用统计。",
   "Video & audio": "视频与音频",
-  "Welcome to T3 Stardust": "欢迎使用 T3 星尘版",
+  "Welcome to Stardust": "欢迎使用星尘",
   "Work admin": "工作事务",
   "Working folder": "工作文件夹",
   "Write an article": "写一篇文章",
@@ -7755,8 +7939,7 @@ export const zhCN: Readonly<Record<string, string>> = {
     "{provider} 按这个速度会在 {runOut} 用完，{reset} 才重置",
   "At this pace, {provider} lasts until the reset": "{provider} 按这个速度，重置前还够用",
   "Weekly quota is on track": "本周额度都在正常范围",
-  "T3 Stardust home": "T3 星尘版主页",
-  Stardust: "星尘版",
+  Stardust: "星尘",
   "Anonymous usage data helps improve the app.": "匿名用量数据用于改进应用。",
   "General preset": "综合",
   "Import one project and its threads": "导入一个项目和其中的会话",
@@ -7765,9 +7948,11 @@ export const zhCN: Readonly<Record<string, string>> = {
   "From your {providers} history": "来自 {providers} 的历史记录",
   "Review all {count}": "查看全部 {count} 项",
   "{count} of {total} selected": "已选 {count} 项，共 {total} 项",
-  "Use T3 Code on your phone": "在手机上使用 T3",
+  "Use T3 Code on your phone": "在手机上使用星尘",
+  "Use Stardust on your phone": "在手机上使用星尘",
   "Scan with your phone to get the app.": "用手机扫码获取应用。",
-  "T3 Code app for iPhone and Android": "T3 的 iPhone 和 Android 应用",
+  "T3 Code app for iPhone and Android": "星尘的 iPhone 和 Android 应用",
+  "Stardust app for iPhone and Android": "星尘的 iPhone 和 Android 应用",
   "Checking T3 Connect…": "正在检查 T3 Connect…",
   "Could not check T3 Connect.": "无法检查 T3 Connect。",
   "Check T3 Connect": "检查 T3 Connect",
@@ -8037,7 +8222,9 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Task board": "任务看板",
   "Task board service is offline": "看板服务没开",
   "Task data is temporarily unavailable. Other T3 features are still available.":
-    "任务数据暂时读不到，T3 其他功能不受影响。",
+    "任务数据暂时读不到，星尘其他功能不受影响。",
+  "Task data is temporarily unavailable. Other Stardust features are still available.":
+    "任务数据暂时读不到，星尘其他功能不受影响。",
   "Couldn’t copy. Copy the command above manually.": "复制失败，请手动复制上方命令",
   "Loading tasks…": "正在读取任务…",
   "Needs my attention": "待我处理",
@@ -8342,8 +8529,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Update now in one click, or review the notes first.": "一键即可更新，也可以先看看更新说明。",
   "Update and restart": "更新并重启",
   "View update notes": "查看更新说明",
-  "T3 Stardust {version} is ready": "T3 星尘版 {version} 已准备好",
-  "It installs the next time you quit T3 Stardust.": "下次退出 T3 星尘版时自动安装。",
+  "Stardust {version} is ready": "星尘 {version} 已准备好",
+  "It installs the next time you quit Stardust.": "下次退出星尘时自动安装。",
   "Restart now": "立即重启更新",
   "Standard mode updates in one click: download, verify, replace and restart. Source mode only links to source changes.":
     "标准模式一键更新：自动下载、校验、替换并重启。源码模式只提供源码变更链接。",
@@ -8367,20 +8554,20 @@ export const zhCN: Readonly<Record<string, string>> = {
   "The downloaded update failed its checksum. It was deleted; try again.":
     "下载的更新包校验失败，已删除，请重试。",
   "Couldn’t unpack the downloaded update. Try again.": "更新包解压失败，请重试。",
-  "The downloaded update is not T3 Stardust, so it was not installed.":
-    "下载的更新包不是 T3 星尘版，已停止安装。",
+  "The downloaded update is not Stardust, so it was not installed.":
+    "下载的更新包不是星尘，已停止安装。",
   "The downloaded update does not match the release version, so it was not installed.":
     "下载的更新包与发布版本号不一致，已停止安装。",
   "The downloaded update failed its code signature check, so it was not installed.":
     "下载的更新包未通过代码签名校验，已停止安装。",
-  "T3 Stardust can’t replace itself in this folder. Move it to Applications or a folder you can write to, then try again.":
-    "T3 星尘版无法在当前文件夹中替换自己。请把它移到「应用程序」或其他你有写入权限的文件夹后再试。",
-  "macOS is running T3 Stardust from a temporary location. Move it to the Applications folder, open it from there, then try again.":
-    "macOS 正在临时位置运行 T3 星尘版。请把它拖到「应用程序」文件夹，从那里打开后再试。",
+  "Stardust can’t replace itself in this folder. Move it to Applications or a folder you can write to, then try again.":
+    "星尘无法在当前文件夹中替换自己。请把它移到「应用程序」或其他你有写入权限的文件夹后再试。",
+  "macOS is running Stardust from a temporary location. Move it to the Applications folder, open it from there, then try again.":
+    "macOS 正在临时位置运行星尘。请把它拖到「应用程序」文件夹，从那里打开后再试。",
   "No downloaded update is ready to install.": "还没有下载好的更新可以安装。",
   "Couldn’t start the update installer. Your current version is unchanged.":
     "无法启动更新安装程序，当前版本没有变化。",
-  "T3 Stardust only offers stable releases.": "T3 星尘版只提供正式版更新。",
+  "Stardust only offers stable releases.": "星尘只提供正式版更新。",
   "View source changes": "查看源码差异",
   "Review and merge the changes in your fork before building. Replacing the app can overwrite your customizations.":
     "请在自己的 fork 中审阅并合并所需修改，再构建；整包覆盖可能替换你的代码改造。",
@@ -8449,9 +8636,11 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Version {version} available. Select to update.": "有新版本 {version}，点击更新",
   "Update available. Select to update.": "有新版本，点击更新",
   "Memory.": "记忆",
+  "Memory settings": "记忆",
+  "Review memory proposal": "去审核",
   "New memory proposal to review": "有新的记忆提案待确认",
-  "Open Settings → Memory to approve, edit, or reject it. Models receive approved memories only.":
-    "前往设置 → 记忆，批准、修改或拒绝。批准前不会提供给模型。",
+  "Models receive approved memories only.": "批准前不会提供给模型。",
+  "Ask in side chat": "侧聊提问",
   "All active tasks": "全部正在进行的任务",
   "Active tasks": "正在进行的任务",
   "{count}{title}’s subtasks": "{count}{title}的子任务",
@@ -8609,7 +8798,7 @@ export const zhCN: Readonly<Record<string, string>> = {
   "History accumulates after scans": "扫描后逐日积累历史",
   "Scan once daily when this page is opened": "每天打开此页时自动扫描一次",
   "No background timer or automatic deletion. Trash is retained until manually restored or emptied.":
-    "没有常驻扫描或自动删除。废纸篓内容由你恢复或清空；T3不会在7天后自动删除。",
+    "没有常驻扫描或自动删除。废纸篓内容由你恢复或清空；星尘不会在7天后自动删除。",
   "Verified generated files": "已核验的生成文件",
   "Needs your confirmation": "需要你确认",
   "Protected / Unverified": "已保护 / 尚未核验",
@@ -8617,7 +8806,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   free: "可用",
   "Used / available · Reserve": "已用 / 可用 · 保护线",
   " · display only": " · 仅显示",
-  "Old T3 rollback apps": "旧 T3 回滚版本",
+  "Old T3 rollback apps": "旧星尘回滚版本",
+  "Old Stardust rollback apps": "旧星尘回滚版本",
   "Build staging": "外盘构建暂存",
   "Cold backups": "冷备份",
   "Select {name}": "选择 {name}",
@@ -8790,7 +8980,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Heatmap of hourly usage over the last 7 days": "最近 7 天真实每小时用量热力格",
   "Hours are grouped by local weekday and time. Hours with no usage show zero.":
     "按小时桶起始时间归入当地星期与时段。没有用量的时段保留为零。",
-  "Outside T3 conversations": "不在 T3 会话里",
+  "Outside T3 conversations": "不在星尘会话里",
+  "Outside Stardust conversations": "不在星尘会话里",
   "Not reported by this server.": "此服务器未上报",
   "By project.": "按项目",
   "By day": "按天",
@@ -8948,7 +9139,6 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Waiting for background tasks": "等待后台任务",
   "Just started": "刚开始",
   "Running for {minutes}m": "已运行 {minutes} 分",
-  "Running for {hours}h{total}": "已运行 {hours} 时{total}",
   " {count}m": " {count} 分",
   "{count}m": "{count}分",
   "{count}h.": "{count}时",
@@ -9028,7 +9218,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Conversation history is protected during cleanup.": "对话历史，普通清理保留",
   "Cache from another AI tool. Verify which tool owns it before cleaning up.":
     "其他 AI 工具缓存；先核对所属软件，本工具不直接删除",
-  "T3 browser cache. In-use cache is protected.": "T3 浏览器缓存；运行中的缓存保留",
+  "T3 browser cache. In-use cache is protected.": "星尘浏览器缓存；运行中的缓存保留",
+  "Stardust browser cache. In-use cache is protected.": "星尘浏览器缓存；运行中的缓存保留",
   "App backup or rollback. Verify references from the current installation first.":
     "应用备份或回滚包；未核对当前安装引用前保留",
   "Registered archive. Restore it from Archives and cleanup history.":
@@ -9123,6 +9314,8 @@ export const zhCN: Readonly<Record<string, string>> = {
     "日志元数据无法安全恢复，原件保留",
   "Only listed rotated logs older than 30 days are included. T3 verifies a compressed archive before removing originals. Restore the archive to a new folder.":
     "仅处理清单内超过30天的轮转日志。先保留压缩归档，校验后删除原日志；归档可恢复到新目录。",
+  "Only listed rotated logs older than 30 days are included. Stardust verifies a compressed archive before removing originals. Restore the archive to a new folder.":
+    "仅处理清单内超过30天的轮转日志。先保留压缩归档，校验后删除原日志；归档可恢复到新目录。",
   "The log root changed.": "日志根目录已变化",
   "The log archive path is invalid. The originals are retained.": "日志归档路径异常，原件保留",
   "The log archive root can’t contain symbolic links.": "日志归档根目录不能含软链接",
@@ -9164,8 +9357,12 @@ export const zhCN: Readonly<Record<string, string>> = {
     "可重建目录含链接或他人文件，保留",
   "Only rebuildable items in approved locations are permanently deleted. T3 checks paths, contents, usage, and volume reserves again before cleanup.":
     "仅白名单内可重建内容会永久删除；执行前再次检查路径、内容、占用和所有卷保护线。",
+  "Only rebuildable items in approved locations are permanently deleted. Stardust checks paths, contents, usage, and volume reserves again before cleanup.":
+    "仅白名单内可重建内容会永久删除；执行前再次检查路径、内容、占用和所有卷保护线。",
   "Moves items to Trash on the same volume. Space stays occupied. T3 keeps the files for at least 7 days and provides recovery from history. Emptying system Trash makes recovery unavailable.":
-    "移入同卷废纸篓，不立即释放空间。T3不自动清空；至少保留7天，期间可从记录恢复。手动清空系统废纸篓会使恢复失效。",
+    "移入同卷废纸篓，不立即释放空间。星尘不自动清空；至少保留7天，期间可从记录恢复。手动清空系统废纸篓会使恢复失效。",
+  "Moves items to Trash on the same volume. Space stays occupied. Stardust keeps the files for at least 7 days and provides recovery from history. Emptying system Trash makes recovery unavailable.":
+    "移入同卷废纸篓，不立即释放空间。星尘不自动清空；至少保留7天，期间可从记录恢复。手动清空系统废纸篓会使恢复失效。",
   "Trash on this volume is unavailable. The original is retained.":
     "同卷废纸篓不可用；原件保留，不回退永久删除",
   "The item or destination changed. Preview again.": "对象或去向变化，请重新预览",
@@ -9194,6 +9391,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Keep the original and create an archive copy for files that can’t be rebuilt.":
     "不可重建资料仅支持归档副本；不能直接释放",
   "System provenance and access tags are kept in the archive. T3 verifies restored data, permissions, and ACLs.":
+    "本机系统来源/访问标记保留在归档记录中，不重写至新文件；数据、权限与ACL会校验恢复。",
+  "System provenance and access tags are kept in the archive. Stardust verifies restored data, permissions, and ACLs.":
     "本机系统来源/访问标记保留在归档记录中，不重写至新文件；数据、权限与ACL会校验恢复。",
   "The restore destination is offline.": "恢复目标卷已离线",
   "HFS+ stores timestamps to the nearest second. The archive keeps nanosecond precision. Data, ownership, and permissions are still verified.":
@@ -9253,6 +9452,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Folder exceeds the size limit. It was kept.": "目录过大，保留原件",
   "Rebuildable cache. T3 checks that it is unchanged and unused before cleanup.":
     "可重建缓存；执行前检查占用和内容变化",
+  "Rebuildable cache. Stardust checks that it is unchanged and unused before cleanup.":
+    "可重建缓存；执行前检查占用和内容变化",
   "npm download cache": "npm 下载缓存",
   "pip download cache": "pip 下载缓存",
   "pip download cache (Library)": "pip 下载缓存（Library）",
@@ -9277,6 +9478,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Outside the two-version reserve. Moves to Trash.": "超出最近两份回滚保留数；移入废纸篓",
   "Current installed version": "当前安装版本",
   "T3 verifies both current cold backups before moving older ones to Trash.":
+    "预览及执行时完整读取校验最新两份冷备后，旧备份仅进废纸篓",
+  "Stardust verifies both current cold backups before moving older ones to Trash.":
     "预览及执行时完整读取校验最新两份冷备后，旧备份仅进废纸篓",
   "Cold backup verification receipt. Kept with the archive.": "冷备校验回执；与归档一同保留",
   "The signature, package manifest, and replacement receipt match. Review individually and keep the current rollback chain.":
@@ -9320,7 +9523,8 @@ export const zhCN: Readonly<Record<string, string>> = {
     "已扫描 {count} 个项目目录{created}，核对处理 {total} 个已有/导入会话。",
   " Reason: {reason}{more}.": " 失败原因: {reason}{more}。",
   "Moved to {provider} → {project}": "已移到 {provider} → {project}",
-  "Running for {hours}h{minutes}": "已运行 {hours} 时{minutes}",
+  "Running for {hours}h": "已运行 {hours} 时",
+  "Running for {hours}h {minutes}m": "已运行 {hours} 时 {minutes} 分",
   "Completed this week · ": "本周完成 · ",
   "Selected ": "已选 ",
   " records": " 条",
@@ -9328,7 +9532,11 @@ export const zhCN: Readonly<Record<string, string>> = {
   "View all ": "查看全部 ",
   " items": " 项",
   "In progress · ": "正在进行 · ",
-  "Next item ": "下一条 ",
+  "Next item {shortcut}": "下一条 {shortcut}",
+  "· Includes {count} subtasks": "· 含 {count} 个子任务",
+  "View all {count} items": "查看全部 {count} 项",
+  "In progress · {main} main tasks, {subtasks} subtasks":
+    "正在进行 · {main} 个主任务，{subtasks} 个子任务",
   "Free: ": "可用 ",
   "Reserve ": "安全线 ",
   " samples": " 次实测",
@@ -9368,8 +9576,6 @@ export const zhCN: Readonly<Record<string, string>> = {
   "{count} more steps": "另外 {count} 步",
   "No result": "无结果",
   "Share anonymous usage data": "共享匿名使用数据",
-  "Off by default. When on, anonymous usage events (feature use, app version, operating system; no prompts, files or paths) are sent to ingest.t3.codes, a server run by the upstream T3 Code project. Turning it off stops sending at once and discards events not yet sent.":
-    "默认关闭。开启后，匿名使用事件（功能使用情况、应用版本、操作系统；不含提示词、文件或路径）会发送到 ingest.t3.codes，该服务由上游 T3 Code 项目运营。关闭后立即停止发送，并丢弃尚未发送的事件。",
   "What this build sends and where. Usage statistics stay off unless you turn them on above.":
     "本版本会发送什么、发往哪里。除非你在上方开启，否则不会发送使用统计。",
   "Usage statistics are off by default. You can turn them on in Settings › About.":
@@ -9423,7 +9629,7 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Select a reset credit below to preview its effect on the quota meters and timeline.":
     "选择下方任意重置卡，可实时在上方刻度格与下方 7 天泳道中预演恢复效果。",
   "Earliest expiry {date}": "最早到期 {date}",
-  "Use {label}": "在 T3 中使用「{label}」",
+  "Use {label}": "在星尘中使用「{label}」",
   "Confirm spending 1 {label}? This cannot be undone.":
     "二次确认：立即核销 1 张「{label}」？核销后不可撤销。",
   "Confirm reset now": "确认立即重置",
@@ -9700,17 +9906,19 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Next message will use {provider}; default model unchanged":
     "下一条起将使用 {provider}，不改默认模型",
   "Average throughput {rate} tok/s": "平均吞吐 {rate} 令牌/秒",
-  "Only counts conversations run in T3": "仅统计在 T3 中运行的对话",
+  "Only counts conversations run in T3": "仅统计在星尘中运行的对话",
+  "Only counts conversations run in Stardust": "仅统计在星尘中运行的对话",
   "Fast & Low-cost": "极速低价",
   "Low-cost": "低价",
-  "T3 Stardust {tag} is available": "T3 星尘版 {tag} 已发布",
-  "T3 Stardust counts active users anonymously": "T3 星尘版会匿名统计活跃人数",
-  "Once a day it sends a random install ID, the app version and your system type. No chats, accounts, projects or IP addresses are stored. You can turn it off any time in Settings → About.":
-    "每天发送一次随机安装 ID、应用版本和系统类型，不保存聊天、账号、项目或 IP 地址。可以随时在「设置 → 关于」里关闭。",
+  "Stardust {version}": "星尘 {version}",
+  "Stardust {tag} is available": "星尘 {tag} 已发布",
+  "Stardust counts active users anonymously": "星尘会匿名统计活跃人数",
+  "Once a day it sends a random install ID, app version, OS type and CPU architecture. No chats, accounts, projects or IP addresses are stored. You can turn it off any time in Settings → About.":
+    "每天发送一次随机安装 ID、版本、系统类型和 CPU 架构，不保存聊天、账号、项目或 IP 地址。可以随时在「设置 → 关于」里关闭。",
   "Turn off": "关闭统计",
-  "Count me as an active Stardust user": "计入星尘版活跃用户",
-  "On by default. Once a day sends a random install ID, the app version and your system type to xiaoxin666.cn so the author knows how many people use T3 Stardust. No chats, accounts, projects or IP addresses are stored.":
-    "默认开启。每天向 xiaoxin666.cn 发送一次随机安装 ID、应用版本和系统类型，让作者知道有多少人在用 T3 星尘版。不保存聊天、账号、项目或 IP 地址。",
+  "Count me as an active Stardust user": "计入星尘活跃用户",
+  "On by default. Sends a random install ID, app version, OS type and CPU architecture to xiaoxin666.cn once a day.":
+    "默认开启。每天向 xiaoxin666.cn 发送一次随机安装 ID、版本、系统类型和 CPU 架构。",
   "{version} available · {action}": "发现 {version}；{action}",
   "Sending when ready": "就绪后发送",
   "Sending message": "正在发送消息",
@@ -9788,8 +9996,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Agent temporary folders": "智能体临时目录",
   "AI session transcripts": "AI 会话记录",
   "Rollback copies and build backups": "改造与构建备份",
-  "System cache lists come from the preview of the open-source tool Mole (tw93/Mole, GPL-3.0). T3 Stardust carries out the removal and supports undo. This feature is not affiliated with the Mole project.":
-    "系统缓存清单来自开源工具 Mole（tw93/Mole，GPL-3.0）的预览结果，由 T3 Stardust 执行并支持撤销。本功能与 Mole 项目无隶属关系。",
+  "System cache lists come from the preview of the open-source tool Mole (tw93/Mole, GPL-3.0). Stardust carries out the removal and supports undo. This feature is not affiliated with the Mole project.":
+    "系统缓存清单来自开源工具 Mole（tw93/Mole，GPL-3.0）的预览结果，由星尘执行并支持撤销。本功能与 Mole 项目无隶属关系。",
   "Deletion is decided by fixed rules, not by an AI model.":
     "删除由固定规则决定，不由 AI 模型决定。",
   "Safe to clean": "放心清",
@@ -9858,7 +10066,8 @@ export const zhCN: Readonly<Record<string, string>> = {
     "请保持本页打开。每一项在动手前都会重新检查一遍。",
   "Set My build folder in the preferences below to include older builds and rollback copies.":
     "在下方偏好里设置「我的构建目录」，就能把历史构建和回滚备份也纳入。",
-  "T3 data": "T3 数据",
+  "T3 data": "星尘数据",
+  "Stardust data": "星尘数据",
   "User app caches": "用户应用缓存",
   "App caches": "应用缓存",
   "Browser caches": "浏览器缓存",
@@ -9885,7 +10094,7 @@ export const zhCN: Readonly<Record<string, string>> = {
     "无需恢复，下次安装或构建会自动补上。",
   "Not merged": "未合并",
   "A checked-out copy of a repository that an agent worked in.": "智能体工作时检出的仓库副本。",
-  "T3 Stardust worktree": "T3 Stardust 工作树",
+  "Stardust worktree": "星尘工作树",
   "Its branch is merged and nothing in it is uncommitted, so every change already lives in git.":
     "它的分支已合并，里面也没有未提交的内容，所有改动都已保存在 git 里。",
   "It has no uncommitted changes, but its branch is not merged yet or it was used in the last 3 days. Commits stay in git; only this folder goes to Trash.":
@@ -9905,9 +10114,13 @@ export const zhCN: Readonly<Record<string, string>> = {
     "旧会话记录只有想回看时才用得上，压缩后体积会小很多。",
   "A compressed copy goes to the rescue folder first, and the originals can be put back while they are in Trash.":
     "先把压缩副本存进抢救目录，原文件在废纸篓期间也能放回。",
-  "T3 chat database and attachments": "T3 聊天数据库与附件",
-  "Managed by T3 itself": "由 T3 自己管理",
-  "The database and attachments behind your T3 conversations.": "你的 T3 对话背后的数据库和附件。",
+  "T3 chat database and attachments": "星尘聊天数据库与附件",
+  "Stardust chat database and attachments": "星尘聊天数据库与附件",
+  "Managed by T3 itself": "由星尘自己管理",
+  "Managed by Stardust itself": "由星尘自己管理",
+  "The database and attachments behind your T3 conversations.": "你的星尘对话背后的数据库和附件。",
+  "The database and attachments behind your Stardust conversations.":
+    "你的星尘对话背后的数据库和附件。",
   "Removing these would delete conversations, so this page never touches them. Use Maintenance settings to compact or archive.":
     "删除它们会丢失对话，所以本页绝不会动。需要压缩或归档，请到「维护」设置。",
   "Agent temporary folders in /tmp": "/tmp 里的智能体临时目录",
@@ -9991,4 +10204,218 @@ export const zhCN: Readonly<Record<string, string>> = {
     "存储 磁盘 空间 清理 扫描 缓存 Mole worktree 会话记录 备份 构建 废纸篓 放心清 看一眼 抢救",
   "There is not enough free space to save a rescue copy first, so it was kept":
     "剩余空间太少，无法先存抢救副本，已保留原件",
+  // Copy introduced by the November 2026 upstream merge.
+  "Waiting in the original thread": "正在原始对话中等待",
+  "Closed without sending": "已关闭，未发送",
+  Bug: "错误",
+  Confusing: "难以理解",
+  "Missing capability": "缺少功能",
+  "Wrong docs": "文档有误",
+  Kind: "类型",
+  Expected: "预期行为",
+  Happened: "实际情况",
+  "Did instead": "替代做法",
+  "{speaker} · {count} characters": "{speaker} · {count} 个字符",
+  "Turn {turn} · {what}": "第 {turn} 轮 · {what}",
+  "Outline of {turns, plural, one {{turns} recent turn} other {{turns} recent turns}}, {textTurns, plural, =0 {no message text} one {message text of the last turn} other {message text of the last {textTurns} turns}}{truncated, select, yes {, shortened to fit} other {}}":
+    "{turns, plural, one {最近 {turns} 轮的概要} other {最近 {turns} 轮的概要}}，{textTurns, plural, =0 {不含消息文本} one {包含最后一轮的消息文本} other {包含最近 {textTurns} 轮的消息文本}}{truncated, select, yes {，已缩短以符合长度限制} other {}}",
+  "Could not send your answer. Try again.": "无法发送你的回答。请重试。",
+  "No longer registered on this server": "已不再注册到此服务器",
+  "Runs as part of other workflows": "作为其他工作流的一部分运行",
+  "Started by hand": "手动启动",
+  "Starts on {triggers}": "由 {triggers} 触发启动",
+  "Needs you": "等你处理",
+  Sleeping: "休眠中",
+  "Asks: {question} and {more} more": "提问：{question}，另有 {more} 个",
+  "Asks: {question}": "提问：{question}",
+  "A step failed": "有步骤失败",
+  "Running its own steps": "正在运行自身的步骤",
+  "{step} is working": "{step} 正在运行",
+  "Sleeping at {step}": "在 {step} 休眠中",
+  "Runs {run}": "运行 {run}",
+  "{count} runs under way": "{count} 个运行进行中",
+  "Waiting for {step}": "正在等待 {step}",
+  "Ended early": "提前结束",
+  "{host} sent a server configuration update this client could not read.":
+    "{host} 发送了此客户端无法读取的服务器配置更新。",
+  "{host} sent an incompatible server configuration.": "{host} 发送了不兼容的服务器配置。",
+  "Update the client and server to compatible versions.": "请将客户端和服务器更新到兼容的版本。",
+  "Loading {provider} plugins": "正在加载 {provider} 插件",
+  "Starting {provider} MCP servers": "正在启动 {provider} MCP 服务器",
+  "Loading {provider} hooks": "正在加载 {provider} 钩子",
+  "Loading {provider} rules and skills": "正在加载 {provider} 规则和技能",
+  "Step of the workflow run": "工作流运行的步骤",
+  "Open run": "打开运行",
+  "Open workflows": "打开工作流",
+  "Projects: {projects}": "项目：{projects}",
+  "Feedback for the T3 team": "给 T3 团队的反馈",
+  "Send this report to the T3 team?": "将这份报告发送给 T3 团队？",
+  "This is everything that leaves your machine. Nothing is sent unless you press Send.":
+    "只有这些内容会从你的机器发送出去。点击“发送”前，不会发送任何内容。",
+  "Include the conversation": "包含对话",
+  "Adds the text of your messages and the agent's replies in the last {textTurns, plural, one {turn} other {{textTurns} turns}}.":
+    "添加你在最近 {textTurns} 轮中的消息和智能体回复的文本。",
+  "Only someone who can run agents on this machine can send or decline it.":
+    "只有能在这台机器上运行智能体的人，才能发送或拒绝这份报告。",
+  "Don't send": "不发送",
+  "The file is still loading. Try again in a moment.": "文件仍在加载中。请稍后重试。",
+  "When I ask": "当我要求时",
+  "Agents send no feedback to the T3 team.": "智能体不会向 T3 团队发送反馈。",
+  "When you ask, agents show you a short report about T3 Code and send it to the T3 team if you approve.":
+    "当你要求时，智能体会向你展示一份关于 T3 Code 的简短报告，经你批准后发送给 T3 团队。",
+  "Agents also report T3 Code problems they hit on their own, such as a T3 tool that failed.":
+    "智能体还会主动报告自己遇到的 T3 Code 问题，例如 T3 工具运行失败。",
+  "Run multi-step workflows from files in the workflows folder of this server's T3 home. Open them from the command palette. While off, nothing in that folder runs; runs wait until it is on again.":
+    "从此服务器 T3 主目录下 workflows 文件夹中的文件运行多步骤工作流。可从命令面板打开。关闭期间，该文件夹中的内容都不会运行；运行会等到重新开启后继续。",
+  Workflows: "工作流",
+  "The selected machines use different agent feedback modes.": "所选机器使用的智能体反馈模式不同。",
+  "Agent feedback": "智能体反馈",
+  "Forget {label}? Agents here stop working there, and their session on {label} ends too if it answers.":
+    "忘记 {label}？此处的代理将不再在那里工作；如果 {label} 有响应，它们在那里的会话也会结束。",
+  "{label} did not answer": "{label} 没有响应",
+  "Revoke \"T3 Code · …\" in {label}''s Sharing & access to end the session there too.":
+    "在 {label} 的“共享与访问”中撤销“T3 Code · …”，以同时结束那里的连接。",
+  "beta workflow durable runs automation steps schedule webhook folder":
+    "测试版 工作流 workflow 持久 运行 自动化 步骤 计划 webhook 文件夹",
+  "report bug problem t3 team send feedback agents tools automatic when i ask":
+    "报告 错误 问题 t3 团队 发送 反馈 智能体 工具 自动 当我要求时",
+  "Leave without saving? Your changes to this file are lost.":
+    "不保存就离开？对此文件的更改将丢失。",
+  "Unsaved changes": "未保存的更改",
+  "Saved and running": "已保存并生效",
+  "The file on disk does not load. The last version that did keeps running.":
+    "磁盘上的文件无法加载。上一个可加载的版本会继续运行。",
+  "Saved, but it does not run yet.": "已保存，但尚未运行。",
+  "Not saved. Nothing changed on the server.": "未保存。服务器上没有任何更改。",
+  "Could not save": "无法保存",
+  "{name} is not connected": "{name} 未连接",
+  "Its workflows show again when it reconnects. Pick another environment to see its runs.":
+    "重新连接后，它的工作流会再次显示。选择其他环境可查看其运行。",
+  "Could not read the workflow files": "无法读取工作流文件",
+  "Delete {file}? The workflows it defines can no longer be started.":
+    "要删除 {file} 吗？它定义的工作流将无法再启动。",
+  "{name} is not connected. What you write here stays, and saves once it is back.":
+    "{name} 未连接。你在这里写的内容会保留，重新连接后即可保存。",
+  "Deleted, but what runs has not caught up yet.": "已删除，但正在运行的内容尚未更新。",
+  "Not deleted. Nothing changed on the server.": "未删除。服务器上没有任何更改。",
+  "These files do not fit together. What ran before keeps running.":
+    "这些文件彼此不匹配。之前的版本会继续运行。",
+  "File name": "文件名",
+  "Defines no workflows": "未定义任何工作流",
+  "The file changed on disk while you were editing. Saving replaces that change.":
+    "编辑期间磁盘上的文件发生了变化。保存会覆盖该变化。",
+  "Load the file and drop my changes": "加载该文件并放弃我的更改",
+  "Loading the workflow files…": "正在加载工作流文件…",
+  "New file": "新建文件",
+  "No workflows yet. Make the first file here, or ask an agent to write one in that folder.":
+    "还没有工作流。在这里创建第一个文件，或让智能体在该文件夹中编写一个。",
+  "Does not load": "无法加载",
+  "Open beside the run": "在运行旁打开的内容",
+  "Close tab": "关闭标签页",
+  "Open as a full thread": "作为完整会话打开",
+  "Open on its own page": "在单独的页面打开",
+  "Close the pane": "关闭面板",
+  "This run no longer lists it.": "此运行不再列出它。",
+  "{count, plural, =1 {1st try} =2 {2nd try} =3 {3rd try} other {{count}th try}}":
+    "{count, plural, =1 {第 1 次尝试} =2 {第 2 次尝试} =3 {第 3 次尝试} other {第 {count} 次尝试}}",
+  "Could not resume the run": "无法继续此运行",
+  "Cancel {title}? Its agents stop and the run cannot be resumed.":
+    "要取消 {title} 吗？其智能体将停止，且此运行无法再继续。",
+  "Could not cancel the run": "无法取消此运行",
+  "Back to the list of runs": "返回运行列表",
+  "Cancel run": "取消运行",
+  "took {duration}": "用时 {duration}",
+  "{duration} so far": "已用时 {duration}",
+  "What the run touched": "此运行涉及的内容",
+  "What happened": "经过",
+  "{names} and {count} more": "{names} 等另外 {count} 个",
+  "{count} in parallel": "{count} 个并行",
+  "{count} running": "{count} 个运行中",
+  "Asks you": "向你提问",
+  "Steps so far": "目前的步骤",
+  "waits for your approval": "等待你的批准",
+  working: "工作中",
+  "wakes in {duration}": "{duration} 后唤醒",
+  "about to wake": "即将唤醒",
+  "nobody answered": "无人回答",
+  "You said {choice}": "你的回答：{choice}",
+  "Quick steps": "快速步骤",
+  slept: "已休眠",
+  waited: "已等待",
+  "running for {duration}": "已运行 {duration}",
+  "Watch live": "实时查看",
+  Transcript: "对话记录",
+  "cannot go on until its workflow version is registered again": "需重新注册其工作流版本后才能继续",
+  "waits for you to resume it": "等你手动继续",
+  "tries again by itself in {duration}": "{duration} 后自动重试",
+  "about to try again by itself": "即将自动重试",
+  "Why it paused": "暂停原因",
+  "Paused at {step}": "暂停于 {step}",
+  "Could not answer the question": "无法回答此问题",
+  "Reason for {title}": "{title} 的理由",
+  "Why, in a sentence. It goes with whichever answer you pick.":
+    "用一句话说明理由。无论你选哪个回答，它都会一并附上。",
+  Runs: "运行",
+  "its version is no longer registered": "其版本已不再注册",
+  "Nothing yet.": "暂无内容。",
+  "Only the failed step runs again; what finished before it is kept.":
+    "只会重新运行失败的步骤；此前已完成的内容会保留。",
+  "Add a reason": "添加理由",
+  "Ask the agent first": "先问问智能体",
+  "Nothing waits on you.": "没有等你处理的内容。",
+  "Nothing is running.": "没有正在运行的内容。",
+  "No runs yet.": "还没有运行。",
+  "Could not load workflow runs": "无法加载工作流运行",
+  "This run is not here": "此运行不在这里",
+  "No workflow runs yet": "还没有工作流运行",
+  "Which runs": "显示哪些运行",
+  Workflow: "工作流",
+  "All {count} workflows": "全部 {count} 个工作流",
+  "Workflow runs": "工作流运行",
+  "Has not run yet.": "尚未运行过。",
+  "Hide skipped": "隐藏已跳过",
+  "Show {count} skipped": "显示 {count} 个已跳过",
+  "Loading workflow runs…": "正在加载工作流运行…",
+  "Open the file": "打开文件",
+  "All workflows": "全部工作流",
+  "{step} · transcript": "{step} · 记录",
+  "This thread is no longer there.": "此会话已不存在。",
+  "Loading the thread…": "正在加载会话…",
+  "Workflows breadcrumb": "工作流面包屑导航",
+  "Workflows are off": "工作流已关闭",
+  "No environment connected": "未连接任何环境",
+  "Connect an environment to see its workflow runs.": "连接一个环境以查看其工作流运行。",
+  "Beside the run": "运行旁",
+  Definitions: "定义",
+  "Loading the editor…": "正在加载编辑器…",
+  "Another account": "其他账号",
+  "Connect a second {tracker} workspace or user.": "连接第二个 {tracker} 工作区或用户。",
+  "For the new {tracker} account.": "用于新的 {tracker} 账号。",
+  "Add account": "添加账号",
+  "Connect an environment to see limits.": "连接环境后即可查看额度。",
+  "Connect an environment to see usage.": "连接环境后即可查看用量。",
+  "Select an environment to see limits.": "选择环境后即可查看额度。",
+  "Select an environment to see usage.": "选择环境后即可查看用量。",
+  "{environment}: {error}": "{environment}：{error}",
+  "Adds this side chat to the main thread's next message.": "把本次侧聊加到主会话的下一条消息。",
+  "Available after the first message.": "发送第一条消息后可用。",
+  "Delete side chat": "删除侧聊",
+  "Close side chat": "关闭侧聊",
+  "This side chat was deleted.": "这次侧聊已删除。",
+  "This thread is no longer available.": "此会话已不可用。",
+  'Delete side chat "{title}"?': "要删除侧聊「{title}」吗？",
+  "This permanently clears its conversation history.": "这会永久清除侧聊记录。",
+  "Could not delete the side chat": "无法删除侧聊",
+  "Upstream usage statistics": "上游使用统计",
+  "Disabled. Stardust does not send usage events to the upstream project.":
+    "已关闭。星尘不会向上游项目发送使用事件。",
+  "How Stardust handles your data.": "了解星尘如何处理你的数据。",
+  "T3 Connect uses the upstream project's relay when enabled. Stardust counts active installations using a random ID, app version, OS and CPU architecture.":
+    "启用 T3 Connect 后，星尘会使用上游项目的中继服务。星尘通过随机安装 ID、应用版本、操作系统和 CPU 架构统计活跃安装数。",
+  "Stardust Agent licenses": "星尘 Agent 许可",
+  "Stardust Agent’s MIT license, NOTICE, and third-party notices.":
+    "星尘 Agent 的 MIT 许可证、NOTICE 和第三方声明。",
+  "T3 Connect (third-party service operated by the upstream project)":
+    "T3 Connect（上游项目提供的第三方服务）",
+  "T3 Connect is not configured in this build.": "此版本未配置 T3 Connect。",
 };

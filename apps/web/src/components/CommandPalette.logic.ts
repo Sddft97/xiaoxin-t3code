@@ -6,6 +6,7 @@ import {
   rankSearchGroups,
   scoreSearchTerms,
   scoreThreadSearch,
+  threadRecentUse,
   type SearchMatchHint,
   type SearchRange,
   type ThreadSearchSubject,
@@ -468,6 +469,7 @@ export function buildThreadActionItems<TThread extends BuildThreadActionItemsThr
     environmentLabelOf?: (thread: TThread) => string | null;
     /** Tasks linked environments run for a listed thread; they open from under that thread. */
     delegatedUnderParent?: ReadonlySet<string>;
+    recentOnly?: boolean;
   },
   resolve: MessageResolver = m,
 ): CommandPaletteActionItem[] {
@@ -482,10 +484,35 @@ export function buildThreadActionItems<TThread extends BuildThreadActionItemsThr
         delegatedUnderParent,
       ),
   );
-  return visibleThreads.map((thread) => {
+  const threadsWithSearch = visibleThreads.map((thread) => {
     const projectTitle = input.projectByKey.get(
       `${thread.environmentId}:${thread.projectId}`,
     )?.title;
+    const isCurrent =
+      thread.id === input.activeThread?.id &&
+      thread.environmentId === input.activeThread.environmentId;
+    return {
+      thread,
+      projectTitle,
+      isCurrent,
+      search: threadSearchSubject(
+        {
+          ...thread,
+          latestUserMessageAt: thread.latestUserMessageAt ?? null,
+          opens: thread.opens ?? null,
+        },
+        projectTitle,
+        input.environmentLabelOf?.(thread),
+      ),
+    };
+  });
+  const rows = input.recentOnly
+    ? threadsWithSearch
+        .filter(({ isCurrent }) => !isCurrent)
+        .sort((left, right) => threadRecentUse(right.search) - threadRecentUse(left.search))
+        .slice(0, RECENT_THREAD_LIMIT)
+    : threadsWithSearch;
+  return rows.map(({ thread, projectTitle, isCurrent, search }) => {
     const descriptionParts: string[] = [];
     if (projectTitle) {
       descriptionParts.push(projectTitle);
@@ -493,9 +520,6 @@ export function buildThreadActionItems<TThread extends BuildThreadActionItemsThr
     if (thread.branch) {
       descriptionParts.push(`#${thread.branch}`);
     }
-    const isCurrent =
-      thread.id === input.activeThread?.id &&
-      thread.environmentId === input.activeThread.environmentId;
     if (isCurrent) {
       descriptionParts.push(resolve(msg("Current thread")));
     }
@@ -510,15 +534,7 @@ export function buildThreadActionItems<TThread extends BuildThreadActionItemsThr
         value: `thread:${thread.environmentId}:${thread.id}`,
         threadRef: { environmentId: thread.environmentId, threadId: thread.id },
         searchTerms: [thread.title],
-        threadSearch: threadSearchSubject(
-          {
-            ...thread,
-            latestUserMessageAt: thread.latestUserMessageAt ?? null,
-            opens: thread.opens ?? null,
-          },
-          projectTitle,
-          input.environmentLabelOf?.(thread),
-        ),
+        threadSearch: search,
         title: thread.title,
         description,
         timestamp: formatRelativeTimeLabel(

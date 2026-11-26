@@ -1,7 +1,38 @@
-html[data-platform="windows"] {
-  --font-sans: "Segoe UI Variable", "Segoe UI", "Microsoft YaHei UI", system-ui, sans-serif;
+html:root[data-platform="windows"] {
+  --font-sans:
+    "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", system-ui,
+    sans-serif;
+  --font-mono: "Cascadia Mono", Consolas, monospace;
 }
-html[data-platform="windows"] [class*="quota-topbar"] {
+
+html:root[data-interface-style="windows"] [data-slot="sidebar-container"][data-app-sidebar] {
+  padding: 0;
+}
+
+html:root[data-interface-style="windows"] [data-slot="sidebar-inner"] {
+  border-radius: 0;
+}
+
+html:root[data-interface-style="windows"] [data-slot="sidebar-inset"] {
+  border-start-start-radius: 8px;
+  box-shadow: -1px 0 0 var(--border);
+}
+
+@media (prefers-reduced-transparency: no-preference) {
+  html:root[data-interface-style="windows"][data-window-material="mica"],
+  html:root[data-interface-style="windows"][data-window-material="mica"] body,
+  html:root[data-interface-style="windows"][data-window-material="mica"]
+    [data-slot="sidebar-wrapper"] {
+    background: transparent;
+  }
+
+  html:root[data-interface-style="windows"][data-window-material="mica"]
+    [data-slot="sidebar-inner"] {
+    background: color-mix(in srgb, var(--sidebar) 76%, transparent);
+  }
+}
+
+html:root[data-platform="windows"] [class*="quota-topbar"] {
   background: var(--background);
   border-radius: 6px;
   box-shadow: none;

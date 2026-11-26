@@ -64,10 +64,16 @@ export function InboxQuickActions(props: {
     reportFailure: false,
   });
   const [menuOpen, setMenuOpen] = useState(false);
-  const presets = menuOpen
-    ? // oxlint-disable-next-line react/purity -- Presets are resolved only while the menu is open, so each opening reads a fresh time.
-      resolveSnoozePresets(new Date(), timestampFormat, threadRef.environmentId)
+  // Read the time once per opening and keep the items until the close finishes: clearing them
+  // on close would shrink the menu while it is still fading out.
+  const [presetsAt, setPresetsAt] = useState<Date | null>(null);
+  const presets = presetsAt
+    ? resolveSnoozePresets(presetsAt, timestampFormat, threadRef.environmentId)
     : [];
+  const changeMenuOpen = (open: boolean) => {
+    if (open) setPresetsAt(new Date());
+    setMenuOpen(open);
+  };
 
   const stop = (event: ReactMouseEvent) => {
     event.stopPropagation();
@@ -125,7 +131,7 @@ export function InboxQuickActions(props: {
               onClick(event);
             }}
             className={cn(
-              "inline-flex size-5.5 shrink-0 cursor-pointer items-center justify-center rounded-md text-sidebar-muted-foreground outline-none transition-colors hover:bg-foreground/8 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+              "inline-flex size-5.5 shrink-0 cursor-pointer items-center justify-center rounded-md text-sidebar-muted-foreground outline-none transition-[color,background-color,scale] duration-(--motion-press) ease-standard hover:bg-foreground/8 hover:text-sidebar-foreground active:scale-94 motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
               tone === "done" && "hover:bg-success/12 hover:text-success-foreground",
               tone === "stop" &&
                 "text-destructive-foreground/80 hover:bg-destructive/10 hover:text-destructive-foreground",
@@ -142,10 +148,15 @@ export function InboxQuickActions(props: {
   return (
     <span
       data-inbox-quick-actions={mode}
+      data-menu-open={menuOpen || undefined}
       className={cn(
-        // V14: sits in the space the title line gives up on hover (see WorkbenchInbox), never over text.
-        "pointer-events-none absolute top-1.5 right-1.5 flex h-5 items-center gap-px opacity-0 transition-opacity motion-reduce:transition-none",
-        "group-hover/inbox-row:pointer-events-auto group-hover/inbox-row:opacity-100 has-[:focus-visible]:pointer-events-auto has-[:focus-visible]:opacity-100",
+        // Sits where the row's time was; the title tail fades out beneath it (.workbench-row-fade).
+        "pointer-events-none absolute top-1.5 right-1.5 flex h-5 items-center gap-px opacity-0 transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none",
+        // Same trigger as the title fade and time (skins.css): hover, keyboard focus anywhere in
+        // the row, or an open menu. Touch has no hover, so the strip stays reachable there,
+        // except Stop, which must not sit under a thumb scrolling the list.
+        "group-hover/inbox-row:pointer-events-auto group-hover/inbox-row:opacity-100 group-has-[:focus-visible]/inbox-row:pointer-events-auto group-has-[:focus-visible]/inbox-row:opacity-100",
+        mode !== "running" && "pointer-coarse:pointer-events-auto pointer-coarse:opacity-100",
         menuOpen && "pointer-events-auto opacity-100",
       )}
     >
@@ -187,7 +198,13 @@ export function InboxQuickActions(props: {
       {mode === "finished" || mode === "done"
         ? iconButton("archive", text("Archive"), <ArchiveIcon className="size-3.5" />, archive)
         : null}
-      <Menu open={menuOpen} onOpenChange={setMenuOpen}>
+      <Menu
+        open={menuOpen}
+        onOpenChange={changeMenuOpen}
+        onOpenChangeComplete={(open) => {
+          if (!open) setPresetsAt(null);
+        }}
+      >
         <Tooltip>
           <TooltipTrigger
             render={
@@ -198,7 +215,7 @@ export function InboxQuickActions(props: {
                     aria-label={text("More")}
                     data-inbox-quick-action="more"
                     onClick={(event) => event.stopPropagation()}
-                    className="inline-flex size-5.5 shrink-0 cursor-pointer items-center justify-center rounded-md text-sidebar-muted-foreground outline-none transition-colors hover:bg-foreground/8 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                    className="inline-flex size-5.5 shrink-0 cursor-pointer items-center justify-center rounded-md text-sidebar-muted-foreground outline-none transition-colors duration-(--motion-press) ease-standard hover:bg-foreground/8 hover:text-sidebar-foreground active:bg-foreground/12 motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                   />
                 }
               />
@@ -243,7 +260,7 @@ export type InboxStatus = "running" | "needs-you" | "result" | "failed" | "done"
 const STATUS_DOT: Record<InboxStatus, string> = {
   running: "bg-info",
   "needs-you": "bg-warning",
-  result: "bg-warning",
+  result: "bg-success",
   failed: "bg-destructive",
   done: "bg-success",
 };
@@ -263,9 +280,10 @@ export function InboxStatusDot(props: {
   const { snoozeThread } = useThreadActions();
   const timestampFormat = useClientSettings((settings) => settings.timestampFormat);
   const [open, setOpen] = useState(false);
-  const presets = open
-    ? // oxlint-disable-next-line react/purity -- Presets are resolved only while the menu is open, so each opening reads a fresh time.
-      resolveSnoozePresets(new Date(), timestampFormat, props.threadRef.environmentId)
+  // As in the More menu: one time per opening, kept until the fade-out finishes.
+  const [presetsAt, setPresetsAt] = useState<Date | null>(null);
+  const presets = presetsAt
+    ? resolveSnoozePresets(presetsAt, timestampFormat, props.threadRef.environmentId)
     : [];
   const snooze = (presetId: string) => {
     const picked = pickSnoozePreset(
@@ -295,7 +313,16 @@ export function InboxStatusDot(props: {
     </span>
   );
   return (
-    <Menu open={open} onOpenChange={setOpen}>
+    <Menu
+      open={open}
+      onOpenChange={(next) => {
+        if (next) setPresetsAt(new Date());
+        setOpen(next);
+      }}
+      onOpenChangeComplete={(next) => {
+        if (!next) setPresetsAt(null);
+      }}
+    >
       <MenuTrigger
         render={
           <button
@@ -303,22 +330,24 @@ export function InboxStatusDot(props: {
             aria-label={text("Change task status")}
             data-inbox-status={current}
             onClick={(event) => event.stopPropagation()}
-            className="group/status-dot absolute top-1.5 left-0.5 z-10 grid size-5 cursor-pointer place-items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+            className="group/status-dot absolute start-0.75 top-1.5 z-10 grid size-5 cursor-pointer place-items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
           />
         }
       >
-        <span
-          aria-hidden
-          className={cn(
-            "size-1.5 rounded-full transition-[box-shadow,transform] group-hover/status-dot:scale-125 group-hover/status-dot:ring-3 group-hover/status-dot:ring-current/20",
-            STATUS_DOT[current],
-            current === "done"
-              ? "text-success"
-              : current === "running"
-                ? "text-primary"
-                : "text-warning",
-          )}
-        />
+        <span aria-hidden data-sidebar-status-slot className="grid w-3.5 place-items-center">
+          <span
+            className={cn(
+              // The dot keeps its hover look while its menu is open, so the menu reads as the dot's.
+              "size-1.5 rounded-full transition-[box-shadow,scale,background-color] duration-(--motion-hover) ease-standard motion-reduce:transition-none group-hover/status-dot:scale-125 group-hover/status-dot:ring-3 group-hover/status-dot:ring-current/20 group-data-popup-open/status-dot:scale-125 group-data-popup-open/status-dot:ring-3 group-data-popup-open/status-dot:ring-current/20",
+              STATUS_DOT[current],
+              current === "done" || current === "result"
+                ? "text-success"
+                : current === "running"
+                  ? "text-primary"
+                  : "text-warning",
+            )}
+          />
+        </span>
       </MenuTrigger>
       <MenuPopup side="bottom" align="start">
         <MenuItem disabled>

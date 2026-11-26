@@ -4,8 +4,7 @@ import {
   type AssistantCitation,
   type ScopedThreadRef,
 } from "@t3tools/contracts";
-import { useGT } from "gt-react";
-import { QuoteIcon } from "lucide-react";
+import { MessageSquarePlusIcon, QuoteIcon } from "lucide-react";
 import { use, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -18,6 +17,7 @@ import {
   resolveSelectionActionPosition,
   type SelectionActionPoint,
 } from "~/lib/selectionActions";
+import { useUiText } from "~/i18n/useUiText";
 import { Button } from "../ui/button";
 import { BackgroundThreadContext } from "./backgroundThread";
 
@@ -25,28 +25,39 @@ export function AssistantSelectionToolbar({
   viewport,
   threadRef,
   onCite,
+  onAskInSideChat,
 }: {
   viewport: HTMLElement | null;
   threadRef: ScopedThreadRef;
   onCite: (citation: AssistantCitation, sourceAnchor: AssistantCitationSourceAnchor) => boolean;
+  onAskInSideChat?: ((citation: AssistantCitation) => void) | undefined;
 }) {
   const [selection, setSelection] = useState<{
     citation: AssistantCitation;
-    position: SelectionActionPoint;
+    x: number;
+    top: number;
+    bottom: number;
     sourceAnchor: AssistantCitationSourceAnchor;
   } | null>(null);
-  const toolbarRef = useRef<HTMLButtonElement>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const actionsRef = useRef<ReturnType<typeof observeSelectionActions> | null>(null);
   const backgroundThread = use(BackgroundThreadContext);
-  const gt = useGT();
+  const uiText = useUiText();
 
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- measures the toolbar DOM node and clamps its position inside the window before paint
   useLayoutEffect(() => {
     const toolbar = toolbarRef.current;
     if (!toolbar || !selection) return;
     const rect = toolbar.getBoundingClientRect();
-    toolbar.style.left = `${Math.max(8, Math.min(selection.position.x, window.innerWidth - rect.width - 8))}px`;
-    toolbar.style.top = `${Math.max(8, Math.min(selection.position.y, window.innerHeight - rect.height - 8))}px`;
+    const gap = 6;
+    const inset = 8;
+    const above = selection.top - rect.height - gap;
+    const below = selection.bottom + gap;
+    const fitsAbove = above >= inset;
+    const fitsBelow = below + rect.height <= window.innerHeight - inset;
+    toolbar.style.left = `${Math.max(inset, Math.min(selection.x, window.innerWidth - rect.width - inset))}px`;
+    toolbar.style.top = `${fitsAbove ? above : below}px`;
+    toolbar.style.visibility = fitsAbove || fitsBelow ? "visible" : "hidden";
   }, [selection]);
 
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- subscribes to document selectionchange and keydown to track text selections in the viewport
@@ -131,12 +142,14 @@ export function AssistantSelectionToolbar({
           messageId: MessageId.make(messageId),
           ...captured.selector,
         },
-        position: resolveSelectionActionPosition({
+        top: rect.top,
+        bottom: rect.bottom,
+        x: resolveSelectionActionPosition({
           bounds: viewportRect,
           selectionRect: rects.item(rects.length - 1) ?? rect,
           pointer: pointerOnText ? pointer : null,
           viewport: { width: window.innerWidth, height: window.innerHeight },
-        }),
+        }).x,
       });
     };
     const actions = observeSelectionActions({
@@ -158,15 +171,16 @@ export function AssistantSelectionToolbar({
         event.metaKey ||
         event.isComposing ||
         event.defaultPrevented ||
-        !toolbar ||
+        !toolbar?.checkVisibility({ visibilityProperty: true }) ||
         toolbar.contains(event.target as Node)
       ) {
         return;
       }
-      if (toolbar.disabled) return;
+      const firstAction = toolbar.querySelector<HTMLButtonElement>("button:enabled");
+      if (!firstAction) return;
       event.preventDefault();
       event.stopPropagation();
-      toolbar.focus({ preventScroll: true });
+      firstAction.focus({ preventScroll: true });
     };
     // Tab belongs to the foreground chat; a background timeline only follows its selection.
     if (!backgroundThread) document.addEventListener("keydown", focusActions, true);
@@ -191,18 +205,20 @@ export function AssistantSelectionToolbar({
     dismiss();
     return true;
   };
+  const askInSideChat = () => {
+    if (tooLong || !onAskInSideChat) return;
+    onAskInSideChat(selection.citation);
+    window.getSelection()?.removeAllRanges();
+    dismiss();
+  };
   return createPortal(
-    <Button
+    <div
       ref={toolbarRef}
-      type="button"
-      size="xs"
-      variant="glass"
-      disabled={tooLong}
-      aria-label={tooLong ? gt("Selection is too long to cite") : gt("Cite selection in composer")}
-      className="fixed z-50 max-w-[calc(100vw-1rem)]"
-      style={{ left: selection.position.x, top: selection.position.y }}
+      role="group"
+      aria-label={uiText("Cite selection in composer")}
+      className="fixed z-50 flex max-w-[calc(100vw-1rem)] gap-1"
+      style={{ left: selection.x }}
       onPointerDown={(event) => event.preventDefault()}
-      onClick={cite}
       onKeyDown={(event) => {
         event.stopPropagation();
         if (event.key === "Escape" && !event.nativeEvent.isComposing) {
@@ -211,11 +227,26 @@ export function AssistantSelectionToolbar({
         }
       }}
     >
-      <QuoteIcon aria-hidden="true" className="size-3.5" />
-      {tooLong
-        ? gt("Shorten selection")
-        : gt("Cite", { $context: "verb, button that quotes the selected text" })}
-    </Button>,
+      <Button
+        type="button"
+        size="xs"
+        variant="glass"
+        disabled={tooLong}
+        aria-label={
+          tooLong ? uiText("Selection is too long to cite") : uiText("Cite selection in composer")
+        }
+        onClick={cite}
+      >
+        <QuoteIcon aria-hidden="true" className="size-3.5" />
+        {tooLong ? uiText("Shorten selection") : uiText("Cite")}
+      </Button>
+      {onAskInSideChat && !tooLong ? (
+        <Button type="button" size="xs" variant="glass" onClick={askInSideChat}>
+          <MessageSquarePlusIcon aria-hidden="true" className="size-3.5" />
+          {uiText("Ask in side chat")}
+        </Button>
+      ) : null}
+    </div>,
     document.body,
   );
 }

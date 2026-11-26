@@ -1,13 +1,14 @@
 /* Clerk injects its component styles into the clerk layer (clerkAppearance.cssLayerName). */
 @layer theme, base, clerk, components, utilities;
 @import "tailwindcss";
-@import "./windowsProfile.css";
 @import "./liquidGlass.css";
 @import "./skins.css";
 @import "./components/chat/taskPlanCapsule.css";
 @import "./components/chat/cosmicEffortSlider.css";
 @import "./components/chat/taskCommandActivities.css";
 @import "./themes/apple.css";
+@import "./themes/stardust.css";
+@import "./windowsProfile.css";
 @import "./components/usage/usagePresentation.css";
 
 @custom-variant dark (&:is(.dark, .dark *));
@@ -98,6 +99,30 @@ html[data-mobile-composer-route-transition="true"]::view-transition-old(t3-mobil
 
 :root {
   --app-scrollbar-width: 6px;
+  /*
+   * One motion language. Every state change picks one row; nothing invents its own curve.
+   *   press   80ms  standard  pressed rows and buttons
+   *   hover  120ms  standard  hover reveals, colour and tint changes
+   *   swap   160ms  standard  a mark changing meaning (status glyph to another)
+   *   exit   180ms  exit      departures and collapses; leaving is quicker than arriving
+   *   enter  220ms  standard  arrivals and rows making room (FLIP)
+   *   expand 240ms  standard  disclosures opening, chevrons turning, progress advancing
+   *   pop    240ms  pop       two-frame scale-ins only (a three-frame bounce uses standard)
+   * Motion moves transform and opacity. Two deliberate exceptions change layout per frame, both
+   * bounded and measured against the baseline: a disclosure folding (grid-template-rows) and a
+   * leaving last row folding its height (nothing below it can glide instead).
+   * Mirrored for script-driven animations in lib/workbenchMotion.ts (MOTION).
+   */
+  --motion-ease-standard: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-ease-exit: cubic-bezier(0.4, 0, 0.85, 0.6);
+  --motion-ease-pop: cubic-bezier(0.22, 1.16, 0.36, 1);
+  --motion-press: 80ms;
+  --motion-hover: 120ms;
+  --motion-swap: 160ms;
+  --motion-exit: 180ms;
+  --motion-enter: 220ms;
+  --motion-expand: 240ms;
+  --motion-pop: 240ms;
   --appearance-contrast-base: 100%;
   --appearance-contrast-boost: 0%;
   --appearance-contrast-border-boost: 0%;
@@ -212,6 +237,9 @@ html[data-mobile-composer-route-transition="true"]::view-transition-old(t3-mobil
   --inset-shadow-control-highlight: 0 1px rgb(255 255 255 / 16%);
   --inset-shadow-control-pressed: 0 1px rgb(0 0 0 / 8%);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-standard: var(--motion-ease-standard);
+  --ease-exit: var(--motion-ease-exit);
+  --ease-pop: var(--motion-ease-pop);
   /* The composer's elevation: a soft drop pulled in under the surface, shared
      by the composer, its context strip and attached banners. */
   --shadow-composer: 0 1px 2px rgb(0 0 0 / 5%);
@@ -250,6 +278,10 @@ html[data-mobile-composer-route-transition="true"]::view-transition-old(t3-mobil
   --animate-stash-pulse-row: stash-pulse-row 1400ms;
   --animate-stash-pulse-row-alt: stash-pulse-row-alt 1400ms;
   --animate-stash-pulse-count: stash-pulse-count 1400ms step-start;
+  /* One-off arrivals in a workflow run's timeline; nothing here loops. */
+  --animate-step-in: step-in 180ms ease-out;
+  --animate-step-ping: step-ping 520ms ease-out;
+  --animate-check-draw: check-draw 200ms ease-out;
   --color-warning-foreground: var(--warning-foreground);
   --color-warning: var(--warning);
   --color-warning-surface: var(--warning-surface);
@@ -306,6 +338,7 @@ html[data-mobile-composer-route-transition="true"]::view-transition-old(t3-mobil
   --color-sidebar-row-hover: var(--sidebar-row-hover);
   --color-sidebar-row-active: var(--sidebar-row-active);
   --color-sidebar-row-selected: var(--sidebar-row-selected);
+  --color-sidebar-running-dot: light-dark(var(--color-orange-600), var(--color-orange-400));
   --color-sidebar-border: var(--contrast-sidebar-border);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -348,6 +381,27 @@ html[data-mobile-composer-route-transition="true"]::view-transition-old(t3-mobil
     from,
     85.7% {
       color: var(--color-primary);
+    }
+  }
+  @keyframes step-in {
+    from {
+      opacity: 0;
+      translate: 0 4px;
+    }
+  }
+  @keyframes step-ping {
+    from {
+      opacity: 0.55;
+      scale: 0.7;
+    }
+    to {
+      opacity: 0;
+      scale: 1.45;
+    }
+  }
+  @keyframes check-draw {
+    from {
+      stroke-dashoffset: 12;
     }
   }
   @keyframes status-ping {

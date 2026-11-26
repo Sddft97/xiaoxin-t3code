@@ -75,17 +75,20 @@ export const useStardustStats = create<StardustStatsState>((set, get) => {
       if (pending) return pending;
       if (!isElectron || !shouldSendBeat(get(), Date.now())) return Promise.resolve();
       pending = (async () => {
+        const architecture = await cpuArchitecture();
+        if (!shouldSendBeat(get(), Date.now())) return;
         const beat = buildBeat({
           preferences: get(),
           tag: COMMUNITY_BASE_TAG,
           platform: window.desktopBridge?.getClientPlatform(),
-          architecture: await cpuArchitecture(),
+          architecture,
         });
         if (!beat) return;
         try {
           const response = await fetch(STARDUST_STATS_ENDPOINT, {
             method: "POST",
             credentials: "omit",
+            redirect: "error",
             referrerPolicy: "no-referrer",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(beat),

@@ -168,7 +168,12 @@ export function ComposerControlsBar(props: {
     promptUltrathink,
     onPromptEdit,
   });
-  const effort = describeComposerEffort(traitsInput, props.effortDisplay, controlSize);
+  const effort = describeComposerEffort(
+    traitsInput,
+    props.effortDisplay,
+    controlSize,
+    unifiedModelPicker,
+  );
   const restingBlockDefs = showModeBlock
     ? [
         {
@@ -194,6 +199,7 @@ export function ComposerControlsBar(props: {
         ? {
             triggerSuffix: effort.suffix,
             triggerDetail: effort.detail,
+            ...(effort.level === undefined ? {} : { triggerEffortLevel: effort.level }),
             triggerShortcuts: pickerOwnsModeShortcut
               ? "composer.effort composer.mode"
               : "composer.effort",

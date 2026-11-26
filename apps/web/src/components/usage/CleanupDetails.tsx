@@ -1,7 +1,7 @@
 import { serverCopy } from "~/i18n/serverCopy";
 import { uiText } from "../../i18n";
 import { Tooltip, TooltipTrigger, TooltipPopup } from "../ui/tooltip";
-import { useTheme } from "../../hooks/useTheme";
+import { useAppleMaterialTheme } from "../../hooks/useTheme";
 import { useState } from "react";
 import type { StorageActionInput, StorageInspection } from "@t3tools/contracts";
 import { Button } from "../ui/button";
@@ -53,8 +53,7 @@ export function CleanupDetails({
     | undefined;
   onSelect: (id: string) => void;
 }) {
-  const { theme } = useTheme();
-  const apple = theme === "apple";
+  const apple = useAppleMaterialTheme();
   const [volumePath, setVolumePath] = useState("");
   const [category, setCategory] = useState<string | null>(null);
   const volume =

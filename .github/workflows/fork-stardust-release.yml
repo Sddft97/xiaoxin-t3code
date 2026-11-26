@@ -14,7 +14,7 @@ on:
 
 permissions:
   contents: write
-  actions: read
+  actions: write
   issues: write
 
 concurrency:
@@ -82,6 +82,7 @@ jobs:
       - name: Merge the released source without changing fork features
         if: steps.version.outputs.skip != 'true'
         env:
+          GH_TOKEN: ${{ github.token }}
           UPSTREAM_COMMIT: ${{ steps.version.outputs.upstream_commit }}
           UPSTREAM_TAG: ${{ steps.version.outputs.upstream_tag }}
         shell: bash
@@ -99,6 +100,7 @@ jobs:
             fi
             git merge --no-ff "$UPSTREAM_COMMIT" -m "chore: merge Stardust $UPSTREAM_TAG into the fork"
             git push origin main
+            gh workflow run ci.yml --ref main --repo "$GITHUB_REPOSITORY"
           fi
 
       - name: Verify the fork customizations survive every merge
@@ -159,7 +161,10 @@ jobs:
           vp -C apps/server test run src/cloud/CloudLink.test.ts src/cloud/ConnectReachability.test.ts src/cli/connect.test.ts --config vite.config.ts
 
       - name: Build the update package from merged source
-        run: vp run dist:desktop:dmg:arm64 --build-version "${{ needs.sync.outputs.tag }}-nightly.fork" --output-dir release/fork
+        env:
+          TAG: ${{ needs.sync.outputs.tag }}
+          VITE_RELEASE_CHANNEL: stable
+        run: vp run dist:desktop:dmg:arm64 --build-version "${TAG#v}" --output-dir release/fork
 
       - name: Verify package payload
         run: node scripts/verify-fork-stardust-package.mjs release/fork "${{ needs.sync.outputs.tag }}"
@@ -169,6 +174,39 @@ jobs:
           TAG: ${{ needs.sync.outputs.tag }}
           UPSTREAM_TAG: ${{ needs.sync.outputs.upstream_tag }}
         run: node scripts/prepare-fork-stardust-package.mjs release/fork "$TAG" "$UPSTREAM_TAG"
+      - name: Smoke test the signed update bundle
+        env:
+          TAG: ${{ needs.sync.outputs.tag }}
+        timeout-minutes: 12
+        run: |
+          set -euo pipefail
+          app="$RUNNER_TEMP/fork-smoke/T3 Stardust.app"
+          ditto -x -k "release/fork/T3-Stardust-${TAG#v}-macOS-arm64.zip" "$(dirname "$app")"
+          executable=$(/usr/libexec/PlistBuddy -c 'Print CFBundleExecutable' "$app/Contents/Info.plist")
+          ELECTRON_RUN_AS_NODE=1 "$app/Contents/MacOS/$executable" \
+            "$app/Contents/Resources/app.asar/apps/server/dist/bin.mjs" connect --help > "$RUNNER_TEMP/fork-connect-help.txt"
+          grep -Eq '^ +login +' "$RUNNER_TEMP/fork-connect-help.txt"
+          grep -Eq '^ +link +' "$RUNNER_TEMP/fork-connect-help.txt"
+          node scripts/stardust-release/smoke.ts --version "${TAG#v}" \
+            --executable "$app/Contents/MacOS/$executable" --output "$RUNNER_TEMP/fork-smoke-evidence"
+
+      - name: Require successful CI for the packaged commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ needs.sync.outputs.source_sha }}
+        timeout-minutes: 30
+        run: |
+          set -euo pipefail
+          while true; do
+            run=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml --branch main \
+              --commit "$SOURCE_SHA" --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+            if [[ -n "$run" ]]; then
+              gh run watch "$run" --repo "$GITHUB_REPOSITORY" --interval 20 --exit-status
+              break
+            fi
+            sleep 20
+          done
+
       - name: Publish the fork release only after its package passes
         env:
           GH_TOKEN: ${{ github.token }}

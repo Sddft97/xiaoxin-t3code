@@ -75,21 +75,34 @@ function startAnnotationThemeSync(preview: DesktopPreviewBridge): () => void {
       lastSerializedTheme = "";
     });
   };
-  // App services start before the first paint, when the theme styles may not be applied yet.
-  const frameId = window.requestAnimationFrame(syncTheme);
-  const observer = new MutationObserver(syncTheme);
+  let frameId: number | undefined;
+  let timer: number | undefined;
+  const scheduleThemeSync = () => {
+    if (frameId !== undefined || timer !== undefined) return;
+    frameId = window.requestAnimationFrame(() => {
+      frameId = undefined;
+      timer = window.setTimeout(() => {
+        timer = undefined;
+        syncTheme();
+      }, 0);
+    });
+  };
+  // Coalesce root and stylesheet mutations after the theme's paint to avoid a forced style pass.
+  scheduleThemeSync();
+  const observer = new MutationObserver(scheduleThemeSync);
   observer.observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["class", "style", "lang"],
   });
-  const headObserver = new MutationObserver(syncTheme);
+  const headObserver = new MutationObserver(scheduleThemeSync);
   headObserver.observe(document.head, {
     childList: true,
     subtree: true,
     characterData: true,
   });
   return () => {
-    window.cancelAnimationFrame(frameId);
+    if (frameId !== undefined) window.cancelAnimationFrame(frameId);
+    window.clearTimeout(timer);
     observer.disconnect();
     headObserver.disconnect();
   };

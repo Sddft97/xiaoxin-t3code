@@ -15,10 +15,9 @@ import { CliError } from "effect/cli";
 import { HttpClient } from "effect/http";
 import * as Schema from "effect/Schema";
 
-import { CLI_RELEASE_BASE_URL_ENV } from "@t3tools/shared/cliRelease";
-
 import * as ProcessRunner from "../processRunner.ts";
 import { acquireServiceSelectionLock } from "./serviceSelectionLock.ts";
+import { RESTORE_OOMD_WATCH_SCRIPT } from "./userManagerOom.ts";
 import {
   serviceLauncherIsRunning,
   serviceLauncherLockPath,
@@ -107,7 +106,7 @@ export function renderBootServiceUnit(plan: BootServicePlan): string {
   // The user manager has no reliable network-online target; server networking retries itself.
   return [
     "[Unit]",
-    "Description=T3 Code server",
+    "Description=Stardust server",
     "StartLimitIntervalSec=300",
     "StartLimitBurst=5",
     "",
@@ -233,7 +232,7 @@ export function renderBootServiceTask(
   return [
     `<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">`,
     `  <RegistrationInfo>`,
-    `    <Description>T3 Code server</Description>`,
+    `    <Description>Stardust server</Description>`,
     `  </RegistrationInfo>`,
     `  <Triggers>`,
     `    <LogonTrigger>`,
@@ -329,12 +328,21 @@ function systemdManager(input: {
     command: "systemctl",
     args: ["--user", "reset-failed", BOOT_SERVICE_UNIT_FILE],
   };
-  const prepareActivation = [
+  const reload = [
     {
       step: "reloading systemd user units",
       command: "systemctl",
       args: ["--user", "daemon-reload"],
     },
+    {
+      step: "restoring systemd-oomd's watch on the user manager",
+      optional: true,
+      command: "/bin/sh",
+      args: ["-c", RESTORE_OOMD_WATCH_SCRIPT],
+    },
+  ];
+  const prepareActivation = [
+    ...reload,
     {
       step: "enabling the service",
       command: "systemctl",
@@ -388,13 +396,7 @@ function systemdManager(input: {
         timeout: STOP_STEP_TIMEOUT,
       },
     ],
-    finalize: [
-      {
-        step: "reloading systemd user units",
-        command: "systemctl",
-        args: ["--user", "daemon-reload"],
-      },
-    ],
+    finalize: reload,
   };
 }
 
@@ -650,7 +652,7 @@ export class BootServiceInstallError extends Schema.TaggedError<BootServiceInsta
   { cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return "Could not set up the T3 Code background service.";
+    return "Could not set up the Stardust background service.";
   }
 }
 
@@ -673,11 +675,11 @@ export function formatBootServiceProblem(
 ): string {
   switch (problem) {
     case "user-manager-unavailable":
-      return "Cannot reach the systemd user manager. Run `systemctl --user status` in a login session for the service user. Install your distribution's systemd user-session support if it is missing; do not run T3 with sudo.";
+      return "Cannot reach the systemd user manager. Run `systemctl --user status` in a login session for the service user. Install your distribution's systemd user-session support if it is missing; do not run Stardust with sudo.";
     case "linger-unavailable":
       return 'Cannot check whether this user can run services after logout. Run `loginctl show-user "$(id -un)" --property=Linger` and check that systemd-logind is available.';
     case "linger-disabled":
-      return 'Lingering is disabled. T3 Code will stop when your last login session ends and will not start at boot. Run `sudo loginctl enable-linger "$(id -un)"` on this machine, then retry the service command as your normal user.';
+      return 'Lingering is disabled. Stardust will stop when your last login session ends and will not start at boot. Run `sudo loginctl enable-linger "$(id -un)"` on this machine, then retry the service command as your normal user.';
     case "service-disabled":
       return `The service is not enabled to start automatically. Run \`${commands.install}\` to repair it.`;
     case "service-stopped":
@@ -731,7 +733,7 @@ export class BootServiceOtherBaseDirError extends Schema.TaggedError<BootService
   },
 ) {
   override get message(): string {
-    return `The T3 Code service on this machine serves ${this.installedBaseDir}, not ${this.baseDir}. Pass ${formatBootServiceBaseDirOption(this.installedBaseDir)} to manage it, or run \`t3 service uninstall ${formatBootServiceBaseDirOption(this.installedBaseDir)}\` first to move it; both data directories are kept.`;
+    return `The Stardust service on this machine serves ${this.installedBaseDir}, not ${this.baseDir}. Pass ${formatBootServiceBaseDirOption(this.installedBaseDir)} to manage it, or run \`t3 service uninstall ${formatBootServiceBaseDirOption(this.installedBaseDir)}\` first to move it; both data directories are kept.`;
   }
 
   // A refusal the user fixes by rerunning, so the CLI prints the message, not a stack trace.
@@ -745,7 +747,7 @@ export class BootServiceBaseDirUnsupportedError extends Schema.TaggedError<BootS
   { baseDir: Schema.String },
 ) {
   override get message(): string {
-    return `systemd cannot run T3 Code from ${JSON.stringify(this.baseDir)}: the path contains a quote, backslash or control character. Choose another T3 home with --base-dir.`;
+    return `systemd cannot run Stardust from ${JSON.stringify(this.baseDir)}: the path contains a quote, backslash or control character. Choose another Stardust home with --base-dir.`;
   }
 
   override get [CliError.userMessage]() {
@@ -818,9 +820,6 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
   const arch = yield* HostProcess.Architecture;
   const uid = yield* HostProcess.UserId;
   const httpClient = yield* HttpClient.HttpClient;
-  const releaseBaseUrl = Option.getOrUndefined(
-    yield* Config.String(CLI_RELEASE_BASE_URL_ENV).pipe(Config.option),
-  );
   const homeDir = yield* Config.String(platform === "win32" ? "USERPROFILE" : "HOME").pipe(
     Config.withDefault(""),
   );
@@ -1020,12 +1019,15 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
   let { manager: detectedManager, unitPath, plan } = resolveTarget(systemdUnitDir);
   const statePath = path.join(input.baseDir, "runtime", SERVICE_STATE_FILE);
   const restartPendingPath = path.join(input.baseDir, "runtime", SERVICE_RESTART_PENDING_FILE);
+  const canonicalPath = (dir: string) =>
+    fs.realPath(dir).pipe(Effect.orElseSucceed(() => path.resolve(dir)));
+  const isThisHome = (dir: string) =>
+    Effect.zipWith(canonicalPath(dir), canonicalPath(input.baseDir), (a, b) => a === b);
   const otherBaseDirOf = (unit: string) => {
     const installedBaseDir = bootServiceBaseDirOf(unit);
-    return installedBaseDir !== undefined &&
-      path.resolve(installedBaseDir) !== path.resolve(input.baseDir)
-      ? installedBaseDir
-      : undefined;
+    return installedBaseDir === undefined
+      ? Effect.undefined
+      : Effect.map(isThisHome(installedBaseDir), (same) => (same ? undefined : installedBaseDir));
   };
   const writeDurably = (filePath: string, contents: string | Uint8Array) =>
     Effect.scoped(
@@ -1257,7 +1259,7 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
     const refuseOtherBaseDir = Effect.gen(function* () {
       const existingUnit = yield* readUnit().pipe(Effect.option);
       const installedBaseDir = Option.isSome(existingUnit)
-        ? otherBaseDirOf(existingUnit.value)
+        ? yield* otherBaseDirOf(existingUnit.value)
         : undefined;
       if (installedBaseDir !== undefined) {
         return yield* new BootServiceOtherBaseDirError({
@@ -1292,7 +1294,6 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
       httpClient,
       platform,
       arch,
-      releaseBaseUrl,
       validate: (runtime) =>
         runner
           .run({
@@ -1487,10 +1488,7 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
     const unit = yield* readUnit().pipe(Effect.option);
     if (Option.isNone(unit)) return "skipped" as const;
     const installedBaseDir = bootServiceBaseDirOf(unit.value);
-    if (
-      installedBaseDir === undefined ||
-      path.resolve(installedBaseDir) !== path.resolve(input.baseDir)
-    ) {
+    if (installedBaseDir === undefined || !(yield* isThisHome(installedBaseDir))) {
       return "skipped" as const;
     }
     // Writes no state, and the launcher lets an update transition in flight
@@ -1520,10 +1518,7 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
     const unit = yield* readUnit().pipe(Effect.option);
     if (Option.isNone(unit)) return yield* operation;
     const installedBaseDir = bootServiceBaseDirOf(unit.value);
-    if (
-      installedBaseDir === undefined ||
-      path.resolve(installedBaseDir) !== path.resolve(input.baseDir)
-    ) {
+    if (installedBaseDir === undefined || !(yield* isThisHome(installedBaseDir))) {
       return yield* operation;
     }
     // `is-active` misses crash-looping systemd units; launchd can be loaded without a pid.
@@ -1603,7 +1598,12 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
       ? serviceStateActiveVersion(stateText.value)
       : undefined;
     const installedBaseDir = bootServiceBaseDirOf(unit);
-    const otherBaseDir = otherBaseDirOf(unit);
+    const otherBaseDir = yield* otherBaseDirOf(unit);
+    // Another spelling of this home is current; repairing it would flip the unit between spellings.
+    const thisHomeUnit =
+      installedBaseDir !== undefined && otherBaseDir === undefined
+        ? unit.replaceAll(installedBaseDir, () => input.baseDir)
+        : unit;
     const normalizeUnit = (contents: string) =>
       manager.kind === "launchd"
         ? contents.replace(/(<key>PATH<\/key>\n\s*<string>)[^<]*(<\/string>)/, "$1$2")
@@ -1625,7 +1625,7 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
       current:
         problems.length === 0 &&
         !(manager.kind === "systemd" && systemdUnsafeValue(planForUnit(unit))) &&
-        normalizeUnit(unit) === normalizeUnit(manager.render(planForUnit(unit))) &&
+        normalizeUnit(thisHomeUnit) === normalizeUnit(manager.render(planForUnit(unit))) &&
         runtimeEntryExists &&
         Option.isSome(runtimeSentinel) &&
         runtimeSentinel.value.trim() === input.cliVersion &&

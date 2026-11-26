@@ -54,8 +54,8 @@ export const installCli = Effect.fn("cli.install.install")(function* () {
   const windows = platform === "win32";
   if (Option.isNone(runtime)) {
     const script = windows
-      ? "irm https://raw.githubusercontent.com/zds-xiaoxin/xiaoxin-t3code/main/scripts/install.ps1 | iex"
-      : "curl -fsSL https://raw.githubusercontent.com/zds-xiaoxin/xiaoxin-t3code/main/scripts/install.sh | sh";
+      ? "irm https://raw.githubusercontent.com/zds-xiaoxin/stardust/main/scripts/install.ps1 | iex"
+      : "curl -fsSL https://raw.githubusercontent.com/zds-xiaoxin/stardust/main/scripts/install.sh | sh";
     return yield* new CliInstallError({
       reason: `Only the standalone t3 can install itself. Use \`${script}\`, or Settings in the desktop app.`,
     });
@@ -322,7 +322,7 @@ export const offerCliInstall = Effect.fn("cli.install.offer")(function* <E, R, E
     .readFileString(path.join(runtimeDir, "launchers"))
     .pipe(Effect.orElseSucceed(() => ""));
   const candidates = [
-    ...launchers.split(/\r?\n/).filter(Boolean),
+    ...launchers.split(/\r?\n/).filter((launcher) => path.isAbsolute(launcher)),
     path.join(path.dirname(runtimeDir), "bin", windows ? "t3.cmd" : "t3"),
     ...(environment.PATH ?? environment.Path ?? "")
       .split(windows ? ";" : ":")
@@ -332,7 +332,7 @@ export const offerCliInstall = Effect.fn("cli.install.offer")(function* <E, R, E
       .flatMap((directory) => names.map((name) => path.join(directory, name))),
   ];
   for (const candidate of candidates) {
-    if (yield* fs.exists(candidate).pipe(Effect.orElseSucceed(() => false))) return true;
+    if (yield* resolveCommandPath(candidate, { env: environment })) return true;
   }
 
   const declinedFile = path.join(runtimeDir, "install-prompt-declined");

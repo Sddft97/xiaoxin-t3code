@@ -52,7 +52,9 @@ try {
     "apple-speech",
     "resource-monitor",
     "server-compile-cache",
-    "stardust-build.json",
+    "LICENSE",
+    "NOTICE",
+    "third-party-licenses.json",
   ]) {
     const source = NodePath.join(packagedApp, "Contents/Resources", resource);
     if (!NodeFS.existsSync(source)) continue;
@@ -75,6 +77,7 @@ try {
         releaseChannel: "stable",
         signingMode: "ad-hoc",
         upstreamTag,
+        sourceCommit: run("git", ["rev-parse", "HEAD"]).trim(),
       },
       null,
       2,
@@ -108,6 +111,7 @@ function copy(source, destination) {
 function run(command, args) {
   const result = NodeChildProcess.spawnSync(command, args, { encoding: "utf8" });
   if (result.status !== 0) throw new Error(`${command} ${args.join(" ")} failed: ${result.stderr}`);
+  return result.stdout;
 }
 
 function download(url, destination) {

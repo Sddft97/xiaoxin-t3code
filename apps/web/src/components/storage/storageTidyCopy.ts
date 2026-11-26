@@ -65,7 +65,7 @@ export function itemCopy(t: Translate, item: StorageTidyItem): ItemCopy {
         subtitle: [d.repo, d.branch].filter(Boolean).join(" · "),
         badge: item.tier === "remind" ? null : merged ? t("Merged") : t("Not merged"),
         what: t("A checked-out copy of a repository that an agent worked in."),
-        tool: t("T3 Stardust worktree"),
+        tool: t("Stardust worktree"),
         why:
           item.tier === "safe"
             ? t(
@@ -111,11 +111,11 @@ export function itemCopy(t: Translate, item: StorageTidyItem): ItemCopy {
     }
     case "t3-data":
       return {
-        title: t("T3 chat database and attachments"),
-        subtitle: t("Managed by T3 itself"),
+        title: t("Stardust chat database and attachments"),
+        subtitle: t("Managed by Stardust itself"),
         badge: null,
-        what: t("The database and attachments behind your T3 conversations."),
-        tool: "T3 Stardust",
+        what: t("The database and attachments behind your Stardust conversations."),
+        tool: t("Stardust"),
         why: t(
           "Removing these would delete conversations, so this page never touches them. Use Maintenance settings to compact or archive.",
         ),
@@ -127,7 +127,7 @@ export function itemCopy(t: Translate, item: StorageTidyItem): ItemCopy {
         subtitle: t("{count} folders untouched for a day or more", { count }),
         badge: null,
         what: t("Scratch folders that agents and test browsers leave in /tmp."),
-        tool: t("Codex, Claude Code, T3 and test browsers"),
+        tool: t("Codex, Claude Code, Stardust and test browsers"),
         why: t("Nothing has written to them for 24 hours, and /tmp is scratch space by design."),
         recover: t(
           "Nothing to restore. The tool recreates its scratch folder the next time it runs.",

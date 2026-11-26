@@ -233,7 +233,7 @@ export function CleanupRecords({ data }: { readonly data: StorageInspection }) {
           onClick={() => setShowAll((value) => !value)}
         >
           {showAll
-            ? uiText("Collapse recommendation")
+            ? uiText("Show less")
             : total === 1
               ? uiText("Show all {total} item", { total })
               : uiText("Show all {total} items", { total })}

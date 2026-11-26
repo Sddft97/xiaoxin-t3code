@@ -1,3 +1,4 @@
+import { platformProfile } from "~/lib/PlatformProfile";
 import {
   type KeybindingCommand,
   type KeybindingShortcut,
@@ -17,13 +18,24 @@ import {
   resolveEventKeys,
   type ShortcutEventLike as SharedShortcutEventLike,
   type ShortcutModifierStateLike,
+  type ShortcutKeyboardLayoutMap,
+  shortcutKeyFromEvent as sharedShortcutKeyFromEvent,
 } from "@t3tools/shared/keybindings";
 import { isElectron } from "./env";
 import { isEditableFocused } from "./lib/editableFocus";
 import { projectScriptIdFromCommand } from "./projectScripts";
+import { getKeyboardLayoutMap } from "./keyboardLayout";
 
 export type { ShortcutModifierStateLike } from "@t3tools/shared/keybindings";
-export { shortcutKeyFromEvent } from "@t3tools/shared/keybindings";
+export function shortcutKeyFromEvent(
+  event: Pick<ShortcutEventLike, "key" | "code" | "shiftKey" | "altKey">,
+  platform: string,
+) {
+  return sharedShortcutKeyFromEvent(
+    event,
+    isMacPlatform(platform) && event.altKey ? getKeyboardLayoutMap() : undefined,
+  );
+}
 
 export interface ShortcutEventLike extends SharedShortcutEventLike {
   target?: EventTarget | null;
@@ -42,6 +54,7 @@ export interface ShortcutMatchContext {
 
 interface ShortcutMatchOptions {
   platform?: string;
+  keyboardLayoutMap?: ShortcutKeyboardLayoutMap;
   context?: Partial<ShortcutMatchContext>;
 }
 
@@ -55,7 +68,7 @@ const TERMINAL_LINE_START = "\u0001";
 const TERMINAL_LINE_END = "\u0005";
 const TERMINAL_DELETE_TO_LINE_START = "\u0015";
 function resolvePlatform(options: ShortcutMatchOptions | undefined): string {
-  return options?.platform ?? navigator.platform;
+  return options?.platform ?? platformProfile.platform;
 }
 
 function resolveContext(options: ShortcutMatchOptions | undefined): ShortcutMatchContext {
@@ -96,7 +109,7 @@ function matchesWhenClause(
 
 export function shortcutConflictKey(
   shortcut: KeybindingShortcut,
-  platform = navigator.platform,
+  platform = platformProfile.platform,
 ): string {
   const useMetaForMod = isMacPlatform(platform);
   const metaKey = shortcut.metaKey || (shortcut.modKey && useMetaForMod);
@@ -194,7 +207,15 @@ export function resolveShortcutCommand(
     const binding = keybindings[index];
     if (!binding) continue;
     if (!matchesWhenClause(binding.whenAst, context)) continue;
-    if (!matchesKeybindingShortcut(event, shortcutForContext(binding, context), platform)) continue;
+    if (
+      !matchesKeybindingShortcut(
+        event,
+        shortcutForContext(binding, context),
+        platform,
+        options?.keyboardLayoutMap ?? getKeyboardLayoutMap(),
+      )
+    )
+      continue;
     return binding.command;
   }
   return null;
@@ -232,7 +253,7 @@ export function formatShortcutKeyLabel(key: string): string {
 
 export function formatShortcutLabel(
   shortcut: KeybindingShortcut,
-  platform = navigator.platform,
+  platform = platformProfile.platform,
 ): string {
   const keyLabel = formatShortcutKeyLabel(shortcut.key);
   const useMetaForMod = isMacPlatform(platform);
@@ -435,7 +456,7 @@ export function isRichTextFormattingShortcut(event: ShortcutEventLike): boolean 
 
 export function isTerminalClearShortcut(
   event: ShortcutEventLike,
-  platform = navigator.platform,
+  platform = platformProfile.platform,
 ): boolean {
   if (event.type !== undefined && event.type !== "keydown") {
     return false;
@@ -459,7 +480,7 @@ export function isTerminalClearShortcut(
 
 export function terminalDeleteShortcutData(
   event: ShortcutEventLike,
-  platform = navigator.platform,
+  platform = platformProfile.platform,
 ): string | null {
   if (event.type !== undefined && event.type !== "keydown") {
     return null;
@@ -481,7 +502,7 @@ export function terminalDeleteShortcutData(
 
 export function terminalNavigationShortcutData(
   event: ShortcutEventLike,
-  platform = navigator.platform,
+  platform = platformProfile.platform,
 ): string | null {
   if (event.type !== undefined && event.type !== "keydown") {
     return null;

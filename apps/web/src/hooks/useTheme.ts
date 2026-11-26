@@ -10,6 +10,7 @@ import {
   canonicalThemePreference,
   isKnownThemePreference,
   getThemePreferenceMode,
+  getThemeDefinition,
   getThemePreviewAppearance,
   parseThemeHalves,
   resolveDesktopTheme,
@@ -278,18 +279,17 @@ function resolveBrowserChromeSurface(): HTMLElement {
 
 export function syncBrowserChromeTheme() {
   if (typeof document === "undefined" || typeof getComputedStyle === "undefined") return;
-  const rootStyles = getComputedStyle(document.documentElement);
-  const themeChromeColor = document.documentElement.dataset.themeId
-    ? normalizeThemeColor(rootStyles.getPropertyValue("--app-chrome-background"))
+  const root = document.documentElement;
+  const themeChromeColor = root.dataset.themeId
+    ? normalizeThemeColor(getComputedStyle(root).getPropertyValue("--app-chrome-background"))
     : null;
-  const surfaceColor = normalizeThemeColor(
-    getComputedStyle(resolveBrowserChromeSurface()).backgroundColor,
-  );
-  const fallbackColor = normalizeThemeColor(getComputedStyle(document.body).backgroundColor);
-  const backgroundColor = themeChromeColor ?? surfaceColor ?? fallbackColor;
+  const backgroundColor =
+    themeChromeColor ??
+    normalizeThemeColor(getComputedStyle(resolveBrowserChromeSurface()).backgroundColor) ??
+    normalizeThemeColor(getComputedStyle(document.body).backgroundColor);
   if (!backgroundColor) return;
 
-  document.documentElement.style.backgroundColor = backgroundColor;
+  root.style.backgroundColor = backgroundColor;
   document.body.style.backgroundColor = backgroundColor;
   const themeColorMetas = document.querySelectorAll<HTMLMetaElement>(
     `meta[name="${THEME_COLOR_META_NAME}"]`,
@@ -302,6 +302,8 @@ export function syncBrowserChromeTheme() {
     element.setAttribute("content", backgroundColor);
   }
 }
+
+let themePaintFrame: number | undefined;
 
 function applyTheme(theme: Theme, { suppressTransitions = false, preservePreview = true } = {}) {
   if (typeof document === "undefined" || typeof window === "undefined") return;
@@ -336,15 +338,20 @@ function applyTheme(theme: Theme, { suppressTransitions = false, preservePreview
   applyThemePalette(resolveThemeHalf(theme, themeHalves, resolvedAppearance), resolvedAppearance);
   document.documentElement.classList.toggle("dark", resolvedAppearance === "dark");
   lastAppliedTheme = { theme, systemDark, followSystem, appearanceMode, themeHalves };
-  syncBrowserChromeTheme();
   syncDesktopTheme(theme, followSystem, appearanceMode);
-  if (suppressTransitions) {
-    // Force a reflow so the no-transitions class takes effect before removal
-    void document.documentElement.offsetHeight;
-    requestAnimationFrame(() => {
+  if (!suppressTransitions) {
+    syncBrowserChromeTheme();
+    return;
+  }
+  if (themePaintFrame !== undefined) cancelAnimationFrame(themePaintFrame);
+  // Read chrome colors after React commits, then let the new palette paint with transitions disabled.
+  themePaintFrame = requestAnimationFrame(() => {
+    syncBrowserChromeTheme();
+    themePaintFrame = requestAnimationFrame(() => {
+      themePaintFrame = undefined;
       document.documentElement.classList.remove("no-transitions");
     });
-  }
+  });
 }
 
 async function syncDesktopThemePreference(
@@ -666,4 +673,10 @@ export function useTheme() {
     resolvedTheme,
     themeHalves: snapshot.themeHalves,
   } as const;
+}
+
+export function useAppleMaterialTheme() {
+  const { theme, resolvedTheme, themeHalves } = useTheme();
+  const id = getThemeDefinition(resolveThemeHalf(theme, themeHalves, resolvedTheme))?.id;
+  return id === "stardust" || id === "apple";
 }

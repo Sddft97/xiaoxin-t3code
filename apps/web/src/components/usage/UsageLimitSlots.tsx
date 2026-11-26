@@ -222,7 +222,7 @@ function LimitSlot({
               <circle cx="101" cy="49" r="4" className="usage-compass-node-a" />
               <circle cx="40" cy="24" r="3.5" className="usage-compass-node-b" />
             </svg>
-            <b>T3</b>
+            <b>Stardust</b>
           </span>
           <span className="usage-slot-caption">
             <strong>{text("Room for one more model")}</strong>

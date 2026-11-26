@@ -23,6 +23,8 @@ import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "~/lib/utils";
 import "./composerV9.css";
+import "./modelChip.css";
+import { GeminiChipIcon, GrokChipIcon } from "./ComposerChipIcons";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { ModelPickerContent, resolveModelPickerSelectedModel } from "./ModelPickerContent";
 import { retainedModelWhileProviderLocked } from "./ProviderModelPicker.logic";
@@ -122,6 +124,7 @@ export const ProviderModelPicker = memo(function ProviderModelPicker(props: {
   triggerSuffix?: ReactNode;
   /** Names the suffix for the tooltip and screen readers. */
   triggerDetail?: string | null;
+  triggerEffortLevel?: number;
   /** Composer shortcuts this trigger answers besides the picker's own. */
   triggerShortcuts?: string;
   /**
@@ -174,10 +177,18 @@ export const ProviderModelPicker = memo(function ProviderModelPicker(props: {
     (activeEntry?.driverKind === "opencode" || activeEntry?.driverKind === "antigravity"
       ? undefined
       : selectedInstanceOptions[0]);
+  const useChip = Boolean(props.isComposerOwned && !props.selectedModels && !props.triggerLabel);
+  const chipProvider = activeEntry?.driverKind;
+  const modelSlug = selectedModel?.slug ?? props.model;
+  const ChipIcon =
+    /(?:^|\/)gemini(?:[- .]|$)/i.test(modelSlug) ||
+    (chipProvider === "antigravity" && /^Gemini\b/.test(selectedModel?.name ?? ""))
+      ? GeminiChipIcon
+      : chipProvider === "grok" || /(?:^|\/)grok(?:[- .]|$)/i.test(modelSlug)
+        ? GrokChipIcon
+        : null;
   const triggerTitle = selectedModel
-    ? props.isComposerOwned
-      ? getDisplayModelName(selectedModel)
-      : getTriggerDisplayModelName(selectedModel, activeEntry?.driverKind)
+    ? getTriggerDisplayModelName(selectedModel, activeEntry?.driverKind)
     : props.model === ANTIGRAVITY_DEFAULT_MODEL
       ? "Choose model"
       : props.model || "Choose model";
@@ -186,6 +197,18 @@ export const ProviderModelPicker = memo(function ProviderModelPicker(props: {
     : triggerTitle;
   const showInstanceBadge =
     activeEntry !== null && shouldShowInstanceBadge(activeEntry, props.instanceEntries);
+
+  const accountNumber =
+    useChip && showInstanceBadge
+      ? props.instanceEntries
+          .filter((entry) => entry.driverKind === activeEntry.driverKind)
+          .findIndex((entry) => entry.instanceId === activeEntry.instanceId) + 1
+      : 0;
+  const shortTitle = useChip
+    ? triggerTitle.replace(/^Claude[ -]+/i, "").replace(/\s+(?:Preview|Latest)$/i, "")
+    : triggerTitle;
+  const shortCharacters = Array.from(shortTitle);
+  const splitLongName = shortCharacters.length > 18;
 
   const setIsMenuOpen = (open: boolean) => {
     props.onOpenChange?.(open);
@@ -201,9 +224,11 @@ export const ProviderModelPicker = memo(function ProviderModelPicker(props: {
   const focusEffort = (rows: "levels" | "any") => {
     const column = popupRef.current?.querySelector("[data-model-picker-effort]");
     const level =
+      column?.querySelector<HTMLElement>('[data-effort-slider]:not([aria-disabled="true"])') ??
       column?.querySelector<HTMLElement>(
         '[data-effort-level][aria-checked="true"]:not(:disabled)',
-      ) ?? column?.querySelector<HTMLElement>("[data-effort-level]:not(:disabled)");
+      ) ??
+      column?.querySelector<HTMLElement>("[data-effort-level]:not(:disabled)");
     // No aria-checked here: an On switch is checked but is not where focus belongs.
     const row =
       level ??
@@ -276,8 +301,10 @@ export const ProviderModelPicker = memo(function ProviderModelPicker(props: {
     ? selectedEntries.map((selection) => selection.fullLabel).join(", ") || "Choose models"
     : undefined;
   const triggerTooltipContent = [
-    props.triggerLabel ?? allModelNames ?? triggerLabel,
-    props.triggerDetail,
+    useChip ? activeEntry?.displayName : null,
+    accountNumber > 0 ? uiText("Account {number}", { number: accountNumber }) : null,
+    props.triggerLabel ?? allModelNames ?? (useChip ? selectedModel?.name : null) ?? triggerLabel,
+    props.triggerDetail ? uiText(props.triggerDetail) : null,
     shortcutLabel,
   ]
     .filter(Boolean)
@@ -354,6 +381,9 @@ export const ProviderModelPicker = memo(function ProviderModelPicker(props: {
         render={
           <ComposerControl
             ref={triggerRef}
+            title={useChip ? triggerTooltipContent : undefined}
+            data-stardust-model-chip={useChip || undefined}
+            aria-description={useChip ? triggerTooltipContent : undefined}
             aria-label={[
               props.triggerAriaLabel ?? props.triggerLabel ?? allModelNames ?? triggerLabel,
               props.triggerDetail,
@@ -424,31 +454,59 @@ export const ProviderModelPicker = memo(function ProviderModelPicker(props: {
               data-size={props.isComposerOwned ? "trigger" : undefined}
               className={props.isComposerOwned ? undefined : "contents"}
             >
-              <ProviderInstanceIcon
-                driverKind={activeEntry.driverKind}
-                displayName={activeEntry.displayName}
-                accentColor={activeEntry.accentColor}
-                acpRegistryAgentId={activeEntry.acpRegistryAgentId}
-                acpRegistryIconUrl={activeEntry.acpRegistryIconUrl}
-                showBadge={showInstanceBadge}
-                className={props.isComposerOwned ? "size-3.5" : "size-4"}
-                iconClassName={cn(
-                  props.isComposerOwned ? "size-3.5" : "size-4",
-                  props.activeProviderIconClassName,
-                )}
-                indicatorBackground={
-                  props.isComposerOwned
-                    ? "var(--v9-logo-bg)"
-                    : (props.instanceIndicatorBackground ?? "var(--contrast-input)")
-                }
-                badgeClassName={cn(
-                  "right-[-0.125rem] bottom-[-0.125rem] h-3 min-w-3 px-0.5 text-5xs",
-                  size === "xs" && "shadow-none",
-                )}
-              />
+              {useChip && ChipIcon ? (
+                <ChipIcon className="size-[15px]" />
+              ) : (
+                <ProviderInstanceIcon
+                  driverKind={activeEntry.driverKind}
+                  displayName={activeEntry.displayName}
+                  accentColor={activeEntry.accentColor}
+                  acpRegistryAgentId={activeEntry.acpRegistryAgentId}
+                  acpRegistryIconUrl={activeEntry.acpRegistryIconUrl}
+                  showBadge={showInstanceBadge && !useChip}
+                  className={props.isComposerOwned ? "size-3.5" : "size-4"}
+                  iconClassName={cn(
+                    props.isComposerOwned ? "size-3.5" : "size-4",
+                    props.activeProviderIconClassName,
+                  )}
+                  indicatorBackground={
+                    props.isComposerOwned
+                      ? "var(--v9-logo-bg)"
+                      : (props.instanceIndicatorBackground ?? "var(--contrast-input)")
+                  }
+                  badgeClassName={cn(
+                    "right-[-0.125rem] bottom-[-0.125rem] h-3 min-w-3 px-0.5 text-5xs",
+                    size === "xs" && "shadow-none",
+                  )}
+                />
+              )}
+              {accountNumber > 0 ? (
+                <span aria-hidden data-model-account-number>
+                  {accountNumber}
+                </span>
+              ) : null}
             </span>
           ) : null}
-          {props.isComposerOwned ? (
+          {useChip ? (
+            <span data-model-chip-copy data-chat-provider-model-picker-label="true">
+              <span className="sr-only">{shortTitle}</span>
+              <span aria-hidden data-model-chip-middot>
+                {splitLongName ? shortCharacters.slice(0, -7).join("") : shortTitle}
+              </span>
+              {splitLongName ? (
+                <span aria-hidden data-model-chip-tail>
+                  {shortCharacters.slice(-7).join("")}
+                </span>
+              ) : null}
+              {props.triggerEffortLevel !== undefined ? (
+                <span data-model-effort-track aria-hidden>
+                  {[0, 1, 2, 3, 4].map((level) => (
+                    <i key={level} data-filled={level <= props.triggerEffortLevel! || undefined} />
+                  ))}
+                </span>
+              ) : null}
+            </span>
+          ) : props.isComposerOwned ? (
             <span {...triggerTextProps}>{triggerText}</span>
           ) : (
             <Tooltip>

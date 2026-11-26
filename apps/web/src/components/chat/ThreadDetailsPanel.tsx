@@ -90,6 +90,8 @@ interface ThreadDetailsPanelProps extends Pick<
   gitCwd: string | null;
   workspaceMutationId: string | null;
   isGitRepo: boolean;
+  /** False when no worktree can come from this folder, so it offers no workspace modes. */
+  offersWorkspaceModes: boolean;
   envLocked: boolean;
   availableEnvironments: readonly EnvironmentOption[];
   autoEnvironmentLabel?: string | undefined;
@@ -294,7 +296,7 @@ export function ThreadDetailsPanel(props: ThreadDetailsPanelProps) {
                 {show.environment || show.openIn || show.scripts ? (
                   <ThreadDetailsSection
                     headingId="thread-details-workspace-heading"
-                    title="Workspace"
+                    title={uiText("Workspace")}
                     separated={false}
                     showHeading={false}
                   >
@@ -310,6 +312,7 @@ export function ThreadDetailsPanel(props: ThreadDetailsPanelProps) {
                           autoEnvironmentLabel={props.autoEnvironmentLabel}
                           onAutoEnvironment={props.onAutoEnvironment}
                           {...branchToolbarProps}
+                          showGitControls={props.offersWorkspaceModes}
                         />
                       ) : null}
 

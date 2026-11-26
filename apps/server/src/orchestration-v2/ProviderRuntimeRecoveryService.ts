@@ -376,10 +376,19 @@ export const make = Effect.gen(function* () {
           cancelledBackgroundNativeIds.add(item.nativeItemRef.nativeId);
         }
       };
+      const stagedSharingAttempts = new Set(
+        projection.attempts
+          .filter(
+            (attempt) => attempt.status === "pending" && attempt.codexSharingRecovery !== undefined,
+          )
+          .map((attempt) => attempt.id),
+      );
+      const stagedSharingRecovery = (run: OrchestrationV2ThreadProjection["runs"][number]) =>
+        run.activeAttemptId !== null && stagedSharingAttempts.has(run.activeAttemptId);
       const unstartedRuns = runs.filter(
         (run) =>
           run.status === "starting" &&
-          neverStarted(run) &&
+          (neverStarted(run) || stagedSharingRecovery(run)) &&
           !projection.providerTurns.some((turn) => turn.runAttemptId === run.activeAttemptId) &&
           !projection.runtimeRequests.some(
             (request) =>
@@ -424,12 +433,14 @@ export const make = Effect.gen(function* () {
           .map((message) => message.id),
       );
       // A saved user message the provider never accepted stays available through the held queue.
-      const retryableRuns = unstartedRuns.filter((run) =>
-        retryableMessageIds.has(run.userMessageId),
+      const retryableRuns = unstartedRuns.filter(
+        (run) => retryableMessageIds.has(run.userMessageId) && !stagedSharingRecovery(run),
       );
-      // Nobody reviews a delegated, agent-sent or scheduled prompt, so it is sent again instead.
-      const unattendedRuns = continueAfterRestart
-        ? unstartedRuns.filter((run) =>
+      // A staged sharing attempt has a durable rejection record and has not sent a prompt.
+      const unattendedRuns = unstartedRuns.filter((run) =>
+        stagedSharingRecovery(run)
+          ? trigger === "startup"
+          : continueAfterRestart &&
             queuedMessages.some(
               (message) =>
                 message.id === run.userMessageId &&
@@ -438,8 +449,7 @@ export const make = Effect.gen(function* () {
                 message.delegatedCompletion === undefined &&
                 (message.scheduledTaskId !== undefined || message.creationSource === "mcp"),
             ),
-          )
-        : [];
+      );
       const resentRuns: Array<OrchestrationV2ThreadProjection["runs"][number]> = [];
       const resends: Array<EffectOutbox.PendingOrchestrationEffectV2> = [];
       for (const run of unattendedRuns) {
@@ -495,7 +505,11 @@ export const make = Effect.gen(function* () {
           payload: run,
         });
       }
-      const keptRuns = [...retryableRuns, ...resentRuns];
+      const keptRuns = [
+        ...retryableRuns,
+        ...resentRuns,
+        ...(trigger === "shutdown" ? unstartedRuns.filter(stagedSharingRecovery) : []),
+      ];
       for (const run of keptRuns) {
         for (const attempt of projection.attempts.filter(
           (candidate) => candidate.id === run.activeAttemptId && candidate.status === "running",
@@ -761,6 +775,8 @@ export const make = Effect.gen(function* () {
             !isAppOwnedDelegationItem(candidate) &&
             // A link card waits on the user, not the run, and answers by message.
             candidate.type !== "link_request" &&
+            // So does a feedback card, answered from what it recorded.
+            candidate.type !== "feedback_request" &&
             // The orchestrator queues a steer the provider never reported reading.
             !(
               candidate.type === "user_message" &&
@@ -986,7 +1002,7 @@ export const make = Effect.gen(function* () {
         });
       }
       const continuationRun =
-        continueAfterRestart && trigger === "startup"
+        continueAfterRestart && trigger === "startup" && !unstartedRuns.some(stagedSharingRecovery)
           ? restartContinuationRun(
               { ...projection, providerSessions: sessionsLiveAtStart(projection, stoppedThisPass) },
               now,

@@ -290,9 +290,11 @@ export const make = Effect.gen(function* () {
 
 export const layer = Layer.effect(ModelManifest, make);
 
-export const layerTest = Layer.suspend(() =>
+export const layerLocal = Layer.suspend(() =>
   layerModelCatalog.pipe(Layer.provideMerge(layerBundledOnly)),
 );
+
+export const layerTest = layerLocal;
 
 export const layerModelCatalog = Layer.effect(
   ModelCatalog.ModelCatalog,

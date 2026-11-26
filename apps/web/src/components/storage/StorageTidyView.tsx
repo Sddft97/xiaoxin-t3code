@@ -269,7 +269,7 @@ function scanStepLabel(step: string): string {
     case "backups":
       return "Rollback copies and build backups";
     case "t3data":
-      return "T3 data";
+      return "Stardust data";
     case "mole":
       return "System and app caches (Mole rules)";
     default:

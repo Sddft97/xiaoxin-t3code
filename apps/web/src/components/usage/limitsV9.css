@@ -318,7 +318,9 @@
 
 /* ---------- 4-card grid ---------- */
 [data-lv9-root] [data-lv9~="limit-4grid"],
-html:root[data-theme-id="apple"] [data-lv9-root] [data-lv9~="limit-4grid"][data-usage-limit-grid] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-lv9-root]
+  [data-lv9~="limit-4grid"][data-usage-limit-grid] {
   display: grid;
   /* V13: four compact cards a row, stepping down to 3 / 2 / 1 as the page narrows. */
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -327,7 +329,7 @@ html:root[data-theme-id="apple"] [data-lv9-root] [data-lv9~="limit-4grid"][data-
 }
 @container (width < 1000px) {
   [data-lv9-root] [data-lv9~="limit-4grid"],
-  html:root[data-theme-id="apple"]
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
     [data-lv9-root]
     [data-lv9~="limit-4grid"][data-usage-limit-grid] {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -335,7 +337,7 @@ html:root[data-theme-id="apple"] [data-lv9-root] [data-lv9~="limit-4grid"][data-
 }
 @container (width < 760px) {
   [data-lv9-root] [data-lv9~="limit-4grid"],
-  html:root[data-theme-id="apple"]
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
     [data-lv9-root]
     [data-lv9~="limit-4grid"][data-usage-limit-grid] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -343,14 +345,15 @@ html:root[data-theme-id="apple"] [data-lv9-root] [data-lv9~="limit-4grid"][data-
 }
 @container (width < 480px) {
   [data-lv9-root] [data-lv9~="limit-4grid"],
-  html:root[data-theme-id="apple"]
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
     [data-lv9-root]
     [data-lv9~="limit-4grid"][data-usage-limit-grid] {
     grid-template-columns: 1fr;
   }
 }
 /* Override legacy 388px card chrome when UsageLimitRings renders a V9 vessel. */
-html:root[data-theme-id="apple"] .usage-limit-ring-card:has([data-lv9~="vessel-outer"]),
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-limit-ring-card:has([data-lv9~="vessel-outer"]),
 [data-lv9-root] .usage-limit-ring-card {
   display: block;
   height: var(--lv9-card-h, 224px);
@@ -363,8 +366,9 @@ html:root[data-theme-id="apple"] .usage-limit-ring-card:has([data-lv9~="vessel-o
   overflow: visible;
   transform: none;
 }
-html:root[data-theme-id="apple"] .usage-limit-ring-card:has([data-lv9~="vessel-outer"]):hover,
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-limit-ring-card:has([data-lv9~="vessel-outer"]):hover,
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   .usage-limit-ring-card:has([data-lv9~="vessel-outer"])[data-highlighted],
 [data-lv9-root] .usage-limit-ring-card:hover,
 [data-lv9-root] .usage-limit-ring-card[data-highlighted] {
@@ -373,7 +377,9 @@ html:root[data-theme-id="apple"]
 }
 /* Reset legacy UsageLimitRings sub-region rules inside a V9 vessel so V9 metrics win cleanly. */
 [data-lv9-root][data-lv9~="vessel-outer"] .usage-limit-header,
-html:root[data-theme-id="apple"] [data-lv9-root][data-lv9~="vessel-outer"] .usage-limit-header {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-lv9-root][data-lv9~="vessel-outer"]
+  .usage-limit-header {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -383,7 +389,9 @@ html:root[data-theme-id="apple"] [data-lv9-root][data-lv9~="vessel-outer"] .usag
   flex-shrink: 0;
 }
 [data-lv9-root][data-lv9~="vessel-outer"] .usage-rings,
-html:root[data-theme-id="apple"] [data-lv9-root][data-lv9~="vessel-outer"] .usage-rings {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-lv9-root][data-lv9~="vessel-outer"]
+  .usage-rings {
   position: relative;
   width: 44px;
   height: 44px;
@@ -395,14 +403,20 @@ html:root[data-theme-id="apple"] [data-lv9-root][data-lv9~="vessel-outer"] .usag
   background: transparent;
 }
 [data-lv9-root][data-lv9~="vessel-outer"] .usage-rings svg,
-html:root[data-theme-id="apple"] [data-lv9-root][data-lv9~="vessel-outer"] .usage-rings svg {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-lv9-root][data-lv9~="vessel-outer"]
+  .usage-rings
+  svg {
   position: absolute;
   inset: 0;
   width: 44px;
   height: 44px;
 }
 [data-lv9-root][data-lv9~="vessel-outer"] .usage-rings > span,
-html:root[data-theme-id="apple"] [data-lv9-root][data-lv9~="vessel-outer"] .usage-rings > span {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-lv9-root][data-lv9~="vessel-outer"]
+  .usage-rings
+  > span {
   position: relative;
   inset: auto;
   display: inline-flex;
@@ -417,7 +431,9 @@ html:root[data-theme-id="apple"] [data-lv9-root][data-lv9~="vessel-outer"] .usag
   line-height: 1;
 }
 [data-lv9-root][data-lv9~="vessel-outer"] .usage-limit-windows,
-html:root[data-theme-id="apple"] [data-lv9-root][data-lv9~="vessel-outer"] .usage-limit-windows {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-lv9-root][data-lv9~="vessel-outer"]
+  .usage-limit-windows {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -428,7 +444,7 @@ html:root[data-theme-id="apple"] [data-lv9-root][data-lv9~="vessel-outer"] .usag
   border-top: 0;
 }
 [data-lv9-root][data-lv9~="vessel-outer"] .usage-limit-windows [data-limit-countdown],
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-lv9-root][data-lv9~="vessel-outer"]
   .usage-limit-windows
   [data-limit-countdown] {
@@ -439,7 +455,7 @@ html:root[data-theme-id="apple"]
   padding: 0;
 }
 [data-lv9-root][data-lv9~="vessel-outer"] .usage-limit-action-slot,
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-lv9-root][data-lv9~="vessel-outer"]
   .usage-limit-action-slot {
   display: flex;
@@ -456,7 +472,7 @@ html:root[data-theme-id="apple"]
   flex-shrink: 0;
 }
 [data-lv9-root][data-lv9~="vessel-outer"] .usage-limit-action-slot > div,
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-lv9-root][data-lv9~="vessel-outer"]
   .usage-limit-action-slot
   > div {
@@ -466,13 +482,13 @@ html:root[data-theme-id="apple"]
   flex-shrink: 0;
 }
 [data-lv9-root][data-lv9~="vessel-outer"] .usage-limit-action-slot svg,
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-lv9-root][data-lv9~="vessel-outer"]
   .usage-limit-action-slot
   svg {
   display: block;
 }
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-lv9-root][data-lv9~="vessel-outer"]
   .usage-limit-action-slot
   button[data-lv9~="flip-icon-btn"] {
@@ -488,14 +504,14 @@ html:root[data-theme-id="apple"]
   color: var(--fg-2);
   margin-left: 0;
 }
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-lv9-root][data-lv9~="vessel-outer"]
   .usage-limit-action-slot
   button[data-lv9~="flip-icon-btn"]:hover {
   background: var(--fill-hover);
   color: var(--fg);
 }
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-lv9-root][data-lv9~="vessel-outer"]
   .usage-limit-action-slot
   button[data-lv9~="rc-pill"] {
@@ -511,13 +527,13 @@ html:root[data-theme-id="apple"]
   color: var(--fg);
   margin-left: 0;
 }
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-lv9-root][data-lv9~="vessel-outer"]
   .usage-limit-action-slot
   button[data-lv9~="rc-pill"]:hover {
   background: var(--fill-hover);
 }
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-lv9-root][data-lv9~="vessel-outer"]
   .usage-limit-action-slot
   button[data-lv9~="rc-pill"][data-lv9~="recommend"] {
@@ -525,7 +541,7 @@ html:root[data-theme-id="apple"]
   color: var(--warn);
   box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--warn) 30%, transparent);
 }
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-lv9-root][data-lv9~="vessel-outer"]
   .usage-limit-action-slot
   button[data-lv9~="rc-pill"][data-lv9~="open"] {
@@ -1729,7 +1745,7 @@ html:root[data-theme-id="apple"]
     transition: none;
   }
 }
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-lv9-root][data-lv9~="vessel-outer"]
   .usage-limit-action-slot
   button[data-lv9~="flip-icon-btn"][data-lv9~="icon-only"] {

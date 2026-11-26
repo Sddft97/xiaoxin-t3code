@@ -1,8 +1,13 @@
 import { msg } from "gt-react";
 import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
 import { m } from "~/i18n/messages";
-import type { ModelSelection, RuntimeMode, ScopedThreadRef } from "@t3tools/contracts";
-import { scopeThreadRef } from "@t3tools/client-runtime/environment";
+import type {
+  AssistantCitation,
+  ModelSelection,
+  RuntimeMode,
+  ScopedThreadRef,
+} from "@t3tools/contracts";
+import { scopedThreadKey, scopeThreadRef } from "@t3tools/client-runtime/environment";
 import type { StartThreadTurnInput } from "@t3tools/client-runtime/operations";
 import {
   type AtomCommandResult,
@@ -12,6 +17,7 @@ import {
 import { useRef } from "react";
 
 import { newMessageId, newThreadId } from "~/lib/utils";
+import { formatAssistantCitationForComposer } from "../../composer-logic";
 import { useComposerDraftStore } from "../../composerDraftStore";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { useRightPanelStore } from "../../rightPanelStore";
@@ -24,6 +30,12 @@ export type SideChatMessage = Pick<
   StartThreadTurnInput["message"],
   "text" | "attachments" | "context"
 > & { readonly titleSeed: string };
+
+const pendingComposerFocus = new Set<ReturnType<typeof scopedThreadKey>>();
+
+export function consumeSideChatComposerFocus(threadRef: ScopedThreadRef): boolean {
+  return pendingComposerFocus.delete(scopedThreadKey(threadRef));
+}
 
 /**
  * Starts side chats from `threadRef`, or offers none when it is null. `open` forks the
@@ -56,7 +68,11 @@ export function useSideChat(input: {
     const error = squashAtomCommandFailure(failure);
     input.onError(thrownErrorMessage(error, m) ?? fallback);
   };
-  const start = async (threadRef: ScopedThreadRef, message: SideChatMessage | undefined) => {
+  const start = async (
+    threadRef: ScopedThreadRef,
+    message: SideChatMessage | undefined,
+    citation: AssistantCitation | undefined,
+  ) => {
     const { runtimeMode, modelSelection } = input.readSettings();
     const targetThreadId = newThreadId();
     const fork = await forkSideChat({
@@ -117,19 +133,28 @@ export function useSideChat(input: {
         discard();
         return false;
       }
-    } else if (modelSelection !== undefined) {
-      useComposerDraftStore.getState().setModelSelection(targetRef, modelSelection);
+    } else {
+      const drafts = useComposerDraftStore.getState();
+      if (modelSelection !== undefined) drafts.setModelSelection(targetRef, modelSelection);
+      if (citation) {
+        drafts.setPrompt(targetRef, formatAssistantCitationForComposer(citation));
+        pendingComposerFocus.add(scopedThreadKey(targetRef));
+      }
     }
     useRightPanelStore.getState().openThread(threadRef, targetThreadId);
     return true;
   };
-  const open = async (message?: SideChatMessage) => {
+  const open = async (message?: SideChatMessage, citation?: AssistantCitation) => {
     const { threadRef } = input;
     if (!threadRef || pendingRef.current) return false;
     pendingRef.current = true;
-    return start(threadRef, message).finally(() => {
+    return start(threadRef, message, citation).finally(() => {
       pendingRef.current = false;
     });
   };
-  return { available: input.threadRef !== null, open: useStableCallback(open) };
+  return {
+    available: input.threadRef !== null,
+    open: useStableCallback((message?: SideChatMessage) => open(message)),
+    openWithCitation: useStableCallback((citation: AssistantCitation) => open(undefined, citation)),
+  };
 }

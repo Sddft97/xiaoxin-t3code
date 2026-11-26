@@ -503,7 +503,7 @@ it.effect(
   },
 );
 
-it.effect("leaves a task delegated from a linked environment out of the top-level list", () => {
+it.effect("leaves delegated tasks and workflow agent steps out of the top-level list", () => {
   const harness = makeHarness();
   return Effect.gen(function* () {
     const launches = yield* ThreadLaunch.ThreadLaunchService;
@@ -522,15 +522,26 @@ it.effect("leaves a task delegated from a linked environment out of the top-leve
         title: "Remote parent",
       },
     });
+    const workflowStep = yield* launches.launch({
+      ...launchInput({ command: "command:workflow-step", thread: "thread:workflow-step" }),
+      createdBy: "system",
+      creationSource: "server",
+      workflowRun: {
+        environmentId: EnvironmentId.make("environment:local"),
+        runId: "run:1",
+        workflow: "review",
+        step: "agent",
+      },
+    });
     const listed = yield* threads.listProjectThreads({ projectId, includeSubagents: false });
     assert.deepEqual(
       listed.map((thread) => thread.id),
       [ThreadId.make("thread:top-level")],
     );
     const all = yield* threads.listProjectThreads({ projectId, includeSubagents: true });
-    assert.include(
+    assert.includeMembers(
       all.map((thread) => thread.id),
-      delegated.threadId,
+      [delegated.threadId, workflowStep.threadId],
     );
   }).pipe(Effect.provide(harness.layer));
 });
@@ -1190,6 +1201,8 @@ const preparationSettled = (threadId: ThreadId) =>
   });
 
 it.effect.each([
+  { prefix: "t3", collision: null, expected: /^stardust\/[0-9a-f]{8}$/ },
+  { prefix: "t3/", collision: "stardust", expected: /^stardust-[0-9a-f]{8}$/ },
   { prefix: "my-prefix", collision: null, expected: /^my-prefix\/[0-9a-f]{8}$/ },
   { prefix: "my-prefix", collision: "my-prefix", expected: /^my-prefix-[0-9a-f]{8}$/ },
   { prefix: "team/topic", collision: "team", expected: /^team-topic-[0-9a-f]{8}$/ },
@@ -1254,7 +1267,7 @@ it.effect(
       );
       const projection = yield* preparationSettled(launched.threadId);
       assert.equal(projection.runs[0]?.status, "starting");
-      assert.match(projection.thread.branch!, /^t3\/[0-9a-f]{8}$/);
+      assert.match(projection.thread.branch!, /^stardust\/[0-9a-f]{8}$/);
       assert.equal(harness.createWorktree.mock.calls[0]?.[0]?.newRefName, projection.thread.branch);
       assert.equal(harness.runSetup.mock.calls.length, 1);
       assert.equal(harness.renameBranch.mock.calls.length, 0);
@@ -1291,6 +1304,34 @@ it.effect("renames a temporary branch with a configured prefix when generation s
     );
   }).pipe(Effect.provide(harness.layer));
 });
+
+it.effect.each(["stardust/abcd1234", "t3/abcd1234"])(
+  "renames the attached temporary branch %s on the first message",
+  (branch) => {
+    const harness = makeHarness({
+      generateBranchName: () => Effect.succeed({ branch: "t3/fix-parser" }),
+    });
+    return Effect.gen(function* () {
+      const launches = yield* ThreadLaunch.ThreadLaunchService;
+      const launched = yield* launches.launch(
+        launchInput({
+          command: "attached-branch-rename",
+          thread: "attached-branch-rename-thread",
+          message: "Fix the parser",
+          workspace: { type: "existing_worktree", worktreePath: "/attached-worktree", branch },
+        }),
+      );
+      const projection = yield* preparationSettled(launched.threadId);
+      assert.equal(projection.thread.branch, "t3/fix-parser");
+      assert.deepEqual(harness.renameBranch.mock.calls[0]?.[0], {
+        cwd: "/attached-worktree",
+        oldBranch: branch,
+        newBranch: "t3/fix-parser",
+      });
+      assert.equal(harness.createWorktree.mock.calls.length, 0);
+    }).pipe(Effect.provide(harness.layer));
+  },
+);
 
 function scheduledTaskInput(id: string, targetProjectId: ProjectId) {
   return {
@@ -3218,6 +3259,46 @@ it.effect("starts the agent of a new worktree thread only after its branch is re
         yield* Deferred.await(releasedAtRename),
         "the agent's run was released while its branch still had the temporary name",
       );
+    }).pipe(Effect.provide(harness.layer));
+  }),
+);
+
+it.effect("names a new worktree thread's branch while its worktree is being created", () =>
+  Effect.gen(function* () {
+    const branchNameStarted = yield* Deferred.make<void>();
+    const renamedTo = yield* Deferred.make<string>();
+    const harness = makeHarness({
+      generateBranchName: () =>
+        Deferred.succeed(branchNameStarted, undefined).pipe(
+          Effect.as({ branch: "generated-branch" }),
+        ),
+      createWorktree: (input) =>
+        Deferred.await(branchNameStarted).pipe(
+          Effect.as({
+            worktree: {
+              path: "/repo-worktrees/feature",
+              refName: input.newRefName,
+              headSha: "abc",
+            },
+          } as never),
+        ),
+      renameBranch: (input) =>
+        Deferred.succeed(renamedTo, input.newBranch).pipe(Effect.as({ branch: input.newBranch })),
+    });
+    yield* Effect.gen(function* () {
+      const launches = yield* ThreadLaunch.ThreadLaunchService;
+      yield* launches.launch(
+        launchInput({
+          command: "launch:name-during-checkout",
+          thread: "thread:name-during-checkout",
+          message: "Start",
+          workspace: { type: "worktree", baseRef: "main" },
+        }),
+      );
+      assert.equal(yield* Deferred.await(renamedTo), "generated-branch");
+      const createdBranch = harness.createWorktree.mock.calls[0]?.[0]?.newRefName;
+      assert.match(createdBranch ?? "", /^stardust\/[0-9a-f]{8}$/);
+      assert.equal(harness.renameBranch.mock.calls[0]?.[0]?.oldBranch, createdBranch);
     }).pipe(Effect.provide(harness.layer));
   }),
 );

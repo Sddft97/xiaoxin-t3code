@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { uiText } from "../../i18n";
 import { useEffect, useRef } from "react";
 import { useEnvironments } from "../../state/environments";
@@ -5,6 +6,7 @@ import { toastManager } from "../ui/toast";
 
 export function useMemoryProposalNotification() {
   const { environments } = useEnvironments();
+  const navigate = useNavigate();
   const ids = environments.flatMap((environment) =>
     (environment.serverConfig?.settings.memory?.pending ?? []).map(
       ({ id }) => `${environment.environmentId}:${id}`,
@@ -17,14 +19,26 @@ export function useMemoryProposalNotification() {
     const current = new Set<string>(JSON.parse(key));
     const previous = seen.current;
     if (previous !== null && [...current].some((id) => !previous.has(id))) {
-      toastManager.add({
+      const id = toastManager.add({
         type: "info",
         title: uiText("New memory proposal to review"),
-        description: uiText(
-          "Open Settings → Memory to approve, edit, or reject it. Models receive approved memories only.",
-        ),
+        description: uiText("Models receive approved memories only."),
+        actionProps: {
+          children: uiText("Review memory proposal"),
+          onClick: () => {
+            toastManager.close(id);
+            void navigate({ to: "/settings/memory" });
+          },
+        },
+        data: {
+          secondaryActionProps: {
+            children: uiText("Later"),
+            onClick: () => toastManager.close(id),
+          },
+          secondaryActionVariant: "ghost",
+        },
       });
     }
     seen.current = current;
-  }, [key]);
+  }, [key, navigate]);
 }

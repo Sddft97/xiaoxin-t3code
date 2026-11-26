@@ -4,6 +4,7 @@ import { act, fakeTimers, render } from "../test/render";
 import { useStableCategoryOrder, type CategorySection } from "./sidebarCategoryActivity";
 import type { SidebarProjectSnapshot } from "./sidebarProjectGrouping";
 import { observeSidebarList } from "./lib/sidebarListMotion";
+import { MOTION } from "./lib/workbenchMotion";
 
 function Harness({ reverse = false }: { reverse?: boolean }) {
   const sections: CategorySection[] = [
@@ -92,7 +93,7 @@ it("plays a finite transform FLIP on reorder and does not restart for identical 
     animate.mock.calls.every(
       ([, options]) =>
         typeof options === "object" &&
-        options?.duration === 250 &&
+        options?.duration === MOTION.enter &&
         options.iterations === undefined,
     ),
   ).toBe(true);

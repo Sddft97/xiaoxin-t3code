@@ -2,7 +2,7 @@ import { testUiLocale } from "../../../test/uiLocale";
 import "~/index.css";
 import { expect, it, vi } from "vite-plus/test";
 import { render } from "../../../test/render";
-import { CommunityUpdateSettings } from "./CommunityUpdates";
+import { CommunityUpdatePreferences, CommunityUpdateSettings } from "./CommunityUpdates";
 import { useCommunityUpdates } from "../../state/communityUpdates";
 it("keeps modified workbenches on source review and only offers downloads after opting into standard mode", async () => {
   using _locale = testUiLocale("zh-CN");
@@ -16,16 +16,16 @@ it("keeps modified workbenches on source review and only offers downloads after 
   });
   const originalFetch = globalThis.fetch;
   using request = vi.spyOn(globalThis, "fetch").mockImplementation((input, init) =>
-    String(input).includes("api.github.com/repos/zds-xiaoxin/xiaoxin-t3code/")
+    String(input).includes("api.github.com/repos/Sddft97/xiaoxin-t3code/")
       ? Promise.resolve(
           new Response(
             JSON.stringify({
-              tag_name: "v1.2.4",
+              tag_name: "v1.2.5",
               draft: false,
               prerelease: false,
               assets: [
                 {
-                  name: "T3-Stardust-1.2.4-macOS-arm64.zip",
+                  name: "Stardust-v1.2.5-macOS-arm64.zip",
                   state: "uploaded",
                   size: 100,
                   digest: `sha256:${"a".repeat(64)}`,
@@ -35,9 +35,16 @@ it("keeps modified workbenches on source review and only offers downloads after 
             { status: 200 },
           ),
         )
-      : originalFetch(input, init),
+      : String(input).includes("api.github.com/")
+        ? Promise.reject(new Error("Unexpected release feed request"))
+        : originalFetch(input, init),
   );
-  await using screen = await render(<CommunityUpdateSettings />);
+  await using screen = await render(
+    <>
+      <CommunityUpdateSettings />
+      <CommunityUpdatePreferences />
+    </>,
+  );
   await screen.getByRole("button", { name: "检查更新", exact: true }).click();
   await expect.element(screen.getByRole("button", { name: "查看源码差异" })).toBeVisible();
   expect(document.body.textContent).not.toContain("前往下载页");

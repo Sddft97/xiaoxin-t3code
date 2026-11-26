@@ -36,7 +36,9 @@ import { ComposerControl, type ComposerControlSize } from "./ComposerControl";
 import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import { useComposerMenuState } from "./useComposerMenuState";
 import type { RuntimeModeOption } from "./ComposerFooterControls";
-import { CosmicEffortSlider, cosmicColorAtRatio } from "./CosmicEffortSlider";
+import { GalaxyEffortSlider } from "./GalaxyEffortSlider";
+import { galaxyEffortStops } from "./galaxyEffortLevels";
+import { cosmicColorAtRatio } from "./CosmicEffortSlider";
 import {
   composerFloatingLayerProps,
   takeOpenTarget,
@@ -134,7 +136,8 @@ export function describeComposerEffort(
   traits: TraitsSelectionInput | null,
   effortDisplay: EffortDisplay,
   size: ComposerControlSize,
-): { suffix: ReactNode; detail: string | null } {
+  compactTrack = false,
+): { suffix: ReactNode; detail: string | null; level?: number } {
   if (!traits) return { suffix: null, detail: null };
   const visibility = getTraitsSectionVisibility(traits);
   if (!visibility.hasAnyControls) return { suffix: null, detail: null };
@@ -191,6 +194,17 @@ export function describeComposerEffort(
     const index = choices.findIndex((choice) => choice.id === current);
     return index < 0 ? null : index / (choices.length - 1);
   })();
+  const level = (() => {
+    if (reasoning?.type !== "select" || ultrathink) return undefined;
+    const choices = selectableProviderOptionChoices(reasoning);
+    const current = getDescriptorStringValue(
+      reasoning,
+      modelSelection,
+      traits.reportedModelSelection,
+    );
+    const index = choices.findIndex((choice) => choice.id === current);
+    return index < 0 ? undefined : galaxyEffortStops(choices)[index];
+  })();
   const fast = display.speedLabel === "Fast" || display.speedLabel === "Ultrafast";
   // Agent options such as modes live in the picker; the trigger adds only the context window.
   const contextWindow =
@@ -204,6 +218,7 @@ export function describeComposerEffort(
     return { suffix: null, detail: display.label };
   return {
     detail: display.label,
+    ...(level === undefined ? {} : { level }),
     suffix: (
       <span
         className={cn(
@@ -211,7 +226,7 @@ export function describeComposerEffort(
           size === "sm" && "-ms-0.5",
         )}
       >
-        {word ? (
+        {compactTrack ? null : word ? (
           <CosmicTierPill ratio={sliderRatio} word={word} />
         ) : glyph ? (
           <>
@@ -261,8 +276,8 @@ function ColumnRow(props: {
     "aria-checked": props.selected,
     disabled: props.disabled,
     "data-effort-row": true,
-    // Focus lands on a level after a model pick.
-    "data-effort-level": true,
+    // Focus lands on a level after a model pick, and a typed letter finds one by its label.
+    "data-effort-level": props.label,
     // Up and Down move between rows.
     tabIndex: props.tabStop ? 0 : -1,
     className: COLUMN_ROW,
@@ -293,15 +308,30 @@ function ColumnRow(props: {
 }
 
 function moveBetweenRows(event: KeyboardEvent<HTMLElement>) {
-  if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+  if (event.target instanceof HTMLElement && event.target.hasAttribute("data-effort-slider"))
+    return;
+  const arrow = event.key === "ArrowDown" || event.key === "ArrowUp";
+  if (
+    !arrow &&
+    (event.key.length !== 1 ||
+      event.key.trim() === "" ||
+      event.ctrlKey ||
+      event.altKey ||
+      event.metaKey ||
+      event.nativeEvent.isComposing)
+  )
+    return;
   // An option's side menu is a React child here, but it moves through its own items.
   if (!event.currentTarget.contains(event.target as Node)) return;
   const rows = Array.from(
     event.currentTarget.querySelectorAll<HTMLButtonElement>("[data-effort-row]:not(:disabled)"),
   );
   const index = rows.findIndex((row) => row === document.activeElement);
-  const next =
-    rows[Math.min(rows.length - 1, Math.max(0, index + (event.key === "ArrowDown" ? 1 : -1)))];
+  const next = arrow
+    ? rows[Math.min(rows.length - 1, Math.max(0, index + (event.key === "ArrowDown" ? 1 : -1)))]
+    : [...rows.slice(index + 1), ...rows.slice(0, index + 1)].find((row) =>
+        row.dataset.effortLevel?.toLowerCase().startsWith(event.key.toLowerCase()),
+      );
   if (!next) return;
   event.preventDefault();
   event.stopPropagation();
@@ -389,8 +419,6 @@ function EffortRows(props: { control: ColumnControl; traits: TraitsSelection; lo
   const shown = choices.some((option) => option.id === value);
   const asSlider = choices.length >= 2;
   return (
-    // With the slider, the level radios live in its tier scale, which carries the group role so the
-    // slider-style switcher (its own radiogroup) is not nested inside this one.
     <div
       role={asSlider ? undefined : "radiogroup"}
       aria-label={asSlider ? undefined : descriptor.label}
@@ -402,52 +430,12 @@ function EffortRows(props: { control: ColumnControl; traits: TraitsSelection; lo
         </div>
       ) : null}
       {asSlider ? (
-        <CosmicEffortSlider
-          label={descriptor.label}
+        <GalaxyEffortSlider
           options={choices}
           value={value}
           disabled={locked}
           onChange={(nextId) => traits.changeSelect(control.descriptor, nextId)}
-        >
-          {/* V9 tier scale: the level radios themselves, laid out under the track. */}
-          <div role="radiogroup" aria-label={descriptor.label} data-cosmic-tier-scale>
-            {choices.map((option, index) => {
-              const selected = option.id === value;
-              const translatedLabel = uiText(option.label);
-              return (
-                <HintButton
-                  key={option.id}
-                  hint={option.description}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  aria-label={option.isDefault ? `${translatedLabel} (Default)` : translatedLabel}
-                  disabled={locked}
-                  data-effort-row
-                  data-effort-level
-                  tabIndex={(shown ? selected : index === 0) ? 0 : -1}
-                  onClick={() => traits.changeSelect(control.descriptor, option.id)}
-                  onKeyDown={(event) => {
-                    if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
-                    const step = event.key === "ArrowRight" ? 1 : -1;
-                    const next = choices[index + step];
-                    if (!next) return;
-                    event.preventDefault();
-                    event.stopPropagation();
-                    traits.changeSelect(control.descriptor, next.id);
-                    const sibling =
-                      step > 0
-                        ? event.currentTarget.nextElementSibling
-                        : event.currentTarget.previousElementSibling;
-                    (sibling as HTMLElement | null)?.focus();
-                  }}
-                >
-                  {translatedLabel}
-                </HintButton>
-              );
-            })}
-          </div>
-        </CosmicEffortSlider>
+        />
       ) : null}
       {asSlider
         ? null
@@ -909,7 +897,7 @@ export function ComposerEffortMenu(props: {
       return;
     }
     const selected = popup.current?.querySelector<HTMLElement>(
-      '[data-effort-level][aria-checked="true"]:not(:disabled)',
+      '[data-effort-slider]:not([aria-disabled="true"]), [data-effort-level][aria-checked="true"]:not(:disabled)',
     );
     const first = popup.current?.querySelector<HTMLElement>(
       "[data-effort-row]:not(:disabled), [data-composer-permission-option]:not(:disabled)",

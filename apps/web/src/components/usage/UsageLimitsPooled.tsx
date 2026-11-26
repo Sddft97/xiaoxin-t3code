@@ -41,7 +41,7 @@ import {
   type ResetCardScope,
 } from "./limitsHealthModel";
 import { limitPoolTitles } from "./limitPoolTitle";
-import { useTheme } from "../../hooks/useTheme";
+import { useAppleMaterialTheme } from "../../hooks/useTheme";
 import { UsageLimitRings, quotaStateText } from "./UsageLimitRings";
 import {
   quotaReadingStale,
@@ -1128,7 +1128,7 @@ function PoolSection({
   readonly previewAffectedWindowIds?: ReadonlySet<string> | undefined;
 }) {
   const uiText = useUiText();
-  const { theme } = useTheme();
+  const apple = useAppleMaterialTheme();
   const color = barColor(pool.driver);
   const label = title;
   const driverLabel = providerClients.get(pool.driver)?.label ?? String(pool.driver);
@@ -1148,7 +1148,7 @@ function PoolSection({
     !resetTrayOpen &&
     (health?.gapMs !== null ? (health?.gapMs ?? 0) > 0.35 * 86_400_000 : state === "early"),
   );
-  if (theme === "apple")
+  if (apple)
     return (
       <section
         data-usage-card
@@ -1336,8 +1336,7 @@ export function UsageLimitsPooled({
   readonly now: number;
 }) {
   const uiText = useUiText();
-  const { theme } = useTheme();
-  const apple = theme === "apple";
+  const apple = useAppleMaterialTheme();
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const [flashPoolId, setFlashPoolId] = useState<string | null>(null);
   const flashTimerRef = useRef<number | null>(null);

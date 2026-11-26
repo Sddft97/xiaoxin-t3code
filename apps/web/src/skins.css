@@ -308,24 +308,6 @@ html[data-theme-id="porcelain"] .task-trail {
   padding-inline: 0;
 }
 
-/* Selected conversation: a 2px notch on the row's left edge; ink on paper, red in the darkroom. */
-:is(html[data-theme-id="graphite"], html[data-theme-id="darkroom"], html[data-theme-id="porcelain"])
-  [data-thread-item]
-  > [data-sidebar="menu-sub-button"][data-active="true"]::before {
-  content: "";
-  position: absolute;
-  inset-block: 8px;
-  left: 0;
-  width: 2px;
-  border-radius: 2px;
-  background: var(--color-foreground);
-}
-html[data-theme-id="darkroom"]
-  [data-thread-item]
-  > [data-sidebar="menu-sub-button"][data-active="true"]::before {
-  background: #e5484d;
-}
-
 /* Inspector tabs: one shared slider under the pressed tab; it moves only when the tab changes. */
 [data-inspector-tabs] {
   border-radius: var(--radius-lg);
@@ -426,15 +408,90 @@ html[data-interface-style="macos"][data-theme-id="porcelain"] {
     transform: none;
   }
 }
+/* A leaving row fades in place. In a sidebar list, observeSidebarList pins it where it stood and
+   lifts it out of the flow (data-flip-lifted) so the rows below close the gap while it fades. */
+[data-flip-lifted] {
+  position: absolute;
+  inset-inline: 0;
+}
+/* The fade (or tail fold) itself is scripted by observeSidebarList, so a row that comes back
+   mid-exit can resume from exactly what is on screen. */
 .workbench-inbox-exit {
   pointer-events: none;
-  animation: workbench-inbox-exit 350ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
-@keyframes workbench-inbox-exit {
-  to {
-    opacity: 0;
-    transform: translateX(-16px);
+/* Hover actions take the time's place: the time fades out, the actions fade in, and the title
+   keeps its width (no re-truncation) while its tail fades out beneath the actions. The fade is a
+   registered number so the mask itself eases; at rest the mask is fully opaque. */
+@property --row-fade {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+.workbench-row-fade {
+  --row-actions-width: 4.5rem;
+  mask-image: linear-gradient(
+    to right,
+    #000 calc(100% - var(--row-actions-width) - 1rem),
+    rgb(0 0 0 / var(--row-fade)) calc(100% - var(--row-actions-width))
+  );
+  transition: --row-fade var(--motion-hover) var(--motion-ease-standard);
+}
+/* Widths follow the measured action strips (needs-you carries a text button: 70px zh, 76px en). */
+.workbench-row-fade[data-actions="needs-you"] {
+  --row-actions-width: 5rem;
+}
+.workbench-row-fade[data-actions="running"] {
+  --row-actions-width: 3.125rem;
+}
+.workbench-row-time {
+  transition: opacity var(--motion-hover) var(--motion-ease-standard);
+}
+@media (hover: hover) {
+  [data-row-actions-host]:hover .workbench-row-fade {
+    --row-fade: 0;
   }
+  [data-row-actions-host]:hover .workbench-row-time {
+    opacity: 0;
+  }
+}
+[data-row-actions-host]:has(:focus-visible, [data-menu-open]) .workbench-row-fade {
+  --row-fade: 0;
+}
+[data-row-actions-host]:has(:focus-visible, [data-menu-open]) .workbench-row-time {
+  opacity: 0;
+}
+@media (pointer: coarse) {
+  [data-row-actions-host]:not(:has([data-inbox-quick-actions="running"])) .workbench-row-fade {
+    --row-fade: 0;
+  }
+  [data-row-actions-host]:not(:has([data-inbox-quick-actions="running"])) .workbench-row-time {
+    opacity: 0;
+  }
+}
+/* Disclosure content opens from its header and folds back into it. */
+.workbench-disclosure {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows var(--motion-expand) var(--motion-ease-standard),
+    opacity var(--motion-expand) var(--motion-ease-standard);
+}
+.workbench-disclosure > * {
+  min-height: 0;
+  overflow: hidden;
+}
+@starting-style {
+  .workbench-disclosure:not([data-initial]) {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+.workbench-disclosure[data-closing] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition-duration: var(--motion-exit);
+  transition-timing-function: var(--motion-ease-exit);
 }
 .artifact-wall-row::before {
   content: "";
@@ -449,6 +506,11 @@ html[data-interface-style="macos"][data-theme-id="porcelain"] {
   .composer-artifact-enter,
   .workbench-inbox-exit {
     animation: none;
+  }
+  .workbench-disclosure,
+  .workbench-row-fade,
+  .workbench-row-time {
+    transition: none;
   }
 }
 
@@ -465,13 +527,26 @@ html[data-interface-style="macos"][data-theme-id="porcelain"] {
 .resume-card-enter {
   animation: resume-card-enter 350ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
+/* The composer strip removes a leaving card after 350ms (useInboxExitRows' default): the fade
+   spans that whole hold so the card never sits blank before it goes. */
+.resume-card-exit {
+  pointer-events: none;
+  animation: resume-card-exit 350ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes resume-card-exit {
+  to {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+}
 :has(> [data-resume-card])
   [data-composer-banner-stack][data-artifact-compact]
   [data-composer-banner-row] {
   flex-wrap: nowrap;
 }
 @media (prefers-reduced-motion: reduce) {
-  .resume-card-enter {
+  .resume-card-enter,
+  .resume-card-exit {
     animation: none;
   }
 }

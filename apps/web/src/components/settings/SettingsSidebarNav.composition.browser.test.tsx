@@ -1,10 +1,22 @@
+import "~/index.css";
 import { expect, it, vi } from "vite-plus/test";
 import { page, userEvent } from "vite-plus/test/browser";
 
+import { testUiLocale } from "../../../test/uiLocale";
 import { act, render } from "../../../test/render";
+import { ToastProvider } from "../ui/toast";
+import { useMemoryProposalNotification } from "./useMemoryProposalNotification";
 import { SidebarProvider } from "../ui/sidebar";
 import { SettingsSidebarNav } from "./SettingsSidebarNav";
 import { settingsNavGroups, SETTINGS_SECTION_LABELS } from "./settingsSearch";
+
+const memory = vi.hoisted(() => ({ pending: [] as { id: string }[] }));
+vi.mock("../../state/environments", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../state/environments")>()),
+  useEnvironments: () => ({
+    environments: [{ environmentId: "memory-test", serverConfig: { settings: { memory } } }],
+  }),
+}));
 
 vi.mock("./useAvailableSettingsSearchItems", () => ({
   useAvailableSettingsSearchItems: () => [
@@ -14,6 +26,7 @@ vi.mock("./useAvailableSettingsSearchItems", () => ({
 }));
 
 it("ignores composing keys in the search", async () => {
+  await page.viewport(1280, 800);
   await using screen = await render(
     <SidebarProvider defaultOpen>
       <SettingsSidebarNav pathname="/settings/general" />
@@ -111,4 +124,89 @@ it.each([1280, 390])("names each group by a heading outside it at %ipx wide", as
     expect(heading?.tagName, `the group starting at ${first} has no heading`).toBe("H3");
   }
   expect(page.getByRole("tree").query()).toBeNull();
+});
+
+it.each(["light", "dark"] as const)(
+  "shows the memory entry under 智能体 in %s mode",
+  async (theme) => {
+    using _locale = testUiLocale("zh-CN");
+    await page.viewport(1100, 900);
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    const container = document.createElement("div");
+    container.dataset.testid = "memory-sidebar-frame";
+    container.className = "h-screen w-64 bg-sidebar text-sidebar-foreground";
+    memory.pending = [{ id: "pending-proposal" }];
+    try {
+      await using screen = await render(
+        <SidebarProvider defaultOpen>
+          <SettingsSidebarNav pathname="/settings/memory" />
+        </SidebarProvider>,
+        { router: "/settings/memory", container },
+      );
+      const agents = screen.getByRole("group", { name: "智能体" });
+      const memoryEntry = agents.getByRole("button", { name: /记忆/ });
+      await expect.element(memoryEntry).toBeVisible();
+      expect(memoryEntry.element().textContent).toMatch(/记忆\s*1/);
+      expect(memoryEntry.element().getAttribute("aria-current")).toBe("page");
+      const previousRow = memoryEntry.element().closest("li")?.previousElementSibling;
+      expect(
+        previousRow
+          ?.querySelector("[data-settings-section]")
+          ?.getAttribute("data-settings-section"),
+      ).toBe("/settings/threads");
+      if (import.meta.env.VITE_STARDUST_FIX_SHOTS) {
+        await page.screenshot({
+          path: `${import.meta.env.VITE_STARDUST_FIX_SHOTS}/01-memory-sidebar-${theme}.png`,
+          element: page.getByTestId("memory-sidebar-frame"),
+        });
+      }
+    } finally {
+      memory.pending = [];
+      document.documentElement.classList.remove("dark");
+    }
+  },
+);
+
+function MemoryNotice() {
+  useMemoryProposalNotification();
+  return null;
+}
+
+it("offers review and dismiss for a new memory proposal", async () => {
+  using _locale = testUiLocale("zh-CN");
+  await page.viewport(1050, 620);
+  memory.pending = [];
+  const renderNotice = () => (
+    <ToastProvider>
+      <MemoryNotice />
+    </ToastProvider>
+  );
+  await using screen = await render(renderNotice(), { router: "/settings/general" });
+  const emit = async (id: string) => {
+    memory.pending = [{ id }];
+    await screen.rerender(renderNotice());
+    await expect.element(page.getByText("批准前不会提供给模型。")).toBeVisible();
+  };
+  try {
+    await emit("first");
+    const review = page.getByRole("button", { name: "去审核" });
+    const later = page.getByRole("button", { name: "稍后" });
+    await expect.element(review).toBeVisible();
+    await expect.element(later).toBeVisible();
+    if (import.meta.env.VITE_STARDUST_FIX_SHOTS) {
+      const root = review.element().closest<HTMLElement>("[data-position]")!;
+      root.dataset.testid = "proposal-toast-capture";
+      await page.screenshot({
+        path: `${import.meta.env.VITE_STARDUST_FIX_SHOTS}/02-memory-proposal-toast.png`,
+        element: page.getByTestId("proposal-toast-capture"),
+      });
+    }
+    await later.click();
+    await expect.element(review).not.toBeInTheDocument();
+    await emit("second");
+    await review.click();
+    await vi.waitFor(() => expect(screen.router?.state.location.pathname).toBe("/settings/memory"));
+  } finally {
+    memory.pending = [];
+  }
 });

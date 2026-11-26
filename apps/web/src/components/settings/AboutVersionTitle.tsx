@@ -1,13 +1,16 @@
+import { STARDUST_WINDOWS_BRAND } from "@t3tools/shared/stardustWindowsBrand";
+import { platformProfile } from "~/lib/PlatformProfile";
 import { msg, T, useGT } from "gt-react";
 
-import { APP_VERSION } from "../../branding";
+import { useUiText } from "../../i18n/useUiText";
 import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
 import { InlineButton } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 
-export function AboutVersionTitle() {
+export function AboutVersionTitle({ version }: { version: string }) {
   const gt = useGT();
+  const uiText = useUiText();
   const { copyToClipboard } = useCopyToClipboard<void>({
     target: {
       target: "version",
@@ -26,28 +29,23 @@ export function AboutVersionTitle() {
   });
 
   return (
-    <span className="inline-flex items-baseline gap-2">
-      <span>
-        <T>Version</T>
-      </span>
-      <code className="text-2xs font-medium">
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <InlineButton
-                tone="muted"
-                aria-label={gt("Copy version {version}", { version: APP_VERSION })}
-                onClick={() => copyToClipboard(APP_VERSION, undefined)}
-              >
-                {APP_VERSION}
-              </InlineButton>
-            }
-          />
-          <TooltipPopup>
-            <T>Copy version</T>
-          </TooltipPopup>
-        </Tooltip>
-      </code>
-    </span>
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <InlineButton
+            tone="muted"
+            aria-label={gt("Copy version {version}", { version })}
+            onClick={() => copyToClipboard(version, undefined)}
+          >
+            {platformProfile.isWindowsDesktop
+              ? `${STARDUST_WINDOWS_BRAND.description} ${version}`
+              : uiText("Stardust {version}", { version })}
+          </InlineButton>
+        }
+      />
+      <TooltipPopup>
+        <T>Copy version</T>
+      </TooltipPopup>
+    </Tooltip>
   );
 }

@@ -336,13 +336,22 @@ describe("scoreThreadSearch beyond Latin text and titles", () => {
       ranges: [{ start: 0, end: 7 }],
     });
     expect(scoreThreadSearch("trim", subject, NOW)?.explain?.()).toBeUndefined();
-    // Nor is it in the flat t3-<hex> form used when a `t3` branch blocks nested refs.
-    const flat = thread("Add search", { branch: "t3-abcd1234" });
-    expect(scoreThreadSearch("t3", flat, NOW)).toBeNull();
-    expect(scoreThreadSearch("t3 connect", flat, NOW)).toBeNull();
+  });
+
+  it.each(["stardust", "t3"])("strips the %s prefix from branch search", (prefix) => {
+    const nested = thread("Add search", { branch: `${prefix}/abcd1234` });
+    expect(scoreThreadSearch(prefix, nested, NOW)).toBeNull();
+    expect(scoreThreadSearch(`${prefix}/abcd`, nested, NOW)?.explain?.()?.text).toBe("abcd1234");
+
+    const flat = thread("Add search", { branch: `${prefix}-abcd1234`, projectTitle: "connect" });
+    expect(scoreThreadSearch(prefix, flat, NOW)).toBeNull();
     expect(scoreThreadSearch("abcd1234", flat, NOW)).not.toBeNull();
-    for (const query of ["t3-abcd", "t3-abcd1234 connect", "connect t3-abcd1234"]) {
-      expect(scoreThreadSearch(query, { ...flat, projectTitle: "connect" }, NOW)).not.toBeNull();
+    for (const query of [
+      `${prefix}-abcd`,
+      `${prefix}-abcd1234 connect`,
+      `connect ${prefix}-abcd1234`,
+    ]) {
+      expect(scoreThreadSearch(query, flat, NOW)).not.toBeNull();
     }
   });
 

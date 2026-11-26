@@ -1,15 +1,4 @@
 // @effect-diagnostics nodeBuiltinImport:off -- Hashes a downloaded file outside any Effect runtime.
-/**
- * T3 Stardust's own macOS update feed and installer. Squirrel.Mac only installs Developer ID
- * builds and public Stardust builds are ad-hoc signed, so the fork verifies, extracts and swaps
- * its GitHub release zip itself. Nothing here reaches the network.
- *
- * @module stardustUpdate
- */
-/* oxlint-disable t3code/no-low-value-comments -- The owner asked for this TODO; no tracking issue exists yet. */
-// TODO(windows): electron-updater with a `github` provider for zds-xiaoxin/xiaoxin-t3code can
-// serve Windows NSIS builds once they publish latest.yml; Windows and Linux are unchanged until then.
-/* oxlint-enable t3code/no-low-value-comments */
 import * as NodeCrypto from "node:crypto";
 import * as NodeFS from "node:fs";
 
@@ -21,7 +10,7 @@ export type StardustUpdateErrorCode =
   | "network"
   | "rate-limited"
   | "invalid-release"
-  | "no-mac-asset"
+  | "no-asset"
   | "digest-mismatch"
   | "extract-failed"
   | "bundle-mismatch"
@@ -40,18 +29,18 @@ const STARDUST_UPDATE_ERROR_MESSAGES: Readonly<Record<StardustUpdateErrorCode, s
   network: "Couldn’t reach GitHub to check for updates. Try again later.",
   "rate-limited": "GitHub is rate-limiting update checks. Try again later.",
   "invalid-release": "The latest release information is invalid.",
-  "no-mac-asset": "The latest release has no verifiable Mac Apple Silicon build.",
+  "no-asset": "The latest release has no verifiable Mac Apple Silicon build.",
   "digest-mismatch": "The downloaded update failed its checksum. It was deleted; try again.",
   "extract-failed": "Couldn’t unpack the downloaded update. Try again.",
-  "bundle-mismatch": "The downloaded update is not T3 Stardust, so it was not installed.",
+  "bundle-mismatch": "The downloaded update is not Stardust, so it was not installed.",
   "version-mismatch":
     "The downloaded update does not match the release version, so it was not installed.",
   "signature-invalid":
     "The downloaded update failed its code signature check, so it was not installed.",
   "not-writable":
-    "T3 Stardust can’t replace itself in this folder. Move it to Applications or a folder you can write to, then try again.",
+    "Stardust can’t replace itself in this folder. Move it to Applications or a folder you can write to, then try again.",
   translocated:
-    "macOS is running T3 Stardust from a temporary location. Move it to the Applications folder, open it from there, then try again.",
+    "macOS is running Stardust from a temporary location. Move it to the Applications folder, open it from there, then try again.",
   "no-download": "No downloaded update is ready to install.",
   "install-failed": "Couldn’t start the update installer. Your current version is unchanged.",
 };
@@ -61,8 +50,12 @@ const STARDUST_UPDATE_ERROR_MESSAGES: Readonly<Record<StardustUpdateErrorCode, s
 export class StardustUpdateError extends Error {
   readonly code: StardustUpdateErrorCode;
   readonly detail: string | undefined;
-  constructor(code: StardustUpdateErrorCode, detail?: string) {
-    super(STARDUST_UPDATE_ERROR_MESSAGES[code]);
+  constructor(
+    code: StardustUpdateErrorCode,
+    detail?: string,
+    message = STARDUST_UPDATE_ERROR_MESSAGES[code],
+  ) {
+    super(message);
     this.name = "StardustUpdateError";
     this.code = code;
     this.detail = detail;
@@ -163,12 +156,23 @@ export interface StardustRelease {
   };
 }
 
-function stardustMacAssetNames(version: string): ReadonlyArray<string> {
-  return [`T3-Stardust-v${version}-macOS-arm64.zip`, `T3-Stardust-${version}-macOS-arm64.zip`];
+export type StardustUpdateTarget = "macOS-arm64" | "Windows-x64";
+
+function stardustAssetNames(target: StardustUpdateTarget, version: string): ReadonlyArray<string> {
+  const suffix = target === "macOS-arm64" ? "macOS-arm64.zip" : "Windows-x64-Setup.exe";
+  return [
+    `Stardust-v${version}-${suffix}`,
+    `Stardust-${version}-${suffix}`,
+    `T3-Stardust-v${version}-${suffix}`,
+    `T3-Stardust-${version}-${suffix}`,
+  ];
 }
 
-/** Parses GitHub's `releases/latest` response. Only URLs this function builds are ever fetched. */
-export function parseStardustRelease(value: unknown): StardustRelease {
+function checkedReleaseTag(value: unknown): {
+  release: Record<string, unknown>;
+  version: string;
+  tag: string;
+} {
   if (!value || typeof value !== "object") throw new StardustUpdateError("invalid-release");
   const release = value as Record<string, unknown>;
   const tag = typeof release.tag_name === "string" ? release.tag_name : "";
@@ -176,7 +180,20 @@ export function parseStardustRelease(value: unknown): StardustRelease {
   if (version === null || release.draft !== false || release.prerelease !== false) {
     throw new StardustUpdateError("invalid-release", `unexpected release ${tag || "(no tag)"}`);
   }
-  const names = stardustMacAssetNames(version);
+  return { release, version, tag };
+}
+
+export function stardustReleaseVersion(value: unknown): string {
+  return checkedReleaseTag(value).version;
+}
+
+/** Parses GitHub's `releases/latest` response. Only URLs this function builds are ever fetched. */
+export function parseStardustRelease(
+  value: unknown,
+  target: StardustUpdateTarget = "macOS-arm64",
+): StardustRelease {
+  const { release, version, tag } = checkedReleaseTag(value);
+  const names = stardustAssetNames(target, version);
   const assets = Array.isArray(release.assets) ? release.assets : [];
   for (const name of names) {
     const asset = assets.find(
@@ -209,7 +226,13 @@ export function parseStardustRelease(value: unknown): StardustRelease {
       },
     };
   }
-  throw new StardustUpdateError("no-mac-asset", `release ${tag} has no complete arm64 zip`);
+  throw new StardustUpdateError(
+    "no-asset",
+    `release ${tag} has no complete ${target} asset`,
+    target === "Windows-x64"
+      ? "The latest release has no verifiable Windows x64 build."
+      : undefined,
+  );
 }
 
 function sha256OfFile(filePath: string): Promise<string> {
@@ -270,6 +293,8 @@ export interface StardustInstallScriptOptions {
   readonly waitTimeoutSeconds?: number;
   /** Overridable for tests; production uses /usr/bin/open. */
   readonly openCommand?: string;
+  /** Overridable for unsigned test fixtures; production uses /usr/bin/codesign. */
+  readonly codesignCommand?: string;
 }
 
 /**
@@ -279,15 +304,21 @@ export interface StardustInstallScriptOptions {
 export function buildStardustInstallScript(options: StardustInstallScriptOptions): string {
   const backupApp = `${options.backupDir}/${options.currentAppPath.split("/").pop() ?? "T3 Stardust.app"}`;
   const slash = options.currentAppPath.lastIndexOf("/");
-  const stagedApp = `${options.currentAppPath.slice(0, slash + 1)}.${options.currentAppPath.slice(slash + 1)}.update-previous`;
+  const directory = options.currentAppPath.slice(0, slash + 1);
+  const currentName = options.currentAppPath.slice(slash + 1);
+  const destination =
+    currentName === "T3 Stardust.app" ? `${directory}Stardust.app` : options.currentAppPath;
+  const stagedApp = `${directory}.${currentName}.update-previous`;
   const openCommand = options.openCommand ?? "/usr/bin/open";
+  const codesignCommand = options.codesignCommand ?? "/usr/bin/codesign";
   const waitTimeout = Math.max(1, Math.floor(options.waitTimeoutSeconds ?? 600));
   return `#!/bin/zsh
-# T3 Stardust updater: ${options.fromVersion} -> ${options.toVersion}
+# Stardust updater: ${options.fromVersion} -> ${options.toVersion}
 set -u
 umask 022
 PID=${options.pid}
 CURRENT=${shellQuote(options.currentAppPath)}
+DESTINATION=${shellQuote(destination)}
 NEW=${shellQuote(options.newAppPath)}
 BACKUP_DIR=${shellQuote(options.backupDir)}
 BACKUP=${shellQuote(backupApp)}
@@ -296,6 +327,9 @@ LOG=${shellQuote(options.logPath)}
 CLEANUP=${shellQuote(options.cleanupDir ?? "")}
 RELAUNCH=${options.relaunch ? 1 : 0}
 OPEN=${shellQuote(openCommand)}
+CODESIGN=${shellQuote(codesignCommand)}
+installed=0
+staged=0
 FROM=${shellQuote(options.fromVersion)}
 TO=${shellQuote(options.toVersion)}
 
@@ -309,10 +343,10 @@ relaunch() {
 }
 
 restore_previous() {
-  if [[ -e "$CURRENT" ]]; then
-    /bin/rm -rf "$CURRENT" >> "$LOG" 2>&1
+  if (( installed )); then
+    /bin/rm -rf "$DESTINATION" >> "$LOG" 2>&1 || return 1
   fi
-  if /bin/mv "$STAGED" "$CURRENT" >> "$LOG" 2>&1; then
+  if (( ! staged )) || { /bin/mv -n "$STAGED" "$CURRENT" >> "$LOG" 2>&1 && [[ ! -e "$STAGED" ]]; }; then
     log "rolled back to $FROM"
     return 0
   fi
@@ -331,7 +365,7 @@ fail_after_swap() {
   if restore_previous; then
     relaunch "$CURRENT"
   else
-    relaunch "$STAGED"
+    [[ ! -e "$STAGED" ]] || relaunch "$STAGED"
   fi
   exit 1
 }
@@ -349,41 +383,90 @@ done
 
 [[ -d "$NEW/Contents" ]] || fail_before_swap "new app is missing at $NEW"
 [[ -d "$CURRENT/Contents" ]] || fail_before_swap "current app is missing at $CURRENT"
-if [[ -e "$STAGED" ]]; then
-  /bin/rm -rf "$STAGED" >> "$LOG" 2>&1 || fail_before_swap "cannot clear $STAGED"
+[[ ! -e "$STAGED" && ! -L "$STAGED" ]] || fail_before_swap "a previous app is already kept at $STAGED"
+if [[ "$DESTINATION" != "$CURRENT" && ( -e "$DESTINATION" || -L "$DESTINATION" ) ]]; then
+  fail_before_swap "destination already exists: $DESTINATION"
 fi
 
-# A rename in the same folder is atomic, so the previous app is never half-moved.
-/bin/mv "$CURRENT" "$STAGED" >> "$LOG" 2>&1 || fail_before_swap "cannot move $CURRENT aside (is the folder writable?)"
-/bin/mv "$NEW" "$CURRENT" >> "$LOG" 2>&1 || fail_after_swap "cannot move the new app into place"
-[[ -f "$CURRENT/Contents/Info.plist" && -d "$CURRENT/Contents/MacOS" ]] || fail_after_swap "the installed app is incomplete"
-log "installed $TO at $CURRENT"
+verify_app() {
+  [[ -f "$1/Contents/Info.plist" && -d "$1/Contents/MacOS" ]] &&
+    "$CODESIGN" --verify --deep --strict "$1" >> "$LOG" 2>&1
+}
+
+stage_current() {
+  /bin/mv -n "$CURRENT" "$STAGED" >> "$LOG" 2>&1 && [[ ! -e "$CURRENT" ]] || return 1
+  staged=1
+}
+
+if [[ "$DESTINATION" == "$CURRENT" ]]; then
+  verify_app "$NEW" || fail_before_swap "the new app failed verification"
+  stage_current || fail_before_swap "cannot move $CURRENT aside (is the folder writable?)"
+fi
+/bin/mv -n "$NEW" "$DESTINATION" >> "$LOG" 2>&1 &&
+  [[ ! -e "$NEW" ]] || fail_after_swap "cannot move the new app into place (is the folder writable?)"
+installed=1
+verify_app "$DESTINATION" || fail_after_swap "the installed app failed verification"
+if (( ! staged )); then
+  stage_current || fail_after_swap "cannot move $CURRENT aside (is the folder writable?)"
+fi
+log "installed $TO at $DESTINATION"
 
 if (( RELAUNCH )); then
-  relaunch "$CURRENT" || fail_after_swap "could not open the new app"
+  relaunch "$DESTINATION" || fail_after_swap "could not open the new app"
   log "relaunched $TO"
 fi
 
 # Keep the previous version as the only backup.
 if /bin/mkdir -p "$BACKUP_DIR" >> "$LOG" 2>&1; then
-  for old in "\${BACKUP_DIR:h}"/*(N/); do
-    [[ "$old" == "$BACKUP_DIR" ]] || /bin/rm -rf "$old" >> "$LOG" 2>&1
-  done
-  [[ -e "$BACKUP" ]] && /bin/rm -rf "$BACKUP" >> "$LOG" 2>&1
-  if /bin/mv "$STAGED" "$BACKUP" >> "$LOG" 2>&1; then
+  if [[ ! -e "$BACKUP" && ! -L "$BACKUP" ]] &&
+     /bin/mv -n "$STAGED" "$BACKUP" >> "$LOG" 2>&1 &&
+     [[ ! -e "$STAGED" ]]; then
     log "backed up $FROM to $BACKUP"
+    for old in "\${BACKUP_DIR:h}"/*(N/); do
+      [[ "$old" == "$BACKUP_DIR" ]] || /bin/rm -rf "$old" >> "$LOG" 2>&1
+    done
   else
-    log "could not move the previous app to $BACKUP; removing it"
-    /bin/rm -rf "$STAGED" >> "$LOG" 2>&1
+    log "could not move the previous app to $BACKUP; kept at $STAGED"
   fi
 else
-  log "could not create $BACKUP_DIR; removing the previous app"
-  /bin/rm -rf "$STAGED" >> "$LOG" 2>&1
+  log "could not create $BACKUP_DIR; previous app kept at $STAGED"
 fi
 if [[ -n "$CLEANUP" && -d "$CLEANUP" ]]; then
   /bin/rm -rf "$CLEANUP" >> "$LOG" 2>&1
 fi
 log "update to $TO finished"
 exit 0
+`;
+}
+
+/** The v1.2.3 installer keeps its old path. Rename that bundle on the next regular quit. */
+export function buildStardustLegacyRenameScript(options: {
+  readonly pid: number;
+  readonly currentAppPath: string;
+  readonly logPath: string;
+  readonly codesignCommand?: string;
+}): string | null {
+  const suffix = "/T3 Stardust.app";
+  if (!options.currentAppPath.endsWith(suffix)) return null;
+  const destination = options.currentAppPath.slice(0, -suffix.length) + "/Stardust.app";
+  return `#!/bin/zsh
+current=${shellQuote(options.currentAppPath)}
+destination=${shellQuote(destination)}
+log=${shellQuote(options.logPath)}
+verify=${shellQuote(options.codesignCommand ?? "/usr/bin/codesign")}
+/bin/mkdir -p "\${log:h}" || exit 1
+for ((attempt = 0; attempt < 150; attempt++)); do
+  kill -0 ${options.pid} 2>/dev/null || break
+  /bin/sleep 0.2
+done
+kill -0 ${options.pid} 2>/dev/null && exit 1
+[[ -d "$current/Contents" && ! -L "$current" && ! -e "$destination" && ! -L "$destination" ]] || exit 1
+"$verify" --verify --deep --strict "$current" >> "$log" 2>&1 || exit 1
+/bin/mv -n "$current" "$destination" >> "$log" 2>&1 && [[ ! -e "$current" ]] || exit 1
+if ! "$verify" --verify --deep --strict "$destination" >> "$log" 2>&1; then
+  /bin/mv -n "$destination" "$current" >> "$log" 2>&1
+  exit 1
+fi
+print -r -- "Migrated Stardust 1.2.4 to $destination" >> "$log"
 `;
 }

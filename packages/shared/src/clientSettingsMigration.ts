@@ -11,3 +11,19 @@ export function migrateLegacyClientSettings(value: unknown): unknown {
   const { appLocale, ...settings } = record;
   return { ...settings, language: appLocale === "zh-CN" ? "zh" : "en" };
 }
+
+const MATH_DEFAULT_MIGRATION_VERSION = 1;
+const MATH_DEFAULT_MIGRATION_KEY = "stardustMathDefaultMigrationVersion";
+
+export function stampMathDefaultMigration(settings: object) {
+  return { ...settings, [MATH_DEFAULT_MIGRATION_KEY]: MATH_DEFAULT_MIGRATION_VERSION };
+}
+
+export function migrateMathRenderingDefault(value: unknown): Record<string, unknown> | null {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return null;
+  const settings = value as Record<string, unknown>;
+  const version = settings[MATH_DEFAULT_MIGRATION_KEY];
+  if (settings.mathRenderingEnabled !== false) return null;
+  if (typeof version === "number" && version >= MATH_DEFAULT_MIGRATION_VERSION) return null;
+  return stampMathDefaultMigration({ ...settings, mathRenderingEnabled: true });
+}

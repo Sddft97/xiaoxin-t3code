@@ -681,7 +681,7 @@ export function UsageBreakdownCard({
                 project.kind === "project"
                   ? project.title
                   : project.kind === "unlinked"
-                    ? copy("Outside T3 conversations")
+                    ? copy("Outside Stardust conversations")
                     : copy("Not reported by this server."),
               amount: value(project),
               shown: format(value(project)),
@@ -815,7 +815,7 @@ export function UsageBreakdownCard({
         >
           {copy("{action} · Sorted by {metric}", {
             action: expanded
-              ? copy("Collapse recommendation")
+              ? copy("Show less")
               : copy("Show all · {count} more", { count: rows.length - 6 }),
             metric: copy(metric === "cost" ? copy("Cost") : copy("Tokens")),
           })}
@@ -1739,7 +1739,7 @@ export function V9CostDashboard({
                 project.kind === "project"
                   ? project.title
                   : project.kind === "unlinked"
-                    ? copy("Outside T3 conversations")
+                    ? copy("Outside Stardust conversations")
                     : copy("Not reported by this server."),
               costUsd: project.costUsd,
               shownCost: formatUsd(project.costUsd),
@@ -2141,7 +2141,7 @@ export function V9CostDashboard({
                 <span>{text("Cost routing insight")}</span>
               </span>
               <span data-ctv9="beui-insight-toggle">
-                {insightOpen ? copy("Collapse recommendation") : copy("Expand")}
+                {insightOpen ? copy("Show less") : copy("Expand")}
               </span>
             </button>
             <div data-ctv9="beui-insight-body">
@@ -2257,7 +2257,7 @@ export function V9CostDashboard({
               onClick={() => setRankExpanded((prev) => !prev)}
             >
               {rankExpanded
-                ? copy("Collapse recommendation")
+                ? copy("Show less")
                 : copy("Show all · {count} more", { count: rankRows.length - 6 })}
             </button>
           ) : null}
@@ -2416,7 +2416,7 @@ export function V9TokensDashboard({
       ? visibleThroughput
       : visibleThroughput.filter((entry) => usageSeries(entry.provider) === selectedProvider),
   );
-  const noThroughputHint = text("Only counts conversations run in T3");
+  const noThroughputHint = text("Only counts conversations run in Stardust");
 
   const sortedModels = sortModelsByTokens(detailUsage.models);
   const modelTokenSum = sortedModels.reduce((sum, m) => sum + m.totalTokens, 0) || 1;
@@ -2876,7 +2876,7 @@ export function V9TokensDashboard({
               onClick={() => setRankExpanded((prev) => !prev)}
             >
               {rankExpanded
-                ? copy("Collapse recommendation")
+                ? copy("Show less")
                 : copy("Show all · {count} more", { count: sortedModels.length - 6 })}
             </button>
           ) : null}

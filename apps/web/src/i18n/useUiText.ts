@@ -24,6 +24,7 @@ export function useUiText() {
             : String(values[name])
           : match[0];
     }
+    if (locale === "zh") return uiText(source, variables, "zh-CN");
     // The source is application copy; user strings are only interpolation variables.
     return gt(customMessageSource(source), {
       ...variables,

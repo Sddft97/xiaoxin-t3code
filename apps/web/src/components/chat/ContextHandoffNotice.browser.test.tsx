@@ -1,4 +1,5 @@
 import { GTProvider } from "gt-react";
+import "~/index.css";
 import zh from "../../i18n/translations/zh.json";
 import { describe, expect, it, vi } from "vite-plus/test";
 import { render, stubGlobal } from "../../../test/render";
@@ -344,6 +345,60 @@ describe("V9 compact context ring capsule", () => {
     expect(Math.round(trigger!.getBoundingClientRect().width)).toBe(30);
     expect(Math.round(trigger!.getBoundingClientRect().height)).toBe(30);
   });
+
+  it.each([
+    ["light", 27, "rgb(110, 110, 115)", "rgba(118, 118, 128, 0.094)", "rgb(227, 71, 23)"],
+    ["light", 85, "rgb(194, 84, 0)", "rgba(255, 149, 0, 0.14)", "rgb(194, 84, 0)"],
+    ["dark", 27, "rgb(161, 161, 166)", "rgba(255, 255, 255, 0.086)", "rgb(255, 103, 52)"],
+    ["dark", 85, "rgb(255, 159, 10)", "rgba(255, 159, 10, 0.18)", "rgb(255, 159, 10)"],
+  ] as const)(
+    "keeps one C115 context ring in Stardust %s at %i%%",
+    async (mode, usage, text, background, ringColor) => {
+      using _setup = setup();
+      const root = document.documentElement;
+      const beforeTheme = root.getAttribute("data-theme-id");
+      const beforeDark = root.classList.contains("dark");
+      using _theme = {
+        [Symbol.dispose]: () => {
+          if (beforeTheme === null) root.removeAttribute("data-theme-id");
+          else root.setAttribute("data-theme-id", beforeTheme);
+          root.classList.toggle("dark", beforeDark);
+        },
+      };
+      root.dataset.themeId = "stardust";
+      root.classList.toggle("dark", mode === "dark");
+      const projection = {
+        ...fixture(),
+        runs: [],
+        turnItems: [],
+        providerTurns: [
+          {
+            providerThreadId: "provider",
+            tokenUsage: { usedTokens: usage * 1000, maxTokens: 100_000 },
+          },
+        ],
+      } as unknown as OrchestrationV2ThreadProjection;
+      await using screen = await render(
+        <div data-slot="composer-shell">
+          <div data-slot="composer-host" style={{ width: 560 }}>
+            <div data-composer-leading="">{probe(projection, true, true)}</div>
+          </div>
+        </div>,
+      );
+      const trigger = screen.container.querySelector<HTMLButtonElement>("[data-context-handoff]")!;
+      const ring = trigger.querySelector("[data-v9-ctx-ring]")!;
+      expect(trigger.textContent).toBe(`${usage}%`);
+      expect(getComputedStyle(trigger, "::before").content).toBe("none");
+      expect(getComputedStyle(trigger, "::before").display).toBe("none");
+      expect(trigger.querySelectorAll("[data-v9-ctx-ring]")).toHaveLength(1);
+      expect(getComputedStyle(trigger).color).toBe(text);
+      expect(getComputedStyle(trigger).backgroundColor).toBe(background);
+      expect(getComputedStyle(trigger).height).toBe("30px");
+      expect(getComputedStyle(trigger).borderRadius).toBe("999px");
+      expect(getComputedStyle(ring).width).toBe("14px");
+      expect(getComputedStyle(ring).backgroundImage).toContain(`${ringColor} ${usage}%`);
+    },
+  );
 
   it("preserves high-usage warning tone and strong reminder state", async () => {
     using _setup = setup();

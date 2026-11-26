@@ -1,3 +1,4 @@
+import { useUiText } from "~/i18n/useUiText";
 import { msg, T, useGT, useMessages } from "gt-react";
 import { m, type MessageResolver } from "../i18n/messages";
 import { sourceControlClients } from "@t3tools/client-runtime/source-control-clients";
@@ -189,7 +190,7 @@ function shouldOpenDefaultBrowserProfileFromMenuClick(pointerType: string | unde
 }
 
 const SURFACE_DISABLED_REASONS = {
-  browser: msg("Browser previews are only available in the T3 Code desktop app."),
+  browser: msg("Browser previews are only available in the Stardust desktop app."),
   terminal: msg("Terminal surfaces are only available from a project thread."),
   files: msg("Files are only available when a project is open."),
   diff: msg("Diff is only available for server threads in Git repositories."),
@@ -967,6 +968,7 @@ function RightPanelTab(
   },
 ) {
   const gt = useGT();
+  const text = useUiText();
   const messages = useMessages();
   const {
     surface,
@@ -992,7 +994,9 @@ function RightPanelTab(
     sideChatShell === null
       ? props.title
       : sideChatShell.lineage.sideChat === true
-        ? sideChatShell.title
+        ? sideChatShell.title === "Side chat"
+          ? text("Side chat")
+          : sideChatShell.title
         : formatSubagentDisplayTitle(sideChatShell.title);
   const sideChatState = sideChatTabState(sideChatShell);
   const content = (

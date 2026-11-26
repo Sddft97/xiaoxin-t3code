@@ -30,6 +30,7 @@ import "~/components/ChatView";
 import { DraftId, useComposerDraftStore } from "~/composerDraftStore";
 import { selectThreadDiffPanelSelection, useDiffPanelStore } from "~/diffPanelStore";
 import { __setClientSettingsForTests } from "~/hooks/useSettings";
+import { startI18n, whenLocaleReady } from "~/i18n/runtime";
 import stylesheet from "~/index.css?inline";
 import { environmentContextRecord } from "~/lib/composerContextRecords";
 import { startWorkspaceFocus } from "~/lib/workspaceFocus";
@@ -57,6 +58,7 @@ import {
   type FakeDriver,
 } from "../../test/fakeEnvironment";
 import { act, fakeTimers, render } from "../../test/render";
+import { testUiLocale } from "../../test/uiLocale";
 
 const PNG = Uint8Array.from(
   atob(
@@ -620,6 +622,45 @@ it.each(["new", "existing"] as const)(
     launch.release();
   },
 );
+
+it("a file picked after the phone composer collapses still attaches", async () => {
+  const thread = threadWithHistory("thread-40993", 1);
+  using _environment = installFakeEnvironment([thread]);
+  await page.viewport(390, 844);
+  __setClientSettingsForTests({
+    ...DEFAULT_CLIENT_SETTINGS,
+    onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
+  });
+  const router = getRouter(
+    createMemoryHistory({ initialEntries: [`/${ENVIRONMENT_ID}/${thread.id}`] }),
+  );
+  await router.load();
+  await using _app = await render(<AppRoot router={router} />, {
+    // AppRoot brings its own router.
+    router: false,
+  });
+  using _uploads = acceptAttachmentUploads();
+  const editor = page.getByTestId("composer-editor");
+  await expect.element(page.getByText(`Answer 0 for ${thread.id}.`)).toBeVisible();
+  await userEvent.click(editor);
+  await expect.element(page.getByRole("button", { name: "Add attachment" })).toBeVisible();
+  const input = document.querySelector<HTMLInputElement>(
+    'form[data-chat-composer-form] input[type="file"]',
+  );
+  expect(input).not.toBeNull();
+
+  // Opening the native picker blurs the editor, which collapses the phone composer.
+  (editor.element() as HTMLElement).blur();
+  await expect
+    .element(page.getByRole("button", { name: "Add attachment" }))
+    .not.toBeInTheDocument();
+  const files = new DataTransfer();
+  files.items.add(new File([PNG], "picked.png", { type: "image/png" }));
+  input!.files = files.files;
+  input!.dispatchEvent(new Event("change", { bubbles: true }));
+
+  await expect.element(page.getByRole("img", { name: "picked.png" })).toBeVisible();
+});
 
 it("opens the thread actions menu for an older settled thread the shell leaves out", async () => {
   const thread = { ...threadWithHistory("older-settled", 1), olderSettled: true as const };
@@ -1220,4 +1261,100 @@ it("/side sends the draft's attachments and context, and keeps them when it does
       "/side what is this?",
     ]),
   );
+});
+
+function captureWorkbenchStyle() {
+  const style = document.createElement("style");
+  style.textContent = stylesheet;
+  document.head.append(style);
+  return { [Symbol.dispose]: () => style.remove() };
+}
+
+it("opens a side chat with the selected reply quoted and focuses the draft without sending", async () => {
+  using _locale = testUiLocale("zh-CN");
+  using _style = captureWorkbenchStyle();
+  await page.viewport(1440, 900);
+  const thread = threadWithHistory("selection-side-chat", 1);
+  using _environment = installFakeEnvironment([thread], { acceptCommands: true });
+  __setClientSettingsForTests({
+    ...DEFAULT_CLIENT_SETTINGS,
+    language: "zh",
+    onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
+  });
+  startI18n();
+  await whenLocaleReady();
+  const router = getRouter(
+    createMemoryHistory({ initialEntries: [`/${ENVIRONMENT_ID}/${thread.id}`] }),
+  );
+  await router.load();
+  await using _app = await render(<AppRoot router={router} />, { router: false });
+  const answer = page.getByText(`Answer 0 for ${thread.id}.`, { exact: true });
+  await expect.element(answer).toBeVisible();
+  const text = answer.element();
+  const firstLetter = document.createRange();
+  firstLetter.setStart(text.firstChild!, 0);
+  firstLetter.setEnd(text.firstChild!, 1);
+  const letterRect = firstLetter.getBoundingClientRect();
+  const answerRect = text.getBoundingClientRect();
+  await userEvent.dblClick(answer, {
+    position: {
+      x: letterRect.left - answerRect.left + letterRect.width / 2,
+      y: letterRect.top - answerRect.top + letterRect.height / 2,
+    },
+  });
+
+  const ask = page.getByRole("button", { name: "侧聊提问", exact: true });
+  await vi.waitFor(
+    () => {
+      expect(
+        ask.query(),
+        `Selection: ${window.getSelection()?.toString()}; source: ${answer.element().closest("[data-assistant-citation-source]")?.outerHTML.slice(0, 240)}; buttons: ${Array.from(
+          document.querySelectorAll("button"),
+        )
+          .filter((b) => b.textContent?.match(/引用|Cite|Side chat|侧聊/))
+          .map((b) => b.textContent)
+          .join(" / ")}`,
+      ).not.toBeNull();
+    },
+    { timeout: 5000 },
+  );
+  await vi.waitFor(
+    () => {
+      const actions = ask.element().parentElement;
+      expect(actions?.textContent).toContain("引用");
+    },
+    { timeout: 4000 },
+  );
+  if (import.meta.env.VITE_STARDUST_FIX_SHOTS) {
+    await page.screenshot({
+      path: `${import.meta.env.VITE_STARDUST_FIX_SHOTS}/03-selection-toolbar.png`,
+    });
+  }
+  const selectionBounds = window.getSelection()!.getRangeAt(0).getBoundingClientRect();
+  const toolbarBounds = ask.element().parentElement!.getBoundingClientRect();
+  expect(toolbarBounds.bottom).toBeLessThan(selectionBounds.top);
+  const quoted = window.getSelection()?.toString().trim() ?? "";
+  expect(quoted).not.toBe("");
+  await ask.click();
+  const pane = page.getByTestId("side-thread-pane");
+  const editor = pane.getByTestId("composer-editor");
+  await vi.waitFor(
+    () => {
+      expect(editor.query(), "The side-chat composer mounted").not.toBeNull();
+      expect(document.activeElement, "The side-chat composer has keyboard focus").toBe(
+        editor.element(),
+      );
+    },
+    { timeout: 6000 },
+  );
+  await expect.element(pane.getByRole("heading", { name: "侧聊", exact: true })).toBeVisible();
+  await expect.element(editor).toHaveTextContent(quoted);
+  expect(dispatchedCommands().filter((command) => command.type === "message.dispatch")).toEqual([]);
+  expect(window.getSelection()?.isCollapsed).toBe(true);
+  if (import.meta.env.VITE_STARDUST_FIX_SHOTS) {
+    await page.screenshot({
+      path: `${import.meta.env.VITE_STARDUST_FIX_SHOTS}/04-side-chat-quote.png`,
+      element: pane,
+    });
+  }
 });

@@ -13,7 +13,6 @@ import {
   parseOriginUrlFromGitConfig,
   resolveAutoFeatureBranchName,
   sanitizeFeatureBranchName,
-  WORKTREE_BRANCH_PREFIX,
 } from "./git.ts";
 
 describe("normalizeGitRemoteUrl", () => {
@@ -228,54 +227,44 @@ describe("parseOriginUrlFromGitConfig", () => {
   });
 });
 
-describe("isTemporaryWorktreeBranch", () => {
-  it("matches generated temporary worktree refs", () => {
-    expect(isTemporaryWorktreeBranch(`${WORKTREE_BRANCH_PREFIX}/deadbeef`)).toBe(true);
-    expect(isTemporaryWorktreeBranch(` ${WORKTREE_BRANCH_PREFIX}/deadbeef `)).toBe(true);
-    expect(isTemporaryWorktreeBranch(`${WORKTREE_BRANCH_PREFIX}/DEADBEEF`)).toBe(true);
-  });
-
-  it("normalizes a UUID-shaped random callback to the canonical 8-hex form", () => {
+describe("temporary worktree branch names", () => {
+  it("generates the Stardust prefix with eight hex digits from a UUID", () => {
     expect(buildTemporaryWorktreeBranchName(() => "f4ae4e0e-f971-4d48-b4f2-9cf0aa54ab12")).toBe(
-      `${WORKTREE_BRANCH_PREFIX}/f4ae4e0e`,
+      "stardust/f4ae4e0e",
     );
   });
 
-  it("matches legacy t3code temporary worktree refs", () => {
-    expect(isTemporaryWorktreeBranch("t3code/deadbeef")).toBe(true);
-    expect(isTemporaryWorktreeBranch("t3code-deadbeef")).toBe(true);
-    expect(isTemporaryWorktreeBranch("t3code/f4ae4e0e-f971-4d48-b4f2-9cf0aa54ab12")).toBe(true);
-    expect(
-      isTemporaryWorktreeBranch(`${WORKTREE_BRANCH_PREFIX}/f4ae4e0e-f971-4d48-b4f2-9cf0aa54ab12`),
-    ).toBe(false);
+  it.each(["stardust", "t3", "t3code"])("recognizes nested and flat %s refs", (prefix) => {
+    expect(isTemporaryWorktreeBranch(` ${prefix}/DEADBEEF `)).toBe(true);
+    expect(isTemporaryWorktreeBranch(`${prefix}-deadbeef`)).toBe(true);
+    expect(isTemporaryWorktreeBranch(`${prefix}/feature/demo`)).toBe(false);
+    expect(isTemporaryWorktreeBranch(`${prefix}/deadbeef-extra`)).toBe(false);
+    expect(isTemporaryWorktreeBranch(`${prefix}-deadbeef-extra`)).toBe(false);
   });
 
-  it("rejects UUID-shaped refs that are not RFC 4122 v4", () => {
+  it("recognizes the legacy t3code UUID v4 form", () => {
+    expect(isTemporaryWorktreeBranch("t3code/f4ae4e0e-f971-4d48-b4f2-9cf0aa54ab12")).toBe(true);
     expect(isTemporaryWorktreeBranch("t3code/f4ae4e0e-f971-1d48-b4f2-9cf0aa54ab12")).toBe(false);
     expect(isTemporaryWorktreeBranch("t3code/f4ae4e0e-f971-4d48-c4f2-9cf0aa54ab12")).toBe(false);
+    expect(isTemporaryWorktreeBranch("stardust/f4ae4e0e-f971-4d48-b4f2-9cf0aa54ab12")).toBe(false);
+    expect(isTemporaryWorktreeBranch("t3/f4ae4e0e-f971-4d48-b4f2-9cf0aa54ab12")).toBe(false);
   });
 
-  it("matches the flat fallback used when a plain t3 branch exists", () => {
-    const flat = flattenTemporaryWorktreeBranchName(`${WORKTREE_BRANCH_PREFIX}/deadbeef`);
-    expect(flat).toBe(`${WORKTREE_BRANCH_PREFIX}-deadbeef`);
+  it.each([
+    ["stardust/deadbeef", "stardust-deadbeef"],
+    ["t3/deadbeef", "t3-deadbeef"],
+    ["t3code/deadbeef", "t3-deadbeef"],
+    ["t3code-deadbeef", "t3-deadbeef"],
+    ["t3code/f4ae4e0e-f971-4d48-b4f2-9cf0aa54ab12", "t3-f4ae4e0e"],
+  ])("flattens %s when the nesting prefix is taken", (branch, flat) => {
+    expect(flattenTemporaryWorktreeBranchName(branch)).toBe(flat);
     expect(isTemporaryWorktreeBranch(flat)).toBe(true);
-    expect(isTemporaryWorktreeBranch(`${WORKTREE_BRANCH_PREFIX}-deadbeef-extra`)).toBe(false);
-    expect(isTemporaryWorktreeBranch(`${WORKTREE_BRANCH_PREFIX}-feature`)).toBe(false);
-    expect(flattenTemporaryWorktreeBranchName("t3code/f4ae4e0e-f971-4d48-b4f2-9cf0aa54ab12")).toBe(
-      `${WORKTREE_BRANCH_PREFIX}-f4ae4e0e`,
-    );
-    expect(flattenTemporaryWorktreeBranchName("t3code-deadbeef")).toBe(
-      `${WORKTREE_BRANCH_PREFIX}-deadbeef`,
-    );
-    expect(flattenTemporaryWorktreeBranchName("t3code/deadbeef")).toBe(
-      `${WORKTREE_BRANCH_PREFIX}-deadbeef`,
-    );
   });
 
-  it("rejects non-temporary refName names", () => {
-    expect(isTemporaryWorktreeBranch(`${WORKTREE_BRANCH_PREFIX}/feature/demo`)).toBe(false);
+  it("rejects ordinary branch names", () => {
     expect(isTemporaryWorktreeBranch("main")).toBe(false);
-    expect(isTemporaryWorktreeBranch(`${WORKTREE_BRANCH_PREFIX}/deadbeef-extra`)).toBe(false);
+    expect(isTemporaryWorktreeBranch("stardust-feature")).toBe(false);
+    expect(isTemporaryWorktreeBranch("t3-feature")).toBe(false);
   });
 });
 

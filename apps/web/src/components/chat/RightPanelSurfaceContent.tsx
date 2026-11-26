@@ -141,7 +141,7 @@ export function RightPanelSurfaceContent(props: {
         return (
           <PullRequestsUnavailableState
             title={gt("Pull requests unavailable")}
-            error={gt("Update this environment's T3 Code server to browse pull requests.")}
+            error={gt("Update this environment's Stardust server to browse pull requests.")}
           />
         );
       }
@@ -150,9 +150,14 @@ export function RightPanelSurfaceContent(props: {
           getShortcutContext={props.getShortcutContext}
           shortcutsEnabled={visible && props.activeSurfaceId === surface.id}
           key={`${scopedThreadKey(threadRef)}:${surface.id}`}
-          environmentId={props.environmentId}
+          environmentId={
+            (surface.environmentId as EnvironmentId | undefined) ?? props.environmentId
+          }
           onSelectPullRequest={(reference) => {
             useRightPanelStore.getState().openPullRequest(threadRef, {
+              ...(surface.environmentId === undefined
+                ? {}
+                : { environmentId: surface.environmentId }),
               projectId: reference.projectId,
               repository: reference.repository,
               number: reference.number,
@@ -194,7 +199,7 @@ export function RightPanelSurfaceContent(props: {
         return (
           <PullRequestsUnavailableState
             title={gt("Issues unavailable")}
-            error={gt("Update this environment's T3 Code server to browse issues.")}
+            error={gt("Update this environment's Stardust server to browse issues.")}
           />
         );
       }
@@ -214,10 +219,22 @@ export function RightPanelSurfaceContent(props: {
           threadRef={threadRef}
           onSelectPullRequest={(reference) => {
             useRightPanelStore.getState().openPullRequest(threadRef, {
+              ...(surface.environmentId === undefined
+                ? {}
+                : { environmentId: surface.environmentId }),
               projectId: reference.projectId,
               repository: reference.repository,
               number: reference.number,
               ...(reference.host ? { host: reference.host } : {}),
+            });
+          }}
+          onSelectIssue={({ host, ...reference }) => {
+            useRightPanelStore.getState().openIssue(threadRef, {
+              ...(surface.environmentId === undefined
+                ? {}
+                : { environmentId: surface.environmentId }),
+              ...reference,
+              ...(host ? { host } : {}),
             });
           }}
         />

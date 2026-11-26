@@ -56,6 +56,8 @@ function MenuPopup({
         <MenuPrimitive.Popup
           className={cn(
             "dropdown-glass relative flex origin-(--transform-origin) rounded-lg shadow-[0_16px_40px_-18px_rgb(0_0_0/55%)] outline-none focus:outline-none dark:shadow-[0_18px_44px_-18px_rgb(0_0_0/80%)]",
+            // Opens out of its trigger and fades back; quick, since menus are opened constantly.
+            "transition-[scale,opacity] duration-(--motion-hover) ease-standard data-starting-style:scale-97 data-starting-style:opacity-0 data-ending-style:scale-97 data-ending-style:opacity-0 data-ending-style:ease-exit motion-reduce:transition-none will-change-[scale]",
             // Electron drag hit-testing ignores z-index; opt portaled menus out to keep overlapping rows
             // hoverable.
             "[-webkit-app-region:no-drag]",

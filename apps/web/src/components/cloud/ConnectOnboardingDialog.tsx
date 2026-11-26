@@ -73,6 +73,7 @@ function ConfiguredConnectOnboardingDialog() {
   // Pending Clerk sessions must not look signed out or activation would look like a new sign-in.
   const { isLoaded, isSignedIn, userId } = useAuth({ treatPendingAsSignedOut: false });
   const gt = useGT();
+  const connectText = useUiText();
   const m = useMessages();
   const [optOutState, setOptOutState] = useLocalStorage(
     CONNECT_ONBOARDING_OPT_OUT_STORAGE_KEY,
@@ -252,7 +253,7 @@ function ConfiguredConnectOnboardingDialog() {
     >
       <WizardPopup>
         <WizardHeader
-          title={gt("Set up T3 Connect")}
+          title={connectText("T3 Connect (third-party service operated by the upstream project)")}
           description={
             <T>
               Mesh your devices together. Publish this environment and connect the rest, all in one

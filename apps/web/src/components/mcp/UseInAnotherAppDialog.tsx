@@ -1,3 +1,4 @@
+import { useUiText } from "~/i18n/useUiText";
 import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
 import { useAuth } from "@clerk/react";
 import { useAtomValue } from "@effect/atom-react";
@@ -86,7 +87,7 @@ export function UseInAnotherAppDialogHost() {
 function UseInAnotherAppDialog({ requested }: { readonly requested: EnvironmentId | null }) {
   const { environment, label } = useAccessEnvironment(requested);
   const gt = useGT();
-  const title = `${gt("Use T3 Code in another app (MCP)")} · ${label ?? "T3 Code"}`;
+  const title = `${gt("Use Stardust in another app (MCP)")} · ${label ?? "T3 Code"}`;
   return (
     <Dialog open onOpenChange={(open) => (open ? undefined : close())}>
       <WizardPopup>
@@ -394,6 +395,7 @@ function GateScreen({
 }) {
   const name = environment.label;
   const gt = useGT();
+  const connectText = useUiText();
   const turnOnHere = useT3ConnectTurnOn(environment.environmentId);
   const { openAuthPrompt } = useT3ConnectAuthPrompt();
   const retry = (onClick: () => void) => (
@@ -415,7 +417,7 @@ function GateScreen({
     case "sign-in":
       return (
         <GateMessage
-          title={gt("Sign in to T3 Connect")}
+          title={connectText("T3 Connect (third-party service operated by the upstream project)")}
           lines={[
             gt(
               "Apps like Poke and Claude run in the cloud. They need a public address to reach {environment}.",
@@ -446,7 +448,7 @@ function GateScreen({
         </GateMessage>
       );
     case "update":
-      return <GateMessage title={gt("Update T3 Code on {environment}", { environment: name })} />;
+      return <GateMessage title={gt("Update Stardust on {environment}", { environment: name })} />;
     case "no-relay-read":
       return (
         <GateMessage
@@ -513,7 +515,7 @@ function GateScreen({
               <CommandBlock command="t3 connect link" />
               <p>
                 <T>
-                  Restart T3 Code on <Var>{name}</Var>.
+                  Restart Stardust on <Var>{name}</Var>.
                 </T>
               </p>
               {checkAgain}

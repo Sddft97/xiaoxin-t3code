@@ -10,7 +10,7 @@ import {
   resumeRequestHidden,
 } from "../../resumeCard";
 import { useResumeCardStore } from "../../resumeCardStore";
-import { InboxProgress } from "./InboxProgress";
+import { InboxStatusDetail } from "./InboxStatusDetail";
 import { useTaskBoard, type InboxThreadRequest } from "../../taskBoard";
 import { useAtomValue } from "@effect/atom-react";
 import { primaryServerKeybindingsAtom } from "../../state/server";
@@ -21,7 +21,7 @@ import { isCommandPaletteOpen } from "../../commandPaletteBus";
 import { isModelPickerOpen } from "../../modelPickerVisibility";
 import { sidebarProviderLabel } from "../../sidebarProviderGrouping";
 import { useEffect, useRef, useState } from "react";
-import { BookmarkIcon, ChevronDownIcon, ChevronRightIcon, XIcon } from "lucide-react";
+import { BookmarkIcon, XIcon } from "lucide-react";
 import { scopeThreadRef } from "@t3tools/client-runtime/environment";
 import type { ScopedThreadRef } from "@t3tools/contracts";
 import type { SidebarThreadSummary } from "../../types";
@@ -34,7 +34,6 @@ import {
   inboxThreadKey,
   resumableThreads,
   resumeVisits,
-  shouldShowInboxRow,
   inboxHoldsBackgroundWork,
 } from "../../workbenchInbox";
 import { useWorkbenchInboxStore } from "../../workbenchInboxStore";
@@ -46,7 +45,15 @@ import {
   sortedAttentionThreads,
   sidebarRelativeTime,
 } from "../../sidebarInboxPresentation";
-import { useInboxCountBounce, useInboxExitRows } from "~/lib/workbenchMotion";
+import { observeSidebarList } from "~/lib/sidebarListMotion";
+import {
+  MOTION,
+  useInboxCountBounce,
+  useInboxExitRows,
+  usePresence,
+  withExitingRows,
+} from "~/lib/workbenchMotion";
+import { DisclosureChevron, WorkbenchDisclosure, disclosureProps } from "./WorkbenchDisclosure";
 import { ActiveWorkOverview } from "./ActiveWorkOverview";
 import { InboxQuickActions, InboxStatusDot } from "./InboxQuickActions";
 import { useThreadActions } from "../../hooks/useThreadActions";
@@ -225,11 +232,17 @@ export function WorkbenchInbox({
     window.addEventListener("keydown", onKeyDown, true);
     return () => window.removeEventListener("keydown", onKeyDown, true);
   }, [attention, activeKey, keybindings, navigate, reasons]);
-  // Same rule as the right-panel "待回复" tab: things that need an answer, not unread results.
-  const requestCount =
-    attention.filter((thread) => reasons.get(inboxThreadKey(thread)) !== "有新结果").length +
-    boardAttention.length;
-  const badgeRef = useInboxCountBounce(requestCount);
+  // A finished row leaves the list as this count grows: the pop says where it went.
+  const doneCountRef = useInboxCountBounce(doneToday.length);
+  // The section folds away when its last item is restored, rather than leaving a gap that snaps.
+  const doneSection = usePresence(doneToday.length > 0);
+  // While the section folds away (its last item restored), it keeps showing what it last held.
+  const doneSignature = doneToday.map(inboxThreadKey).join("\u0000");
+  const [lastDone, setLastDone] = useState({ signature: doneSignature, rows: doneToday });
+  if (doneToday.length > 0 && lastDone.signature !== doneSignature) {
+    setLastDone({ signature: doneSignature, rows: doneToday });
+  }
+  const shownDone = doneSection.closing ? lastDone.rows : doneToday;
   const requests: InboxThreadRequest[] = attention.map((thread) => {
     const key = inboxThreadKey(thread);
     const reason = reasons.get(key) ?? "有新结果";
@@ -459,12 +472,27 @@ export function WorkbenchInbox({
     detail: task.judge?.trim() || task.blocked?.trim() || task.next?.trim() || null,
   }));
   const allRows = [...threadRows, ...boardRows];
+  const badgeRef = useInboxCountBounce(allRows.length);
   const page = attentionPage(allRows, showAllAttention);
   const rows = page.rows.map((row, index) => ({ ...row, index }));
   const allKeys = new Set(allRows.map((row) => row.key));
-  const exiting = useInboxExitRows(rows, allKeys);
-  const displayedRows = [...rows];
-  for (const row of exiting) displayedRows.splice(row.index, 0, row);
+  const exiting = useInboxExitRows(
+    rows,
+    allKeys,
+    (row) =>
+      [
+        row.index,
+        row.reason,
+        row.label.title,
+        row.timestamp,
+        row.detail ?? "",
+        // Board progress renders from its steps; a stale snapshot would rewind them while leaving.
+        row.boardTask ? JSON.stringify([row.boardTask.steps, row.boardTask.current_id]) : "",
+      ].join("|"),
+    MOTION.exit,
+  );
+  const attentionSection = usePresence(exiting.length > 0 || allRows.length > 0);
+  const displayedRows = withExitingRows(rows, exiting);
   return (
     <>
       <ActiveWorkOverview
@@ -475,200 +503,225 @@ export function WorkbenchInbox({
         incomplete={incomplete}
       />
       <SidebarMenu>
-        {/* Nothing counted and nothing listed: the row stays out of the way. */}
-        {exiting.length > 0 ||
-        shouldShowInboxRow(requestCount, attention.length + boardAttention.length) ? (
-          <SidebarMenuItem>
-            <div
-              className="group/inbox-cap flex items-center gap-1.5 px-2 pt-2 pb-1 text-2xs tracking-wider text-sidebar-muted-foreground"
-              data-sidebar-cap=""
-            >
-              <span>{uiText("Needs my attention")}</span>
-              {nextShortcut && attention.length > 0 ? (
-                <span className="tracking-normal opacity-0 transition-opacity group-hover/inbox-cap:opacity-70 motion-reduce:transition-none">
-                  {uiText("Next item ")}
-                  {nextShortcut}
+        {/* Nothing counted and nothing listed: the row folds out of the way. */}
+        {attentionSection.mounted ? (
+          <SidebarMenuItem {...disclosureProps(attentionSection)}>
+            <div>
+              <div
+                className="group/inbox-cap flex items-center gap-1.5 px-2 pt-2 pb-1 text-2xs tracking-wider text-sidebar-muted-foreground"
+                data-sidebar-cap=""
+              >
+                <span>{uiText("Needs my attention")}</span>
+                {nextShortcut && attention.length > 0 ? (
+                  <span className="tracking-normal opacity-0 transition-opacity group-hover/inbox-cap:opacity-70 motion-reduce:transition-none">
+                    {uiText("Next item {shortcut}", { shortcut: nextShortcut })}
+                  </span>
+                ) : null}
+                <span
+                  ref={badgeRef}
+                  aria-label={uiText("{count} items", { count: allRows.length })}
+                  className="ml-auto min-w-5 rounded-full bg-sidebar-border/50 px-1.5 text-center font-semibold tracking-normal tabular-nums text-sidebar-muted-foreground transition-colors duration-(--motion-hover) ease-standard motion-reduce:transition-none"
+                >
+                  {allRows.length}
                 </span>
+              </div>
+              {displayedRows.length > 0 ? (
+                <ul
+                  ref={observeSidebarList}
+                  aria-label={uiText("Conversations that need my attention")}
+                  className="relative space-y-px"
+                >
+                  {displayedRows.map(
+                    ({ key, thread, boardTask, reason, label, detail, timestamp }) => {
+                      const failed = reason === "运行失败";
+                      const isResult = reason === "有新结果";
+                      const leaving = !allKeys.has(key);
+                      return (
+                        <li
+                          key={key}
+                          inert={leaving}
+                          aria-hidden={leaving || undefined}
+                          data-flip-exiting={leaving ? "" : undefined}
+                          data-row-actions-host=""
+                          className={cn(
+                            "group/inbox-row",
+                            leaving ? "workbench-inbox-exit" : "relative",
+                          )}
+                        >
+                          <button
+                            type="button"
+                            data-inbox-thread={thread?.id}
+                            data-inbox-task={boardTask?.folder}
+                            onClick={() => {
+                              if (boardTask) openBoardTask(boardTask);
+                              else if (thread) openThread(thread);
+                            }}
+                            aria-current={activeKey === key ? "page" : undefined}
+                            className="relative block w-full min-w-0 rounded-lg py-1.5 pe-2 ps-5 text-left outline-none hover:bg-sidebar-row-hover active:bg-sidebar-row-active focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring aria-[current=page]:bg-sidebar-row-active"
+                          >
+                            {thread && !boardTask ? null : (
+                              <span
+                                aria-hidden
+                                data-sidebar-status-slot
+                                className="absolute start-1.5 top-2.25 grid size-3.5 place-items-center"
+                              >
+                                <span
+                                  className={`size-1.5 rounded-full ${failed ? "bg-destructive" : "bg-warning"}`}
+                                />
+                              </span>
+                            )}
+                            <span
+                              className={cn(
+                                "flex min-w-0 items-baseline gap-2",
+                                // The title keeps its width; its tail fades under the hover actions.
+                                thread && !boardTask && "workbench-row-fade",
+                              )}
+                              data-actions={isResult || failed ? undefined : "needs-you"}
+                            >
+                              <span className="min-w-0 flex-1 truncate text-sm text-sidebar-foreground">
+                                {label.title}
+                              </span>
+                              <span
+                                className={cn(
+                                  "shrink-0 text-2xs tabular-nums text-sidebar-muted-foreground",
+                                  thread && !boardTask && "workbench-row-time",
+                                )}
+                              >
+                                {sidebarRelativeTime(timestamp)}
+                              </span>
+                            </span>
+                            {thread ? (
+                              <InboxStatusDetail
+                                thread={thread}
+                                board={boardTask}
+                                reason={reason}
+                                detail={detail}
+                              />
+                            ) : null}
+                          </button>
+                          {thread && !boardTask && !leaving ? (
+                            <InboxStatusDot
+                              status={failed ? "failed" : isResult ? "result" : "needs-you"}
+                              threadRef={scopeThreadRef(thread.environmentId, thread.id)}
+                              onMarkDone={
+                                isResult || failed
+                                  ? () => completeThread(thread, failed)
+                                  : undefined
+                              }
+                            />
+                          ) : null}
+                          {thread && !boardTask && !leaving ? (
+                            <InboxQuickActions
+                              mode={isResult || failed ? "finished" : "needs-you"}
+                              threadRef={scopeThreadRef(thread.environmentId, thread.id)}
+                              title={label.title}
+                              doneLabel={failed ? uiText("Acknowledged") : uiText("Mark done")}
+                              onDone={
+                                isResult || failed
+                                  ? () => completeThread(thread, failed)
+                                  : undefined
+                              }
+                              onOpen={() => openThread(thread)}
+                            />
+                          ) : null}
+                        </li>
+                      );
+                    },
+                  )}
+                  {allRows.length > page.rows.length || showAllAttention ? (
+                    <li>
+                      <button
+                        type="button"
+                        aria-expanded={showAllAttention}
+                        onClick={() => setShowAllAttention(!showAllAttention)}
+                        className="w-full rounded-lg py-1 pe-2 ps-5 text-left text-xs text-sidebar-muted-foreground outline-none hover:bg-sidebar-row-hover hover:text-sidebar-foreground focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
+                      >
+                        {showAllAttention
+                          ? uiText("Show less")
+                          : uiText("{hidden} more", { hidden: page.hidden })}
+                      </button>
+                    </li>
+                  ) : null}
+                </ul>
               ) : null}
-              <span
-                ref={badgeRef}
-                aria-label={uiText("{requestCount} need answers", { requestCount })}
-                className={`ml-auto min-w-5 rounded-full px-1.5 text-center font-semibold tracking-normal tabular-nums ${requestCount ? "bg-warning text-background" : ""}`}
-              >
-                {requestCount}
-              </span>
+              {storageError ? (
+                <p role="alert" className="px-2 py-1 text-xs text-destructive">
+                  {uiText("Couldn’t save locally. Check browser storage and try again.")}
+                </p>
+              ) : null}
             </div>
-            {displayedRows.length > 0 ? (
-              <ul
-                aria-label={uiText("Conversations that need my attention")}
-                className="space-y-px"
+          </SidebarMenuItem>
+        ) : null}
+        {doneSection.mounted ? (
+          <SidebarMenuItem data-inbox-done-today="" {...disclosureProps(doneSection)}>
+            <div>
+              <button
+                type="button"
+                aria-expanded={showDoneToday}
+                onClick={() => setShowDoneToday(!showDoneToday)}
+                className="flex w-full items-center gap-1.5 rounded-md px-2 pt-2 pb-1 text-left text-2xs tracking-wider text-sidebar-muted-foreground outline-none hover:text-sidebar-foreground focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
               >
-                {displayedRows.map(
-                  ({ key, thread, boardTask, reason, label, detail, timestamp }) => {
-                    const failed = reason === "运行失败";
-                    // oxlint-disable-next-line t3code/no-hardcoded-ui-han -- inbox reason key shared with inboxReason(), not display copy
-                    const isResult = reason === "有新结果";
-                    const leaving = !allKeys.has(key);
+                <span>{uiText("Done today")}</span>
+                <span className="ml-auto inline-flex items-center gap-0.5 tracking-normal tabular-nums">
+                  <span ref={doneCountRef} className="inline-block">
+                    {shownDone.length}
+                  </span>
+                  <DisclosureChevron open={showDoneToday} />
+                </span>
+              </button>
+              <WorkbenchDisclosure open={showDoneToday}>
+                <ul
+                  ref={observeSidebarList}
+                  aria-label={uiText("Done today")}
+                  className="relative space-y-px"
+                >
+                  {shownDone.map((thread) => {
+                    const ref = scopeThreadRef(thread.environmentId, thread.id);
                     return (
                       <li
-                        key={key}
-                        inert={leaving}
-                        aria-hidden={leaving || undefined}
-                        className={cn(
-                          "group/inbox-row relative",
-                          leaving && "workbench-inbox-exit",
-                        )}
+                        key={inboxThreadKey(thread)}
+                        className="group/inbox-row relative"
+                        data-row-actions-host=""
                       >
                         <button
                           type="button"
-                          data-inbox-thread={thread?.id}
-                          data-inbox-task={boardTask?.folder}
-                          onClick={() => {
-                            if (boardTask) openBoardTask(boardTask);
-                            else if (thread) openThread(thread);
-                          }}
-                          aria-current={activeKey === key ? "page" : undefined}
-                          className="relative block w-full min-w-0 rounded-lg py-1.5 pr-2 pl-5.5 text-left outline-none hover:bg-sidebar-row-hover focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring aria-[current=page]:bg-sidebar-row-active"
+                          data-inbox-done-thread={thread.id}
+                          onClick={() => navigate(ref)}
+                          aria-current={activeKey === inboxThreadKey(thread) ? "page" : undefined}
+                          className="relative block w-full min-w-0 rounded-lg py-1.5 pe-2 ps-5 text-left opacity-65 outline-none transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none hover:bg-sidebar-row-hover hover:opacity-100 active:bg-sidebar-row-active focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring aria-[current=page]:bg-sidebar-row-active aria-[current=page]:opacity-100"
                         >
-                          {thread && !boardTask ? null : (
-                            <span
-                              aria-hidden
-                              className={`absolute top-3.25 left-2.25 size-1.5 rounded-full ${failed ? "bg-destructive" : "bg-warning"}`}
-                            />
-                          )}
-                          <span
-                            className={cn(
-                              "flex min-w-0 items-baseline gap-2",
-                              // V14: the hover actions take this space instead of covering the title.
-                              thread && !boardTask && "group-hover/inbox-row:pe-18",
-                            )}
-                          >
+                          <span className="workbench-row-fade flex min-w-0 items-baseline gap-2">
                             <span className="min-w-0 flex-1 truncate text-sm text-sidebar-foreground">
-                              {label.title}
+                              {thread.title || uiText("Untitled thread")}
                             </span>
-                            <span
-                              className={cn(
-                                "shrink-0 text-2xs tabular-nums text-sidebar-muted-foreground transition-opacity",
-                                thread && !boardTask && "group-hover/inbox-row:hidden",
-                              )}
-                            >
-                              {sidebarRelativeTime(timestamp)}
+                            <span className="workbench-row-time shrink-0 text-2xs tabular-nums text-sidebar-muted-foreground">
+                              {sidebarRelativeTime(thread.settledAt ?? thread.updatedAt)}
                             </span>
                           </span>
-                          {thread ? (
-                            <InboxProgress
-                              thread={thread}
-                              board={boardTask}
-                              reason={reason}
-                              detail={detail}
-                            />
-                          ) : null}
                         </button>
-                        {thread && !boardTask && !leaving ? (
-                          <InboxStatusDot
-                            status={failed ? "failed" : isResult ? "result" : "needs-you"}
-                            threadRef={scopeThreadRef(thread.environmentId, thread.id)}
-                            onMarkDone={
-                              isResult || failed ? () => completeThread(thread, failed) : undefined
-                            }
-                          />
-                        ) : null}
-                        {thread && !boardTask && !leaving ? (
-                          <InboxQuickActions
-                            mode={isResult || failed ? "finished" : "needs-you"}
-                            threadRef={scopeThreadRef(thread.environmentId, thread.id)}
-                            title={label.title}
-                            doneLabel={failed ? uiText("Acknowledged") : uiText("Mark done")}
-                            onDone={
-                              isResult || failed ? () => completeThread(thread, failed) : undefined
-                            }
-                            onOpen={() => openThread(thread)}
-                          />
-                        ) : null}
+                        {/* Folding away: drop the menus, which would outlive the inert snapshot. */}
+                        {doneSection.closing ? null : (
+                          <>
+                            <InboxStatusDot
+                              status="done"
+                              threadRef={ref}
+                              onMarkTodo={() => reopenThread(thread)}
+                            />
+                            <InboxQuickActions
+                              mode="done"
+                              threadRef={ref}
+                              title={thread.title}
+                              onRestore={() => reopenThread(thread)}
+                              onOpen={() => navigate(ref)}
+                            />
+                          </>
+                        )}
                       </li>
                     );
-                  },
-                )}
-                {allRows.length > page.rows.length || showAllAttention ? (
-                  <li>
-                    <button
-                      type="button"
-                      aria-expanded={showAllAttention}
-                      onClick={() => setShowAllAttention(!showAllAttention)}
-                      className="w-full rounded-lg py-1 pr-2 pl-5.5 text-left text-xs text-sidebar-muted-foreground outline-none hover:bg-sidebar-row-hover hover:text-sidebar-foreground focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
-                    >
-                      {showAllAttention
-                        ? uiText("Collapse recommendation")
-                        : uiText("{hidden} more", { hidden: page.hidden })}
-                    </button>
-                  </li>
-                ) : null}
-              </ul>
-            ) : null}
-            {storageError ? (
-              <p role="alert" className="px-2 py-1 text-xs text-destructive">
-                {uiText("Couldn’t save locally. Check browser storage and try again.")}
-              </p>
-            ) : null}
-          </SidebarMenuItem>
-        ) : null}
-        {doneToday.length > 0 ? (
-          <SidebarMenuItem data-inbox-done-today="">
-            <button
-              type="button"
-              aria-expanded={showDoneToday}
-              onClick={() => setShowDoneToday(!showDoneToday)}
-              className="flex w-full items-center gap-1.5 rounded-md px-2 pt-2 pb-1 text-left text-2xs tracking-wider text-sidebar-muted-foreground outline-none hover:text-sidebar-foreground focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
-            >
-              <span>{uiText("Done today")}</span>
-              <span className="ml-auto inline-flex items-center gap-0.5 tracking-normal tabular-nums">
-                {doneToday.length}
-                {showDoneToday ? (
-                  <ChevronDownIcon aria-hidden className="size-3" />
-                ) : (
-                  <ChevronRightIcon aria-hidden className="size-3" />
-                )}
-              </span>
-            </button>
-            {showDoneToday ? (
-              <ul aria-label={uiText("Done today")} className="space-y-px">
-                {doneToday.map((thread) => {
-                  const ref = scopeThreadRef(thread.environmentId, thread.id);
-                  return (
-                    <li key={inboxThreadKey(thread)} className="group/inbox-row relative">
-                      <button
-                        type="button"
-                        data-inbox-done-thread={thread.id}
-                        onClick={() => navigate(ref)}
-                        aria-current={activeKey === inboxThreadKey(thread) ? "page" : undefined}
-                        className="relative block w-full min-w-0 rounded-lg py-1.5 pr-2 pl-5.5 text-left opacity-65 outline-none hover:bg-sidebar-row-hover hover:opacity-100 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring aria-[current=page]:bg-sidebar-row-active aria-[current=page]:opacity-100"
-                      >
-                        <span className="flex min-w-0 items-baseline gap-2 group-hover/inbox-row:pe-18">
-                          <span className="min-w-0 flex-1 truncate text-sm text-sidebar-foreground">
-                            {thread.title || uiText("Untitled thread")}
-                          </span>
-                          <span className="shrink-0 text-2xs tabular-nums text-sidebar-muted-foreground group-hover/inbox-row:hidden">
-                            {sidebarRelativeTime(thread.settledAt ?? thread.updatedAt)}
-                          </span>
-                        </span>
-                      </button>
-                      <InboxStatusDot
-                        status="done"
-                        threadRef={ref}
-                        onMarkTodo={() => reopenThread(thread)}
-                      />
-                      <InboxQuickActions
-                        mode="done"
-                        threadRef={ref}
-                        title={thread.title}
-                        onRestore={() => reopenThread(thread)}
-                        onOpen={() => navigate(ref)}
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : null}
+                  })}
+                </ul>
+              </WorkbenchDisclosure>
+            </div>
           </SidebarMenuItem>
         ) : null}
         <SidebarMenuItem>

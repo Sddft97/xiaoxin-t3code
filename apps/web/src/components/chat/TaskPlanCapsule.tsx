@@ -150,14 +150,14 @@ export function TaskPlanCapsule({
     if (mode !== "need" && mode !== "problem") return;
     // oxlint-disable-next-line react/set-state-in-effect -- Only the rising edge into a wait or problem pulses, and the focus check reads the document.
     setHintKey((key) => key + 1);
-    if (mode !== "need") return;
+    if (mode !== "need" || (!approvalPending && decision === undefined)) return;
     const typing = document.activeElement?.closest("[data-chat-composer-form]") != null;
     if (typing) return;
     setOpen(true);
     const waitingMilestone = milestones.find((milestone) => milestone.status === "need");
     if (waitingMilestone) setOpenStage(waitingMilestone.id);
-    // oxlint-disable-next-line react/exhaustive-effect-dependencies -- Milestones change on every progress tick; only a change of mode counts.
-  }, [mode]);
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies -- Milestones change on every progress tick; only a change of mode or inline card presence counts.
+  }, [mode, approvalPending, decision !== undefined]);
 
   // Esc and a press outside both fold the panel; a pending approval keeps Esc for "deny".
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- Document listeners exist only while the panel is open.

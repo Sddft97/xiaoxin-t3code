@@ -4,6 +4,7 @@ import * as HttpServerRespondable from "effect/http/HttpServerRespondable";
 import * as HttpServerResponse from "effect/http/HttpServerResponse";
 
 import {
+  GitRefName,
   ForwardCompatibleArray,
   IsoDateTime,
   NonNegativeInt,
@@ -352,7 +353,7 @@ export const PullRequestStackMembership = Schema.Struct({
   number: PositiveInt,
   position: PositiveInt,
   size: PositiveInt,
-  base: TrimmedNonEmptyString,
+  base: GitRefName,
 });
 export type PullRequestStackMembership = typeof PullRequestStackMembership.Type;
 
@@ -371,8 +372,8 @@ export const PullRequestListEntry = Schema.Struct({
   title: TrimmedNonEmptyString,
   url: TrimmedNonEmptyString,
   author: Schema.NullOr(PullRequestActor),
-  headBranch: TrimmedNonEmptyString,
-  baseBranch: TrimmedNonEmptyString,
+  headBranch: GitRefName,
+  baseBranch: GitRefName,
   state: PullRequestState,
   isDraft: Schema.Boolean,
   mergeability: PullRequestMergeability,
@@ -524,8 +525,8 @@ export const PullRequestSummary = Schema.Struct({
   url: TrimmedNonEmptyString,
   state: PullRequestState,
   isDraft: Schema.optional(Schema.Boolean),
-  headBranch: TrimmedNonEmptyString,
-  baseBranch: TrimmedNonEmptyString,
+  headBranch: GitRefName,
+  baseBranch: GitRefName,
   closedAt: Schema.optional(Schema.NullOr(Schema.String)),
   mergedAt: Schema.optional(Schema.NullOr(Schema.String)),
   updatedAt: IsoDateTime,
@@ -551,14 +552,14 @@ export const PullRequestStack = Schema.Struct({
   id: TrimmedNonEmptyString,
   number: PositiveInt,
   url: TrimmedNonEmptyString,
-  base: TrimmedNonEmptyString,
+  base: GitRefName,
   layers: Schema.Array(
     Schema.Struct({
       number: PositiveInt,
       title: Schema.optional(Schema.String),
       isDraft: Schema.optional(Schema.Boolean),
       headSha: Schema.optional(TrimmedNonEmptyString),
-      headBranch: TrimmedNonEmptyString,
+      headBranch: GitRefName,
       state: PullRequestState,
     }),
   ),
@@ -665,10 +666,10 @@ export const PullRequestDetail = Schema.Struct({
   additions: NonNegativeInt,
   deletions: NonNegativeInt,
   changedFiles: NonNegativeInt,
-  headBranch: TrimmedNonEmptyString,
+  headBranch: GitRefName,
   headRepositoryNameWithOwner: Schema.optional(Schema.NullOr(TrimmedNonEmptyString)),
   headSha: Schema.optional(TrimmedNonEmptyString),
-  baseBranch: TrimmedNonEmptyString,
+  baseBranch: GitRefName,
   createdAt: IsoDateTime,
   updatedAt: IsoDateTime,
   observedAt: Schema.optional(Schema.Finite),
@@ -1043,9 +1044,9 @@ export class PullRequestUnavailableError extends Schema.TaggedError<PullRequestU
         return "Change requests cannot be browsed for this project's host yet.";
       case "repository-without-project":
         if (this.host !== undefined) {
-          return `No project in T3 Code is on ${this.host}. Add any ${this.host} project to read its change requests.`;
+          return `No project in Stardust is on ${this.host}. Add any ${this.host} project to read its change requests.`;
         }
-        return `${this.repository ?? "This repository"} is not a project in T3 Code. Add it as a project to read its change requests.`;
+        return `${this.repository ?? "This repository"} is not a project in Stardust. Add it as a project to read its change requests.`;
     }
   }
 }

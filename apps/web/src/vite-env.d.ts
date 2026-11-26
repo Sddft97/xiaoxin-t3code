@@ -25,6 +25,7 @@ interface ImportMeta {
 declare global {
   interface Window {
     desktopBridge?: DesktopBridge;
+    stardustWindowMica?: boolean;
     /** Dev builds only, from DevReplayHost. Agents call these from the browser console. */
     t3dev?: {
       readonly replayScenarios: () => ReadonlyArray<string>;

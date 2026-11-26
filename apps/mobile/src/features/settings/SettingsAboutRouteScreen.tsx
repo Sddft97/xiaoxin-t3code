@@ -140,7 +140,16 @@ function AppSettingsSection() {
         label={gt("Open source licenses")}
         target="SettingsOpenSourceLicenses"
       />
-      <SettingsRow icon="doc.text" label={gt("Legal")} fullScreenTarget="SettingsLegal" />
+      <View className="gap-1 px-4 py-3">
+        <Text className="font-t3-medium text-foreground">
+          <T>Privacy</T>
+        </Text>
+        <Text textRole="footnote" className="text-foreground-muted">
+          {gt(
+            "T3 Connect uses the upstream project's relay when enabled. Stardust counts active installations using a random ID, app version, OS and CPU architecture.",
+          )}
+        </Text>
+      </View>
       {updateCheckAvailable ? (
         <Pressable
           accessibilityLabel={gt("Version {version}", { version: versionLabel })}

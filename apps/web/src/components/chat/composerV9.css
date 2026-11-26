@@ -158,8 +158,8 @@ html:root [data-slot="popover-popup"][data-v9-model-picker-popup] > [data-slot="
 }
 
 html:root [data-v9-mp-search] input,
-html:root[data-theme-id="apple"] [data-v9-mp-search] input,
-html:root[data-theme-id="apple"].dark [data-v9-mp-search] input {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-v9-mp-search] input,
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark [data-v9-mp-search] input {
   flex: 1;
   min-width: 0;
   height: 100%;
@@ -176,10 +176,16 @@ html:root[data-theme-id="apple"].dark [data-v9-mp-search] input {
 
 html:root [data-v9-mp-search] input:focus,
 html:root [data-v9-mp-search] input:focus-visible,
-html:root[data-theme-id="apple"] [data-v9-mp-search] input:focus,
-html:root[data-theme-id="apple"] [data-v9-mp-search] input:focus-visible,
-html:root[data-theme-id="apple"].dark [data-v9-mp-search] input:focus,
-html:root[data-theme-id="apple"].dark [data-v9-mp-search] input:focus-visible {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-v9-mp-search] input:focus,
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-v9-mp-search]
+  input:focus-visible,
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark
+  [data-v9-mp-search]
+  input:focus,
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark
+  [data-v9-mp-search]
+  input:focus-visible {
   outline: none;
   border: 0;
   background: transparent;
@@ -617,6 +623,10 @@ html:root[data-theme-id="apple"] [data-slot="composer-host"] {
   border: 0.5px solid var(--v9-line);
 }
 
+html:root[data-theme-id="stardust"] [data-slot="composer-host"] {
+  border-radius: 20px;
+}
+
 html:root [data-chat-composer-footer="true"] {
   padding: 4px 10px 9px;
   gap: 5px;
@@ -687,7 +697,7 @@ html:root [data-chat-provider-model-picker="true"][data-v9-unified-model-btn="tr
 
 /* Thin-Line Permission Footer Pill (V9 .perm-footer-pill) */
 html:root [data-composer-perm-mode],
-html:root[data-theme-id="apple"] [data-composer-perm-mode] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-composer-perm-mode] {
   display: inline-flex;
   align-items: center;
   gap: 4.5px;
@@ -706,48 +716,57 @@ html:root[data-theme-id="apple"] [data-composer-perm-mode] {
 }
 
 html:root [data-composer-perm-mode]:active,
-html:root[data-theme-id="apple"] [data-composer-perm-mode]:active {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-composer-perm-mode]:active {
   transform: scale(0.95);
 }
 
 html:root [data-composer-perm-mode] svg,
-html:root[data-theme-id="apple"] [data-composer-perm-mode] svg {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-composer-perm-mode] svg {
   width: 13.5px;
   height: 13.5px;
   color: currentColor;
 }
 
 html:root [data-composer-perm-mode="auto"],
-html:root[data-theme-id="apple"] [data-composer-perm-mode="auto"],
-html:root[data-theme-id="apple"].dark [data-composer-perm-mode="auto"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-composer-perm-mode="auto"],
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark
+  [data-composer-perm-mode="auto"] {
   background: var(--v9-blue-bg);
   color: var(--v9-blue);
   box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--v9-blue) 28%, transparent);
 }
 
 html:root [data-composer-perm-mode="auto"]:hover,
-html:root[data-theme-id="apple"] [data-composer-perm-mode="auto"]:hover,
-html:root[data-theme-id="apple"].dark [data-composer-perm-mode="auto"]:hover {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-composer-perm-mode="auto"]:hover,
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark
+  [data-composer-perm-mode="auto"]:hover {
   background: color-mix(in srgb, var(--v9-blue) 18%, transparent);
 }
 
 html:root [data-composer-perm-mode="approval-required"],
-html:root[data-theme-id="apple"] [data-composer-perm-mode="approval-required"],
-html:root[data-theme-id="apple"].dark [data-composer-perm-mode="approval-required"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-composer-perm-mode="approval-required"],
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark
+  [data-composer-perm-mode="approval-required"] {
   background: var(--v9-warn-bg);
   color: var(--v9-warn);
   box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--v9-warn) 32%, transparent);
 }
 
 html:root [data-composer-perm-mode="approval-required"]:hover,
-html:root[data-theme-id="apple"] [data-composer-perm-mode="approval-required"]:hover,
-html:root[data-theme-id="apple"].dark [data-composer-perm-mode="approval-required"]:hover {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-composer-perm-mode="approval-required"]:hover,
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark
+  [data-composer-perm-mode="approval-required"]:hover {
   background: color-mix(in srgb, var(--v9-warn) 22%, transparent);
 }
 
 html:root [data-composer-perm-mode="auto-accept-edits"],
-html:root[data-theme-id="apple"] [data-composer-perm-mode="auto-accept-edits"],
-html:root[data-theme-id="apple"].dark [data-composer-perm-mode="auto-accept-edits"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-composer-perm-mode="auto-accept-edits"],
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark
+  [data-composer-perm-mode="auto-accept-edits"] {
   background: var(--v9-blue-bg);
   color: var(--v9-blue);
   box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--v9-blue) 28%, transparent);
@@ -887,27 +906,30 @@ html:root [data-slot="voice-input-pill"] [data-v9-voice-recording-pill] {
 }
 
 /* Send button & Context pill calibration under Apple theme (V9 .send-btn / .ctx-pill) */
-html:root[data-theme-id="apple"] [data-chat-composer-form] button[type="submit"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-chat-composer-form]
+  button[type="submit"] {
   width: 30px;
   height: 30px;
   min-width: 30px;
   padding: 0;
   border-radius: 50%;
-  background: var(--v9-ac);
+  background: var(--composer-send-accent, var(--v9-ac));
   color: #ffffff;
-  box-shadow: 0 2px 10px var(--v9-ac-glow);
+  box-shadow: 0 2px 10px
+    color-mix(in srgb, var(--composer-send-accent, var(--v9-ac)) 24%, transparent);
   transition:
     transform 180ms var(--v9-spring),
     filter 160ms ease;
 }
 
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-chat-composer-form]
   button[type="submit"]:hover:not(:disabled) {
   filter: brightness(1.06);
 }
 
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-chat-composer-form]
   button[type="submit"]:active:not(:disabled) {
   transform: scale(0.93);
@@ -915,7 +937,7 @@ html:root[data-theme-id="apple"]
 
 /* V9 Context Ring Capsule (.ctx-pill / .ctx-ring / .ctx-pill.compact-ring) */
 html:root [data-context-handoff],
-html:root[data-theme-id="apple"] [data-context-handoff] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-context-handoff] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -937,37 +959,40 @@ html:root[data-theme-id="apple"] [data-context-handoff] {
 }
 
 html:root [data-context-handoff]:hover,
-html:root[data-theme-id="apple"] [data-context-handoff]:hover {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-context-handoff]:hover {
   background: var(--v9-fill-hover);
   color: var(--v9-fg);
 }
 
 html:root [data-context-handoff]:active,
-html:root[data-theme-id="apple"] [data-context-handoff]:active {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-context-handoff]:active {
   transform: scale(0.96);
 }
 
 html:root [data-context-handoff]:focus-visible,
-html:root[data-theme-id="apple"] [data-context-handoff]:focus-visible {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-context-handoff]:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--v9-fg) 22%, transparent);
 }
 
 /* Suppress legacy apple.css ::before pseudo-ring so only the explicit [data-v9-ctx-ring] renders */
 html:root [data-context-handoff]::before,
-html:root[data-theme-id="apple"] [data-context-handoff]::before {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-context-handoff]::before {
   content: none;
   display: none;
 }
 
 /* Prevent index.css @media (max-width: 767px) from stretching spans inside the compact capsule */
 html:root [data-context-handoff] > span,
-html:root[data-theme-id="apple"] [data-context-handoff] > span {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-context-handoff] > span {
   flex-basis: auto;
 }
 
 html:root [data-context-handoff] [data-v9-ctx-ring],
-html:root[data-theme-id="apple"] [data-context-handoff] [data-v9-ctx-ring] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-context-handoff]
+  [data-v9-ctx-ring] {
   display: block;
   width: 14px;
   height: 14px;
@@ -993,33 +1018,37 @@ html:root [data-context-handoff] [data-v9-ctx-alert-icon] {
 }
 
 html:root [data-context-handoff][data-v9-ctx-tone="warn"],
-html:root[data-theme-id="apple"] [data-context-handoff][data-v9-ctx-tone="warn"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-context-handoff][data-v9-ctx-tone="warn"] {
   --v9-ctx-ring-color: var(--v9-warn);
   background: var(--v9-warn-bg);
   color: var(--v9-warn);
 }
 
 html:root [data-context-handoff][data-v9-ctx-tone="warn"]:hover,
-html:root[data-theme-id="apple"] [data-context-handoff][data-v9-ctx-tone="warn"]:hover {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-context-handoff][data-v9-ctx-tone="warn"]:hover {
   background: color-mix(in srgb, var(--v9-warn) 22%, transparent);
 }
 
 html:root [data-context-handoff][data-v9-ctx-tone="bad"],
-html:root[data-theme-id="apple"] [data-context-handoff][data-v9-ctx-tone="bad"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-context-handoff][data-v9-ctx-tone="bad"] {
   --v9-ctx-ring-color: var(--v9-bad);
   background: var(--v9-bad-bg);
   color: var(--v9-bad);
 }
 
 html:root [data-context-handoff][data-v9-ctx-tone="bad"]:hover,
-html:root[data-theme-id="apple"] [data-context-handoff][data-v9-ctx-tone="bad"]:hover {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-context-handoff][data-v9-ctx-tone="bad"]:hover {
   background: color-mix(in srgb, var(--v9-bad) 20%, transparent);
 }
 
 /* Narrow (<=460px) Composer Compact Mode (V9 narrow layout) */
 @container composer-card (max-width: 460px) {
   html:root [data-context-handoff],
-  html:root[data-theme-id="apple"] [data-context-handoff] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-context-handoff] {
     width: 30px;
     padding: 0;
     gap: 0;
@@ -1028,7 +1057,7 @@ html:root[data-theme-id="apple"] [data-context-handoff][data-v9-ctx-tone="bad"]:
 
   /* Keep the ring visible even when apple.css hides leading spans without svg */
   html:root [data-composer-leading] [data-context-handoff] [data-v9-ctx-ring],
-  html:root[data-theme-id="apple"]
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
     [data-composer-leading]
     [data-context-handoff]
     [data-v9-ctx-ring],
@@ -1037,25 +1066,31 @@ html:root[data-theme-id="apple"] [data-context-handoff][data-v9-ctx-tone="bad"]:
   }
 
   html:root [data-context-handoff] [data-v9-ctx-pct],
-  html:root[data-theme-id="apple"] [data-context-handoff] [data-v9-ctx-pct] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-context-handoff]
+    [data-v9-ctx-pct] {
     display: none;
   }
 
   html:root [data-context-handoff] [data-v9-ctx-alert-icon],
-  html:root[data-theme-id="apple"] [data-context-handoff] [data-v9-ctx-alert-icon] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-context-handoff]
+    [data-v9-ctx-alert-icon] {
     display: block;
   }
 
   html:root [data-composer-perm-mode],
-  html:root[data-theme-id="apple"] [data-composer-perm-mode],
-  html:root[data-theme-id="apple"].dark [data-composer-perm-mode] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-composer-perm-mode],
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark [data-composer-perm-mode] {
     width: 28px;
     padding: 0;
     justify-content: center;
   }
 
   html:root [data-composer-perm-mode] [data-composer-control-label],
-  html:root[data-theme-id="apple"] [data-composer-perm-mode] [data-composer-control-label] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-composer-perm-mode]
+    [data-composer-control-label] {
     display: none;
   }
 }
@@ -1161,7 +1196,8 @@ html:root[data-theme-id="apple"] [data-context-handoff][data-v9-ctx-tone="bad"]:
 
 /* Stats Glass Popover (V9 .stats-popover) */
 html:root [data-slot="popover-popup"][data-session-stats-popup],
-html:root[data-theme-id="apple"] [data-slot="popover-popup"][data-session-stats-popup] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-slot="popover-popup"][data-session-stats-popup] {
   width: 306px;
   max-width: calc(100vw - 44px);
   background: var(--v9-glass-strong);
@@ -1181,14 +1217,14 @@ html:root[data-theme-id="apple"] [data-slot="popover-popup"][data-session-stats-
 }
 
 html:root [data-slot="popover-popup"][data-session-stats-popup][data-starting-style],
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-slot="popover-popup"][data-session-stats-popup][data-starting-style] {
   opacity: 0;
   transform: scale(0.94) translateY(6px);
 }
 
 html:root [data-slot="popover-popup"][data-session-stats-popup][data-ending-style],
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-slot="popover-popup"][data-session-stats-popup][data-ending-style] {
   opacity: 0;
   transform: scale(0.94) translateY(6px);

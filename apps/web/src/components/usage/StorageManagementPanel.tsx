@@ -1,7 +1,7 @@
 import { serverCopy } from "~/i18n/serverCopy";
 import type { DiskSpaceReport } from "@t3tools/contracts";
 import { storagePresentation } from "./storagePresentation";
-import { useTheme } from "../../hooks/useTheme";
+import { useAppleMaterialTheme } from "../../hooks/useTheme";
 import { UsageDetailsSheet } from "./UsageDetailsSheet";
 import { useUiText } from "~/i18n/useUiText";
 import { squashAtomCommandFailure } from "@t3tools/client-runtime/state/runtime";
@@ -88,7 +88,7 @@ export function StorageManagementPanel({
   const [tab, setTab] = useState<StorageTab>("candidates");
   const [volumePath, setVolumePath] = useState("");
   const [volumeId, setVolumeId] = useState("");
-  const { theme } = useTheme();
+  const apple = useAppleMaterialTheme();
   const [plan, setPlan] = useState<StorageOperation | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -251,7 +251,7 @@ export function StorageManagementPanel({
       <CleanupOverview
         data={storagePresentation(
           { ...data, operations, ...(scanState ? { scan: scanState } : {}) },
-          theme === "apple" ? diskReport : undefined,
+          apple ? diskReport : undefined,
         )}
         previewPlan={plan}
         allowed={allowed}
@@ -277,7 +277,7 @@ export function StorageManagementPanel({
         )}
       />
       {plan?.phase === "planned" ? (
-        theme === "apple" ? (
+        apple ? (
           <UsageDetailsSheet
             open
             onOpenChange={(open) => {
@@ -461,7 +461,7 @@ export function StorageManagementPanel({
                 <option value="">{uiText("All inspected volumes")}</option>
                 {data.volumes.map((volume) => (
                   <option key={volume.id} value={volume.path}>
-                    {volume.internal ? uiText("T3 data volume") : serverCopy(volume.name)}
+                    {volume.internal ? uiText("Stardust data volume") : serverCopy(volume.name)}
                   </option>
                 ))}
               </select>

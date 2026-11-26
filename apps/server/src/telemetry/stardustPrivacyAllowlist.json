@@ -1,0 +1,37 @@
+[
+  {
+    "path": "packages/shared/src/threadLinks.ts",
+    "line": "const HOSTED_PREFIX = \"https://app.t3.codes/threads/\";",
+    "reason": "Recognizes older pasted links locally."
+  },
+  {
+    "path": "apps/mobile/modules/t3-composer-editor/ios/T3ComposerEditorModule.swift",
+    "line": "text.contains(\"t3-thread://v2/\") || text.contains(\"https://app.t3.codes/threads/\")",
+    "reason": "Identifies older pasted links locally."
+  },
+  {
+    "path": "apps/mobile/modules/t3-composer-editor/android/src/main/java/expo/modules/t3composereditor/T3ComposerEditorModule.kt",
+    "line": "text.contains(\"t3-thread://v2/\") || text.contains(\"https://app.t3.codes/threads/\")",
+    "reason": "Identifies older pasted links locally."
+  },
+  {
+    "path": "infra/relay/src/monitoring.ts",
+    "line": "`    kind == \"client\" and url startswith \"https://relay.t3.codes/v1/environments/\" and url endswith \"/connect\", \"3. Relay connect, minting a host credential\",`,",
+    "reason": "Archived upstream infrastructure query for historical spans. The relay is not part of the Stardust product."
+  },
+  {
+    "path": "apps/web/src/components/settings/TelemetryExportSettings.tsx",
+    "line": "placeholder={`http://localhost:4318/v1/${signal}`}",
+    "reason": "Input placeholder. Saving an explicit endpoint is required to start export."
+  },
+  {
+    "path": "scripts/prepare-fork-stardust-package.mjs",
+    "line": "for (const value of [\"relay.t3.codes\", \"t3-relay\", \"Sign in to T3 Connect\"]) {",
+    "reason": "Checks the packaged T3 Connect relay address as text without contacting it."
+  },
+  {
+    "path": "scripts/verify-fork-stardust-package.mjs",
+    "line": "for (const value of [\"relay.t3.codes\", \"t3-relay\", \"Sign in to T3 Connect\"]) {",
+    "reason": "Checks the packaged T3 Connect relay address as text without contacting it."
+  }
+]

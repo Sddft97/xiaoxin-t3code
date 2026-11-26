@@ -416,42 +416,42 @@
   font-weight: 600;
 }
 
-:global([data-theme-id="apple"]) .root {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .root {
   gap: 12px;
 }
-:global([data-theme-id="apple"]) .hero {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .hero {
   grid-template-columns: minmax(210px, 0.8fr) minmax(0, 2fr);
   gap: 12px;
   padding: 0;
   background: none;
   border: 0;
 }
-:global([data-theme-id="apple"]) .volumes {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .volumes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   align-items: stretch;
 }
-:global([data-theme-id="apple"]) .volume {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .volume {
   max-width: none;
   text-align: left;
 }
-:global([data-theme-id="apple"]) .suggestions {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .suggestions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
-:global([data-theme-id="apple"]) .listHeading {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .listHeading {
   grid-column: 1/-1;
 }
-:global([data-theme-id="apple"]) .volumeGroup,
-:global([data-theme-id="apple"]) .root > .group {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .volumeGroup,
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .root > .group {
   background: var(--card);
   border-radius: 12px;
   box-shadow: var(--apple-card-shadow);
   padding: 12px;
 }
-:global([data-theme-id="apple"]) .entry {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .entry {
   border-radius: 0;
   background: none;
   border: 0;
@@ -466,9 +466,9 @@
   transform: scale(0.88);
 }
 @media (max-width: 760px) {
-  :global([data-theme-id="apple"]) .hero,
-  :global([data-theme-id="apple"]) .suggestions,
-  :global([data-theme-id="apple"]) .volumes {
+  :global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .hero,
+  :global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .suggestions,
+  :global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .volumes {
     grid-template-columns: 1fr;
   }
 }
@@ -478,16 +478,18 @@
   }
 }
 
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .root[data-clean-dashboard] {
   grid-template-columns: minmax(0, 1fr) 352px;
   gap: 32px 16px;
 }
-:global([data-theme-id="apple"])
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
   .root[data-clean-dashboard]
   > :not(.suggestions):not([data-clean-map]) {
   grid-column: 1 / -1;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] > [data-clean-map] {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  > [data-clean-map] {
   grid-column: 1;
   align-self: stretch;
   padding: 20px;
@@ -496,7 +498,9 @@
   box-shadow: var(--apple-card-shadow);
   border: 0;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] > .suggestions {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  > .suggestions {
   grid-column: 2;
   display: flex;
   flex-direction: column;
@@ -508,41 +512,56 @@
   max-height: 640px;
   overflow: auto;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .hero {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .hero {
   grid-template-columns: minmax(0, 1fr) 352px;
   gap: 16px;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .action {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .action {
   grid-column: 2;
   grid-row: 1;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .volumes {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .volumes {
   grid-column: 1;
   grid-row: 1;
   gap: 16px;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .volumeGroup {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .volumeGroup {
   padding: 0;
   border: 0;
   box-shadow: none;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .treemap {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .treemap {
   height: 380px;
   border-radius: 12px;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .treemap[data-empty] {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .treemap[data-empty] {
   height: 120px;
   display: grid;
   place-items: center;
   font-size: 13px;
   color: var(--muted-foreground);
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .treemap button {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .treemap
+  button {
   background: color-mix(in srgb, var(--primary) 46%, var(--card));
   border-radius: 12px;
   padding: 12px;
 }
-:global([data-theme-id="apple"])
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
   .root[data-clean-dashboard]
   .treemap
   button[data-protected="true"] {
@@ -554,76 +573,118 @@
     ),
     var(--muted);
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .heading h3 {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .heading
+  h3 {
   font-size: 15px;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .group > summary {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .group
+  > summary {
   font-size: 13px;
   padding: 12px 0;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .group > summary::before {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .group
+  > summary::before {
   content: none;
 }
 @media (max-width: 900px) {
-  :global([data-theme-id="apple"]) .root[data-clean-dashboard] {
+  :global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .root[data-clean-dashboard] {
     display: flex;
     flex-direction: column;
   }
-  :global([data-theme-id="apple"]) .root[data-clean-dashboard] .hero {
+  :global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+    .root[data-clean-dashboard]
+    .hero {
     display: flex;
     flex-direction: column;
   }
 }
 
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) .root[data-clean-dashboard] {
   position: relative;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] > .hero {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  > .hero {
   display: none;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] > .heading {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  > .heading {
   position: absolute;
   right: 0;
   top: 44px;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] > .heading > div {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  > .heading
+  > div {
   display: none;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .suggestions .action {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .suggestions
+  .action {
   border-top: 0.5px solid var(--border);
   border-radius: 0;
   box-shadow: none;
   padding: 16px 0 0;
   margin-top: auto;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .suggestions .emptyAmount {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .suggestions
+  .emptyAmount {
   font-size: 15px;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .suggestions .amount strong {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .suggestions
+  .amount
+  strong {
   font-size: 28px;
 }
 
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] > [data-clean-map] > summary {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  > [data-clean-map]
+  > summary {
   height: 20px;
   padding: 0;
   font-size: 15px;
   font-weight: 600;
 }
 
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .treemap button {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .treemap
+  button {
   border-width: 2px;
   border-radius: 10px;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .treemap button strong {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .treemap
+  button
+  strong {
   white-space: normal;
   text-overflow: clip;
   overflow-wrap: anywhere;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .treemap button[data-small] > * {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .treemap
+  button[data-small]
+  > * {
   visibility: hidden;
 }
 
-:global([data-theme-id="apple"]) [data-clean-map] > summary {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) [data-clean-map] > summary {
   display: flex;
   height: 20px;
   align-items: center;
@@ -631,11 +692,13 @@
   padding: 0;
   margin-bottom: 12px;
 }
-:global([data-theme-id="apple"]) [data-usage-map-disk] {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"])) [data-usage-map-disk] {
   font-size: 12px;
   color: var(--muted-foreground);
   font-weight: 400;
 }
-:global([data-theme-id="apple"]) .root[data-clean-dashboard] .heading {
+:global(:is([data-theme-id="apple"], [data-theme-id="stardust"]))
+  .root[data-clean-dashboard]
+  .heading {
   align-items: flex-end;
 }

@@ -599,7 +599,7 @@ export function TaskBoardPanel({
           <button
             type="button"
             aria-label={uiText("{action} steps for {title}", {
-              action: isOpen ? uiText("Collapse recommendation") : uiText("Expand"),
+              action: isOpen ? uiText("Collapse") : uiText("Expand"),
               title: task.title,
             })}
             aria-expanded={isOpen}
@@ -751,7 +751,9 @@ export function TaskBoardPanel({
             {uiText("Task board service is offline")}
           </h2>
           <p>
-            {uiText("Task data is temporarily unavailable. Other T3 features are still available.")}
+            {uiText(
+              "Task data is temporarily unavailable. Other Stardust features are still available.",
+            )}
           </p>
           <code className="my-3 block break-all rounded-md bg-accent px-2 py-1.5 text-left text-3xs">
             {TASK_BOARD_START_COMMAND}

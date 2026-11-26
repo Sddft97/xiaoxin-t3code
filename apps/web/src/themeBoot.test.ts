@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import indexHtml from "../index.html?raw";
+import { DESKTOP_THEMES, HIDDEN_DESKTOP_THEMES } from "@t3tools/shared/themePalettes";
+import { injectThemeBootData } from "../vite/themeBoot";
 import {
   CUSTOM_THEMES_STORAGE_KEY,
   ENVIRONMENT_THEMES_STORAGE_KEY,
@@ -11,10 +13,7 @@ import {
   publishedThemeDefinitions,
   resolveThemeAppearance,
   T3_CHAT_THEME,
-  EMBER_THEME,
   GROVE_THEME,
-  IRIS_THEME,
-  OCEAN_THEME,
   THEME_APPEARANCE_MODE_STORAGE_KEY,
   THEME_FOLLOW_SYSTEM_STORAGE_KEY,
   toCanonicalThemeColor,
@@ -24,7 +23,7 @@ const THEME_STORAGE_KEY = "t3code:theme";
 const DEFAULT_DARK_CHROME = getDefaultThemeColors("dark").chrome;
 
 const bootScript = (() => {
-  const match = indexHtml.match(/<script>([\s\S]*?)<\/script>/);
+  const match = injectThemeBootData(indexHtml).match(/<script>([\s\S]*?)<\/script>/);
   if (!match?.[1]) throw new Error("Could not find the inline boot script in index.html");
   return match[1];
 })();
@@ -310,8 +309,7 @@ describe("index.html boot script", () => {
   });
 
   it("keeps every built-in boot splash in sync with the real palettes", () => {
-    for (const theme of [T3_CHAT_THEME, GROVE_THEME, OCEAN_THEME, EMBER_THEME, IRIS_THEME]) {
-      expect(theme.appearance).toBe("light");
+    for (const theme of [...DESKTOP_THEMES, ...HIDDEN_DESKTOP_THEMES]) {
       for (const mode of ["light", "dark"] as const) {
         const colors = getThemeColorsForMode(theme, mode);
         expect(colors).not.toBeNull();
@@ -331,6 +329,19 @@ describe("index.html boot script", () => {
         expect(boot.metaContent).toBe(colors!.chrome);
       }
     }
+  });
+
+  it.each([
+    ["apple", "stardust"],
+    ["t3-ocean", "harbor"],
+    ["t3-ember", "stardust"],
+  ])("resolves retired %s to %s before the application mounts", (stored, expected) => {
+    expect(
+      runBootScript({
+        storage: { [THEME_STORAGE_KEY]: stored },
+        prefersDark: true,
+      }).themeId,
+    ).toBe(expected);
   });
 
   it("applies the matching half of an automatic mix to the splash", () => {

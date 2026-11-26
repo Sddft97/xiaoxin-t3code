@@ -51,7 +51,7 @@ function props(over: Partial<StorageTidyViewProps> = {}): StorageTidyViewProps {
   };
 }
 const MOLE_ATTRIBUTION =
-  "系统缓存清单来自开源工具 Mole（tw93/Mole，GPL-3.0）的预览结果，由 T3 Stardust 执行并支持撤销。本功能与 Mole 项目无隶属关系。";
+  "系统缓存清单来自开源工具 Mole（tw93/Mole，GPL-3.0）的预览结果，由星尘执行并支持撤销。本功能与 Mole 项目无隶属关系。";
 const FIXED_RULES = "删除由固定规则决定，不由 AI 模型决定。";
 
 function Frame({ children }: { children: ReactNode }) {
@@ -68,12 +68,13 @@ function Frame({ children }: { children: ReactNode }) {
 
 // Screenshots are written only on request: VITE_TIDY_SHOTS=1 npx vitest run --project browser …
 async function shot(name: string, scrollTo?: string) {
-  if (!import.meta.env.VITE_TIDY_SHOTS) return;
+  const output = import.meta.env.VITE_STARDUST_FIX_SHOTS;
+  if (!import.meta.env.VITE_TIDY_SHOTS && !output) return;
   await page.viewport(1280, 820);
   const frame = document.querySelector<HTMLElement>('[data-testid="frame"]')!;
   if (scrollTo) frame.querySelector(scrollTo)?.scrollIntoView({ block: "start" });
   else frame.scrollTop = 0;
-  await page.screenshot({ path: `${name}.png` });
+  await page.screenshot({ path: output ? `${output}/storage-${name}.png` : `${name}.png` });
 }
 
 it("start: disk overview, one scan button and the two required lines", async () => {

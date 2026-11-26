@@ -1,3 +1,7 @@
+import {
+  classifyCodexManagedError,
+  CODEX_SHARING_UNSUPPORTED,
+} from "../provider/CodexManagedErrors.ts";
 import { makeAssistantStreamingFilter } from "./assistantStreaming.ts";
 import { resolveProjectSettings } from "@t3tools/shared/projectSettings";
 import {
@@ -50,7 +54,6 @@ import * as IdAllocator from "@t3tools/provider-core/server/IdAllocator";
 import * as ProviderAdapter from "@t3tools/provider-core/server/ProviderAdapter";
 import { PROVIDER_STOP_REASON_SIGNAL } from "@t3tools/provider-core/server/subagentProjection";
 import * as ProviderEventIngestor from "./ProviderEventIngestor.ts";
-import * as ProviderUsageAnalytics from "../telemetry/ProviderUsageAnalytics.ts";
 import type { ProjectionStoreV2Error } from "./ProjectionStore.ts";
 import {
   knownProviderFailureMessage,
@@ -104,12 +107,6 @@ function isSettledSubagentStatus(status: OrchestrationV2Subagent["status"]): boo
 }
 
 /** A provider-native subagent's turns arrive on its parent's run, but the parent agent started them. */
-const NATIVE_SUBAGENT_TURN_ORIGIN: ProviderUsageAnalytics.ProviderTurnOrigin = {
-  createdBy: "agent",
-  creationSource: "provider",
-  scheduled: false,
-  subagent: true,
-};
 
 const backgroundCapableTurnItemTypes: ReadonlySet<OrchestrationV2TurnItem["type"]> = new Set([
   "command_execution",
@@ -460,6 +457,8 @@ export function routeProviderEvent(
         },
       ];
     }
+    case "thread_model_selection.updated":
+      return [event.threadId === input.threadId, state];
     case "provider_thread.updated": {
       const belongs =
         state.ownedProviderThreadIds.has(event.providerThread.id) ||
@@ -587,9 +586,10 @@ export function routeProviderEvent(
       ];
     case "background_work.updated":
       return [state.ownedProviderTurns.has(event.providerTurnId), state];
+    case "background_work.lost":
     case "command_output.delta":
     case "prompt_suggestion.updated":
-      // The session manager serves these to clients directly; runs never see them.
+      // The session manager handles these itself; runs never see them.
       return [false, state];
     case "turn.terminal":
       return event.providerTurnId === state.rootProviderTurnId
@@ -659,6 +659,12 @@ export interface RunExecutionServiceV2StartRootRunInput {
   readonly hasUnpairedRunInterruptRequest?: () => Effect.Effect<boolean, never>;
   readonly loadRunInterruptReason?: () => Effect.Effect<string | undefined, never>;
   readonly hasWorkspaceMoved?: () => Effect.Effect<boolean, never>;
+  readonly recoverCodexSharing?: (
+    failure: OrchestrationV2ProviderFailure,
+    providerThread: OrchestrationV2ProviderThread,
+    providerTurn: OrchestrationV2ProviderTurn | null,
+    replaySafe: boolean,
+  ) => Effect.Effect<"recovered" | "blocked" | "failed", unknown>;
   /** Restores inline context handoffs if the provider drops this turn's prompt before persisting it. */
   readonly loadDroppedInlineHandoffs?: () => Effect.Effect<
     ReadonlyArray<OrchestrationV2ContextHandoff>,
@@ -723,7 +729,6 @@ export const layer: Layer.Layer<
     const previewAgentActivity = yield* PreviewAgentActivity.PreviewAgentActivity;
     const turnItemPositions = yield* TurnItemPositionStore.TurnItemPositionStoreV2;
     const finalizationObserver = yield* RunFinalizationService.RunFinalizationObserver;
-    const turnAnalytics = yield* ProviderUsageAnalytics.ProviderTurnAnalytics;
     const threadCommands = yield* ThreadCommandExecutor.ThreadCommandExecutor;
 
     const writeFinalRunEvents = Effect.fn("RunExecutionService.writeFinalRunEvents")(
@@ -990,6 +995,9 @@ export const layer: Layer.Layer<
                     providerInstanceId: input.run.providerInstanceId,
                     occurredAt: completedAt,
                     payload: makeProviderFailureTurnItem({
+                      ...(input.terminal.failureItemId === undefined
+                        ? {}
+                        : { id: input.terminal.failureItemId }),
                       driver: input.terminal.driver,
                       threadId: input.run.threadId,
                       runId: input.run.id,
@@ -1070,12 +1078,6 @@ export const layer: Layer.Layer<
         } else {
           yield* eventSink.writeWithEffects(finalization);
         }
-        yield* turnAnalytics.runSettled({
-          runId: input.run.id,
-          status: input.terminal.status,
-          completedAt,
-          childrenRunning: hasOpenSubagentProjection && cascadedSubagentEvents.length === 0,
-        });
         yield* input.refreshAfterTurn;
         return true;
       },
@@ -1111,12 +1113,6 @@ export const layer: Layer.Layer<
           Effect.map(Fiber.join),
         ),
       startRootRun: Effect.fn("RunExecutionService.startRootRun")(function* (input) {
-        const rootTurnOrigin: ProviderUsageAnalytics.ProviderTurnOrigin = {
-          createdBy: input.message.createdBy,
-          creationSource: input.message.creationSource,
-          scheduled: input.message.scheduledTaskId !== undefined,
-          subagent: input.appThread.lineage.relationshipToParent === "subagent",
-        };
         // Startup failure and stream shutdown can report the same attempt.
         const refreshAfterTurn = yield* Effect.cached(
           finalizationObserver.refreshAfterTurn(input.appThread.projectId).pipe(
@@ -1215,25 +1211,6 @@ export const layer: Layer.Layer<
         const latestTurnItemOrdinal = yield* Ref.make(input.providerTurnOrdinal * 100);
         const latestProviderThread = yield* Ref.make(input.providerThread);
         const latestRootProviderTurn = yield* Ref.make<OrchestrationV2ProviderTurn | null>(null);
-        // Later root turns in one attempt are provider continuations, such as Codex goal turns.
-        let firstRootProviderTurnId: ProviderTurnId | undefined;
-        const analyticsContext = {
-          runId: input.run.id,
-          modelSelection: input.modelSelection,
-          runtimeMode: input.runtimePolicy.runtimeMode,
-          interactionMode: input.runtimePolicy.interactionMode,
-          origin: rootTurnOrigin,
-          ...(input.run.restartContinuationOfRunId === undefined
-            ? {}
-            : { restartContinuation: true }),
-        } satisfies ProviderUsageAnalytics.ProviderTurnAnalyticsContext;
-        if (input.attempt.reason === "initial") {
-          yield* turnAnalytics.runStarted({
-            runId: input.run.id,
-            driver: input.providerThread.driver,
-            context: { ...analyticsContext, segment: "initial" },
-          });
-        }
         const routeIdentity: ProviderEventRouteIdentity = {
           threadId: input.run.threadId,
           runId: input.run.id,
@@ -1801,27 +1778,7 @@ export const layer: Layer.Layer<
           const isRootProviderThreadUpdate =
             event.type === "provider_thread.updated" &&
             event.providerThread.id === input.providerThread.id;
-          const nativeChildTurn =
-            event.type === "provider_turn.updated" &&
-            event.providerTurn.providerThreadId !== input.providerThread.id;
-          if (event.type === "provider_turn.updated" && !nativeChildTurn) {
-            firstRootProviderTurnId ??= event.providerTurn.id;
-          }
           const storedEvents = yield* providerEventIngestor.ingestNormalized({
-            analyticsContext: nativeChildTurn
-              ? {
-                  ...analyticsContext,
-                  origin: NATIVE_SUBAGENT_TURN_ORIGIN,
-                  segment: "native_child",
-                }
-              : {
-                  ...analyticsContext,
-                  segment:
-                    event.type === "provider_turn.updated" &&
-                    event.providerTurn.id !== firstRootProviderTurnId
-                      ? "continuation"
-                      : input.attempt.reason,
-                },
             providerSessionId: input.providerSessionId,
             providerInstanceId: input.run.providerInstanceId,
             threadId: input.run.threadId,
@@ -1907,6 +1864,31 @@ export const layer: Layer.Layer<
           }
           yield* scheduleIdleFlush;
         });
+        let sharingReplaySafe = true;
+        const recoverSharing = Effect.fnUntraced(function* (
+          failure: OrchestrationV2ProviderFailure,
+        ) {
+          if (failure.code !== CODEX_SHARING_UNSUPPORTED || input.recoverCodexSharing === undefined)
+            return "failed" as const;
+          return yield* threadCommands
+            .withLock(
+              input.run.threadId,
+              input.recoverCodexSharing(
+                failure,
+                yield* Ref.get(latestProviderThread),
+                yield* Ref.get(latestRootProviderTurn),
+                sharingReplaySafe,
+              ),
+            )
+            .pipe(
+              Effect.catch((cause) =>
+                Effect.logWarning("Could not schedule Codex sharing recovery", {
+                  runId: input.run.id,
+                  cause,
+                }).pipe(Effect.as("failed" as const)),
+              ),
+            );
+        });
         const ingestEvent = Effect.fnUntraced(function* ({
           event,
           accepted,
@@ -1915,6 +1897,53 @@ export const layer: Layer.Layer<
           accepted: boolean;
         }) {
           if (!accepted) return;
+          if (input.recoverCodexSharing !== undefined) {
+            if (
+              event.type === "runtime_request.updated" ||
+              event.type === "subagent.updated" ||
+              (event.type === "background_work.updated" && event.pending) ||
+              (event.type === "turn_item.updated" &&
+                event.turnItem.type !== "reasoning" &&
+                event.turnItem.type !== "user_message" &&
+                event.turnItem.type !== "error")
+            ) {
+              sharingReplaySafe = false;
+            }
+            if (
+              event.type === "turn.terminal" &&
+              event.status === "failed" &&
+              event.failure.code === CODEX_SHARING_UNSUPPORTED
+            ) {
+              if (yield* Ref.get(rootTerminalSeen)) return;
+              const recovery = yield* recoverSharing(event.failure);
+              if (recovery === "recovered") {
+                yield* Ref.set(terminalEvent, event);
+                yield* Ref.set(rootTerminalSeen, true);
+                yield* Ref.set(rootRunFinalized, true);
+                return;
+              }
+              const stopped = yield* (
+                input.hasUnpairedRunInterruptRequest?.() ?? Effect.succeed(false)
+              );
+              const ownsRun = yield* input.shouldStartProviderTurn?.() ?? Effect.succeed(true);
+              if (stopped || !ownsRun) {
+                event = { ...event, status: "interrupted", failure: null };
+              } else if (recovery === "blocked") {
+                event = {
+                  ...event,
+                  childTurnsContinue: true,
+                  failure: {
+                    ...event.failure,
+                    codexSharing: {
+                      reason: "unknown",
+                      ...event.failure.codexSharing,
+                      blocked: true,
+                    },
+                  },
+                };
+              }
+            }
+          }
           if (
             event.type === "provider_turn.updated" &&
             event.providerTurn.runAttemptId === input.attempt.id &&
@@ -2346,52 +2375,83 @@ export const layer: Layer.Layer<
             ),
           ),
           Effect.catchCause((cause) =>
-            Effect.logError("orchestration V2 provider turn start failed", {
-              runId: input.run.id,
-              cause,
-            }).pipe(
-              Effect.andThen(Fiber.interrupt(providerEventFiber)),
-              Effect.andThen(Ref.get(latestProviderThread)),
-              Effect.flatMap((providerThread) =>
-                Ref.get(latestTurnItemOrdinal).pipe(
-                  Effect.flatMap((latestItemOrdinal) =>
-                    Ref.get(openRunOwnedSubagents).pipe(
-                      Effect.flatMap((openSubagents) =>
-                        writeFinalRunEvents({
-                          run: input.run,
-                          rootNode: input.rootNode,
-                          checkpointScope: input.checkpointScope,
-                          providerThread,
-                          attempt: input.attempt,
-                          writeIfRunCurrent: {
-                            activeAttemptId: input.attempt.id,
-                            expectedStatus: "running",
-                          },
-                          openRunOwnedSubagents: openSubagents,
-                          terminal: makeFailedTerminalEvent(
-                            makeProviderFailure({
-                              cause: Cause.squash(cause),
-                              class: Exit.isFailure(shouldStart) ? "unknown" : "provider_error",
-                            }),
-                            latestItemOrdinal + 1,
-                          ),
-                          failureItemPersisted: false,
-                          refreshAfterTurn,
-                        }),
+            Effect.gen(function* () {
+              yield* Fiber.interrupt(providerEventFiber);
+              const startFailure = Cause.squash(cause);
+              const classification =
+                input.recoverCodexSharing === undefined || Exit.isFailure(shouldStart)
+                  ? undefined
+                  : classifyCodexManagedError(startFailure, true);
+              const sharingFailure: OrchestrationV2ProviderFailure | undefined =
+                classification?.code === CODEX_SHARING_UNSUPPORTED &&
+                classification.codexSharing !== undefined
+                  ? {
+                      ...makeProviderFailure({
+                        code: classification.code,
+                        message: classification.message,
+                      }),
+                      codexSharing: classification.codexSharing,
+                    }
+                  : undefined;
+              const recovery =
+                sharingFailure === undefined ? "failed" : yield* recoverSharing(sharingFailure);
+              if (recovery === "recovered") return;
+              const failure =
+                sharingFailure === undefined
+                  ? makeProviderFailure({
+                      cause: startFailure,
+                      class: Exit.isFailure(shouldStart) ? "unknown" : "provider_error",
+                    })
+                  : recovery === "blocked"
+                    ? {
+                        ...sharingFailure,
+                        codexSharing: {
+                          reason: "unknown" as const,
+                          ...sharingFailure.codexSharing,
+                          blocked: true as const,
+                        },
+                      }
+                    : sharingFailure;
+              return yield* Effect.logError("orchestration V2 provider turn start failed", {
+                runId: input.run.id,
+                ...(sharingFailure === undefined ? { cause } : { code: sharingFailure.code }),
+              }).pipe(
+                Effect.andThen(Ref.get(latestProviderThread)),
+                Effect.flatMap((providerThread) =>
+                  Ref.get(latestTurnItemOrdinal).pipe(
+                    Effect.flatMap((latestItemOrdinal) =>
+                      Ref.get(openRunOwnedSubagents).pipe(
+                        Effect.flatMap((openSubagents) =>
+                          writeFinalRunEvents({
+                            run: input.run,
+                            rootNode: input.rootNode,
+                            checkpointScope: input.checkpointScope,
+                            providerThread,
+                            attempt: input.attempt,
+                            writeIfRunCurrent: {
+                              activeAttemptId: input.attempt.id,
+                              expectedStatus: "running",
+                            },
+                            openRunOwnedSubagents: openSubagents,
+                            terminal: makeFailedTerminalEvent(failure, latestItemOrdinal + 1),
+                            failureItemPersisted: false,
+                            refreshAfterTurn,
+                          }),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Effect.mapError(
-                (writeCause) =>
-                  new RunExecutionStartError({
-                    commandId: input.commandId,
-                    runId: input.run.id,
-                    cause: { start: cause, write: writeCause },
-                  }),
-              ),
-            ),
+                Effect.mapError(
+                  (writeCause) =>
+                    new RunExecutionStartError({
+                      commandId: input.commandId,
+                      runId: input.run.id,
+                      cause: { start: cause, write: writeCause },
+                    }),
+                ),
+              );
+            }),
           ),
         );
       }),

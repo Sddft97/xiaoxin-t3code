@@ -23,7 +23,7 @@ export function dispatchCommandPalette(action: CommandPaletteUiAction): void {
   const state = useCommandPaletteStore.getState();
   const next = reduceCommandPaletteUiState(state, action);
   if (!state.open && next.open) {
-    // The workspace turns inert before the popup mounts, which blurs the opener.
+    // Capture the opener before the modal transfers focus to the input.
     returnFocus = {
       element: document.activeElement instanceof HTMLElement ? document.activeElement : null,
       href: window.location.href,

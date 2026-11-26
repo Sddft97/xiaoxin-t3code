@@ -10,7 +10,12 @@ import {
   environmentThemeFileHasColors,
 } from "@t3tools/contracts";
 import { fromJsonStringPretty, fromLenientJson } from "@t3tools/shared/schemaJson";
-import { BUILT_IN_THEME_IDS, UNPUBLISHABLE_THEME_IDS } from "@t3tools/shared/themePalettes";
+import {
+  DESKTOP_THEMES,
+  HIDDEN_DESKTOP_THEMES,
+  normalizeBuiltInThemeId,
+  UNPUBLISHABLE_THEME_IDS,
+} from "@t3tools/shared/themePalettes";
 import * as Config from "effect/Config";
 import * as Console from "effect/Console";
 import * as DateTime from "effect/DateTime";
@@ -90,7 +95,7 @@ export class ThemeFileInvalidError extends Schema.TaggedError<ThemeFileInvalidEr
   { filePath: Schema.String, cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return `${this.filePath} is not a valid theme file. Use a theme exported from T3 Code, or a seeded file with name, appearance, canvas, and accent.`;
+    return `${this.filePath} is not a valid theme file. Use a theme exported from Stardust, or a seeded file with name, appearance, canvas, and accent.`;
   }
 }
 
@@ -431,10 +436,12 @@ const publishThemeFile = Effect.fn(function* (input: {
   return { themeId, revert, cleanup };
 });
 
-/** Web and desktop cannot resolve the mobile default, and mobile does not follow this setting. */
 const resolvableThemeIds = Effect.fn(function* (themesDir: string) {
   const published = yield* readPublishedThemes(themesDir);
-  return [...BUILT_IN_THEME_IDS, ...published.map((theme) => theme.id)].toSorted();
+  return [
+    ...DESKTOP_THEMES.map((theme) => theme.id),
+    ...published.map((theme) => theme.id),
+  ].toSorted();
 });
 
 const themeSetCommand = Command.make("set", {
@@ -486,7 +493,10 @@ const themeSetCommand = Command.make("set", {
         return yield* new ThemeFileUnreadableError({ filePath: target });
       } else if (isEnvironmentThemeId(target)) {
         const known = yield* resolvableThemeIds(paths.themesDir);
-        if (!known.includes(target)) {
+        if (
+          !known.includes(normalizeBuiltInThemeId(target)) &&
+          !HIDDEN_DESKTOP_THEMES.some((theme) => theme.id === normalizeBuiltInThemeId(target))
+        ) {
           return yield* new ThemeIdUnknownError({ themeId: target, known });
         }
         themeId = target;

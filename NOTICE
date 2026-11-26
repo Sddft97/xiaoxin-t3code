@@ -1,0 +1,9 @@
+Stardust Agent / 星尘 Agent
+
+Stardust Agent is derived from T3 Code, originally developed by T3 Tools Inc.
+The project is distributed under the MIT License in LICENSE.
+
+Separate licenses and source references for dependencies and assets appear in
+third-party-licenses.json and in Settings → About → Open-source licenses.
+
+The optional T3 Connect hosted service is operated by the upstream project.

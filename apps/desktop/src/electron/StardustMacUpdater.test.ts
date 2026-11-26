@@ -254,9 +254,7 @@ describe("StardustMacUpdater check", () => {
         "rate-limited",
       );
       const invalid = makeFixture({ latest: { ...release("1.2.2"), assets: [] } });
-      expect(causeOf(yield* invalid.run(invalid.service.checkForUpdates))?.code).toBe(
-        "no-mac-asset",
-      );
+      expect(causeOf(yield* invalid.run(invalid.service.checkForUpdates))?.code).toBe("no-asset");
     }),
   );
 });

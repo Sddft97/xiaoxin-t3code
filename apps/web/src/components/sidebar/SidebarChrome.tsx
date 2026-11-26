@@ -1,4 +1,7 @@
+import { appBaseName } from "~/branding";
+import { platformProfile } from "~/lib/PlatformProfile";
 import "./stardustWordmark.css";
+import { StardustMark } from "./StardustMark";
 import { useUiText } from "~/i18n/useUiText";
 import { useMemoryProposalNotification } from "../settings/useMemoryProposalNotification";
 
@@ -73,7 +76,7 @@ export const SidebarChromeHeader = memo(function SidebarChromeHeader({
   return (
     <div
       className={cn(
-        "relative flex h-[var(--workspace-topbar-height)] shrink-0 flex-row items-center gap-2 pr-3",
+        "@container/sidebar-head relative flex w-full h-[var(--workspace-topbar-height)] shrink-0 flex-row items-center gap-2 pr-3",
         isElectron && "drag-region",
       )}
     >
@@ -127,7 +130,7 @@ export function SidebarBrandWidthProbe({
       ref={observeWidth}
     >
       <div className="ml-[calc(var(--workspace-titlebar-content-left)-var(--liquid-sidebar-inset,0px)+1px)] flex gap-1">
-        <SidebarBrandMark onBackdrop={false} />
+        <SidebarBrandMark onBackdrop={false} alwaysShowLabel />
         {isElectron ? <div className="w-[calc(2*var(--workspace-titlebar-control-size))]" /> : null}
       </div>
     </div>
@@ -181,7 +184,7 @@ function SidebarBrand({ onBackdrop }: { onBackdrop: boolean }) {
   const gt = useGT();
   return (
     <Link
-      aria-label={gt("T3 Code home")}
+      aria-label={gt("Stardust home")}
       className={cn(
         "relative z-10 ml-[calc(var(--workspace-titlebar-content-left)-var(--liquid-sidebar-inset,0px)+1px)] hidden h-7 w-fit min-w-0 shrink-0 items-center overflow-hidden rounded-md outline-hidden ring-ring focus-visible:ring-2 focus-visible:ring-inset md:flex",
         onBackdrop ? "text-white" : "text-foreground",
@@ -193,28 +196,34 @@ function SidebarBrand({ onBackdrop }: { onBackdrop: boolean }) {
   );
 }
 /**
- * A quiet brand mark: "T3" in the secondary label colour plus the app icon's sparkle, the only
- * brand colour. It is a name, not copy, so it is never translated. Static: no animation.
+ * A quiet brand: the static T2 star mark next to "星尘" / "Stardust" in the secondary label
+ * colour. Static: no animation (an animated wordmark once measured ~30% CPU at idle). In a narrow
+ * header only the mark shows.
  */
-function SidebarBrandMark({ onBackdrop }: { onBackdrop: boolean }) {
+function SidebarBrandMark({
+  onBackdrop,
+  alwaysShowLabel = false,
+}: {
+  onBackdrop: boolean;
+  alwaysShowLabel?: boolean;
+}) {
+  const uiText = useUiText();
   return (
     <span
       data-stardust-wordmark
       data-on-backdrop={onBackdrop || undefined}
-      className="inline-flex items-center gap-0.75 text-sm font-semibold tracking-tight [text-box:trim-both_cap_alphabetic] supports-[text-box:trim-both_cap_alphabetic]:py-1"
+      className="inline-flex items-center gap-1.5 text-sm font-semibold tracking-tight"
     >
-      T3
-      <svg
-        aria-hidden="true"
-        data-stardust-star=""
-        viewBox="0 0 16 16"
-        className="size-[11px] shrink-0"
+      <StardustMark className="size-[18px] shrink-0" />
+      <span
+        data-stardust-label=""
+        className={cn(
+          "whitespace-nowrap",
+          !alwaysShowLabel && "hidden @[9rem]/sidebar-head:inline",
+        )}
       >
-        <path
-          d="M8 0c.4 3.9 2.1 5.6 6 6-3.9.4-5.6 2.1-6 6-.4-3.9-2.1-5.6-6-6 3.9-.4 5.6-2.1 6-6z"
-          fill="currentColor"
-        />
-      </svg>
+        {platformProfile.isWindowsDesktop ? appBaseName() : uiText("Stardust")}
+      </span>
     </span>
   );
 }

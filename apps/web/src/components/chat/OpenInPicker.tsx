@@ -1,3 +1,4 @@
+import { platformProfile } from "~/lib/PlatformProfile";
 import { ThreadDetailsControl } from "./ThreadDetailsControl";
 import {
   AuthOrchestrationOperateScope,
@@ -294,7 +295,7 @@ export const OpenInPicker = memo(function OpenInPicker({
   );
 
   const backgroundThread = use(BackgroundThreadContext);
-  const options = resolveOpenInOptions(navigator.platform, effectiveEditors, messages);
+  const options = resolveOpenInOptions(platformProfile.platform, effectiveEditors, messages);
   const primaryOption = options.find(({ value }) => value === preferredEditor) ?? null;
   const primaryLabel = isPanel
     ? primaryOption
@@ -407,7 +408,7 @@ export const OpenInPicker = memo(function OpenInPicker({
       {...(enableShortcut && !backgroundThread ? { [OPEN_FAVORITE_EDITOR_ATTRIBUTE]: "" } : {})}
       onClick={() => {
         if (!preferredEditor) return;
-        const label = editorLabelForPlatform(preferredEditor, navigator.platform);
+        const label = editorLabelForPlatform(preferredEditor, platformProfile.platform);
         void openInEditor(preferredEditor).then((opened) => {
           if (opened) announce(gt("Opened in {editor}", { editor: label }));
         });

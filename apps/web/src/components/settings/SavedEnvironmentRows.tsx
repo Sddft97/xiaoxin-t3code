@@ -1,3 +1,4 @@
+import { useUiText } from "~/i18n/useUiText";
 import { managedCapabilityDenial } from "@t3tools/client-runtime/contract-labels";
 import { SessionPermissions } from "./SessionPermissions";
 import {
@@ -389,7 +390,7 @@ export function SavedBackendListRow({
           environmentId={environmentId}
           serverLabel={gt("{label} server", {
             label: environment.label,
-            $context: "names a T3 server inside sentences such as {serverLabel} updated",
+            $context: "names a Stardust server inside sentences such as {serverLabel} updated",
           })}
           fromVersion={lastDescriptor?.serverVersion}
           targetVersion={APP_VERSION}
@@ -401,7 +402,7 @@ export function SavedBackendListRow({
           environmentId={environmentId}
           serverLabel={gt("{label} server", {
             label: environment.label,
-            $context: "names a T3 server inside sentences such as {serverLabel} updated",
+            $context: "names a Stardust server inside sentences such as {serverLabel} updated",
           })}
           selfUpdate={resolveServerSelfUpdateCapability(environment.serverConfig)}
           installation={environment.serverConfig?.environment.capabilities.serverInstallation}
@@ -573,6 +574,7 @@ function ConfiguredCloudLinkRow({
 }) {
   const setting = useSearchableSetting();
   const gt = useGT();
+  const connectText = useUiText();
   const updateEnvironmentSettings = useUpdateEnvironmentSettings(environmentId);
   const {
     isSignedIn,
@@ -724,7 +726,7 @@ function ConfiguredCloudLinkRow({
     <>
       {showSwitch ? (
         <SettingsRow
-          title={setting("t3-connect").title}
+          title={connectText("T3 Connect (third-party service operated by the upstream project)")}
           description={
             connectDenial !== undefined && !managedTunnelActive
               ? connectDenial
@@ -771,15 +773,15 @@ function ConfiguredCloudLinkRow({
         </SettingsRow>
       ) : linkRevoked ? (
         <SettingsRow
-          title={setting("t3-connect").title}
+          title={connectText("T3 Connect (third-party service operated by the upstream project)")}
           description={gt(
             "This environment was removed from T3 Connect. Run `t3 connect link` on the host to link it again.",
           )}
         />
       ) : (
         <SettingsRow
-          title={setting("t3-connect").title}
-          description={gt("Run `t3 connect link` on the host, then restart T3 Code there.")}
+          title={connectText("T3 Connect (third-party service operated by the upstream project)")}
+          description={gt("Run `t3 connect link` on the host, then restart Stardust there.")}
         />
       )}
       {signedOut && showSwitch ? null : (
@@ -870,11 +872,19 @@ export function CloudLinkRow({
   readonly connectDeviceApproval: ConnectDeviceApprovalControl | null;
 }) {
   const gt = useGT();
-  if (!hasCloudPublicConfig()) return null;
+  const connectText = useUiText();
+  if (!hasCloudPublicConfig()) {
+    return (
+      <SettingsRow
+        title={connectText("T3 Connect (third-party service operated by the upstream project)")}
+        description={connectText("T3 Connect is not configured in this build.")}
+      />
+    );
+  }
   if (!canReadRelay) {
     return (
       <SettingsRow
-        title={gt("T3 Connect")}
+        title={connectText("T3 Connect (third-party service operated by the upstream project)")}
         description={gt(
           "To edit these settings, pair this connection with both View relay and Manage relay permissions.",
         )}

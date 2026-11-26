@@ -419,7 +419,7 @@ export function IssuesPage() {
         : clearedSelection,
     );
 
-  const selectEntry = (entry: IssueRowTarget) => {
+  const selectEntry = (entry: Omit<IssueRowTarget, "host"> & { readonly host?: string }) => {
     if (rightPanelRef === null) return;
     useRightPanelStore.getState().openIssue(rightPanelRef, entry);
     updateSearch({
@@ -507,7 +507,7 @@ export function IssuesPage() {
   const listBody: ReactNode = !issuesSupported ? (
     <PullRequestsUnavailableState
       title={gt("Issues unavailable")}
-      error={gt("Update this environment's T3 Code server to browse issues.")}
+      error={gt("Update this environment's Stardust server to browse issues.")}
     />
   ) : noneAnswered && list.isPending ? (
     <PullRequestListGhost />
@@ -864,6 +864,13 @@ export function IssuesPage() {
                       environmentId: panelEnvironmentId,
                     });
                   }}
+                  onSelectIssue={({ host, ...reference }) =>
+                    selectEntry({
+                      ...reference,
+                      ...(host === undefined ? {} : { host }),
+                      environmentId: panelEnvironmentId,
+                    })
+                  }
                 />
               ) : (
                 <PullRequestDetailPanel

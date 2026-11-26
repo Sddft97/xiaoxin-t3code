@@ -80,7 +80,7 @@ const checkForUpdatesFromMenu = Effect.gen(function* () {
     yield* electronDialog.showMessageBox({
       type: "info",
       title: m(msg("You're up to date!")),
-      message: m(msg("T3 Code {version} is currently the newest version available."), {
+      message: m(msg("Stardust {version} is currently the newest version available."), {
         version: updateState.currentVersion,
       }),
       buttons: [m(msg("OK"))],
@@ -91,9 +91,9 @@ const checkForUpdatesFromMenu = Effect.gen(function* () {
       title: m(msg("Update available")),
       message:
         updateState.availableVersion === null
-          ? m(msg("A new version of T3 Code is available."))
-          : m(msg("T3 Code {version} is available."), { version: updateState.availableVersion }),
-      detail: m(msg("You're running T3 Code {version}."), {
+          ? m(msg("A new version of Stardust is available."))
+          : m(msg("Stardust {version} is available."), { version: updateState.availableVersion }),
+      detail: m(msg("You're running Stardust {version}."), {
         version: updateState.currentVersion,
       }),
       buttons: [
@@ -110,8 +110,8 @@ const checkForUpdatesFromMenu = Effect.gen(function* () {
       title: m(msg("Update downloading")),
       message:
         updateState.availableVersion === null
-          ? m(msg("A new version of T3 Code is already downloading."))
-          : m(msg("T3 Code {version} is already downloading."), {
+          ? m(msg("A new version of Stardust is already downloading."))
+          : m(msg("Stardust {version} is already downloading."), {
               version: updateState.availableVersion,
             }),
       buttons: [m(msg("OK"))],
@@ -123,9 +123,9 @@ const checkForUpdatesFromMenu = Effect.gen(function* () {
       title: m(msg("Update ready")),
       message:
         version === null
-          ? m(msg("A new version of T3 Code is ready to install."))
-          : m(msg("T3 Code {version} is ready to install."), { version }),
-      detail: m(msg("T3 Code will restart to install it. Any running tasks will be interrupted.")),
+          ? m(msg("A new version of Stardust is ready to install."))
+          : m(msg("Stardust {version} is ready to install."), { version }),
+      detail: m(msg("Stardust will restart to install it. Any running tasks will be interrupted.")),
       buttons: [m(msg("Restart", { $context: "button, restarts the app" })), m(msg("Later"))],
       defaultId: 0,
       cancelId: 1,
@@ -186,6 +186,7 @@ export const make = Effect.gen(function* () {
   const context = yield* Effect.context<DesktopApplicationMenuRuntimeServices>();
   const runPromise = Effect.runPromiseWith(context);
   const runFork = Effect.runForkWith(context);
+  const runSync = Effect.runSyncWith(context);
 
   const runMenuEffect = <E>(
     action: string,
@@ -209,13 +210,19 @@ export const make = Effect.gen(function* () {
     const settingsClick = () => {
       runMenuEffect("open-settings", dispatchMenuAction("open-settings"));
     };
-    // Chromium and the renderer already handle this chord; injecting another paste duplicates text.
     const pasteAsTextClick = (
       _item: Electron.MenuItem,
       _window: Electron.BaseWindow | undefined,
       event: Electron.KeyboardEvent,
     ) => {
-      if (event.triggeredByAccelerator === true) return;
+      if (event.triggeredByAccelerator === true) {
+        // Chromium pastes this chord itself except on macOS. Paste synchronously there:
+        // a renderer round trip can land after the terminal's own clipboard read.
+        if (environment.platform === "darwin") {
+          runSync(electronMenu.pasteAndMatchStyle);
+        }
+        return;
+      }
       runMenuEffect("paste-as-text", dispatchMenuAction("paste-as-text"));
     };
     const zoomClick = (direction: DesktopWindow.MainWindowZoomDirection) => () => {

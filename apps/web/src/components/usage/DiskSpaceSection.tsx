@@ -117,7 +117,7 @@ function DiskSpaceReportView({ report }: { readonly report: DiskSpaceReport }) {
       {report.volume ? (
         <>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-sm font-medium">{uiText("T3 data volume")}</h3>
+            <h3 className="text-sm font-medium">{uiText("Stardust data volume")}</h3>
             <span className="text-sm tabular-nums">
               {uiText("{free} free of {total}", {
                 free: formatBytes(free),
@@ -182,7 +182,7 @@ function DiskSpaceReportView({ report }: { readonly report: DiskSpaceReport }) {
           </p>
           <p className="text-xs text-muted-foreground">
             {uiText(
-              "The overview covers T3 data directories and Codex history. Other detected caches and registered archives are listed below; this is not a whole-disk scan.",
+              "The overview covers Stardust data directories and Codex history. Other detected caches and registered archives are listed below; this is not a whole-disk scan.",
             )}
           </p>
         </div>

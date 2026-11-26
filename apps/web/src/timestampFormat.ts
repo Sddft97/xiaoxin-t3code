@@ -8,9 +8,10 @@ import { getActiveLocale, m, type MessageResolver } from "./i18n/messages";
 function getTimestampFormatOptions(
   timestampFormat: TimestampFormat,
   includeSeconds: boolean,
+  locale: string | undefined,
 ): Intl.DateTimeFormatOptions {
   const baseOptions: Intl.DateTimeFormatOptions = {
-    hour: readUiLocale() === "zh-CN" ? "2-digit" : "numeric",
+    hour: locale === "zh-CN" ? "2-digit" : "numeric",
     minute: "2-digit",
     ...(includeSeconds ? { second: "2-digit" } : {}),
   };
@@ -85,20 +86,24 @@ function getTimestampFormatter(
   timestampFormat: TimestampFormat,
   includeSeconds: boolean,
   timeZone = "UTC",
+  locale?: string,
 ): Intl.DateTimeFormat {
-  const cacheKey = `${timestampFormat}:${includeSeconds ? "seconds" : "minutes"}:${timeZone}`;
+  const displayLocale = locale ?? (readUiLocale() === "zh-CN" ? "zh-CN" : timestampLocale);
+  const cacheKey = `${timestampFormat}:${includeSeconds ? "seconds" : "minutes"}:${timeZone}:${displayLocale ?? ""}:${locale ?? ""}`;
   const cachedFormatter = timestampFormatterCache.get(cacheKey);
   if (cachedFormatter) {
     return cachedFormatter;
   }
 
-  const formatter = new Intl.DateTimeFormat(
-    readUiLocale() === "zh-CN" ? "zh-CN" : timestampLocale,
-    {
-      ...getTimestampFormatOptions(timestampFormat, includeSeconds),
-      ...(timeZone ? { timeZone } : {}),
-    },
-  );
+  const hourCycle =
+    timestampFormat === "locale" && locale !== undefined && locale !== timestampLocale
+      ? new Intl.DateTimeFormat(timestampLocale, { hour: "numeric" }).resolvedOptions().hourCycle
+      : undefined;
+  const formatter = new Intl.DateTimeFormat(displayLocale, {
+    ...getTimestampFormatOptions(timestampFormat, includeSeconds, displayLocale),
+    ...(hourCycle === undefined ? {} : { hourCycle }),
+    timeZone,
+  });
   timestampFormatterCache.set(cacheKey, formatter);
   return formatter;
 }
@@ -179,10 +184,14 @@ export function formatFullTimestamp(isoDate: string, timestampFormat: TimestampF
   );
 }
 
-export function formatShortTimestamp(isoDate: string, timestampFormat: TimestampFormat): string {
+export function formatShortTimestamp(
+  isoDate: string,
+  timestampFormat: TimestampFormat,
+  locale?: string,
+): string {
   const date = parseTimestampDate(isoDate);
   if (!date) return "";
-  return formatTime(date, timestampFormat);
+  return getTimestampFormatter(timestampFormat, false, "UTC", locale).format(wallClockAsUtc(date));
 }
 
 const dateTimeFormatterCache = new Map<TimestampFormat, Intl.DateTimeFormat>();

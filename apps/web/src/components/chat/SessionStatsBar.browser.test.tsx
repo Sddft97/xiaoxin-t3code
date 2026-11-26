@@ -9,6 +9,7 @@ import zh from "../../i18n/translations/zh.json";
 import { makeThreadProjectionFixture } from "../../test-fixtures";
 import { SessionStatsBar } from "./SessionStatsBar";
 import "~/index.css";
+import { applyThemePalette } from "~/themePalette";
 
 vi.mock("../../state/threads", () => ({
   useEnvironmentThread: () => ({ data: Option.none() }),
@@ -123,3 +124,40 @@ it("explains unreported fields and exposes finished token details using English 
     /\p{Script=Han}/u,
   );
 });
+
+it.each([
+  ["light", "rgb(110, 110, 115)", "rgb(29, 138, 63)", "rgb(227, 71, 23)"],
+  ["dark", "rgb(161, 161, 166)", "rgb(48, 209, 88)", "rgb(255, 103, 52)"],
+] as const)(
+  "keeps the C115 session stats text and status dots in Stardust %s",
+  async (mode, text, idleDot, runningDot) => {
+    const root = document.documentElement;
+    const beforeTheme = root.dataset.themeId ?? "default";
+    const beforeAppearance = root.classList.contains("dark") ? "dark" : "light";
+    using _theme = {
+      [Symbol.dispose]: () => {
+        root.classList.toggle("dark", beforeAppearance === "dark");
+        applyThemePalette(beforeTheme, beforeAppearance);
+      },
+    };
+    root.classList.toggle("dark", mode === "dark");
+    applyThemePalette("stardust", mode);
+    const view = (finished: boolean) => (
+      <div data-slot="composer-shell" style={{ width: 580 }}>
+        <div data-session-stats-dock>{bar(projection(finished), "zh")}</div>
+      </div>
+    );
+    await using screen = await render(view(true));
+    const dot = () => screen.container.querySelector("[data-v9-stats-dot]")!;
+    const stats = () => screen.container.querySelector("[data-v9-stats-trig='session']")!;
+    expect(stats().textContent).toContain("1 轮 1 步 · 10 令牌/秒");
+    expect(screen.container.querySelector("[data-v9-stats-trig='tokens']")?.textContent).toContain(
+      "800 令牌 · 缓存 80%",
+    );
+    expect(getComputedStyle(stats()).color).toBe(text);
+    expect(getComputedStyle(stats()).height).toBe("26px");
+    expect(getComputedStyle(dot()).backgroundColor).toBe(idleDot);
+    await screen.rerender(view(false));
+    expect(getComputedStyle(dot()).backgroundColor).toBe(runningDot);
+  },
+);

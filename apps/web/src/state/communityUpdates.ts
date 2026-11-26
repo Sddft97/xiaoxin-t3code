@@ -1,10 +1,13 @@
+import { platformProfile } from "~/lib/PlatformProfile";
 import { uiText } from "../i18n";
 import { create } from "zustand";
 import {
   COMMUNITY_BASE_TAG,
   COMMUNITY_CHECK_INTERVAL_MS,
   COMMUNITY_REPOSITORY,
+  communityReleaseFromTag,
   communityReleaseNumber,
+  communityOfferedVersion,
   parseCommunityRelease,
   type CommunityRelease,
   type CommunityUpdateMode,
@@ -98,10 +101,31 @@ export const useCommunityUpdates = create<CommunityUpdatesState>((set, get) => {
       set({ status: "checking", error: null });
       pending = (async () => {
         try {
+          if (platformProfile.isWindowsDesktop) {
+            const result = await window.desktopBridge?.checkForUpdate();
+            const state = result?.state;
+            if (!state || !state.enabled || state.status === "error") {
+              throw new Error(
+                state?.message
+                  ? uiText(state.message)
+                  : uiText("Check GitHub Releases for Stardust updates."),
+              );
+            }
+            const version = communityOfferedVersion(state);
+            const tag = version ? `v${version}` : "";
+            const number = communityReleaseNumber(tag);
+            set(
+              number === null
+                ? { status: "current", release: null }
+                : { status: "available", release: communityReleaseFromTag(tag, number) },
+            );
+            return;
+          }
           const response = await fetch(
             `https://api.github.com/repos/${COMMUNITY_REPOSITORY}/releases/latest`,
             {
               credentials: "omit",
+              redirect: "error",
               referrerPolicy: "no-referrer",
               headers: { Accept: "application/vnd.github+json" },
               signal: AbortSignal.timeout(15_000),

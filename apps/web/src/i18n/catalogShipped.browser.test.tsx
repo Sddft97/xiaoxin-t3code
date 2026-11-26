@@ -13,9 +13,7 @@ function Probe({ onResult }: { readonly onResult: (missing: string[]) => void })
   return null;
 }
 
-// The runtime reads translations/zh.json by hash, not catalog.ts. A catalog entry missing from the
-// shipped file renders English in the app while unit tests that read the catalog still pass (C79 C20).
-it("ships every Chinese catalog entry in the GT translation file", async () => {
+it("renders every Chinese catalog entry in the active GT locale", async () => {
   let missing: string[] = [];
   await using _screen = await render(
     <GTProvider locale="zh" translations={{ zh, en: {} } as never}>

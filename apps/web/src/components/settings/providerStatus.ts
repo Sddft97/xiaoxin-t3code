@@ -74,7 +74,7 @@ export function getProviderSummary(
       headline: resolve(msg("Disabled", { $context: "provider status" })),
       detail:
         provider.message ??
-        resolve(msg("This provider is installed but disabled for new sessions in T3 Code.")),
+        resolve(msg("This provider is installed but disabled for new sessions in Stardust.")),
     };
   }
   if (!provider.installed) {

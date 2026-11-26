@@ -60,8 +60,8 @@ export function activeWorkElapsed(startedAt: string, nowMs: number) {
   if (minutes < 1) return uiText("Just started");
   if (minutes < 60) return uiText("Running for {minutes}m", { minutes });
   const hours = Math.floor(minutes / 60);
-  return uiText("Running for {hours}h{minutes}", {
-    hours,
-    minutes: minutes % 60 ? uiText(" {count}m", { count: minutes % 60 }) : "",
-  });
+  const remainingMinutes = minutes % 60;
+  return remainingMinutes === 0
+    ? uiText("Running for {hours}h", { hours })
+    : uiText("Running for {hours}h {minutes}m", { hours, minutes: remainingMinutes });
 }

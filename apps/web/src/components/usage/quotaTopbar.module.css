@@ -507,7 +507,7 @@
   display: none;
 }
 
-:global(html[data-theme-id="apple"]) {
+:global(html:is([data-theme-id="apple"], [data-theme-id="stardust"])) {
   .quota-topbar {
     height: 36px;
     min-height: 36px;
@@ -759,7 +759,7 @@
   }
 }
 
-:global(html[data-theme-id="apple"].dark) {
+:global(html:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark) {
   .quota-chip[data-low] .quota-chip-value,
   .quota-numbers[data-low] strong {
     color: #ff9f0a;
@@ -775,7 +775,7 @@
   }
 }
 
-:global(html[data-theme-id="apple"]) .quota-topbar-host {
+:global(html:is([data-theme-id="apple"], [data-theme-id="stardust"])) .quota-topbar-host {
   margin-right: 0;
 }
 

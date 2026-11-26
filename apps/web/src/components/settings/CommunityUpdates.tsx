@@ -1,3 +1,4 @@
+import { platformProfile } from "~/lib/PlatformProfile";
 import { uiText } from "../../i18n";
 import { useEffect, useRef, useState } from "react";
 import { isElectron } from "../../env";
@@ -5,7 +6,6 @@ import { useCommunityUpdates } from "../../state/communityUpdates";
 import { useDesktopUpdateState } from "../../state/desktopUpdate";
 import {
   COMMUNITY_BASE_TAG,
-  COMMUNITY_CHECK_INTERVAL_MS,
   COMMUNITY_RELEASES_URL,
   communityInstallPhase,
   communityOfferedVersion,
@@ -17,7 +17,8 @@ import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
 import { toastManager } from "../ui/toast";
 import { SettingsRow } from "./settingsLayout";
-import { StardustStatsRow } from "./StardustStats";
+import { AboutVersionTitle } from "./AboutVersionTitle";
+import { useUiText } from "../../i18n/useUiText";
 import { openDesktopUpdateReleaseNotes } from "../desktopUpdate.toast";
 const openPage = (url: string) => {
   void openDesktopUpdateReleaseNotes(window.desktopBridge, url);
@@ -53,7 +54,6 @@ export function updateAndRestart(): Promise<void> {
 }
 
 export function CommunityUpdateCoordinator() {
-  const automatic = useCommunityUpdates((s) => s.automatic);
   const autoInstall = useCommunityUpdates((s) => s.autoInstall);
   const mode = useCommunityUpdates((s) => s.mode);
   const release = useCommunityUpdates((s) => s.release);
@@ -62,20 +62,6 @@ export function CommunityUpdateCoordinator() {
   const canSelfUpdate = desktopCanSelfUpdate(desktopState);
   const downloadedVersion = desktopState?.downloadedVersion ?? null;
   const announcedDownloadRef = useRef<string | null>(null);
-  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- Own the desktop update polling timers while this coordinator is mounted.
-  useEffect(() => {
-    if (!isElectron || !automatic) return;
-    const timer = window.setTimeout(() => {
-      void useCommunityUpdates.getState().check();
-    }, 10_000);
-    const interval = window.setInterval(() => {
-      void useCommunityUpdates.getState().check();
-    }, COMMUNITY_CHECK_INTERVAL_MS);
-    return () => {
-      window.clearTimeout(timer);
-      window.clearInterval(interval);
-    };
-  }, [automatic]);
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- The desktop process keeps no copy of this preference, so push it at start and on every change.
   useEffect(() => {
     if (!isElectron) return;
@@ -90,7 +76,7 @@ export function CommunityUpdateCoordinator() {
     const canInstall = communityUpdateActions(state.mode, canSelfUpdate).canInstall;
     toastManager.add({
       type: "info",
-      title: uiText("T3 Stardust {tag} is available", { tag: release.tag }),
+      title: uiText("Stardust {tag} is available", { tag: release.tag }),
       description: (
         <>
           <span>
@@ -131,10 +117,10 @@ export function CommunityUpdateCoordinator() {
     announcedDownloadRef.current = downloadedVersion;
     toastManager.add({
       type: "success",
-      title: uiText("T3 Stardust {version} is ready", { version: `v${downloadedVersion}` }),
+      title: uiText("Stardust {version} is ready", { version: `v${downloadedVersion}` }),
       description: (
         <>
-          <span>{uiText("It installs the next time you quit T3 Stardust.")}</span>
+          <span>{uiText("It installs the next time you quit Stardust.")}</span>
           <button
             type="button"
             className="ml-2 font-medium underline"
@@ -151,51 +137,9 @@ export function CommunityUpdateCoordinator() {
   return null;
 }
 
-export function CommunityUpdateSettings() {
+export function CommunityUpdatePreferences() {
   const state = useCommunityUpdates();
-  const desktopState = useDesktopUpdateState();
-  const canSelfUpdate = desktopCanSelfUpdate(desktopState);
-  const actions = communityUpdateActions(state.mode, canSelfUpdate);
-  const phase = communityInstallPhase(desktopState);
-  const [installing, setInstalling] = useState(false);
-  const currentVersion =
-    canSelfUpdate && desktopState ? `v${desktopState.currentVersion}` : COMMUNITY_BASE_TAG;
-  const offeredVersion = communityOfferedVersion(desktopState);
-  const newVersion = offeredVersion ? `v${offeredVersion}` : (state.release?.tag ?? null);
-  const updateFound = state.status === "available" || phase !== "none";
-  const showInstall = actions.canInstall && updateFound;
-  const desktopError =
-    canSelfUpdate && desktopState?.status === "error" ? desktopState.message : null;
-  const percent =
-    typeof desktopState?.downloadPercent === "number"
-      ? Math.floor(desktopState.downloadPercent)
-      : 0;
-  const statusText =
-    phase === "downloading"
-      ? uiText("Downloading {version}… {percent}%", { version: newVersion, percent })
-      : phase === "downloaded"
-        ? uiText("Current {current} · {version} is downloaded and ready to install", {
-            current: currentVersion,
-            version: newVersion,
-          })
-        : state.status === "checking" || desktopState?.status === "checking"
-          ? uiText("Checking…")
-          : updateFound && newVersion
-            ? actions.canInstall
-              ? uiText("Current {current} · New version {version}", {
-                  current: currentVersion,
-                  version: newVersion,
-                })
-              : uiText("{version} available · {action}", {
-                  version: newVersion,
-                  action:
-                    state.mode === "custom"
-                      ? uiText("Review and merge source changes as needed")
-                      : uiText("Review the notes, then download manually"),
-                })
-            : state.status === "current"
-              ? uiText("You have the latest community release.")
-              : uiText("Checks the Stardust Community release feed only.");
+  const canSelfUpdate = desktopCanSelfUpdate(useDesktopUpdateState());
   return (
     <>
       <SettingsRow
@@ -225,19 +169,6 @@ export function CommunityUpdateSettings() {
           </select>
         }
       />
-      <SettingsRow
-        title={uiText("Check for community updates automatically")}
-        description={uiText(
-          "Checks public GitHub releases at startup and every 6 hours. Conversation, account, and project data stay on your device.",
-        )}
-        control={
-          <Switch
-            aria-label={uiText("Check for community updates automatically")}
-            checked={state.automatic}
-            onCheckedChange={state.setAutomatic}
-          />
-        }
-      />
       {canSelfUpdate && state.mode === "standard" && (
         <SettingsRow
           title={uiText("Download updates automatically and install on next launch")}
@@ -253,91 +184,153 @@ export function CommunityUpdateSettings() {
           }
         />
       )}
-      <StardustStatsRow />
+    </>
+  );
+}
+
+export function CommunityUpdateSettings({ versionRowId }: { versionRowId?: string }) {
+  const copy = useUiText();
+  const state = useCommunityUpdates();
+  const desktopState = useDesktopUpdateState();
+  const canSelfUpdate = desktopCanSelfUpdate(desktopState);
+  const actions = communityUpdateActions(state.mode, canSelfUpdate);
+  const phase = communityInstallPhase(desktopState);
+  const [installing, setInstalling] = useState(false);
+  const currentVersion =
+    canSelfUpdate && desktopState ? `v${desktopState.currentVersion}` : COMMUNITY_BASE_TAG;
+  const offeredVersion = communityOfferedVersion(desktopState);
+  const newVersion = offeredVersion ? `v${offeredVersion}` : (state.release?.tag ?? null);
+  const updateFound = state.status === "available" || phase !== "none";
+  const showInstall = actions.canInstall && updateFound;
+  const desktopError =
+    canSelfUpdate && desktopState?.status === "error" ? desktopState.message : null;
+  const percent =
+    typeof desktopState?.downloadPercent === "number"
+      ? Math.floor(desktopState.downloadPercent)
+      : 0;
+  const statusText =
+    phase === "downloading"
+      ? copy("Downloading {version}… {percent}%", { version: newVersion, percent })
+      : phase === "downloaded"
+        ? copy("Current {current} · {version} is downloaded and ready to install", {
+            current: currentVersion,
+            version: newVersion,
+          })
+        : state.status === "checking" || desktopState?.status === "checking"
+          ? copy("Checking…")
+          : updateFound && newVersion
+            ? actions.canInstall
+              ? copy("Current {current} · New version {version}", {
+                  current: currentVersion,
+                  version: newVersion,
+                })
+              : copy("{version} available · {action}", {
+                  version: newVersion,
+                  action:
+                    state.mode === "custom"
+                      ? copy("Review and merge source changes as needed")
+                      : copy("Review the notes, then download manually"),
+                })
+            : state.status === "current"
+              ? copy("You have the latest community release.")
+              : null;
+  return (
+    <>
       <SettingsRow
-        title={uiText("Stardust Community · Mac Apple Silicon")}
-        description={statusText}
-        control={
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={state.status === "checking" || phase === "downloading" || installing}
-            onClick={() => {
-              void state.check(true);
-              if (canSelfUpdate) void window.desktopBridge?.checkForUpdate();
-            }}
-          >
-            {uiText("Check for Updates")}
-          </Button>
-        }
-      />
-      <div className="space-y-2 px-1 text-sm text-muted-foreground">
-        <p>
-          {uiText("Community baseline:")}
-          {COMMUNITY_BASE_TAG}
-          {uiText(". Your local source may contain additional changes.")}
-        </p>
-        {state.error && <p role="status">{state.error}</p>}
-        {desktopError && <p role="status">{updaterMessage(desktopError)}</p>}
-        <div className="flex flex-wrap gap-2">
-          {showInstall && (
+        id={versionRowId}
+        title={
+          <span className="inline-flex flex-wrap items-baseline gap-x-2">
+            <AboutVersionTitle version={currentVersion} />
+            <span aria-hidden="true">·</span>
             <Button
-              size="sm"
-              disabled={phase === "downloading" || installing}
+              size="xs"
+              variant="link"
+              className="-mx-2.5"
+              disabled={state.status === "checking" || phase === "downloading" || installing}
               onClick={() => {
-                setInstalling(true);
-                void updateAndRestart().finally(() => setInstalling(false));
+                void state.check(true);
+                if (canSelfUpdate && !platformProfile.isWindowsDesktop)
+                  void window.desktopBridge?.checkForUpdate();
               }}
             >
-              {phase === "downloading"
-                ? uiText("Downloading {percent}%", { percent })
-                : installing
-                  ? uiText("Preparing update…")
-                  : uiText("Update and restart")}
+              {copy("Check for Updates")}
             </Button>
-          )}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() =>
-              openPage(
-                offeredVersion
-                  ? releaseNotesUrl(offeredVersion)
-                  : (state.release?.url ?? COMMUNITY_RELEASES_URL),
-              )
-            }
-          >
-            {actions.canInstall ? uiText("View update notes") : uiText("View release notes")}
-          </Button>
-          {state.status === "available" &&
-            state.release &&
-            actions.canOpenDownloadPage &&
-            !showInstall && (
-              <Button size="sm" onClick={() => openPage(state.release!.url)}>
-                {uiText("Open download page")}
+          </span>
+        }
+        description={
+          statusText || state.error || desktopError ? (
+            <span role="status">
+              {state.error ?? (desktopError ? updaterMessage(desktopError) : statusText)}
+            </span>
+          ) : null
+        }
+      />
+      {updateFound && (
+        <div className="space-y-2 px-1 text-sm text-muted-foreground">
+          <div className="flex flex-wrap gap-2">
+            {showInstall && (
+              <Button
+                size="sm"
+                disabled={phase === "downloading" || installing}
+                onClick={() => {
+                  setInstalling(true);
+                  void updateAndRestart().finally(() => setInstalling(false));
+                }}
+              >
+                {phase === "downloading"
+                  ? copy("Downloading {percent}%", { percent })
+                  : installing
+                    ? copy("Preparing update…")
+                    : copy("Update and restart")}
               </Button>
             )}
-          {state.status === "available" && state.release && actions.canViewSourceDiff && (
-            <Button size="sm" variant="outline" onClick={() => openPage(state.release!.compareUrl)}>
-              {uiText("View source changes")}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                openPage(
+                  offeredVersion
+                    ? releaseNotesUrl(offeredVersion)
+                    : (state.release?.url ?? COMMUNITY_RELEASES_URL),
+                )
+              }
+            >
+              {actions.canInstall ? copy("View update notes") : copy("View release notes")}
             </Button>
+            {state.status === "available" &&
+              state.release &&
+              actions.canOpenDownloadPage &&
+              !showInstall && (
+                <Button size="sm" onClick={() => openPage(state.release!.url)}>
+                  {copy("Open download page")}
+                </Button>
+              )}
+            {state.status === "available" && state.release && actions.canViewSourceDiff && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => openPage(state.release!.compareUrl)}
+              >
+                {copy("View source changes")}
+              </Button>
+            )}
+          </div>
+          {showInstall && (
+            <p>
+              {copy(
+                "Updating keeps your conversations and settings. The previous version is kept as a backup and restored automatically if the update fails.",
+              )}
+            </p>
+          )}
+          {state.mode === "custom" && (
+            <p>
+              {copy(
+                "Review and merge the changes in your fork before building. Replacing the app can overwrite your customizations.",
+              )}
+            </p>
           )}
         </div>
-        {showInstall && (
-          <p>
-            {uiText(
-              "Updating keeps your conversations and settings. The previous version is kept as a backup and restored automatically if the update fails.",
-            )}
-          </p>
-        )}
-        {state.mode === "custom" && (
-          <p>
-            {uiText(
-              "Review and merge the changes in your fork before building. Replacing the app can overwrite your customizations.",
-            )}
-          </p>
-        )}
-      </div>
+      )}
     </>
   );
 }

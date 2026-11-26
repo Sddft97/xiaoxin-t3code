@@ -1,32 +1,54 @@
-export const BUILT_IN_THEME_IDS = ["t3-chat", "grove", "ocean", "ember", "iris"] as const;
+export const STARDUST_THEME_ID = "stardust";
+export const MOBILE_DEFAULT_THEME_ID = "t3-chat";
+export const ENABLE_STARDUST_THEME_MIGRATION = true;
 
-/** Desktop-only skins (not shipped to mobile). */
-const SKIN_THEME_IDS = ["harbor", "mist", "graphite", "darkroom", "porcelain"] as const;
-
-export const MOBILE_DEFAULT_THEME_ID = "t3-code";
-
+export const BUILT_IN_THEME_IDS = ["grove", "ocean", "ember"] as const;
+const SKIN_THEME_IDS = ["harbor", "mist", "graphite", "ink", "apple"] as const;
 export const MOBILE_THEME_IDS = [MOBILE_DEFAULT_THEME_ID, ...BUILT_IN_THEME_IDS] as const;
 
-/** Reserve appearance keywords, built-ins, and legacy aliases so custom themes cannot capture stored preferences. */
+// Keep the original ids of renamed palettes and continue recognizing older prefixed ids.
+export const LEGACY_THEME_ID_ALIASES = {
+  "t3-chat-dark": "t3-chat",
+  "t3-grove": "grove",
+  "t3-ocean": "ocean",
+  "t3-ember": "ember",
+  "t3-iris": "iris",
+} as const;
+
+export const STARDUST_THEME_MIGRATION = {
+  "t3-code": STARDUST_THEME_ID,
+  apple: STARDUST_THEME_ID,
+  ocean: "harbor",
+  ember: STARDUST_THEME_ID,
+  porcelain: "ink",
+  darkroom: "ink",
+} as const;
+
+export function normalizeBuiltInThemeId(
+  id: string,
+  migrate = ENABLE_STARDUST_THEME_MIGRATION,
+): string {
+  const aliases: Readonly<Partial<Record<string, string>>> = LEGACY_THEME_ID_ALIASES;
+  const migrations: Readonly<Partial<Record<string, string>>> = STARDUST_THEME_MIGRATION;
+  const canonical = Object.hasOwn(aliases, id) ? aliases[id]! : id;
+  return migrate && Object.hasOwn(migrations, canonical) ? migrations[canonical]! : canonical;
+}
+
+/** Custom or published palettes cannot claim built-in or historical preference ids. */
 export const RESERVED_THEME_IDS: ReadonlySet<string> = new Set([
   "system",
   "light",
   "dark",
+  STARDUST_THEME_ID,
   ...BUILT_IN_THEME_IDS,
-  "t3-chat-dark",
-  "t3-grove",
-  "t3-ocean",
-  "t3-ember",
-  "t3-iris",
   ...SKIN_THEME_IDS,
-  "apple",
+  "t3-chat",
+  "iris",
+  ...Object.keys(LEGACY_THEME_ID_ALIASES),
+  ...Object.keys(STARDUST_THEME_MIGRATION),
 ]);
 
-/** The mobile default id is valid in saved themes but cannot be published because web/desktop cannot resolve it. */
-export const UNPUBLISHABLE_THEME_IDS: ReadonlySet<string> = new Set([
-  ...RESERVED_THEME_IDS,
-  MOBILE_DEFAULT_THEME_ID,
-]);
+export const UNPUBLISHABLE_THEME_IDS = RESERVED_THEME_IDS;
 
 export type BuiltInThemeId = (typeof BUILT_IN_THEME_IDS)[number];
 export type MobileThemeId = (typeof MOBILE_THEME_IDS)[number];
@@ -102,6 +124,7 @@ export type ThemeVariants = Readonly<Partial<Record<ThemeAppearance, ThemeColors
 export type ThemeDefinition = Readonly<{
   id: string;
   label: string;
+  labelZh?: string;
   appearance: ThemeAppearance;
   colors: ThemeColors;
   variants?: ThemeVariants;
@@ -242,7 +265,8 @@ export const T3_CODE_DARK_THEME_COLORS: ThemeColors = {
 
 export const T3_CHAT_THEME: ThemeDefinition = {
   id: "t3-chat",
-  label: "T3 Chat",
+  label: "Classic Chat",
+  labelZh: "经典对话",
   appearance: "light",
   colors: {
     canvas: "oklch(0.982446 0.010114 325.653)",
@@ -377,7 +401,8 @@ export const T3_CHAT_THEME: ThemeDefinition = {
 
 export const GROVE_THEME: ThemeDefinition = {
   id: "grove",
-  label: "Grove",
+  label: "Pine",
+  labelZh: "松影",
   appearance: "light",
   colors: {
     canvas: "oklch(0.972369 0.005497 157.15)",
@@ -512,7 +537,8 @@ export const GROVE_THEME: ThemeDefinition = {
 
 export const OCEAN_THEME: ThemeDefinition = {
   id: "ocean",
-  label: "Ocean",
+  label: "Azure",
+  labelZh: "蔚海",
   appearance: "light",
   colors: {
     canvas: "oklch(0.974199 0.002856 241.597)",
@@ -648,6 +674,7 @@ export const OCEAN_THEME: ThemeDefinition = {
 export const EMBER_THEME: ThemeDefinition = {
   id: "ember",
   label: "Ember",
+  labelZh: "余烬",
   appearance: "light",
   colors: {
     canvas: "oklch(0.976527 0.002685 60.725)",
@@ -917,7 +944,8 @@ export const IRIS_THEME: ThemeDefinition = {
 
 export const HARBOR_THEME: ThemeDefinition = {
   id: "harbor",
-  label: "星港 Harbor",
+  label: "Harbor",
+  labelZh: "星港",
   appearance: "dark",
   colors: {
     canvas: "#0f1829",
@@ -1052,7 +1080,8 @@ export const HARBOR_THEME: ThemeDefinition = {
 
 export const MIST_THEME: ThemeDefinition = {
   id: "mist",
-  label: "晨雾 Mist",
+  label: "Mist",
+  labelZh: "晨雾",
   appearance: "light",
   colors: {
     canvas: "#fbfcfd",
@@ -1188,7 +1217,8 @@ export const MIST_THEME: ThemeDefinition = {
 /** 石墨纸 Graphite paper: warm-grey desk, paper panels, ink text; colour only marks state. */
 export const GRAPHITE_THEME: ThemeDefinition = {
   id: "graphite",
-  label: "石墨纸 Graphite",
+  label: "Graphite",
+  labelZh: "石墨纸",
   appearance: "light",
   colors: {
     canvas: "#f6f5f2",
@@ -1213,7 +1243,7 @@ export const GRAPHITE_THEME: ThemeDefinition = {
     secondaryForeground: "#1d1d1f",
     muted: "#f0efec",
     mutedForeground: "#6c6964",
-    placeholder: "#8b8883",
+    placeholder: "#6c6964",
     secondaryLabel: "#6c6964",
     iconMuted: "#7a7772",
     error: "#b4362b",
@@ -1418,7 +1448,7 @@ export const PORCELAIN_THEME: ThemeDefinition = {
     secondaryForeground: "#111111",
     muted: "#f4f4f3",
     mutedForeground: "#6f6f6f",
-    placeholder: "#8a8a8a",
+    placeholder: "#6c6c6c",
     secondaryLabel: "#6f6f6f",
     iconMuted: "#8a8a8a",
     error: "#b4362b",
@@ -1462,7 +1492,8 @@ export const PORCELAIN_THEME: ThemeDefinition = {
 
 export const APPLE_THEME: ThemeDefinition = {
   id: "apple",
-  label: "苹果",
+  label: "Mica",
+  labelZh: "云母",
   appearance: "light",
   colors: {
     canvas: "#F7F7F9",
@@ -1477,19 +1508,19 @@ export const APPLE_THEME: ThemeDefinition = {
     surfaceRaised: "#FFFFFF",
     surfaceOverlay: "#FFFFFF",
     text: "#1D1D1F",
-    textMuted: "rgba(60,60,67,.62)",
+    textMuted: "#64646C",
     border: "rgba(0,0,0,.08)",
     input: "rgba(0,0,0,.08)",
     focus: "#E34717",
-    accent: "#E34717",
+    accent: "#C93D16",
     accentForeground: "#FFFFFF",
     secondary: "rgba(120,120,128,.09)",
     secondaryForeground: "#1D1D1F",
     muted: "rgba(120,120,128,.09)",
-    mutedForeground: "rgba(60,60,67,.62)",
-    placeholder: "rgba(60,60,67,.62)",
-    secondaryLabel: "rgba(60,60,67,.62)",
-    iconMuted: "rgba(60,60,67,.62)",
+    mutedForeground: "#64646C",
+    placeholder: "#64646C",
+    secondaryLabel: "#64646C",
+    iconMuted: "#64646C",
     error: "#FF3B30",
     errorForeground: "#C52D25",
     errorSurface: "rgba(255,59,48,.1)",
@@ -1503,7 +1534,7 @@ export const APPLE_THEME: ThemeDefinition = {
     accentSurfaceForeground: "#1D1D1F",
     messageSurface: "#FFFFFF",
     messageForeground: "#1D1D1F",
-    messageAction: "#E34717",
+    messageAction: "#C93D16",
     messageActionForeground: "#FFFFFF",
     messageActionHover: "#BE380F",
     codeBackground: "#F5F5F7",
@@ -1514,7 +1545,7 @@ export const APPLE_THEME: ThemeDefinition = {
     searchMatchActiveForeground: "#1D1D1F",
     sidebar: "rgba(236,236,244,.7)",
     sidebarForeground: "#1D1D1F",
-    sidebarMutedForeground: "rgba(60,60,67,.62)",
+    sidebarMutedForeground: "#64646C",
     sidebarControlSurface: "rgba(120,120,128,.09)",
     sidebarRowHover: "rgba(120,120,128,.09)",
     sidebarRowActive: "#FFFFFF",
@@ -1541,19 +1572,19 @@ export const APPLE_THEME: ThemeDefinition = {
       surfaceRaised: "#2A2A2D",
       surfaceOverlay: "#2A2A2D",
       text: "#F5F5F7",
-      textMuted: "rgba(235,235,245,.6)",
+      textMuted: "#AAAAB3",
       border: "rgba(255,255,255,.08)",
       input: "rgba(255,255,255,.08)",
       focus: "#FF6734",
-      accent: "#FF6734",
+      accent: "#BC421C",
       accentForeground: "#FFFFFF",
       secondary: "rgba(120,120,128,.2)",
       secondaryForeground: "#F5F5F7",
       muted: "rgba(120,120,128,.2)",
-      mutedForeground: "rgba(235,235,245,.6)",
-      placeholder: "rgba(235,235,245,.6)",
-      secondaryLabel: "rgba(235,235,245,.6)",
-      iconMuted: "rgba(235,235,245,.6)",
+      mutedForeground: "#AAAAB3",
+      placeholder: "#AAAAB3",
+      secondaryLabel: "#AAAAB3",
+      iconMuted: "#AAAAB3",
       error: "#FF453A",
       errorForeground: "#FF6961",
       errorSurface: "rgba(255,69,58,.12)",
@@ -1567,9 +1598,9 @@ export const APPLE_THEME: ThemeDefinition = {
       accentSurfaceForeground: "#F5F5F7",
       messageSurface: "#2A2A2D",
       messageForeground: "#F5F5F7",
-      messageAction: "#FF6734",
+      messageAction: "#BC421C",
       messageActionForeground: "#FFFFFF",
-      messageActionHover: "#FF885E",
+      messageActionHover: "#CD4924",
       codeBackground: "#2A2A2D",
       codeForeground: "#F5F5F7",
       searchMatchBackground: "#66501A",
@@ -1578,7 +1609,7 @@ export const APPLE_THEME: ThemeDefinition = {
       searchMatchActiveForeground: "#1D1D1F",
       sidebar: "rgba(44,44,50,.7)",
       sidebarForeground: "#F5F5F7",
-      sidebarMutedForeground: "rgba(235,235,245,.6)",
+      sidebarMutedForeground: "#AAAAB3",
       sidebarControlSurface: "rgba(120,120,128,.2)",
       sidebarRowHover: "rgba(120,120,128,.2)",
       sidebarRowActive: "#2A2A2D",
@@ -1595,22 +1626,115 @@ export const APPLE_THEME: ThemeDefinition = {
 };
 
 /** Desktop skins share the built-in theme machinery but stay out of mobile theme lists. */
+export const STARDUST_THEME: ThemeDefinition = {
+  id: STARDUST_THEME_ID,
+  label: "Stardust",
+  labelZh: "星尘",
+  appearance: "light",
+  colors: {
+    ...APPLE_THEME.colors,
+    canvas: "#F7F7F9",
+    chrome: "#F7F7F9",
+    toolbar: "#F7F7F9",
+    text: "#1D1D1F",
+    textMuted: "#57575D",
+    mutedForeground: "#57575D",
+    secondaryLabel: "#57575D",
+    accent: "#38383D",
+    accentForeground: "#FFFFFF",
+    focus: "#626269",
+    messageAction: "#38383D",
+    messageActionHover: "#28282D",
+    terminalCursor: "#1D1D1F",
+    terminalSelection: "#DFDFE5",
+  },
+  variants: {
+    dark: {
+      ...APPLE_THEME.variants!.dark!,
+      canvas: "#131219",
+      chrome: "#131219",
+      toolbar: "#131219",
+      surface: "#1E1D27",
+      surfaceRaised: "#25232F",
+      surfaceOverlay: "#1E1D27",
+      text: "#F2F1F7",
+      textMuted: "#A2A0AF",
+      mutedForeground: "#A2A0AF",
+      secondaryLabel: "#A2A0AF",
+      border: "rgba(235,232,255,.09)",
+      input: "rgba(235,232,255,.11)",
+      accent: "#E6E4EB",
+      accentForeground: "#131219",
+      focus: "#A2A0AF",
+      messageAction: "#E6E4EB",
+      messageActionForeground: "#131219",
+      messageActionHover: "#F2F1F7",
+      secondary: "#25232F",
+      secondaryForeground: "#F2F1F7",
+      muted: "#25232F",
+      codeBackground: "#1E1D27",
+      messageSurface: "#1E1D27",
+      sidebar: "rgba(30,28,41,.72)",
+      sidebarRowSelected: "#272632",
+      sidebarRowActive: "#272632",
+      terminalBackground: "#131219",
+      terminalForeground: "#F2F1F7",
+      terminalCursor: "#F2F1F7",
+      terminalSelection: "#454351",
+    },
+  },
+};
+
+export const INK_THEME: ThemeDefinition = {
+  id: "ink",
+  label: "Ink",
+  labelZh: "墨白",
+  appearance: "light",
+  colors: PORCELAIN_THEME.colors,
+  variants: { dark: DARKROOM_THEME.colors },
+};
+
 export const SKIN_THEMES: ReadonlyArray<ThemeDefinition> = [
   HARBOR_THEME,
   MIST_THEME,
   GRAPHITE_THEME,
-  DARKROOM_THEME,
-  PORCELAIN_THEME,
+  INK_THEME,
   APPLE_THEME,
 ];
 
 export const BUILT_IN_THEMES: ReadonlyArray<ThemeDefinition> = [
-  T3_CHAT_THEME,
+  OCEAN_THEME,
   GROVE_THEME,
+  EMBER_THEME,
+];
+
+export const DESKTOP_THEMES: ReadonlyArray<ThemeDefinition> = [
+  STARDUST_THEME,
+  INK_THEME,
+  GRAPHITE_THEME,
+  MIST_THEME,
+  HARBOR_THEME,
+  GROVE_THEME,
+];
+
+/** Legacy palettes remain resolvable when the release migration is disabled. */
+export const LEGACY_DESKTOP_THEMES: ReadonlyArray<ThemeDefinition> = [
+  APPLE_THEME,
   OCEAN_THEME,
   EMBER_THEME,
-  IRIS_THEME,
+  PORCELAIN_THEME,
+  DARKROOM_THEME,
 ];
+
+// Explicit older selections still resolve without cluttering the six-theme library.
+export const HIDDEN_DESKTOP_THEMES = [T3_CHAT_THEME, IRIS_THEME];
+
+export function themeDisplayLabel(
+  theme: Pick<ThemeDefinition, "label" | "labelZh">,
+  locale: string,
+) {
+  return locale.toLowerCase().startsWith("zh") ? (theme.labelZh ?? theme.label) : theme.label;
+}
 
 export function getThemeColorsForAppearance(
   theme: ThemeDefinition,

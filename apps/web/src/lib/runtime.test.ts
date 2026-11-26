@@ -21,30 +21,25 @@ describe("web runtime relay telemetry policy", () => {
     {
       surface: "desktop opt-out",
       desktopBridge: { getRelayTelemetryEnabled: () => false },
-      exports: false,
     },
     {
       surface: "desktop enabled",
       desktopBridge: { getRelayTelemetryEnabled: () => true },
-      exports: true,
     },
     {
       // The desktop host reads the login shell after the renderer has started.
       surface: "desktop enabled once the login shell is read",
       desktopBridge: { getRelayTelemetryEnabled: answers(null, true) },
-      exports: true,
     },
     {
       surface: "desktop opt-out found in the login shell",
       desktopBridge: { getRelayTelemetryEnabled: answers(null, false, true) },
-      exports: false,
     },
     {
-      surface: "ordinary browser ignores host opt-out",
+      surface: "ordinary browser",
       desktopBridge: undefined,
-      exports: true,
     },
-  ])("applies $surface before the first relay span", async ({ desktopBridge, exports }) => {
+  ])("keeps relay export disabled with $surface", async ({ desktopBridge }) => {
     vi.resetModules();
     vi.stubEnv("T3CODE_TELEMETRY_ENABLED", "false");
     vi.stubEnv("T3CODE_OTEL_SDK_DISABLED", "true");
@@ -55,7 +50,7 @@ describe("web runtime relay telemetry policy", () => {
     vi.stubGlobal("window", { desktopBridge });
     const fetchFn = vi.fn<typeof fetch>(async () => new Response(null, { status: 202 }));
     vi.stubGlobal("fetch", fetchFn);
-    // Re-import after setting runtime policy: static initialization creates the exporter layer.
+    // Re-import to exercise initialization with legacy exporter configuration.
     const { runtime: freshRuntime } = await import("./runtime");
     const { setDelegate } = await import("../observability/clientTracer");
     const userSpans: Array<string> = [];
@@ -82,17 +77,10 @@ describe("web runtime relay telemetry policy", () => {
       expect(userSpans).toEqual(["user.work"]);
     } finally {
       setDelegate(null);
-      // Closing the runtime flushes the exporter without waiting for its batch timer.
+      // Disposal would flush any queued spans if an exporter were active.
       await freshRuntime.dispose();
     }
 
-    if (exports) {
-      expect(fetchFn).toHaveBeenCalledOnce();
-      expect(String(fetchFn.mock.calls[0]?.[0])).toBe("https://telemetry.example.test/v1/traces");
-      const payload = new TextDecoder().decode(fetchFn.mock.calls[0]?.[1]?.body as Uint8Array);
-      expect(payload).toContain('"name":"relay.first-operation"');
-    } else {
-      expect(fetchFn).not.toHaveBeenCalled();
-    }
+    expect(fetchFn).not.toHaveBeenCalled();
   });
 });

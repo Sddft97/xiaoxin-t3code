@@ -27,10 +27,6 @@ import * as SqlError from "effect/sql/SqlError";
 
 import { AgentScope } from "@t3tools/shared/AgentScope";
 import { modelSelectionsEqual } from "@t3tools/shared/model";
-import {
-  ProviderTurnAnalytics,
-  type ProviderTurnAnalyticsContext,
-} from "../telemetry/ProviderUsageAnalytics.ts";
 import * as GitVcsDriver from "../vcs/GitVcsDriver.ts";
 import * as ProviderInstanceRegistry from "../provider/ProviderInstanceRegistry.ts";
 import { UsageLimitResetFallback } from "../usage/UsageLimitSources.ts";
@@ -202,7 +198,6 @@ export interface ProviderEventIngestInput {
   readonly nodeId?: NodeId;
   readonly rawEventId?: RawEventId;
   readonly event: ProviderAdapter.ProviderAdapterV2Event;
-  readonly analyticsContext?: ProviderTurnAnalyticsContext;
 }
 
 export interface ProviderEventIngestorV2Shape {
@@ -254,12 +249,10 @@ export const layer: Layer.Layer<
     const projections = yield* ProjectionStore.ProjectionStoreV2;
     const idAllocator = yield* IdAllocator.IdAllocatorV2;
     const threadCommands = yield* ThreadCommandExecutor.ThreadCommandExecutor;
-    const analytics = yield* ProviderTurnAnalytics;
     const agentScope = yield* AgentScope;
     const instances = yield* ProviderInstanceRegistry.ProviderInstanceRegistry;
     const usageLimitResets = yield* UsageLimitResetFallback;
     const scope = yield* Effect.scope;
-    const completedTurnAnalytics = new Set<string>();
 
     const makeDomainEvent =
       /* This helper runs for individual orchestration events; the enclosing operation owns the span. */
@@ -497,6 +490,37 @@ export const layer: Layer.Layer<
                 }),
               ];
             }
+            case "thread_model_selection.updated": {
+              const { instanceId, changes } = input.event;
+              const thread = yield* projections.getThread(input.event.threadId).pipe(
+                Effect.catchTags({
+                  ProjectionStoreThreadNotFoundError: () => Effect.succeed(null),
+                }),
+              );
+              const current = thread?.modelSelection;
+              if (thread === null || current?.instanceId !== instanceId || !current.options) {
+                return [];
+              }
+              let changed = false;
+              const options = current.options.map((option) => {
+                const change = changes.find(
+                  (candidate) => candidate.id === option.id && candidate.from === option.value,
+                );
+                if (change === undefined) return option;
+                changed = true;
+                return { ...option, value: change.to };
+              });
+              if (!changed) return [];
+              const now = yield* DateTime.now;
+              return [
+                yield* makeDomainEvent(input, {
+                  type: "thread.model-selection-updated",
+                  threadId: thread.id,
+                  payload: { ...thread, modelSelection: { ...current, options }, updatedAt: now },
+                  occurredAt: now,
+                }),
+              ];
+            }
             case "provider_session.updated":
               return [
                 yield* makeDomainEvent(input, {
@@ -652,17 +676,21 @@ export const layer: Layer.Layer<
             }
             case "background_work.updated":
               return [];
+            case "background_work.lost":
             case "command_output.delta":
             case "prompt_suggestion.updated":
-              // The session manager serves these to clients before ingestion.
+              // The session manager handles these before ingestion.
               return [];
             case "turn.terminal":
-              const dismissed = yield* dismissNativeUserInputs(
-                input,
-                input.event.providerTurnId,
-                undefined,
-                input.event.retainedRuntimeRequestIds,
-              );
+              const dismissed =
+                input.event.status === "failed" && input.event.failure.codexSharing?.blocked
+                  ? []
+                  : yield* dismissNativeUserInputs(
+                      input,
+                      input.event.providerTurnId,
+                      undefined,
+                      input.event.retainedRuntimeRequestIds,
+                    );
               if (input.event.status !== "failed") {
                 return dismissed;
               }
@@ -705,6 +733,9 @@ export const layer: Layer.Layer<
                 yield* makeDomainEvent(input, {
                   type: "turn-item.updated",
                   payload: makeProviderFailureTurnItem({
+                    ...(input.event.failureItemId === undefined
+                      ? {}
+                      : { id: input.event.failureItemId }),
                     driver: input.event.driver,
                     threadId: input.threadId,
                     runId: input.runId ?? null,
@@ -853,38 +884,12 @@ export const layer: Layer.Layer<
                       ),
                     ),
               ),
-              Effect.tap((storedEvents) =>
-                Effect.gen(function* () {
-                  if (storedEvents.length === 0 || input.event.type !== "provider_turn.updated")
-                    return;
-                  const providerTurn = input.event.providerTurn;
-                  if (
-                    providerTurn.status !== "completed" &&
-                    providerTurn.status !== "failed" &&
-                    providerTurn.status !== "interrupted" &&
-                    providerTurn.status !== "cancelled"
-                  )
-                    return;
-                  const key = `${input.providerInstanceId}:${providerTurn.id}`;
-                  if (completedTurnAnalytics.has(key)) return;
-                  completedTurnAnalytics.add(key);
-                  if (completedTurnAnalytics.size > 4096) {
-                    const oldest = completedTurnAnalytics.values().next().value;
-                    if (oldest !== undefined) completedTurnAnalytics.delete(oldest);
-                  }
-                  yield* analytics.turnCompleted({
-                    driver: input.event.driver,
-                    providerTurn,
-                    ...(input.analyticsContext === undefined
-                      ? {}
-                      : { context: input.analyticsContext }),
-                  });
-                }),
-              ),
               (effect) =>
                 input.event.type === "app_thread.created"
                   ? threadCommands.withLock(input.event.appThread.id, effect)
-                  : effect,
+                  : input.event.type === "thread_model_selection.updated"
+                    ? threadCommands.withLock(input.event.threadId, effect)
+                    : effect,
             ),
         ),
     });

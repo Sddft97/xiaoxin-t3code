@@ -1,3 +1,4 @@
+import { platformProfile } from "~/lib/PlatformProfile";
 import { uiText } from "../../i18n";
 
 import { DEFAULT_SIDEBAR_APPEARANCE } from "../../sidebarAppearance";
@@ -230,7 +231,7 @@ function FontSmoothingRow() {
   const searchableSetting = useSearchableSetting();
   const settings = useScopedSettings();
   const updateSettings = useUpdateScopedSettings();
-  if (!isMacPlatform(navigator.platform)) return null;
+  if (!isMacPlatform(platformProfile.platform)) return null;
   return (
     <SettingsRow
       {...searchableSetting("font-smoothing")}
@@ -516,6 +517,7 @@ function FontFamilySettingsRow({
           };
         }}
         onKeyDown={(event) => {
+          if (event.nativeEvent.isComposing || event.keyCode === 229) return;
           if (event.key === "Enter") flushDraft();
           if (event.key === "Escape") {
             // Discard uncommitted typing without closing the settings page,

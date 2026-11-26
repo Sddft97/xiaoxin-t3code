@@ -181,6 +181,7 @@ function T3ConnectTunnelUsage() {
 export function T3ConnectUserProfilePage() {
   const environmentsState = useManagedRelayEnvironments();
   const gt = useGT();
+  const connectText = useUiText();
   const deregisterEnvironment = useAtomCommand(deregisterManagedRelayEnvironmentCommand, {
     reportFailure: false,
   });
@@ -274,7 +275,7 @@ export function T3ConnectUserProfilePage() {
 
   return (
     <ClerkUserProfilePage
-      title="T3 Connect"
+      title={connectText("T3 Connect (third-party service operated by the upstream project)")}
       description={gt(
         "Environments registered to your account. Connections on this device are managed in Settings.",
       )}

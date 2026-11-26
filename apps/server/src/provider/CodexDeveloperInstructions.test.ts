@@ -82,3 +82,19 @@ describe("Codex device context", () => {
 function runtimeInstructions(runtime: Parameters<typeof buildCodexAdditionalContext>[0]) {
   return buildCodexAdditionalContext(runtime).t3_code_runtime!.value;
 }
+
+it("directs managed sharing to available T3 MCP delegation", () => {
+  const runtime = { model: "fixture" };
+  const text = Object.values(
+    buildCodexAdditionalContext(runtime, { browser: false, device: false }, true),
+  )
+    .map((entry) => entry.value)
+    .join("\n");
+  NodeAssert.match(text, /delegate_task/);
+  NodeAssert.doesNotMatch(text, /spawn_agent/);
+  NodeAssert.doesNotMatch(text, /device_list/);
+  const ordinary = Object.values(buildCodexAdditionalContext(runtime))
+    .map((entry) => entry.value)
+    .join("\n");
+  NodeAssert.match(ordinary, /spawn_agent/);
+});

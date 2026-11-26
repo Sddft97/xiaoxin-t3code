@@ -131,7 +131,9 @@ const layerAnalytics = Layer.effectContext(
         AnalyticsService.AnalyticsService,
         AnalyticsService.AnalyticsService.of({
           record: (event, properties) =>
-            Ref.update(recorded, (events) => [...events, { event, ...properties }]),
+            Ref.update(recorded, (events) => [...events, { event, ...properties }]).pipe(
+              Effect.as(true),
+            ),
           flush: Effect.void,
           recordOwners: () => Effect.void,
         }),
@@ -209,15 +211,12 @@ it.effect("spends an invite once and ends the guest stream when the owner stops 
   }).pipe(Effect.provide(layerTest)),
 );
 
-it.effect("counts a guest joining and sending, without their name or text", () =>
+it.effect("allows guests to join and send without recording analytics", () =>
   Effect.gen(function* () {
     const { guestShares, credential } = yield* shareThread;
     const { token: session, shareId } = yield* guestShares.redeem({ credential, name: "Sam" });
     yield* guestShares.submit(session, { shareId, text: "Hello" }, []);
-    assert.deepEqual(yield* Ref.get(yield* RecordedAnalytics), [
-      { event: "feature.used", feature: "guest_share.join" },
-      { event: "feature.used", feature: "guest_message.submit", variant: "text_only" },
-    ]);
+    assert.deepEqual(yield* Ref.get(yield* RecordedAnalytics), []);
   }).pipe(Effect.provide(layerTest)),
 );
 

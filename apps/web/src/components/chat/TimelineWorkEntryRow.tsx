@@ -341,6 +341,22 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
       : undefined;
   if (pendingApproval) return <TimelinePendingApprovalRow approval={pendingApproval} />;
   if (failureItem?.type === "error" && failureItem.status === "failed") {
+    const sharing = failureItem.failure.code === "subscription_sharing_unsupported_capability";
+    const sharingBlocked = failureItem.failure.codexSharing?.blocked === true;
+    const sharingTitle = sharing
+      ? sharingBlocked
+        ? gt("Codex sharing can’t recover yet")
+        : gt("Codex sharing couldn’t continue")
+      : undefined;
+    const failureMessage = sharing
+      ? sharingBlocked
+        ? gt(
+            "This conversation still has work or an approval in progress. Try again after it’s resolved.",
+          )
+        : gt(
+            "Automatic recovery couldn’t complete this request. Your conversation is still here. Select another provider in the composer and send the request again.",
+          )
+      : failureItem.failure.message;
     const warning = failureItem.failure.class === "usage_limit";
     const resetAt = failureItem.failure.resetAt;
     // The reset time is the viewer's local time; naming the zone keeps it
@@ -353,7 +369,7 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
       ? resetTime
         ? gt("Usage limit reached. Retry after {resetTime}.", { resetTime })
         : gt("Usage limit reached.")
-      : workEntry.label;
+      : (sharingTitle ?? workEntry.label);
     const retryRunId =
       failureItem.runId !== null &&
       retryableWorkspacePreparationRunIds.has(failureItem.runId) &&
@@ -387,7 +403,7 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
       >
         {!warning ? (
           <p className="ms-7 whitespace-pre-wrap break-words py-1 text-sm leading-relaxed text-foreground/80">
-            {failureItem.failure.message}
+            {failureMessage}
           </p>
         ) : null}
         {retryRunId !== null && onRetryWorkspacePreparation ? (

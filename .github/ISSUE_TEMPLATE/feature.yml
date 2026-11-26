@@ -1,0 +1,15 @@
+name: Feature request / 功能建议
+description: Describe an improvement to Stardust Agent / 描述你希望星尘 Agent 改进的地方
+title: "[Feature] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do? / 你想完成什么？
+      description: Describe your workflow and the obstacle you encounter. / 请说明使用场景和现在遇到的困难。
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help? / 哪种改进能帮到你？

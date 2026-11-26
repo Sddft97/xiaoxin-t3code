@@ -255,7 +255,7 @@ it("shows unknown Gemini allowance and keeps unused shared details static", asyn
   expect(screen.container.querySelector("[data-usage-figure]")?.textContent).toBe("?");
   await userEvent.click(screen.getByRole("button", { name: "Antigravity 燃尽详情" }));
   const detail = document.querySelector("[data-usage-sheet]");
-  expect(detail?.textContent).toContain("T3 未使用");
+  expect(detail?.textContent).toContain("星尘未使用");
   expect(detail?.querySelector(".usage-analysis-panel svg")).toBeNull();
   expect(detail?.textContent).not.toContain("预测");
 });

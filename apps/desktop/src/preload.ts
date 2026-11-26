@@ -114,6 +114,10 @@ function unwrapEnsureSshEnvironmentResult(result: unknown) {
   return result as Awaited<ReturnType<DesktopBridge["ensureSshEnvironment"]>>;
 }
 
+if (process.argv.includes("--stardust-window-mica")) {
+  contextBridge.exposeInMainWorld("stardustWindowMica", true);
+}
+
 contextBridge.exposeInMainWorld("desktopBridge", {
   getAppBranding: () => {
     const result = ipcRenderer.sendSync(IpcChannels.GET_APP_BRANDING_CHANNEL);
@@ -322,6 +326,14 @@ contextBridge.exposeInMainWorld("desktopBridge", {
     return () => {
       ipcRenderer.removeListener(IpcChannels.QUIT_SHORTCUT_CHANNEL, wrappedListener);
     };
+  },
+  getOnBatteryPower: () => ipcRenderer.invoke(IpcChannels.GET_ON_BATTERY_POWER_CHANNEL),
+  onBatteryPowerChange: (listener: (onBattery: boolean) => void) => {
+    const wrapped = (_event: Electron.IpcRendererEvent, onBattery: unknown) => {
+      if (typeof onBattery === "boolean") listener(onBattery);
+    };
+    ipcRenderer.on(IpcChannels.ON_BATTERY_POWER_CHANGED_CHANNEL, wrapped);
+    return () => ipcRenderer.removeListener(IpcChannels.ON_BATTERY_POWER_CHANGED_CHANNEL, wrapped);
   },
   getWindowFullscreenState: () =>
     ipcRenderer.sendSync(IpcChannels.GET_WINDOW_FULLSCREEN_STATE_CHANNEL) === true,

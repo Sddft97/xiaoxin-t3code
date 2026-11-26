@@ -46,7 +46,7 @@ export function StorageTidyNotes({ className }: { readonly className?: string })
     <div className={cn("space-y-1 text-xs text-muted-foreground", className)}>
       <p>
         {t(
-          "System cache lists come from the preview of the open-source tool Mole (tw93/Mole, GPL-3.0). T3 Stardust carries out the removal and supports undo. This feature is not affiliated with the Mole project.",
+          "System cache lists come from the preview of the open-source tool Mole (tw93/Mole, GPL-3.0). Stardust carries out the removal and supports undo. This feature is not affiliated with the Mole project.",
         )}
       </p>
       <p>{t("Deletion is decided by fixed rules, not by an AI model.")}</p>

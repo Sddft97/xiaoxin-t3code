@@ -52,15 +52,15 @@ const unrelatedLsof = ProcessRunner.ProcessRunner.of({
 
 afterEach(() => vi.restoreAllMocks());
 
-it.effect("authenticates each release page until the requested channel is found", () =>
+it.effect("checks Stardust release pages without forwarding a GitHub token", () =>
   Effect.gen(function* () {
     const pages: string[] = [];
     const httpClient = HttpClient.make((request) => {
       const url = new URL(request.url);
       assert.equal(url.origin, "https://api.github.com");
-      assert.equal(url.pathname, "/repos/zds-xiaoxin/xiaoxin-t3code/releases");
+      assert.equal(url.pathname, "/repos/zds-xiaoxin/stardust/releases");
       assert.equal(request.headers.accept, "application/vnd.github+json");
-      assert.equal(request.headers.authorization, "Bearer gh-token");
+      assert.equal(request.headers.authorization, undefined);
       const page = url.searchParams.get("page") ?? "";
       pages.push(page);
       const tag_name = page === "1" ? "v1.2.4-preview.20260101.1" : "v1.2.3";
@@ -158,7 +158,7 @@ it.layer(NodeServices.layer)("t3 update under a managed policy", (it) => {
   it.effect("refuses to update when updates are off", () =>
     Effect.gen(function* () {
       const error = yield* runWithPolicy({ mode: "off" });
-      assert.equal(error.message, "Example Corp manages T3 Code updates.");
+      assert.equal(error.message, "Example Corp manages Stardust updates.");
     }),
   );
 
@@ -175,13 +175,13 @@ it.layer(NodeServices.layer)("t3 update under a managed policy", (it) => {
       for (const error of [byChannel, byVersion]) {
         assert.equal(
           error.message,
-          "Example Corp manages T3 Code updates. Only stable releases can be installed.",
+          "Example Corp manages Stardust updates. Only stable releases can be installed.",
         );
       }
     }),
   );
 
-  it.effect("looks for updates on the policy's mirror, never the public releases", () =>
+  it.effect("refuses a configured mirror without making an update request", () =>
     Effect.gen(function* () {
       const requested: string[] = [];
       const error = yield* runWithPolicy(
@@ -194,8 +194,8 @@ it.layer(NodeServices.layer)("t3 update under a managed policy", (it) => {
           );
         }),
       );
-      assert.include(error.message, "from Example Corp's update mirror");
-      assert.deepStrictEqual(requested, ["https://updates.example.com"]);
+      assert.include(error.message, "Stardust GitHub Releases");
+      assert.deepStrictEqual(requested, []);
     }),
   );
 });

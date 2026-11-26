@@ -209,6 +209,7 @@ it.effect("derives discovery metadata from the origin the client reached", () =>
         authorization_endpoint: `${ORIGIN}/oauth/mcp/authorize`,
         token_endpoint: `${ORIGIN}/oauth/mcp/token`,
         registration_endpoint: `${ORIGIN}/oauth/mcp/register`,
+        revocation_endpoint: `${ORIGIN}/oauth/mcp/revoke`,
         code_challenge_methods_supported: ["S256"],
       });
     }),
@@ -396,6 +397,22 @@ it.live("signs in with a pairing code and issues a token only /mcp accepts", () 
         }),
       );
       expect(ticket.status).toBe(401);
+
+      // Revocation ends only an MCP client's own session; any other token is answered alike and kept.
+      const owner = yield* auth.exchangeBootstrapCredentialForAccessToken(
+        (yield* auth.issuePairingCredential()).credential,
+        undefined,
+        { deviceType: "desktop" },
+      );
+      const bearer = (token: string) =>
+        HttpServerRequest.fromWeb(at("/api", { headers: { authorization: `Bearer ${token}` } }));
+      for (const other of ["not-a-token", owner.access_token]) {
+        expect((yield* handler(at("/oauth/mcp/revoke", form({ token: other })))).status).toBe(200);
+      }
+      yield* auth.authenticateHttpRequest(bearer(owner.access_token));
+      const revoked = yield* handler(at("/oauth/mcp/revoke", form({ token: token.access_token })));
+      expect(revoked.status).toBe(200);
+      yield* auth.authenticateMcpClient(bearer(token.access_token)).pipe(Effect.flip);
     }),
   ),
 );
@@ -710,47 +727,41 @@ it.live("an app approval code approves only an app sign-in, at its own level", (
   ),
 );
 
-it.effect(
-  "sends an app sign-in on the linked tunnel to the hosted app, and a link to its own page",
-  () =>
-    Effect.gen(function* () {
-      const handoff = (tunnelHostname: string, peerLink = false) =>
-        withRoutes(
-          (handler) =>
-            Effect.gen(function* () {
-              const registered = yield* handler(
-                at("/oauth/mcp/register", {
-                  method: "POST",
-                  headers: { "content-type": "application/json" },
-                  body: encodeJson({
-                    client_name: "Agent",
-                    redirect_uris: [REDIRECT],
-                    token_endpoint_auth_method: "none",
-                    ...(peerLink ? { software_id: MCP_PEER_LINK_SOFTWARE_ID } : {}),
-                  }),
+it.effect("keeps all app and link approvals on the environment's own page", () =>
+  Effect.gen(function* () {
+    const handoff = (tunnelHostname: string, peerLink = false) =>
+      withRoutes(
+        (handler) =>
+          Effect.gen(function* () {
+            const registered = yield* handler(
+              at("/oauth/mcp/register", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: encodeJson({
+                  client_name: "Agent",
+                  redirect_uris: [REDIRECT],
+                  token_endpoint_auth_method: "none",
+                  ...(peerLink ? { software_id: MCP_PEER_LINK_SOFTWARE_ID } : {}),
                 }),
-              ).pipe(Effect.flatMap(json<{ client_id: string }>));
-              const query = new URLSearchParams(
-                authorizeParams(registered.client_id, "http://localhost:51234/callback"),
-              );
-              const response = yield* handler(at(`/oauth/mcp/authorize?${query}`));
-              return { location: response.headers.get("location")!, query: query.toString() };
-            }),
-          { ...notLinked, linked: true, cloudUserId: "user_1", tunnelHostname },
-        );
+              }),
+            ).pipe(Effect.flatMap(json<{ client_id: string }>));
+            const query = new URLSearchParams(
+              authorizeParams(registered.client_id, "http://localhost:51234/callback"),
+            );
+            const response = yield* handler(at(`/oauth/mcp/authorize?${query}`));
+            return { location: response.headers.get("location")!, query: query.toString() };
+          }),
+        { ...notLinked, linked: true, cloudUserId: "user_1", tunnelHostname },
+      );
 
-      const onTunnel = yield* handoff("box.example.ts.net");
-      const hosted = new URL(onTunnel.location);
-      expect(`${hosted.origin}${hosted.pathname}`).toBe("https://app.t3.codes/approve-agent");
-      expect(hosted.searchParams.get("environment")).toEqual(expect.any(String));
-      hosted.searchParams.delete("environment");
-      expect(hosted.searchParams.toString()).toBe(onTunnel.query);
+    const onTunnel = yield* handoff("box.example.ts.net");
+    expect(onTunnel.location).toBe(`/connect-agent?${onTunnel.query}`);
 
-      const elsewhere = yield* handoff("other.t3coderelay.com");
-      expect(elsewhere.location).toBe(`/connect-agent?${elsewhere.query}`);
-      const peerLink = yield* handoff("box.example.ts.net", true);
-      expect(peerLink.location).toBe(`/connect-agent?${peerLink.query}`);
-    }),
+    const elsewhere = yield* handoff("other.t3coderelay.com");
+    expect(elsewhere.location).toBe(`/connect-agent?${elsewhere.query}`);
+    const peerLink = yield* handoff("box.example.ts.net", true);
+    expect(peerLink.location).toBe(`/connect-agent?${peerLink.query}`);
+  }),
 );
 
 it.live("one-click approves only access the browser session holds the scopes for", () =>

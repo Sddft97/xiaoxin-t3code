@@ -59,12 +59,12 @@ describe("community release boundaries", () => {
     expect(communityReleaseNumber("xiaoxin-c48-windows-20261112")).toBeNull();
   });
   it("ignores arbitrary response URLs and builds repository-bound links", () => {
-    const r = parseCommunityRelease(stardustRelease("1.2.4"));
-    expect(r.url).toBe("https://github.com/zds-xiaoxin/xiaoxin-t3code/releases/tag/v1.2.4");
-    expect(r.compareUrl).toContain("compare/v1.2.3...v1.2.4");
+    const r = parseCommunityRelease(stardustRelease("1.2.5"));
+    expect(r.url).toBe("https://github.com/Sddft97/xiaoxin-t3code/releases/tag/v1.2.5");
+    expect(r.compareUrl).toContain("compare/v1.2.4...v1.2.5");
     const legacy = parseCommunityRelease(release());
     expect(legacy.url).toBe(
-      "https://github.com/zds-xiaoxin/xiaoxin-t3code/releases/tag/xiaoxin-c48-macos-20261112",
+      "https://github.com/Sddft97/xiaoxin-t3code/releases/tag/xiaoxin-c48-macos-20261112",
     );
   });
   it.each([
@@ -75,11 +75,14 @@ describe("community release boundaries", () => {
   ])("rejects unpublished, preview or incomplete binaries", (r) =>
     expect(() => parseCommunityRelease(r)).toThrow(),
   );
-  it("accepts the published asset name, which keeps the tag's v", () => {
-    const published = stardustRelease("1.2.2");
-    published.assets[0]!.name = "T3-Stardust-v1.2.2-macOS-arm64.zip";
-    expect(parseCommunityRelease(published).tag).toBe("v1.2.2");
-  });
+  it.each(["Stardust-v", "Stardust-", "T3-Stardust-v", "T3-Stardust-"])(
+    "accepts current and legacy asset names beginning with %s",
+    (prefix) => {
+      const published = stardustRelease("1.2.2");
+      published.assets[0]!.name = `${prefix}1.2.2-macOS-arm64.zip`;
+      expect(parseCommunityRelease(published).tag).toBe("v1.2.2");
+    },
+  );
   it("custom mode exposes only source review and never installation", () => {
     expect(communityUpdateActions("custom")).toEqual({
       canOpenDownloadPage: false,
@@ -95,7 +98,7 @@ describe("community checks", () => {
   it("defaults to standard mode, performs credential-free checks, and finds a newer release", async () => {
     const fetch = vi
       .fn()
-      .mockResolvedValue({ ok: true, json: async () => stardustRelease("1.2.4") });
+      .mockResolvedValue({ ok: true, json: async () => stardustRelease("1.2.5") });
     vi.stubGlobal("fetch", fetch);
     const { useCommunityUpdates: s } = await import("./communityUpdates");
     expect(s.getState().mode).toBe("standard");
@@ -108,7 +111,7 @@ describe("community checks", () => {
     await s.getState().check();
     expect(fetch).toHaveBeenCalledTimes(1);
   });
-  it.each(["1.2.0", "1.0.11", "1.0.2"])(
+  it.each(["1.2.4", "1.2.0", "1.0.11", "1.0.2"])(
     "does not offer the shipped or an older version (%s) as an upgrade",
     async (version) => {
       vi.stubGlobal(

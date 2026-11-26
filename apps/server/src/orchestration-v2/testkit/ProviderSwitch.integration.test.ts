@@ -1,3 +1,4 @@
+import { CODEX_SHARING_UNSUPPORTED } from "../../provider/CodexManagedErrors.ts";
 import { vi } from "vite-plus/test";
 import { historyResponseItems } from "@t3tools/provider-core/server/handoffBudget";
 import { assert, describe, it } from "@effect/vitest";
@@ -20,12 +21,16 @@ import {
   ProviderThreadId,
   ProviderTurnId,
   ScheduledTaskId,
+  RuntimeRequestId,
+  NodeId,
   ThreadId,
   TurnItemId,
   ProviderDriverKind,
 } from "@t3tools/contracts";
 import { derivePendingBackgroundWork } from "@t3tools/shared/orchestrationV2PendingBackgroundWork";
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import * as DateTime from "effect/DateTime";
+import * as FileSystem from "effect/FileSystem";
 import * as Deferred from "effect/Deferred";
 import * as Effect from "effect/Effect";
 import * as Fiber from "effect/Fiber";
@@ -118,6 +123,15 @@ function makeTestAdapter(input: {
   readonly failure?: ReturnType<typeof makeProviderFailure>;
   readonly rejectedNativeThreads?: Ref.Ref<ReadonlySet<string>>;
   readonly failedRunOrdinals?: ReadonlySet<number>;
+  readonly managedSharing?: true;
+  readonly rejectSharingTurn?: (
+    turn: ProviderAdapter.ProviderAdapterV2TurnInput,
+    sendCount: number,
+  ) => boolean;
+  readonly prepareCodexSharingRetry?: ProviderAdapter.ProviderAdapterV2SessionRuntime["prepareCodexSharingRetry"];
+  readonly duplicateSharingTerminal?: true;
+  readonly sharingActivity?: "approval" | "side-effect";
+  readonly beforeSharingTerminal?: Effect.Effect<void>;
   readonly promptDroppedRunOrdinals?: ReadonlySet<number>;
   readonly brokenRunOrdinals?: ReadonlySet<number>;
   readonly interruptedRunOrdinals?: ReadonlySet<number>;
@@ -145,6 +159,7 @@ function makeTestAdapter(input: {
   return {
     instanceId: input.instanceId,
     driver: input.driver,
+    ...(input.managedSharing ? { runtimeConfigRevision: "sharing-test" } : {}),
     getCapabilities: () => Effect.succeed(input.capabilities),
     planSelectionTransition: () => Effect.succeed({ type: "apply_on_next_turn" }),
     openSession: (sessionInput) =>
@@ -182,6 +197,12 @@ function makeTestAdapter(input: {
           driver: input.driver,
           providerSessionId: sessionInput.providerSessionId,
           providerSession,
+          ...(input.managedSharing ? { runtimeConfigRevision: "sharing-test" } : {}),
+          ...(input.prepareCodexSharingRetry === undefined
+            ? {}
+            : {
+                prepareCodexSharingRetry: input.prepareCodexSharingRetry,
+              }),
           events: Stream.fromPubSub(events),
           ...(input.backgroundTasksEndWithProcess === undefined
             ? {}
@@ -316,7 +337,9 @@ function makeTestAdapter(input: {
                 },
               ]);
               const providerTurnId = ProviderTurnId.make(
-                `provider-turn:${input.driver}:${turnInput.threadId}:${turnInput.runOrdinal}`,
+                input.managedSharing
+                  ? `provider-turn:${turnInput.attemptId}`
+                  : `provider-turn:${input.driver}:${turnInput.threadId}:${turnInput.runOrdinal}`,
               );
               if (
                 turnInput.runOrdinal === (input.holdRunOrdinal ?? 1) &&
@@ -333,7 +356,9 @@ function makeTestAdapter(input: {
                       nodeId: turnInput.rootNodeId,
                       runAttemptId: turnInput.attemptId,
                       nativeTurnRef: null,
-                      ordinal: turnInput.runOrdinal,
+                      ordinal: input.managedSharing
+                        ? turnInput.providerTurnOrdinal
+                        : turnInput.runOrdinal,
                       status: "running",
                       startedAt,
                       completedAt: null,
@@ -381,8 +406,15 @@ function makeTestAdapter(input: {
               const rejectedHistory =
                 input.rejectedNativeThreads !== undefined &&
                 (yield* Ref.get(input.rejectedNativeThreads)).has(nativeThreadId);
+              const rejectedSharing =
+                input.rejectSharingTurn?.(
+                  turnInput,
+                  (yield* Ref.get(input.capturedTurns)).length,
+                ) === true;
               const terminalStatus =
-                input.failedRunOrdinals?.has(turnInput.runOrdinal) || rejectedHistory
+                input.failedRunOrdinals?.has(turnInput.runOrdinal) ||
+                rejectedHistory ||
+                rejectedSharing
                   ? "failed"
                   : input.interruptedRunOrdinals?.has(turnInput.runOrdinal)
                     ? "interrupted"
@@ -393,84 +425,88 @@ function makeTestAdapter(input: {
                 input.responseByThreadId?.[turnInput.threadId]?.[turnInput.runOrdinal] ??
                 input.responseByRunOrdinal[turnInput.runOrdinal] ??
                 `${input.driver} response for run ${turnInput.runOrdinal}`;
-              const providerEvents: ReadonlyArray<ProviderAdapter.ProviderAdapterV2Event> = [
-                {
-                  type: "provider_turn.updated",
-                  driver: input.driver,
-                  providerTurn: {
-                    id: providerTurnId,
-                    providerThreadId: turnInput.providerThread.id,
-                    nodeId: turnInput.rootNodeId,
-                    runAttemptId: turnInput.attemptId,
-                    nativeTurnRef: {
-                      driver: input.driver,
-                      nativeId: `native-turn:${turnInput.threadId}:${turnInput.runOrdinal}`,
-                      strength: "strong",
+              const providerEvents = (
+                [
+                  {
+                    type: "provider_turn.updated",
+                    driver: input.driver,
+                    providerTurn: {
+                      id: providerTurnId,
+                      providerThreadId: turnInput.providerThread.id,
+                      nodeId: turnInput.rootNodeId,
+                      runAttemptId: turnInput.attemptId,
+                      nativeTurnRef: {
+                        driver: input.driver,
+                        nativeId: `native-turn:${turnInput.threadId}:${turnInput.runOrdinal}`,
+                        strength: "strong",
+                      },
+                      ordinal: input.managedSharing
+                        ? turnInput.providerTurnOrdinal
+                        : turnInput.runOrdinal,
+                      status: terminalStatus,
+                      startedAt: eventTime,
+                      completedAt: eventTime,
+                      ...(input.promptDroppedRunOrdinals?.has(turnInput.runOrdinal)
+                        ? { promptDropped: true as const }
+                        : {}),
                     },
-                    ordinal: turnInput.runOrdinal,
-                    status: terminalStatus,
-                    startedAt: eventTime,
-                    completedAt: eventTime,
+                  },
+                  {
+                    type: "turn_item.updated",
+                    driver: input.driver,
+                    turnItem: {
+                      id: TurnItemId.make(
+                        `turn-item:${input.driver}:${turnInput.threadId}:${turnInput.runOrdinal}:assistant`,
+                      ),
+                      threadId: turnInput.threadId,
+                      runId: turnInput.runId,
+                      nodeId: turnInput.rootNodeId,
+                      providerThreadId: turnInput.providerThread.id,
+                      providerTurnId,
+                      nativeItemRef: null,
+                      parentItemId: null,
+                      ordinal: turnInput.runOrdinal * 100 + 1,
+                      status: terminalStatus,
+                      title: null,
+                      startedAt: eventTime,
+                      completedAt: eventTime,
+                      updatedAt: eventTime,
+                      type: "assistant_message",
+                      messageId: MessageId.make(
+                        `message:${input.driver}:${turnInput.threadId}:${turnInput.runOrdinal}:assistant`,
+                      ),
+                      text: rejectedHistory ? "" : response,
+                      streaming: false,
+                    },
+                  },
+                  {
+                    type: "turn.terminal",
+                    driver: input.driver,
+                    providerThreadId: turnInput.providerThread.id,
+                    providerTurnId,
+                    runOrdinal: turnInput.runOrdinal,
+                    ...(terminalStatus === "failed"
+                      ? {
+                          status: terminalStatus,
+                          failureItemOrdinal: turnInput.runOrdinal * 100 + 2,
+                          failure:
+                            input.failure ??
+                            makeProviderFailure({
+                              message: "Simulated provider failure.",
+                              code: "simulated_failure",
+                              class: "provider_error",
+                            }),
+                        }
+                      : { status: terminalStatus, failure: null }),
+                    threadDisposition: input.brokenRunOrdinals?.has(turnInput.runOrdinal)
+                      ? "broken"
+                      : "reusable",
                     ...(input.promptDroppedRunOrdinals?.has(turnInput.runOrdinal)
                       ? { promptDropped: true as const }
                       : {}),
                   },
-                },
-                {
-                  type: "turn_item.updated",
-                  driver: input.driver,
-                  turnItem: {
-                    id: TurnItemId.make(
-                      `turn-item:${input.driver}:${turnInput.threadId}:${turnInput.runOrdinal}:assistant`,
-                    ),
-                    threadId: turnInput.threadId,
-                    runId: turnInput.runId,
-                    nodeId: turnInput.rootNodeId,
-                    providerThreadId: turnInput.providerThread.id,
-                    providerTurnId,
-                    nativeItemRef: null,
-                    parentItemId: null,
-                    ordinal: turnInput.runOrdinal * 100 + 1,
-                    status: terminalStatus,
-                    title: null,
-                    startedAt: eventTime,
-                    completedAt: eventTime,
-                    updatedAt: eventTime,
-                    type: "assistant_message",
-                    messageId: MessageId.make(
-                      `message:${input.driver}:${turnInput.threadId}:${turnInput.runOrdinal}:assistant`,
-                    ),
-                    text: rejectedHistory ? "" : response,
-                    streaming: false,
-                  },
-                },
-                {
-                  type: "turn.terminal",
-                  driver: input.driver,
-                  providerThreadId: turnInput.providerThread.id,
-                  providerTurnId,
-                  runOrdinal: turnInput.runOrdinal,
-                  ...(terminalStatus === "failed"
-                    ? {
-                        status: terminalStatus,
-                        failureItemOrdinal: turnInput.runOrdinal * 100 + 2,
-                        failure:
-                          input.failure ??
-                          makeProviderFailure({
-                            message: "Simulated provider failure.",
-                            code: "simulated_failure",
-                            class: "provider_error",
-                          }),
-                      }
-                    : { status: terminalStatus, failure: null }),
-                  threadDisposition: input.brokenRunOrdinals?.has(turnInput.runOrdinal)
-                    ? "broken"
-                    : "reusable",
-                  ...(input.promptDroppedRunOrdinals?.has(turnInput.runOrdinal)
-                    ? { promptDropped: true as const }
-                    : {}),
-                },
-              ];
+                ] satisfies ReadonlyArray<ProviderAdapter.ProviderAdapterV2Event>
+              ).filter((event) => !rejectedSharing || event.type !== "turn_item.updated");
               const reportedUsage = input.tokenUsageByRunOrdinal?.[turnInput.runOrdinal];
               const turnEvent = providerEvents[0];
               if (reportedUsage && turnEvent?.type === "provider_turn.updated") {
@@ -496,7 +532,62 @@ function makeTestAdapter(input: {
                 });
               }
               for (const event of providerEvents) {
+                if (rejectedSharing && event.type === "turn.terminal") {
+                  if (input.sharingActivity === "approval") {
+                    yield* PubSub.publish(events, {
+                      type: "runtime_request.updated",
+                      driver: input.driver,
+                      threadId: turnInput.threadId,
+                      runtimeRequest: {
+                        id: RuntimeRequestId.make("request:sharing-approval"),
+                        nodeId: NodeId.make("node:sharing-approval"),
+                        providerTurnId,
+                        nativeRequestRef: null,
+                        kind: "command",
+                        status: "pending",
+                        responseCapability: {
+                          type: "live",
+                          providerSessionId: sessionInput.providerSessionId,
+                        },
+                        createdAt: eventTime,
+                        resolvedAt: null,
+                      },
+                    });
+                  } else if (input.sharingActivity === "side-effect") {
+                    yield* PubSub.publish(events, {
+                      type: "turn_item.updated",
+                      driver: input.driver,
+                      turnItem: {
+                        id: TurnItemId.make("turn-item:sharing-side-effect"),
+                        threadId: turnInput.threadId,
+                        runId: turnInput.runId,
+                        nodeId: turnInput.rootNodeId,
+                        providerThreadId: turnInput.providerThread.id,
+                        providerTurnId,
+                        nativeItemRef: null,
+                        parentItemId: null,
+                        ordinal: turnInput.runOrdinal * 100 + 1,
+                        status: "completed",
+                        title: null,
+                        startedAt: eventTime,
+                        completedAt: eventTime,
+                        updatedAt: eventTime,
+                        type: "dynamic_tool",
+                        toolName: "synthetic_write",
+                        input: {},
+                      },
+                    });
+                  }
+                  yield* input.beforeSharingTerminal ?? Effect.void;
+                }
                 yield* PubSub.publish(events, event);
+                if (
+                  input.duplicateSharingTerminal &&
+                  rejectedSharing &&
+                  event.type === "turn.terminal"
+                ) {
+                  yield* PubSub.publish(events, event);
+                }
               }
             }),
           steerTurn: () => Effect.void,
@@ -1874,6 +1965,372 @@ describe("orchestration v2 provider switching", () => {
     ),
   );
 
+  it.live.each([
+    "history",
+    "compatible",
+    "compatible-then-fresh",
+    "exhausted",
+    "background",
+    "approval",
+    "side-effect",
+    "stop",
+    "queued",
+  ] as const)(
+    "recovers a managed sharing turn without duplicating the Stardust message: %s",
+    (scenario) =>
+      Effect.scoped(
+        Effect.gen(function* () {
+          const cwd = yield* checkpointWorkspace("codex-sharing-recovery");
+          const capturedTurns = yield* Ref.make<ReadonlyArray<CapturedTurn>>([]);
+          const injectedHistory = yield* Ref.make<ReadonlyArray<unknown>>([]);
+          const generation = yield* Ref.make(0);
+          const pending = yield* Ref.make(scenario === "background");
+          const compatibilityCalls = yield* Ref.make(0);
+          const waiting = yield* Deferred.make<void>();
+          const release = yield* Deferred.make<void>();
+          const pause = scenario === "stop" || scenario === "queued";
+          const namespace = scenario === "compatible" || scenario === "compatible-then-fresh";
+          const registry = ProviderAdapterRegistry.layerFromAdapters([
+            makeTestAdapter({
+              instanceId: CODEX_MODEL_SELECTION.instanceId,
+              driver: CODEX_DRIVER,
+              capabilities: CodexProviderCapabilitiesV2,
+              modelSelection: CODEX_MODEL_SELECTION,
+              capturedTurns,
+              injectedHistory,
+              nativeThreadGeneration: generation,
+              pendingBackgroundWork: pending,
+              subagentOnlyBackgroundWork: true,
+              managedSharing: true,
+              duplicateSharingTerminal: true,
+              ...(scenario === "approval" || scenario === "side-effect"
+                ? { sharingActivity: scenario }
+                : {}),
+              ...(pause
+                ? {
+                    beforeSharingTerminal: Deferred.succeed(waiting, undefined).pipe(
+                      Effect.andThen(Deferred.await(release)),
+                    ),
+                  }
+                : {}),
+              prepareCodexSharingRetry: () =>
+                Ref.update(compatibilityCalls, (n) => n + 1).pipe(Effect.as(true)),
+              failure: {
+                ...makeProviderFailure({ code: CODEX_SHARING_UNSUPPORTED }),
+                codexSharing: {
+                  reason: namespace ? "namespace" : "history",
+                  param: namespace ? "tools" : "input",
+                },
+              },
+              rejectSharingTurn: (turn, count) =>
+                turn.runOrdinal === 2 &&
+                (scenario === "exhausted" ||
+                  count === 2 ||
+                  (scenario === "compatible-then-fresh" && count === 3)),
+              responseByRunOrdinal: { 1: "CONFIRMED_PROGRESS", 2: "RECOVERED", 3: "FOLLOWUP" },
+            }),
+          ]);
+          yield* Effect.gen(function* () {
+            const orchestrator = yield* Orchestrator.OrchestratorV2;
+            const worker = yield* EffectWorker.OrchestrationEffectWorkerV2;
+            const send = (ordinal: number, text: string) =>
+              orchestrator.dispatch({
+                type: "message.dispatch",
+                commandId: CommandId.make(`sharing:${ordinal}`),
+                threadId,
+                messageId: MessageId.make(`sharing:${ordinal}`),
+                createdBy: "user",
+                creationSource: "web",
+                text,
+                attachments: [],
+                modelSelection: CODEX_MODEL_SELECTION,
+                dispatchMode: { type: "start_immediately" },
+              });
+            const settle = Effect.fn("sharingRecovery.settle")(function* (ordinal: number) {
+              yield* orchestrator.streamStoredEvents.pipe(
+                Stream.filter(
+                  ({ event }) =>
+                    event.type === "run.updated" &&
+                    event.payload.ordinal === ordinal &&
+                    (event.payload.status === "completed" ||
+                      event.payload.status === "failed" ||
+                      event.payload.status === "interrupted"),
+                ),
+                Stream.runHead,
+              );
+              yield* worker.drain();
+              return yield* orchestrator.getThreadProjection(threadId);
+            });
+            const dispatch = (ordinal: number, text: string) =>
+              send(ordinal, text).pipe(Effect.andThen(settle(ordinal)));
+            yield* orchestrator.dispatch({
+              type: "thread.create",
+              commandId: CommandId.make("sharing:create"),
+              threadId,
+              projectId,
+              createdBy: "user",
+              creationSource: "web",
+              title: "Sharing recovery",
+              modelSelection: CODEX_MODEL_SELECTION,
+              runtimeMode: "full-access",
+              interactionMode: "default",
+              branch: null,
+              worktreePath: null,
+            });
+            yield* dispatch(1, "Remember the earlier decision");
+            yield* send(2, "Original request");
+            if (pause) {
+              yield* Deferred.await(waiting);
+              const active = (yield* orchestrator.getThreadProjection(threadId)).runs.at(-1)!;
+              if (scenario === "stop") {
+                yield* orchestrator.dispatch({
+                  type: "run.interrupt",
+                  commandId: CommandId.make("sharing:stop"),
+                  threadId,
+                  runId: active.id,
+                });
+              } else {
+                yield* send(3, "Queued message");
+              }
+              yield* Deferred.succeed(release, undefined);
+            }
+            const projection = yield* settle(2);
+            const run = projection.runs.find((run) => run.ordinal === 2)!;
+            const attempts = projection.attempts.filter((attempt) => attempt.runId === run.id);
+            const turns = yield* Ref.get(capturedTurns);
+            const errors = projection.turnItems.filter(
+              (item) => item.runId === run.id && item.type === "error",
+            );
+            assert.equal(run.userMessageId, MessageId.make("sharing:2"));
+            assert.lengthOf(
+              projection.messages.filter((message) => message.id === run.userMessageId),
+              1,
+            );
+            assert.equal(yield* Ref.get(compatibilityCalls), namespace ? 1 : 0);
+            if (scenario === "stop" || scenario === "side-effect" || scenario === "approval") {
+              assert.equal(run.status, scenario === "stop" ? "interrupted" : "failed");
+              assert.lengthOf(attempts, 1);
+              assert.lengthOf(turns, 2);
+              assert.lengthOf(errors, scenario === "stop" ? 0 : 1);
+              if (scenario === "approval") {
+                assert.equal(
+                  projection.runtimeRequests.find(
+                    (request) => request.id === "request:sharing-approval",
+                  )?.status,
+                  "pending",
+                );
+              }
+              return;
+            }
+            if (scenario === "queued") {
+              const next = yield* settle(3);
+              assert.deepEqual(
+                next.runs.map((run) => run.status),
+                ["completed", "completed", "completed"],
+              );
+              assert.deepEqual(
+                (yield* Ref.get(capturedTurns)).map((turn) => turn.text),
+                [
+                  "Remember the earlier decision",
+                  "Original request",
+                  "Original request",
+                  "Queued message",
+                ],
+              );
+              return;
+            }
+            if (scenario === "background") {
+              assert.equal(run.status, "failed");
+              assert.lengthOf(turns, 2);
+              assert.lengthOf(errors, 1);
+              const [error] = errors;
+              assert.equal(error?.type === "error" && error.failure.codexSharing?.blocked, true);
+              yield* Ref.set(pending, false);
+              const next = yield* dispatch(3, "Continue after the task ends");
+              assert.equal(next.runs.at(-1)?.status, "completed");
+              assert.equal(yield* Ref.get(generation), 2);
+              return;
+            }
+            const exhausted = scenario === "exhausted";
+            assert.equal(run.status, exhausted ? "failed" : "completed");
+            assert.lengthOf(errors, exhausted ? 1 : 0);
+            assert.deepEqual(
+              attempts.map((attempt) => attempt.codexSharingRecovery?.mode ?? "initial"),
+              scenario === "compatible"
+                ? ["initial", "compatible"]
+                : scenario === "compatible-then-fresh"
+                  ? ["initial", "compatible", "fresh"]
+                  : ["initial", "fresh"],
+            );
+            assert.lengthOf(turns, attempts.length + 1);
+            assert.equal(turns[1]?.nativeThreadId, turns[0]?.nativeThreadId);
+            assert.equal(turns.at(-1)?.providerThreadId, turns[0]?.providerThreadId);
+            if (scenario === "compatible")
+              assert.equal(turns.at(-1)?.nativeThreadId, turns[0]?.nativeThreadId);
+            else {
+              assert.notEqual(turns.at(-1)?.nativeThreadId, turns[0]?.nativeThreadId);
+              assert.include(
+                yield* encodeJson(yield* Ref.get(injectedHistory)),
+                "CONFIRMED_PROGRESS",
+              );
+            }
+            assert.isFalse(
+              projection.turnItems.some((item) => item.runId === run.id && item.type === "handoff"),
+            );
+            if (!exhausted) {
+              assert.equal((yield* dispatch(3, "Follow up")).runs.at(-1)?.status, "completed");
+              assert.equal(
+                (yield* Ref.get(capturedTurns)).at(-1)?.nativeThreadId,
+                turns.at(-1)?.nativeThreadId,
+              );
+            }
+          }).pipe(
+            Effect.provide(
+              ProviderReplayHarness.layerWithRegistry(
+                {
+                  name: "codex-sharing-recovery",
+                  runtimePolicyOverride: {
+                    cwd,
+                    approvalPolicy: "never",
+                    sandboxPolicy: { type: "readOnly" },
+                  },
+                },
+                registry,
+              ),
+            ),
+          );
+        }),
+      ),
+  );
+
+  it.live("reopens a persisted sharing recovery without granting another retry", () =>
+    Effect.scoped(
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const dbDir = yield* fs.makeTempDirectoryScoped({ prefix: "t3-codex-sharing-restart-" });
+        const cwd = yield* checkpointWorkspace("codex-sharing-restart");
+        const databaseLayer = SqlitePersistence.layerFromPath(`${dbDir}/state.sqlite`).pipe(
+          Layer.provide(NodeServices.layer),
+        );
+        const capturedTurns = yield* Ref.make<ReadonlyArray<CapturedTurn>>([]);
+        const nativeThreadGeneration = yield* Ref.make(0);
+        const reserved = yield* Deferred.make<void>();
+        const registry = ProviderAdapterRegistry.layerFromAdapters([
+          makeTestAdapter({
+            instanceId: CODEX_MODEL_SELECTION.instanceId,
+            driver: CODEX_DRIVER,
+            capabilities: CodexProviderCapabilitiesV2,
+            modelSelection: CODEX_MODEL_SELECTION,
+            capturedTurns,
+            nativeThreadGeneration,
+            managedSharing: true,
+            rejectSharingTurn: (turn) => turn.runOrdinal === 2,
+            failure: {
+              ...makeProviderFailure({ code: CODEX_SHARING_UNSUPPORTED }),
+              codexSharing: { param: "input", reason: "history" },
+            },
+            responseByRunOrdinal: { 1: "First answer" },
+          }),
+        ]);
+        const scenario = {
+          name: "codex-sharing-restart",
+          runtimePolicyOverride: {
+            cwd,
+            approvalPolicy: "never" as const,
+            sandboxPolicy: { type: "readOnly" as const },
+          },
+        };
+        const firstLayer = ProviderReplayHarness.layerWithRegistry(scenario, registry, {
+          databaseLayer,
+          wrapProjectionStore: (store) => ({
+            ...store,
+            getTurnStartContext: (threadId, runId) =>
+              store
+                .getTurnStartContext(threadId, runId)
+                .pipe(
+                  Effect.tap((projection) =>
+                    projection.attempts.some(
+                      (attempt) =>
+                        attempt.runId === runId &&
+                        attempt.status === "pending" &&
+                        attempt.codexSharingRecovery?.mode === "fresh",
+                    )
+                      ? Deferred.succeed(reserved, undefined).pipe(Effect.andThen(Effect.never))
+                      : Effect.void,
+                  ),
+                ),
+          }),
+        });
+        yield* Effect.gen(function* () {
+          const orchestrator = yield* Orchestrator.OrchestratorV2;
+          yield* orchestrator.dispatch({
+            type: "thread.create",
+            commandId: CommandId.make("sharing-restart:create"),
+            threadId,
+            projectId,
+            createdBy: "user",
+            creationSource: "web",
+            title: "Sharing restart",
+            modelSelection: CODEX_MODEL_SELECTION,
+            runtimeMode: "full-access",
+            interactionMode: "default",
+            branch: null,
+            worktreePath: null,
+          });
+          for (const ordinal of [1, 2]) {
+            yield* orchestrator.dispatch({
+              type: "message.dispatch",
+              commandId: CommandId.make(`sharing-restart:${ordinal}`),
+              threadId,
+              messageId: MessageId.make(`sharing-restart:${ordinal}`),
+              text: `Prompt ${ordinal}`,
+              createdBy: "user",
+              creationSource: "web",
+              attachments: [],
+              modelSelection: CODEX_MODEL_SELECTION,
+              dispatchMode: { type: "start_immediately" },
+            });
+            if (ordinal === 1) yield* waitForIdle(threadId);
+          }
+          yield* Deferred.await(reserved);
+          const current = yield* orchestrator.getThreadProjection(threadId);
+          assert.equal(current.runs.at(-1)?.status, "starting");
+          assert.equal(
+            current.attempts.find((attempt) => attempt.codexSharingRecovery?.mode === "fresh")
+              ?.status,
+            "pending",
+          );
+          assert.lengthOf(yield* Ref.get(capturedTurns), 2);
+        }).pipe(Effect.provide(firstLayer));
+        yield* Effect.gen(function* () {
+          yield* waitForIdle(threadId);
+          const orchestrator = yield* Orchestrator.OrchestratorV2;
+          const recovered = yield* orchestrator.getThreadProjection(threadId);
+          const run = recovered.runs.at(-1)!;
+          assert.equal(run.status, "failed");
+          assert.deepEqual(
+            recovered.attempts
+              .filter((attempt) => attempt.runId === run.id)
+              .map((attempt) => attempt.codexSharingRecovery?.mode ?? "initial"),
+            ["initial", "fresh"],
+          );
+          assert.lengthOf(yield* Ref.get(capturedTurns), 3);
+          assert.lengthOf(
+            recovered.turnItems.filter((item) => item.type === "error" && item.runId === run.id),
+            1,
+          );
+        }).pipe(
+          Effect.provide(
+            ProviderReplayHarness.layerWithRegistry(scenario, registry, {
+              databaseLayer,
+              recoverOnStartup: true,
+            }),
+          ),
+        );
+      }).pipe(Effect.provide(NodeServices.layer)),
+    ),
+  );
+
   it.live.each(["native", "legacy"] as const)(
     "starts a replacement native thread as new after the resume fallback with %s attempts",
     (attempts) =>
@@ -3230,6 +3687,124 @@ describe("orchestration v2 provider switching", () => {
         Effect.provide(ProviderReplayHarness.layerWithRegistry({ name: key }, layerRegistry)),
       );
     }),
+  );
+
+  it.live.each([
+    { name: "a slash command", text: "/implement do X", verbatim: true },
+    { name: "a message opening with a path", text: "/usr/lib/foo is broken", verbatim: false },
+  ] as const)(
+    "a switched ACP provider gets $name with the handoff where the command allows it",
+    ({ text: firstMessage, verbatim }) =>
+      Effect.scoped(
+        Effect.gen(function* () {
+          const cwd = yield* checkpointWorkspace(`slash-command-handoff-${verbatim}`);
+          const capturedTurns = yield* Ref.make<ReadonlyArray<CapturedTurn>>([]);
+          const originalPrompt = "Keep the release marker violet and preserve the existing API.";
+          const codexResponse = "I checked the API and found the release configuration.";
+          const layerRegistry = ProviderAdapterRegistry.layerFromAdapters([
+            makeTestAdapter({
+              instanceId: CODEX_MODEL_SELECTION.instanceId,
+              driver: CODEX_DRIVER,
+              capabilities: CodexProviderCapabilitiesV2,
+              modelSelection: CODEX_MODEL_SELECTION,
+              responseByRunOrdinal: { 1: codexResponse },
+              capturedTurns,
+            }),
+            makeTestAdapter({
+              instanceId: GROK_MODEL_SELECTION.instanceId,
+              driver: GROK_DRIVER,
+              capabilities: AcpProviderCapabilitiesV2,
+              modelSelection: GROK_MODEL_SELECTION,
+              responseByRunOrdinal: { 2: "Implemented.", 3: "Continued." },
+              capturedTurns,
+            }),
+          ]);
+          yield* Effect.gen(function* () {
+            const orchestrator = yield* Orchestrator.OrchestratorV2;
+            const worker = yield* EffectWorker.OrchestrationEffectWorkerV2;
+            const waitForRun = (ordinal: number) =>
+              orchestrator.streamStoredEvents.pipe(
+                Stream.filter(
+                  ({ event }) =>
+                    event.type === "run.updated" &&
+                    event.threadId === threadId &&
+                    event.payload.ordinal === ordinal &&
+                    event.payload.status === "completed",
+                ),
+                Stream.runHead,
+                Effect.andThen(worker.drain()),
+              );
+            const dispatch = (key: string, text: string, modelSelection: ModelSelection) =>
+              orchestrator.dispatch({
+                type: "message.dispatch",
+                commandId: CommandId.make(`command:slash-handoff:${key}`),
+                threadId,
+                messageId: MessageId.make(`message:slash-handoff:${key}`),
+                createdBy: "user",
+                creationSource: "web",
+                text,
+                attachments: [],
+                modelSelection,
+                dispatchMode: { type: "start_immediately" },
+              });
+            yield* orchestrator.dispatch({
+              type: "thread.create",
+              commandId: CommandId.make("command:slash-handoff:create"),
+              threadId,
+              projectId,
+              createdBy: "user",
+              creationSource: "web",
+              title: "Slash command provider handoff",
+              modelSelection: CODEX_MODEL_SELECTION,
+              runtimeMode: "full-access",
+              interactionMode: "default",
+              branch: null,
+              worktreePath: null,
+            });
+            yield* dispatch("source", originalPrompt, CODEX_MODEL_SELECTION);
+            yield* waitForRun(1);
+            yield* dispatch("slash", firstMessage, GROK_MODEL_SELECTION);
+            yield* waitForRun(2);
+            const slashTurn = (yield* Ref.get(capturedTurns)).at(-1)!;
+            assert.equal(slashTurn.driver, GROK_DRIVER);
+            if (!verbatim) {
+              assert.include(slashTurn.text, originalPrompt);
+              assert.include(slashTurn.text, `User message:\n${firstMessage}`);
+              return;
+            }
+            assert.equal(
+              slashTurn.text,
+              firstMessage,
+              "ACP only expands a native slash command when the prompt starts with it",
+            );
+
+            yield* dispatch("next", "Continue", GROK_MODEL_SELECTION);
+            yield* waitForRun(3);
+            const next = (yield* Ref.get(capturedTurns)).at(-1)!;
+            assert.include(next.text, originalPrompt);
+            assert.include(next.text, codexResponse);
+            assert.include(next.text, "User message:\nContinue");
+          }).pipe(
+            Effect.provide(
+              ProviderReplayHarness.layerWithRegistry(
+                {
+                  name: "slash-command-handoff",
+                  runtimePolicyOverride: {
+                    cwd,
+                    approvalPolicy: "never",
+                    sandboxPolicy: {
+                      type: "readOnly",
+                      access: { type: "fullAccess" },
+                      networkAccess: false,
+                    },
+                  },
+                },
+                layerRegistry,
+              ),
+            ),
+          );
+        }),
+      ),
   );
 
   it.live("checks the queued provider's capability while the current provider stays running", () =>

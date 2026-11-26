@@ -22,7 +22,7 @@ export function CursorUsageHint() {
         <PopoverPopup className="max-w-sm">
           <p className="mb-3 text-xs">
             {uiText(
-              "Run this command in your own terminal, then refresh usage. T3 will not run a login command for you.",
+              "Run this command in your own terminal, then refresh usage. Stardust will not run a login command for you.",
             )}
           </p>
           <code className="mb-3 block rounded-lg bg-muted p-2 text-xs">agent login</code>

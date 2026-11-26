@@ -118,6 +118,37 @@ const withClientSettings = <A, E, R>(
   }).pipe(Effect.provide(Layer.mergeAll(NodeServices.layer, NodeCrypto.layer)));
 
 describe("DesktopClientSettings", () => {
+  it.effect("enables math once for a saved false and preserves later user choices", () =>
+    withClientSettings(
+      Effect.gen(function* () {
+        const { clientSettingsPath, stateDir } = yield* DesktopEnvironment.DesktopEnvironment;
+        const fs = yield* FileSystem.FileSystem;
+        const service = yield* DesktopClientSettings.DesktopClientSettings;
+        yield* fs.makeDirectory(stateDir, { recursive: true });
+        yield* fs.writeFileString(
+          clientSettingsPath,
+          JSON.stringify({
+            settings: { mathRenderingEnabled: false, fontSizeCode: 16, otherPreference: "keep" },
+            version: 2,
+          }),
+        );
+        const settings = Option.getOrThrow(yield* service.get);
+        assert.equal(settings.mathRenderingEnabled, true);
+        assert.deepEqual(JSON.parse(yield* fs.readFileString(clientSettingsPath)), {
+          settings: {
+            mathRenderingEnabled: true,
+            fontSizeCode: 16,
+            otherPreference: "keep",
+            stardustMathDefaultMigrationVersion: 1,
+          },
+          version: 2,
+        });
+        yield* service.set({ ...settings, mathRenderingEnabled: false });
+        const restarted = yield* service.get;
+        assert.equal(Option.getOrThrow(restarted).mathRenderingEnabled, false);
+      }),
+    ),
+  );
   it.effect(
     "migrates a private category seed while preserving the rest of the existing profile",
     () =>

@@ -25,6 +25,13 @@ Ordinary coding tasks need no T3 tools.
 - Never use \`preview_*\` unasked to verify or show your own edit. Use them when the current request asks for browser work, including recording edits, or names a page or tab. Don't repeat preview calls from an earlier turn. Public pages: web fetch or search unless browser work was asked; then preview tools only, no web fetch. Close a tab you opened before you reply, unless the user asked for it or uses it.`,
 ];
 
+export const T3_CODE_SHARING_ORCHESTRATION_SECTIONS: ReadonlyArray<string> = [
+  `## T3 Code orchestration
+
+Ordinary coding tasks need no T3 tools. For authorized delegation, use the T3 MCP delegate_task when it is available. Discover orchestrator_capabilities before the first delegation if exposed. Follow the returned next step. Use t3_thread_wait when offered and available. If the delegation tools are unavailable, carry out the work yourself within your authorization. Do not try to start native subagents.`,
+  ...T3_CODE_ORCHESTRATION_SECTIONS.slice(1),
+];
+
 export const T3_CODE_ORCHESTRATION_INSTRUCTIONS = `
 
 ${T3_CODE_ORCHESTRATION_SECTIONS.join("\n\n")}

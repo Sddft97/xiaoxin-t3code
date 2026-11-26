@@ -37,6 +37,10 @@ it("blocks installation behind another t3 without blocking removal of our instal
   getState.mockResolvedValue(state);
   await act(() => registry.refresh(desktopCliCommandStateAtom));
   await expect.element(screen.getByRole("button", { name: "Install" })).toBeEnabled();
+  await expect.element(screen.getByText("Command-line tool", { exact: true })).toBeVisible();
+  await expect
+    .element(screen.getByText("Run Stardust with the `t3` command from any terminal."))
+    .toBeVisible();
 
   getState.mockResolvedValue({
     ...state,

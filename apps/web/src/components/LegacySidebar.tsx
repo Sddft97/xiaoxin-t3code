@@ -1,3 +1,4 @@
+import { platformProfile } from "~/lib/PlatformProfile";
 import { inboxLabel } from "~/i18n/inboxLabel";
 import { ThreadCategorySuggestions } from "./sidebar/ThreadCategorySuggestions";
 import * as Schema from "effect/Schema";
@@ -7,7 +8,6 @@ import type { SidebarCategorySettings } from "@t3tools/contracts/settings";
 import { useUiText } from "~/i18n/useUiText";
 import { TaskBoardDot } from "./TaskBoardPanel";
 import { uiText } from "~/i18n";
-import { SidebarTaskProgress } from "./sidebar/SidebarTaskProgress";
 import { useStableCallback } from "../hooks/useStableCallback";
 import { pendingSidebarRouteReveal, completeSidebarRouteReveal } from "./sidebar/routeReveal";
 import { useSupportsMultiplePullRequests } from "~/hooks/useSupportsMultiplePullRequests";
@@ -306,6 +306,7 @@ import {
 } from "../sidebarInboxPresentation";
 import { useWorkbenchInboxStore } from "../workbenchInboxStore";
 import { WorkbenchInbox } from "./sidebar/WorkbenchInbox";
+import { useSwapIn } from "../lib/workbenchMotion";
 import { activeWorkStatus } from "../sidebarActiveWork";
 import {
   CATEGORY_PROJECT_KEY_PREFIX,
@@ -627,6 +628,8 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
       lastVisitedAt,
     },
   });
+  // The status mark settles in when its meaning changes (e.g. working → new result).
+  const statusSwapRef = useSwapIn(urgentRowReason ?? threadStatus?.label ?? null);
   const linkedPullRequestStatus = useLinkedThreadPullRequest(
     thread.environmentId,
     thread.linkedPullRequest,
@@ -704,7 +707,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
   const threadMetaClassName = isConfirmingArchive
     ? "pointer-events-none opacity-0"
     : canOperateThread && !isThreadRunning
-      ? "pointer-events-none transition-opacity duration-150 max-sm:pr-6 group-hover/menu-sub-item:opacity-0 group-focus-within/menu-sub-item:opacity-0"
+      ? "pointer-events-none transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none max-sm:pr-6 group-hover/menu-sub-item:opacity-0 group-focus-within/menu-sub-item:opacity-0"
       : "pointer-events-none";
   const clearConfirmingArchive = () => {
     setConfirmingArchiveThreadKey((current) => (current === threadKey ? null : current));
@@ -959,12 +962,19 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
             </a>
           ) : null}
           {issueBadge}
-          <TaskBoardDot cwd={thread.worktreePath ?? originalWorkspace} threadId={thread.id} />
-          {urgentRowReason ? (
-            <InboxStatusMark reason={urgentRowReason} />
-          ) : threadStatus ? (
-            <ThreadStatusLabel status={threadStatus} compact={threadStatus.label === "Working"} />
-          ) : null}
+          <span
+            ref={statusSwapRef}
+            data-sidebar-status-slot
+            className="grid w-3.5 shrink-0 place-items-center"
+          >
+            {urgentRowReason ? (
+              <InboxStatusMark reason={urgentRowReason} compact />
+            ) : threadStatus ? (
+              <ThreadStatusLabel status={threadStatus} compact />
+            ) : (
+              <TaskBoardDot cwd={thread.worktreePath ?? originalWorkspace} threadId={thread.id} />
+            )}
+          </span>
           {canOperateThread && renamingThreadKey === threadKey ? (
             <input
               ref={handleRenameInputRef}
@@ -1008,7 +1018,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                       "inline-flex size-3.5 shrink-0 items-center justify-center",
                       // One status mark and the time stay; the provider shows on hover or focus.
                       !isActive &&
-                        "opacity-0 transition-opacity duration-150 group-hover/menu-sub-item:opacity-100 group-focus-within/menu-sub-item:opacity-100 max-sm:opacity-100",
+                        "opacity-0 transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none group-hover/menu-sub-item:opacity-100 group-focus-within/menu-sub-item:opacity-100 max-sm:opacity-100",
                     )}
                     data-testid={`thread-provider-${thread.id}`}
                   />
@@ -1067,7 +1077,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
             className={cn(
               "inline-flex empty:hidden",
               !isActive &&
-                "opacity-0 transition-opacity duration-150 group-hover/menu-sub-item:opacity-100 group-focus-within/menu-sub-item:opacity-100 max-sm:opacity-100",
+                "opacity-0 transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none group-hover/menu-sub-item:opacity-100 group-focus-within/menu-sub-item:opacity-100 max-sm:opacity-100",
             )}
           >
             <ThreadWorktreeIndicator thread={thread} />
@@ -1095,7 +1105,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
               </button>
             ) : canOperateThread && !isThreadRunning ? (
               appSettingsConfirmThreadArchive ? (
-                <div className="pointer-events-none absolute top-1/2 right-0.5 -translate-y-1/2 opacity-0 transition-opacity duration-150 max-sm:pointer-events-auto max-sm:opacity-100 group-hover/menu-sub-item:pointer-events-auto group-hover/menu-sub-item:opacity-100 group-focus-within/menu-sub-item:pointer-events-auto group-focus-within/menu-sub-item:opacity-100">
+                <div className="pointer-events-none absolute top-1/2 right-0.5 -translate-y-1/2 opacity-0 transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none max-sm:pointer-events-auto max-sm:opacity-100 group-hover/menu-sub-item:pointer-events-auto group-hover/menu-sub-item:opacity-100 group-focus-within/menu-sub-item:pointer-events-auto group-focus-within/menu-sub-item:opacity-100">
                   <button
                     type="button"
                     data-thread-selection-safe
@@ -1112,7 +1122,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
                 <Tooltip>
                   <TooltipTrigger
                     render={
-                      <div className="pointer-events-none absolute top-1/2 right-0.5 -translate-y-1/2 opacity-0 transition-opacity duration-150 max-sm:pointer-events-auto max-sm:opacity-100 group-hover/menu-sub-item:pointer-events-auto group-hover/menu-sub-item:opacity-100 group-focus-within/menu-sub-item:pointer-events-auto group-focus-within/menu-sub-item:opacity-100">
+                      <div className="pointer-events-none absolute top-1/2 right-0.5 -translate-y-1/2 opacity-0 transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none max-sm:pointer-events-auto max-sm:opacity-100 group-hover/menu-sub-item:pointer-events-auto group-hover/menu-sub-item:opacity-100 group-focus-within/menu-sub-item:pointer-events-auto group-focus-within/menu-sub-item:opacity-100">
                         <button
                           type="button"
                           data-thread-selection-safe
@@ -1179,7 +1189,6 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
           </div>
         </div>
       </div>
-      {isActive ? <SidebarTaskProgress key={threadKey} threadRef={threadRef} /> : null}
     </SidebarMenuSubItem>
   );
 });
@@ -1459,10 +1468,7 @@ const SidebarProjectThreadList = memo(function SidebarProjectThreadList(
           >
             <span className="flex min-w-0 flex-1 items-center gap-2">
               {hiddenThreadStatus && <ThreadStatusLabel status={hiddenThreadStatus} compact />}
-              <span>
-                {uiText("Show more ")}
-                {hiddenThreadCount}
-              </span>
+              <span>{uiText("Show more ({count} left)", { count: hiddenThreadCount })}</span>
             </span>
           </SidebarMenuSubButton>
         </SidebarMenuSubItem>
@@ -1477,7 +1483,7 @@ const SidebarProjectThreadList = memo(function SidebarProjectThreadList(
               collapseThreadListForProject(projectKey);
             }}
           >
-            <span>{uiText("Collapse recommendation")}</span>
+            <span>{uiText("Show less")}</span>
           </SidebarMenuSubButton>
         </SidebarMenuSubItem>
       )}
@@ -1871,7 +1877,7 @@ const SidebarProjectItem = memo(function SidebarProjectItem(props: SidebarProjec
       isContextMenuPointerDown({
         button: event.button,
         ctrlKey: event.ctrlKey,
-        isMac: isMacPlatform(navigator.platform),
+        isMac: isMacPlatform(platformProfile.platform),
       })
     ) {
       event.stopPropagation();
@@ -2247,7 +2253,7 @@ const SidebarProjectItem = memo(function SidebarProjectItem(props: SidebarProjec
     orderedProjectThreadKeys: readonly string[],
   ) => {
     if (isSidebarNestedLinkClick(event.target)) return;
-    const isMac = isMacPlatform(navigator.platform);
+    const isMac = isMacPlatform(platformProfile.platform);
     const isModClick = isMac ? event.metaKey : event.ctrlKey;
     const isShiftClick = event.shiftKey;
     const threadKey = scopedThreadKey(threadRef);
@@ -2812,7 +2818,7 @@ const SidebarProjectItem = memo(function SidebarProjectItem(props: SidebarProjec
                     />
                   }
                 >
-                  <span className="absolute inset-0 flex items-center justify-center transition-opacity duration-150 group-hover/project-header:opacity-0">
+                  <span className="absolute inset-0 flex items-center justify-center transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none group-hover/project-header:opacity-0">
                     {projectAttentionReason ? (
                       <InboxStatusMark reason={projectAttentionReason} />
                     ) : (
@@ -2821,7 +2827,7 @@ const SidebarProjectItem = memo(function SidebarProjectItem(props: SidebarProjec
                       />
                     )}
                   </span>
-                  <ChevronRightIcon className="absolute inset-0 m-auto size-3.5 text-icon-muted opacity-0 transition-opacity duration-150 group-hover/project-header:opacity-100" />
+                  <ChevronRightIcon className="absolute inset-0 m-auto size-3.5 text-icon-muted opacity-0 transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none group-hover/project-header:opacity-100" />
                 </TooltipTrigger>
                 <TooltipPopup side="top">
                   {projectAttentionReason ?? projectStatus?.label}
@@ -2829,7 +2835,7 @@ const SidebarProjectItem = memo(function SidebarProjectItem(props: SidebarProjec
               </Tooltip>
             ) : (
               <ChevronRightIcon
-                className={`-ml-0.5 size-3.5 shrink-0 text-muted-foreground/70 transition-transform duration-150 ${projectExpanded ? "rotate-90" : ""}`}
+                className={`-ml-0.5 size-3.5 shrink-0 text-muted-foreground/70 transition-transform duration-(--motion-hover) ease-standard motion-reduce:transition-none ${projectExpanded ? "rotate-90" : ""}`}
               />
             )}
             <span className="flex shrink-0">
@@ -2868,10 +2874,10 @@ const SidebarProjectItem = memo(function SidebarProjectItem(props: SidebarProjec
               ) : null}
             </span>
             {isCategoryProjectKey(project.projectKey) ? (
-              // A folded category hints at what is inside: running (blue) and waiting (orange).
+              // A folded category shows the most urgent state with one dot.
               !projectExpanded && (categoryRunning || projectAttentionReason) ? (
                 <span
-                  className="ml-auto flex shrink-0 items-center gap-1"
+                  className="ml-auto grid w-3.5 shrink-0 place-items-center"
                   aria-label={[
                     categoryRunning ? uiText("Work in progress") : null,
                     projectAttentionReason ? inboxLabel(projectAttentionReason) : null,
@@ -2879,12 +2885,16 @@ const SidebarProjectItem = memo(function SidebarProjectItem(props: SidebarProjec
                     .filter(Boolean)
                     .join(uiText(", "))}
                 >
-                  {categoryRunning ? <span className="size-1.5 rounded-full bg-primary" /> : null}
-                  {projectAttentionReason ? (
-                    <span
-                      className={`size-1.5 rounded-full ${projectAttentionReason === "\u8FD0\u884C\u5931\u8D25" ? "bg-destructive" : "bg-warning"}`}
-                    />
-                  ) : null}
+                  <span
+                    className={cn(
+                      "size-1.5 rounded-full",
+                      projectAttentionReason === "运行失败"
+                        ? "bg-destructive"
+                        : projectAttentionReason
+                          ? "bg-warning"
+                          : "bg-sidebar-running-dot",
+                    )}
+                  />
                 </span>
               ) : null
             ) : (
@@ -2907,7 +2917,7 @@ const SidebarProjectItem = memo(function SidebarProjectItem(props: SidebarProjec
                         ? uiText("Local sandbox project")
                         : uiText("Remote project")
                     }
-                    className="pointer-events-none absolute top-1/2 right-1.5 inline-flex size-5 -translate-y-1/2 items-center justify-center rounded-md text-icon-muted transition-opacity duration-150 max-sm:right-7 group-hover/project-header:opacity-0 group-focus-within/project-header:opacity-0 max-sm:group-hover/project-header:opacity-100 max-sm:group-focus-within/project-header:opacity-100"
+                    className="pointer-events-none absolute top-1/2 right-1.5 inline-flex size-5 -translate-y-1/2 items-center justify-center rounded-md text-icon-muted transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none max-sm:right-7 group-hover/project-header:opacity-0 group-focus-within/project-header:opacity-0 max-sm:group-hover/project-header:opacity-100 max-sm:group-focus-within/project-header:opacity-100"
                   />
                 }
               >
@@ -2927,7 +2937,7 @@ const SidebarProjectItem = memo(function SidebarProjectItem(props: SidebarProjec
           <Tooltip>
             <TooltipTrigger
               render={
-                <div className="pointer-events-none absolute top-[calc(50%+1px)] right-0.5 -translate-y-1/2 opacity-0 transition-opacity duration-150 max-sm:pointer-events-auto max-sm:opacity-100 group-hover/project-header:pointer-events-auto group-hover/project-header:opacity-100 group-focus-within/project-header:pointer-events-auto group-focus-within/project-header:opacity-100">
+                <div className="pointer-events-none absolute top-[calc(50%+1px)] right-0.5 -translate-y-1/2 opacity-0 transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none max-sm:pointer-events-auto max-sm:opacity-100 group-hover/project-header:pointer-events-auto group-hover/project-header:opacity-100 group-focus-within/project-header:pointer-events-auto group-focus-within/project-header:opacity-100">
                   <button
                     type="button"
                     aria-label={uiText("New conversation (⌥ to choose a folder)")}
@@ -3795,7 +3805,7 @@ const SidebarProjectsContent = memo(function SidebarProjectsContent(
                 : uiText("Models / projects")}
           </span>
           {/* Tools appear on hover or focus; touch screens keep them visible. */}
-          <div className="flex items-center gap-0.5 opacity-0 transition-opacity duration-150 group-hover/cap:opacity-100 focus-within:opacity-100 pointer-coarse:opacity-100 max-sm:opacity-100 motion-reduce:transition-none">
+          <div className="flex items-center gap-0.5 opacity-0 transition-opacity duration-(--motion-hover) ease-standard motion-reduce:transition-none group-hover/cap:opacity-100 focus-within:opacity-100 pointer-coarse:opacity-100 max-sm:opacity-100 motion-reduce:transition-none">
             {categorySections ? (
               <Tooltip>
                 <TooltipTrigger
@@ -4072,7 +4082,7 @@ export default function LegacySidebar(props: { routeReveal: SidebarRouteReveal }
   const [desktopUpdateActionPending, setDesktopUpdateActionPending] = useState(false);
   const clearSelection = useThreadSelectionStore((s) => s.clearSelection);
   const setSelectionAnchor = useThreadSelectionStore((s) => s.setAnchor);
-  const platform = navigator.platform;
+  const platform = platformProfile.platform;
   const shortcutModifiers = useShortcutModifierState();
   const terminalFocused = useTerminalFocus();
   const { environments } = useEnvironments();

@@ -62,6 +62,8 @@ import * as Stream from "effect/Stream";
 import { Command, Flag } from "effect/cli";
 import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
+import { STARDUST_WINDOWS_BRAND } from "@t3tools/shared/stardustWindowsBrand";
+
 const LINUX_ICON_SIZES = [16, 22, 24, 32, 48, 64, 128, 256, 512] as const;
 const DESKTOP_APP_ID = "com.t3tools.t3code";
 const APPLE_TEAM_ID_PATTERN = /^[A-Z0-9]{10}$/u;
@@ -155,7 +157,7 @@ export function resolveResourceMonitorRustTargets(
 }
 
 export function resourceMonitorExecutableName(platform: typeof BuildPlatform.Type): string {
-  return platform === "win" ? "t3-resource-monitor.exe" : "t3-resource-monitor";
+  return platform === "win" ? STARDUST_WINDOWS_BRAND.resourceMonitor : "t3-resource-monitor";
 }
 
 const PLATFORM_CONFIG: Record<typeof BuildPlatform.Type, PlatformConfig> = {
@@ -383,7 +385,7 @@ export class LinuxDesktopBuildPrerequisitesMissingError extends Schema.TaggedErr
         ? ["Add the requested Rust target with:", `  rustup target add ${this.rustTarget}`]
         : []),
       "",
-      "For other distributions, see docs/operations/development.md#linux-appimage-prerequisites.",
+      "For other distributions, see docs/operations/00_development.md#linux-appimage-prerequisites.",
       "Then rerun `vp run dist:desktop:linux`.",
     ].join("\n");
   }
@@ -455,7 +457,7 @@ export class WindowsDesktopBuildPrerequisitesMissingError extends Schema.TaggedE
       "Install Rust from https://rustup.rs and add the requested target:",
       `  rustup target add ${this.rustTarget}`,
       "Install Python 3 and the Visual Studio Build Tools components listed in",
-      "docs/operations/development.md#windows-installer-prerequisites.",
+      "docs/operations/00_development.md#windows-installer-prerequisites.",
       "",
       "Then rerun the desktop artifact command.",
     ].join("\n");
@@ -1094,6 +1096,12 @@ export const WSL_RUNTIME_EXTRA_RESOURCES = [
   WSL_RUNTIME_ARCHIVE_HASH_EXTRA_RESOURCE,
 ] as const;
 export const DESKTOP_EXTRA_RESOURCES = [
+  { from: "apps/desktop/prod-resources/LICENSE", to: "LICENSE" },
+  { from: "apps/desktop/prod-resources/NOTICE", to: "NOTICE" },
+  {
+    from: "apps/desktop/prod-resources/third-party-licenses.json",
+    to: "third-party-licenses.json",
+  },
   {
     from: "apps/desktop/prod-resources/cursor-sdk",
     to: "node_modules/@cursor",
@@ -1394,6 +1402,8 @@ ${associatedDomains}
     <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
     <true/>
     <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+    <key>com.apple.security.automation.apple-events</key>
     <true/>
     <!-- The hardened runtime denies camera and microphone to the app and every
          child process, with no prompt, unless the app claims these. Terminals
@@ -2405,7 +2415,7 @@ export const stageResourceMonitor = Effect.fn("stageResourceMonitor")(function* 
       "native/resource-monitor/target",
       rustTarget,
       "release",
-      executableName,
+      input.platform === "win" ? "t3-resource-monitor.exe" : executableName,
     );
     if (!(yield* fs.exists(binaryPath))) {
       return yield* new ResourceMonitorBuildOutputMissingError({
@@ -2772,14 +2782,14 @@ export function resolveDesktopBuildIconAssets(version: string): DesktopBuildIcon
     return {
       macIconPng: BRAND_ASSET_PATHS.nightlyMacIconPng,
       linuxIconPng: BRAND_ASSET_PATHS.nightlyLinuxIconPng,
-      windowsIconIco: BRAND_ASSET_PATHS.nightlyWindowsIconIco,
+      windowsIconIco: BRAND_ASSET_PATHS.stardustWindowsIconIco,
     };
   }
 
   return {
     macIconPng: BRAND_ASSET_PATHS.productionMacIconPng,
     linuxIconPng: BRAND_ASSET_PATHS.productionLinuxIconPng,
-    windowsIconIco: BRAND_ASSET_PATHS.productionWindowsIconIco,
+    windowsIconIco: BRAND_ASSET_PATHS.stardustWindowsIconIco,
   };
 }
 
@@ -2821,10 +2831,23 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
   arch?: typeof BuildArch.Type,
 ) {
   const buildConfig: Record<string, unknown> = {
-    afterPack: (yield* Path.Path).join(yield* RepoRoot, "scripts/prepare-server-compile-cache.cjs"),
-    appId: DESKTOP_APP_ID,
-    productName: resolveDesktopProductName(version),
-    artifactName: "T3-Code-${version}-${arch}.${ext}",
+    // Keep Windows within the NSIS loose-file budget. It can compile the cache at runtime.
+    ...(platform === "win"
+      ? {}
+      : {
+          afterPack: (yield* Path.Path).join(
+            yield* RepoRoot,
+            "scripts/prepare-server-compile-cache.cjs",
+          ),
+        }),
+    appId: platform === "win" ? STARDUST_WINDOWS_BRAND.appId : DESKTOP_APP_ID,
+    productName:
+      platform === "win" ? STARDUST_WINDOWS_BRAND.displayName : resolveDesktopProductName(version),
+    artifactName:
+      platform === "win"
+        ? "Stardust-v${version}-Windows-${arch}-Setup.${ext}"
+        : "T3-Code-${version}-${arch}.${ext}",
+    ...(platform === "win" ? { copyright: STARDUST_WINDOWS_BRAND.publisher } : {}),
     electronLanguages: [...DESKTOP_ELECTRON_LANGUAGES],
     files: [
       ...DESKTOP_FILE_EXCLUSIONS,
@@ -2840,13 +2863,21 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
     // Disable smart unpack so native packages' JS/metadata stay archived and avoid slowing NSIS with loose files.
     ...(platform === "win"
       ? { asar: { smartUnpack: false }, asarUnpack: [WINDOWS_NATIVE_ASAR_UNPACK_GLOB] }
-      : { asarUnpack: ["**/node_modules/@transcribe-cpp/**/*.{dylib,so,so.*}"] }),
+      : {
+          asarUnpack: [
+            "**/node_modules/@transcribe-cpp/**/*.{dylib,so,so.*}",
+            "apps/server/dist/client/assets/heic-to-*.js",
+          ],
+        }),
     extraResources: [
       ...DESKTOP_EXTRA_RESOURCES,
       ...(platform === "linux" ? LINUX_CAPTURE_EXTRA_RESOURCES : []),
       ...(platform === "linux" ? LINUX_BROWSER_SECRET_EXTRA_RESOURCES : []),
       ...(platform === "mac" ? MAC_APPLE_SPEECH_EXTRA_RESOURCES : []),
       ...(platform === "win" ? WINDOWS_SERVER_EXTRA_RESOURCES : []),
+      ...(platform === "win" && /^[1-9]\d*\.\d+\.\d+$/.test(version)
+        ? [{ from: "apps/desktop/prod-resources/stardust-build.json", to: "stardust-build.json" }]
+        : []),
       ...(platform === "win" && wslRuntimeBundled ? WSL_RUNTIME_EXTRA_RESOURCES : []),
     ],
   };
@@ -2855,7 +2886,7 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
   buildConfig.publish = null;
   if (!isDesktopPreviewVersion(version)) {
     const publishConfig = yield* resolveGitHubPublishConfig(updateChannel);
-    if (publishConfig) {
+    if (publishConfig && platform !== "win") {
       buildConfig.publish = [publishConfig];
     } else if (mockUpdates) {
       buildConfig.publish = [
@@ -2878,21 +2909,23 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
         // macOS 26 offers Messages/Mail codes in every text field unless opted out.
         NSAutoFillRequiresTextContentTypeForOneTimeCodeOnMac: true,
         NSLocalNetworkUsageDescription:
-          "T3 Code connects to devices on your local network for remote environments and commands run by terminals and coding agents.",
+          "Stardust connects to devices on your local network for remote environments and commands run by terminals and coding agents.",
         NSCalendarsUsageDescription:
-          "Commands you run in T3 Code may need access to your calendars.",
+          "Commands you run in Stardust may need access to your calendars.",
         NSCalendarsFullAccessUsageDescription:
-          "Commands you run in T3 Code may need to read and write your calendar events.",
+          "Commands you run in Stardust may need to read and write your calendar events.",
         NSCalendarsWriteOnlyAccessUsageDescription:
-          "Commands you run in T3 Code may need to add events to your calendars.",
+          "Commands you run in Stardust may need to add events to your calendars.",
         NSScreenCaptureUsageDescription:
-          "T3 Code captures the active window when you use the window capture shortcut.",
+          "Stardust captures the active window when you use the window capture shortcut.",
         NSCameraUsageDescription:
-          "T3 Code lets commands run by terminals and coding agents use the camera.",
+          "Stardust lets commands run by terminals and coding agents use the camera.",
         NSMicrophoneUsageDescription:
-          "T3 Code lets commands run by terminals and coding agents use the microphone.",
+          "Stardust lets commands run by terminals and coding agents use the microphone.",
+        NSAppleEventsUsageDescription:
+          "Stardust lets commands run by terminals and coding agents control other apps.",
         NSSpeechRecognitionUsageDescription:
-          "T3 Code transcribes your dictation on this Mac when you choose Apple Speech.",
+          "Stardust transcribes your dictation on this Mac when you choose Apple Speech.",
         // macOS lists an app under Default web browser only when it opens web
         // pages as documents as well as http and https links (see protocols).
         CFBundleDocumentTypes: [
@@ -2906,7 +2939,7 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
       },
       protocols: [
         {
-          name: "T3 Code",
+          name: "Stardust",
           schemes: ["t3code", "t3code-dev"],
         },
         {
@@ -2959,7 +2992,7 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
       maintainer: "T3 Tools <hello@t3.codes>",
       protocols: [
         {
-          name: "T3 Code",
+          name: "Stardust",
           schemes: ["t3code", "t3code-dev"],
         },
       ],
@@ -3003,11 +3036,20 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
   if (platform === "win") {
     buildConfig.npmRebuild = false;
     buildConfig.nsis = {
-      differentialPackage: true,
+      oneClick: true,
+      perMachine: false,
+      allowElevation: false,
+      runAfterFinish: false,
+      differentialPackage: false,
+      shortcutName: STARDUST_WINDOWS_BRAND.displayName,
+      uninstallDisplayName: STARDUST_WINDOWS_BRAND.displayName,
+      installerIcon: "icon.ico",
+      uninstallerIcon: "icon.ico",
       include: "apps/desktop/resources/installer.nsh",
     };
     const winConfig: Record<string, unknown> = {
       target: [target],
+      executableName: STARDUST_WINDOWS_BRAND.executableName,
       icon: "icon.ico",
       // Smart App Control validates unpacked native libraries independently; sign them too.
       signExts: [".node", ".dll"],
@@ -3465,7 +3507,7 @@ export const validateWindowsPackagedPayload = Effect.fn(
     return yield* new WindowsPackagedPayloadValidationError({
       reason: "resource-monitor-missing",
       packagedAppDir,
-      missingFiles: ["resource-monitor/t3-resource-monitor.exe"],
+      missingFiles: [`resource-monitor/${STARDUST_WINDOWS_BRAND.resourceMonitor}`],
     });
   }
 
@@ -3820,11 +3862,12 @@ const buildDesktopArtifactUnlocked = Effect.fn("buildDesktopArtifactUnlocked")(f
   }
 
   // Stardust: keep the production web brand under the nightly-named native shell.
-  const webAssetBrand: WebAssetBrand =
-    (yield* Config.String("T3CODE_DESKTOP_WEB_ASSET_BRAND").pipe(Config.option))._tag === "Some" &&
-    (yield* Config.String("T3CODE_DESKTOP_WEB_ASSET_BRAND")) === "production"
-      ? "production"
-      : resolveDesktopWebAssetBrand(appVersion);
+  const webAssetBrandOverride = yield* Config.String("T3CODE_DESKTOP_WEB_ASSET_BRAND").pipe(
+    Config.option,
+  );
+  const webAssetBrand: WebAssetBrand = Option.contains(webAssetBrandOverride, "production")
+    ? "production"
+    : resolveDesktopWebAssetBrand(appVersion);
   yield* applyWebBrandAssets(webAssetBrand, "apps/server/dist/client");
   yield* Effect.log(`[desktop-artifact] Applied ${webAssetBrand} web client branding.`);
   yield* validateBundledClientAssets(path.dirname(bundledClientEntry));
@@ -3903,6 +3946,13 @@ const buildDesktopArtifactUnlocked = Effect.fn("buildDesktopArtifactUnlocked")(f
   // electron-builder is filtering out stageResourcesDir directory in the AppImage for production
   const stageProdResourcesDir = path.join(stageAppDir, "apps/desktop/prod-resources");
   yield* fs.copy(stageResourcesDir, stageProdResourcesDir);
+  for (const file of ["LICENSE", "NOTICE"]) {
+    yield* fs.copyFile(path.join(repoRoot, file), path.join(stageProdResourcesDir, file));
+  }
+  yield* fs.copyFile(
+    path.join(path.dirname(bundledClientEntry), "third-party-licenses.json"),
+    path.join(stageProdResourcesDir, "third-party-licenses.json"),
+  );
 
   const configuredMacPasskeySigning =
     options.platform === "mac" && options.signed
@@ -3961,8 +4011,14 @@ const buildDesktopArtifactUnlocked = Effect.fn("buildDesktopArtifactUnlocked")(f
     options.platform === "win"
       ? path.join(stageAppDir, WINDOWS_SERVER_RESOURCE_SOURCE_DIR, WINDOWS_SERVER_ASAR_RESOURCE)
       : undefined;
+  if (options.platform === "win" && /^[1-9]\d*\.\d+\.\d+$/.test(appVersion)) {
+    yield* fs.writeFileString(
+      path.join(stageProdResourcesDir, "stardust-build.json"),
+      yield* encodeJsonString({ communityVersion: appVersion, sourceCommit: commitHash }),
+    );
+  }
   const stagePackageJson: StagePackageJson = {
-    name: "t3code",
+    name: options.platform === "win" ? "stardust" : "t3code",
     version: appVersion,
     buildVersion: appVersion,
     t3codeCommitHash: commitHash,
@@ -3971,10 +4027,12 @@ const buildDesktopArtifactUnlocked = Effect.fn("buildDesktopArtifactUnlocked")(f
     private: true,
     packageManager: rootPackageJson.packageManager,
     description:
-      "T3 Code is an open-source desktop app for coding agents. Work with your existing agent subscriptions, review code changes, and run commands in your projects. Connect from desktop, web, or mobile to continue working remotely.",
+      options.platform === "win"
+        ? STARDUST_WINDOWS_BRAND.description
+        : "Stardust is an open-source desktop app for coding agents. Work with your existing agent subscriptions, review code changes, and run commands in your projects. Connect from desktop, web, or mobile to continue working remotely.",
     license: "MIT",
-    homepage: "https://github.com/zds-xiaoxin/xiaoxin-t3code",
-    author: "T3 Tools",
+    homepage: "https://github.com/zds-xiaoxin/stardust",
+    author: options.platform === "win" ? STARDUST_WINDOWS_BRAND.publisher : "T3 Tools",
     main: "apps/desktop/dist-electron/boot.cjs",
     build: yield* createBuildConfig(
       options.platform,
@@ -4152,7 +4210,7 @@ const buildDesktopArtifactUnlocked = Effect.fn("buildDesktopArtifactUnlocked")(f
   if (options.platform === "win") {
     yield* validateWindowsPackagedPayload({
       stageDistDir,
-      appExecutableName: `${resolveDesktopProductName(appVersion)}.exe`,
+      appExecutableName: `${STARDUST_WINDOWS_BRAND.executableName}.exe`,
       targetArch: options.arch,
       appVersion,
       expectWslRuntime: bundlesWslRuntime({

@@ -40,6 +40,7 @@ import * as DesktopWslEnvironment from "../../wsl/DesktopWslEnvironment.ts";
 import * as ElectronApp from "../../electron/ElectronApp.ts";
 import * as ElectronAudio from "../../electron/ElectronAudio.ts";
 import * as ElectronDialog from "../../electron/ElectronDialog.ts";
+import * as ElectronPowerMonitor from "../../electron/ElectronPowerMonitor.ts";
 import * as ElectronMenu from "../../electron/ElectronMenu.ts";
 import * as ElectronShell from "../../electron/ElectronShell.ts";
 import * as ElectronTheme from "../../electron/ElectronTheme.ts";
@@ -138,6 +139,29 @@ export const getPreferredSystemLanguages = DesktopIpc.makeSyncIpcMethod({
     return yield* electronApp.preferredSystemLanguages;
   }),
 });
+
+export const getOnBatteryPower = DesktopIpc.makeIpcMethod({
+  channel: IpcChannels.GET_ON_BATTERY_POWER_CHANNEL,
+  payload: Schema.Void,
+  result: Schema.Boolean,
+  handler: () =>
+    Effect.flatMap(
+      ElectronPowerMonitor.ElectronPowerMonitor,
+      (powerMonitor) => powerMonitor.isOnBatteryPower,
+    ),
+});
+
+export const installBatteryPowerForwarding = Effect.fn("desktop.ipc.installBatteryPowerForwarding")(
+  function* () {
+    const powerMonitor = yield* ElectronPowerMonitor.ElectronPowerMonitor;
+    const windows = yield* ElectronWindow.ElectronWindow;
+    const runSync = Effect.runSyncWith(yield* Effect.context<never>());
+    const notify = (onBattery: boolean) => () =>
+      runSync(windows.sendAll(IpcChannels.ON_BATTERY_POWER_CHANGED_CHANNEL, onBattery));
+    yield* powerMonitor.onSimpleEvent("on-battery", notify(true));
+    yield* powerMonitor.onSimpleEvent("on-ac", notify(false));
+  },
+);
 
 export const getWindowFullscreenState = DesktopIpc.makeSyncIpcMethod({
   channel: IpcChannels.GET_WINDOW_FULLSCREEN_STATE_CHANNEL,

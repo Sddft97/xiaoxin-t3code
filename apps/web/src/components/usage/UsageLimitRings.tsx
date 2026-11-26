@@ -371,7 +371,7 @@ export function UsageLimitRings({
                           {isUnused ? (
                             <span data-lv9="cap-row-reset">
                               {" · "}
-                              {text("T3 does not use this")}
+                              {text("Stardust does not use this")}
                             </span>
                           ) : winGapMs !== null ? (
                             <span data-lv9="cap-row-reset">
@@ -539,7 +539,7 @@ export function UsageLimitRings({
                 <div data-t3-unused className="text-muted-foreground">
                   <h3>{text("Claude/GPT-OSS shared")}</h3>
                   <p>
-                    {text("T3 does not use this")} · {Math.round(group.remainingPercent)}%
+                    {text("Stardust does not use this")} · {Math.round(group.remainingPercent)}%
                   </p>
                 </div>
               ) : (

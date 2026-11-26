@@ -3,7 +3,7 @@ import "~/index.css";
 import type { DesktopBridge, DesktopUpdateState } from "@t3tools/contracts";
 import { expect, it, vi } from "vite-plus/test";
 import { render } from "../../../test/render";
-import { CommunityUpdateSettings } from "./CommunityUpdates";
+import { CommunityUpdatePreferences, CommunityUpdateSettings } from "./CommunityUpdates";
 import { useCommunityUpdates } from "../../state/communityUpdates";
 
 const offered: DesktopUpdateState = {
@@ -70,7 +70,12 @@ it("offers one-click update and restart when the Mac app can update itself", asy
     lastAttempt: 0,
   });
 
-  await using screen = await render(<CommunityUpdateSettings />);
+  await using screen = await render(
+    <>
+      <CommunityUpdateSettings />
+      <CommunityUpdatePreferences />
+    </>,
+  );
   await expect.element(screen.getByText("当前 v1.2.1 · 新版本 v1.2.2")).toBeVisible();
   await expect
     .element(screen.getByRole("switch", { name: "自动下载更新，下次启动时安装" }))

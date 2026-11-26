@@ -177,6 +177,7 @@ function permissionRejectedToolCallId(request: LogicalFrame, answer: unknown): s
 }
 
 function runAgent(): void {
+  const parity = process.argv.includes("--stardust-parity");
   const turnsByScenario = new Map<string, ReadonlyArray<ReplayTurn>>();
   const loadTurns = (scenarioId: string) => {
     const cached = turnsByScenario.get(scenarioId);
@@ -273,8 +274,32 @@ function runAgent(): void {
               : { ...params, update: { ...params.update, content: { ...content, text: chunk } } },
         });
       }
+      if (
+        parity &&
+        params.update.sessionUpdate === "tool_call_update" &&
+        "toolCallId" in params.update &&
+        params.update.toolCallId === "showcase-edit" &&
+        "status" in params.update &&
+        params.update.status === "completed"
+      ) {
+        await sleep(30_000, signal);
+        if (signal.aborted) return;
+      }
     }
   };
+
+  const parityOptions = parity
+    ? [
+        {
+          id: "reasoning_effort",
+          name: "Reasoning effort",
+          category: "thought_level",
+          type: "select",
+          currentValue: "medium",
+          options: ["low", "medium", "high", "xhigh"].map((value) => ({ value, name: value })),
+        },
+      ]
+    : undefined;
 
   const handleRequest = async (message: JsonRpcMessage): Promise<unknown> => {
     const params = message.params ?? {};
@@ -299,6 +324,7 @@ function runAgent(): void {
         sessions.set(sessionId, { cwd, model: SCENARIOS[0].id, promptCount: 0, cancel: undefined });
         return {
           ...(message.method === "session/new" ? { sessionId } : {}),
+          configOptions: parityOptions,
           models: {
             currentModelId: SCENARIOS[0].id,
             availableModels: SCENARIOS.map((scenario) => ({
@@ -308,6 +334,8 @@ function runAgent(): void {
           },
         };
       }
+      case "session/set_config_option":
+        return { configOptions: parityOptions ?? [] };
       case "session/set_model": {
         const session = sessions.get(String(params.sessionId));
         if (!SCENARIOS.some((scenario) => scenario.id === params.modelId)) {

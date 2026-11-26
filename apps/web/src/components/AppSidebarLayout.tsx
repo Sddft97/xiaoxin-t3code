@@ -1,3 +1,4 @@
+import { platformProfile } from "~/lib/PlatformProfile";
 import { useUiText } from "~/i18n/useUiText";
 import LegacyThreadSidebar from "./LegacySidebar";
 import { useLegacySidebarEnabled } from "../hooks/useSettings";
@@ -87,7 +88,7 @@ function readViewportWidth(): number {
 let windowFullscreenSnapshot: boolean | null = null;
 
 function macosDesktopBridge() {
-  if (!isElectron || !isMacPlatform(navigator.platform)) return null;
+  if (!isElectron || !isMacPlatform(platformProfile.platform)) return null;
   return window.desktopBridge ?? null;
 }
 
@@ -442,7 +443,7 @@ export function AppSidebarLayout({
   const pathname = useLocation({ select: (location) => location.pathname });
   const panelAnimationsSuppressed = usePanelNavigationSuppression(pathname);
   const routePanelAnimationsActive = panelAnimationsActive && !panelAnimationsSuppressed;
-  const isMacosDesktop = isElectron && isMacPlatform(navigator.platform);
+  const isMacosDesktop = isElectron && isMacPlatform(platformProfile.platform);
   const [sidebarWidth, setSidebarWidth] = useState(readInitialThreadSidebarWidth);
   // A clamped drag may not change width, so viewport changes need a separate subscription.
   const viewportWidth = useSyncExternalStore(subscribeToViewportWidth, readViewportWidth);

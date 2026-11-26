@@ -56,6 +56,23 @@ describe("clientPersistenceStorage", () => {
     },
   );
 
+  it("enables legacy math once and persists a later choice to disable it", async () => {
+    const testWindow = getTestWindow();
+    const key = "t3code:client-settings:v1";
+    testWindow.localStorage.setItem(key, '{"mathRenderingEnabled":false,"otherPreference":"keep"}');
+    const { readBrowserClientSettings, writeBrowserClientSettings } =
+      await import("./clientPersistenceStorage");
+    const migrated = readBrowserClientSettings()!;
+    expect(migrated.mathRenderingEnabled).toBe(true);
+    expect(JSON.parse(testWindow.localStorage.getItem(key)!)).toEqual({
+      mathRenderingEnabled: true,
+      otherPreference: "keep",
+      stardustMathDefaultMigrationVersion: 1,
+    });
+    writeBrowserClientSettings({ ...migrated, mathRenderingEnabled: false });
+    expect(readBrowserClientSettings()?.mathRenderingEnabled).toBe(false);
+  });
+
   it("preserves saved settings across a transient read failure", async () => {
     const testWindow = getTestWindow();
     const settings = { ...DEFAULT_CLIENT_SETTINGS, timestampFormat: "12-hour" as const };

@@ -1,5 +1,9 @@
 import { desktopTrackMismatchText } from "@t3tools/client-runtime/state/server";
-import type { DesktopUpdateActionResult, DesktopUpdateState } from "@t3tools/contracts";
+import type {
+  DesktopBridge,
+  DesktopUpdateActionResult,
+  DesktopUpdateState,
+} from "@t3tools/contracts";
 import { desktopUpdateChannelOf } from "@t3tools/shared/cliRelease";
 import { msg } from "gt-react";
 
@@ -89,20 +93,20 @@ export function getArm64IntelBuildWarningDescription(
   if (action === "download") {
     return resolve(
       msg(
-        "This Mac has Apple Silicon, but T3 Code is still running the Intel build under Rosetta. Download the available update to switch to the native Apple Silicon build.",
+        "This Mac has Apple Silicon, but Stardust is still running the Intel build under Rosetta. Download the available update to switch to the native Apple Silicon build.",
       ),
     );
   }
   if (action === "install") {
     return resolve(
       msg(
-        "This Mac has Apple Silicon, but T3 Code is still running the Intel build under Rosetta. Restart to install the downloaded Apple Silicon build.",
+        "This Mac has Apple Silicon, but Stardust is still running the Intel build under Rosetta. Restart to install the downloaded Apple Silicon build.",
       ),
     );
   }
   return resolve(
     msg(
-      "This Mac has Apple Silicon, but T3 Code is still running the Intel build under Rosetta. The next app update will replace it with the native Apple Silicon build.",
+      "This Mac has Apple Silicon, but Stardust is still running the Intel build under Rosetta. The next app update will replace it with the native Apple Silicon build.",
     ),
   );
 }
@@ -142,6 +146,11 @@ export function getDesktopUpdateButtonTooltip(
       : resolve(msg("Downloading update"));
   }
   if (state.status === "downloaded") {
+    if (state.errorContext === "install" && state.downloadedVersion) {
+      return resolve(
+        msg("Install failed for {version}. Click to retry.", { version: state.downloadedVersion }),
+      );
+    }
     const version = state.downloadedVersion ?? state.availableVersion;
     return version === null
       ? resolve(msg("Update ready downloaded. Click to restart and install."))
@@ -170,6 +179,8 @@ export function getDesktopUpdateButtonTooltip(
     }
     return state.message ?? resolve(msg("Update failed"));
   }
+  const disabledReason = getDesktopUpdateDisabledReason(state, undefined, resolve);
+  if (disabledReason !== null) return disabledReason;
   // The updater discards every release of the other track, so "up to date" would be false here.
   const buildChannel = desktopUpdateChannelOf(state.currentVersion);
   if (state.status === "up-to-date" && buildChannel !== state.channel) {
@@ -194,13 +205,13 @@ export function getDesktopUpdateInstallConfirmationMessage(
   return version
     ? resolve(
         msg(
-          "Install update {version} and restart T3 Code?\n\nAny running tasks will be interrupted. Make sure you're ready before continuing.",
+          "Install update {version} and restart Stardust?\n\nAny running tasks will be interrupted. Make sure you're ready before continuing.",
           { version },
         ),
       )
     : resolve(
         msg(
-          "Install update and restart T3 Code?\n\nAny running tasks will be interrupted. Make sure you're ready before continuing.",
+          "Install update and restart Stardust?\n\nAny running tasks will be interrupted. Make sure you're ready before continuing.",
         ),
       );
 }
@@ -210,6 +221,34 @@ export function getDesktopUpdateActionError(result: DesktopUpdateActionResult): 
   if (typeof result.state.message !== "string") return null;
   const message = result.state.message.trim();
   return message.length > 0 ? message : null;
+}
+
+/**
+ * macOS can refuse the restart after installUpdate resolves; the desktop then reports it as a
+ * later state with errorContext "install". Success quits the app, so this never resolves then.
+ */
+export async function installDesktopUpdate(
+  bridge: Pick<DesktopBridge, "installUpdate" | "onUpdateState">,
+  expectedVersion?: string,
+): Promise<DesktopUpdateActionResult> {
+  let awaitingFailure = false;
+  let reportFailure: (state: DesktopUpdateState) => void = () => {};
+  const failure = new Promise<DesktopUpdateState>((resolve) => {
+    reportFailure = resolve;
+  });
+  const unsubscribe = bridge.onUpdateState((state) => {
+    if (awaitingFailure && state.errorContext === "install") reportFailure(state);
+  });
+  try {
+    const result = await bridge.installUpdate(expectedVersion);
+    if (!result.accepted || result.completed || getDesktopUpdateActionError(result) !== null) {
+      return result;
+    }
+    awaitingFailure = true;
+    return { ...result, state: await failure };
+  } finally {
+    unsubscribe();
+  }
 }
 
 export function shouldToastDesktopUpdateActionResult(result: DesktopUpdateActionResult): boolean {
@@ -231,9 +270,25 @@ export function getDesktopUpdateDisabledReason(
 ): string | null {
   if (managedDenial !== undefined) return managedDenial;
   if (!state || (state.enabled && state.status !== "disabled")) return null;
-  return (
-    state.message?.trim() || resolve(msg("Automatic updates are not available in this build."))
-  );
+  const reason = state.message?.trim();
+  switch (reason) {
+    case "Updates are turned off on this machine.":
+      return resolve(msg("Updates are turned off on this machine."));
+    case "Automatic updates are not available because no update feed is configured.":
+      return resolve(
+        msg("Automatic updates are not available because no update feed is configured."),
+      );
+    case "Automatic updates are only available in packaged production builds.":
+      return resolve(msg("Automatic updates are only available in packaged production builds."));
+    case "Automatic updates are disabled by the T3CODE_DISABLE_AUTO_UPDATE setting.":
+      return resolve(
+        msg("Automatic updates are disabled by the T3CODE_DISABLE_AUTO_UPDATE setting."),
+      );
+    case "Automatic updates on Linux require the AppImage or the .deb package.":
+      return resolve(msg("Automatic updates on Linux require the AppImage or the .deb package."));
+    default:
+      return reason || resolve(msg("Automatic updates are not available in this build."));
+  }
 }
 
 export function getDesktopUpdateIdleTooltip(

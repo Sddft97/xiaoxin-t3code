@@ -11,6 +11,7 @@ import {
   StardustUpdateError,
   appBundleOfResourcesPath,
   buildStardustInstallScript,
+  buildStardustLegacyRenameScript,
   compareStardustVersions,
   isStardustUpgrade,
   isTranslocatedAppPath,
@@ -107,6 +108,17 @@ describe("Stardust versions", () => {
 });
 
 describe("parseStardustRelease", () => {
+  it("prefers the Stardust asset while accepting previously published names", () => {
+    const value = githubRelease("1.3.0");
+    const oldAsset = value.assets[1]!;
+    value.assets.push({ ...oldAsset, name: "Stardust-v1.3.0-macOS-arm64.zip" });
+    expect(parseStardustRelease(value).asset.name).toBe("Stardust-v1.3.0-macOS-arm64.zip");
+    value.assets[2]!.name = "Stardust-1.3.0-macOS-arm64.zip";
+    expect(parseStardustRelease(value).asset.name).toBe("Stardust-1.3.0-macOS-arm64.zip");
+    value.assets.pop();
+    expect(parseStardustRelease(value).asset.name).toBe("T3-Stardust-v1.3.0-macOS-arm64.zip");
+  });
+
   it("picks the arm64 zip and its digest and builds the download URL itself", () => {
     const release = parseStardustRelease(githubRelease("1.2.2"));
     expect(release.version).toBe("1.2.2");
@@ -156,7 +168,7 @@ describe("parseStardustRelease", () => {
   });
 
   it("rejects releases whose Mac zip is missing, incomplete or unverifiable", () => {
-    rejects(githubRelease("1.2.2", { assets: [] }), "no-mac-asset");
+    rejects(githubRelease("1.2.2", { assets: [] }), "no-asset");
     const variants: Array<Record<string, unknown>> = [
       { digest: undefined },
       { digest: "sha256:XYZ" },
@@ -168,7 +180,7 @@ describe("parseStardustRelease", () => {
     for (const patch of variants) {
       const value = githubRelease("1.2.2");
       Object.assign(value.assets[1]!, patch);
-      rejects(value, "no-mac-asset");
+      rejects(value, "no-asset");
     }
   });
 });
@@ -260,17 +272,24 @@ print $(( count + 1 )) > ${shellQuote(counter)}
 if (( count < ${failures} )); then exit 1; fi
 print -r -- "$1" >> ${shellQuote(openLog)}
 [[ -e ${shellQuote(NodePath.join(dir, "app-exited"))} ]] && print -n yes > ${shellQuote(NodePath.join(dir, "open-saw-exit"))}
+exit 0
 `,
     { mode: 0o755 },
   );
   return { openPath, openLog };
 }
 
-function makeInstallFixture(options: { openFailures?: number; newAppComplete?: boolean } = {}) {
+function makeInstallFixture(
+  options: {
+    openFailures?: number;
+    newAppComplete?: boolean;
+    installedName?: "T3 Stardust.app" | "Stardust.app";
+  } = {},
+) {
   // Spaces and non-ASCII characters, as in "T3 星尘版.app" and "Application Support".
   const root = NodePath.join(makeTempDir(), "家 目录");
   const applications = NodePath.join(root, "Applications");
-  const currentAppPath = NodePath.join(applications, "T3 Stardust.app");
+  const currentAppPath = NodePath.join(applications, options.installedName ?? "Stardust.app");
   const versionDir = NodePath.join(root, "Library", "Caches", "T3 Stardust", "updates", "1.2.2");
   const newAppPath = NodePath.join(versionDir, "app", "T3 Stardust.app");
   const backupRoot = NodePath.join(
@@ -297,6 +316,7 @@ function makeInstallFixture(options: { openFailures?: number; newAppComplete?: b
     relaunch: true,
     waitTimeoutSeconds: 5,
     openCommand: openPath,
+    codesignCommand: "/usr/bin/true",
   };
   const fixture: InstallFixture = {
     root,
@@ -367,6 +387,26 @@ describe("buildStardustInstallScript", () => {
 });
 
 describe.skipIf(!hasZsh)("install script on disk", () => {
+  it("moves a v1.2.4 bundle left at the old path on quit, without replacing an occupied path", () => {
+    const { options, marker } = makeInstallFixture({ installedName: "T3 Stardust.app" });
+    const destination = NodePath.join(NodePath.dirname(options.currentAppPath), "Stardust.app");
+    const script = buildStardustLegacyRenameScript({
+      pid: 2_147_483_647,
+      currentAppPath: options.currentAppPath,
+      logPath: options.logPath,
+      codesignCommand: "/usr/bin/true",
+    });
+    expect(script).not.toBeNull();
+    makeApp(destination, "existing");
+    expect(NodeChildProcess.spawnSync("/bin/zsh", ["-c", script!]).status).toBe(1);
+    expect(marker(destination)).toBe("existing");
+    expect(marker(options.currentAppPath)).toBe("old");
+    NodeFS.rmSync(destination, { recursive: true });
+    expect(NodeChildProcess.spawnSync("/bin/zsh", ["-c", script!]).status).toBe(0);
+    expect(marker(destination)).toBe("old");
+    expect(NodeFS.existsSync(options.currentAppPath)).toBe(false);
+  });
+
   it("waits for the app to quit, swaps the bundle, keeps one backup and relaunches", () => {
     const fixture = makeInstallFixture();
     // The "app" marks its exit; the fake open records whether that happened first.
@@ -376,7 +416,7 @@ describe.skipIf(!hasZsh)("install script on disk", () => {
 
     expect(status).toBe(0);
     expect(fixture.marker(fixture.options.currentAppPath)).toBe("new");
-    expect(fixture.marker(NodePath.join(fixture.options.backupDir, "T3 Stardust.app"))).toBe("old");
+    expect(fixture.marker(NodePath.join(fixture.options.backupDir, "Stardust.app"))).toBe("old");
     expect(NodeFS.existsSync(NodePath.join(fixture.options.backupDir, "..", "1.1.0"))).toBe(false);
     expect(NodeFS.existsSync(fixture.options.cleanupDir!)).toBe(false);
     expect(
@@ -387,6 +427,44 @@ describe.skipIf(!hasZsh)("install script on disk", () => {
     expect(opened(fixture)).toEqual([fixture.options.currentAppPath]);
     expect(log).toContain("waiting for pid");
     expect(log).toContain("update to 1.2.2 finished");
+  });
+
+  it("migrates the legacy bundle name after verifying the installed bundle", () => {
+    const fixture = makeInstallFixture({ installedName: "T3 Stardust.app" });
+    const destination = NodePath.join(
+      NodePath.dirname(fixture.options.currentAppPath),
+      "Stardust.app",
+    );
+    const verify = NodePath.join(fixture.root, "verify");
+    NodeFS.writeFileSync(
+      verify,
+      `#!/bin/zsh
+[[ "$4" == ${shellQuote(destination)} &&
+   -d ${shellQuote(fixture.options.currentAppPath)} &&
+   -f "$4/Contents/Info.plist" ]]
+`,
+      { mode: 0o755 },
+    );
+    const { status, log } = fixture.run({ codesignCommand: verify });
+    expect(status, log).toBe(0);
+    expect(fixture.marker(fixture.options.currentAppPath)).toBeNull();
+    expect(fixture.marker(destination)).toBe("new");
+    expect(fixture.marker(NodePath.join(fixture.options.backupDir, "T3 Stardust.app"))).toBe("old");
+    expect(opened(fixture)).toEqual([destination]);
+  });
+
+  it("leaves both bundles alone when the renamed destination already exists", () => {
+    const fixture = makeInstallFixture({ installedName: "T3 Stardust.app" });
+    const destination = NodePath.join(
+      NodePath.dirname(fixture.options.currentAppPath),
+      "Stardust.app",
+    );
+    makeApp(destination, "other");
+    const { status, log } = fixture.run();
+    expect(status).toBe(1);
+    expect(log).toContain("destination already exists");
+    expect(fixture.marker(fixture.options.currentAppPath)).toBe("old");
+    expect(fixture.marker(destination)).toBe("other");
   });
 
   it("installs without relaunching when the update runs on quit", () => {
@@ -408,7 +486,7 @@ describe.skipIf(!hasZsh)("install script on disk", () => {
   });
 
   it("rolls back when the installed app is incomplete", () => {
-    const fixture = makeInstallFixture({ newAppComplete: false });
+    const fixture = makeInstallFixture({ newAppComplete: false, installedName: "T3 Stardust.app" });
     const { status, log } = fixture.run();
     expect(status).toBe(1);
     expect(fixture.marker(fixture.options.currentAppPath)).toBe("old");

@@ -18,6 +18,9 @@ import {
   type ThirdPartyLicenseEntry,
 } from "@t3tools/shared/thirdPartyLicenses";
 
+import stardustLicense from "../../../../../LICENSE?raw";
+import stardustNotice from "../../../../../NOTICE?raw";
+import { useUiText } from "../../i18n/useUiText";
 import { m } from "../../i18n/messages";
 import { Button } from "../ui/button";
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../ui/collapsible";
@@ -248,6 +251,7 @@ function LicenseManifestError({ message, onRetry }: { message: string; onRetry: 
 
 export function OpenSourceLicensesPanel() {
   const gt = useGT();
+  const text = useUiText();
   const result = useAtomValue(licenseManifestAtom);
   const retry = useAtomRefresh(licenseManifestAtom);
   const [query, setQuery] = useState("");
@@ -266,8 +270,26 @@ export function OpenSourceLicensesPanel() {
 
   return (
     <SettingsPageContainer>
+      <SettingsSection title={text("Stardust licenses")}>
+        {[
+          { title: "MIT License", contents: stardustLicense },
+          { title: "NOTICE", contents: stardustNotice },
+        ].map(({ title, contents }) => (
+          <Collapsible key={title}>
+            <CollapsibleTrigger className="flex min-h-10 items-center gap-2 px-3 text-left sm:px-4">
+              <ChevronRightIcon aria-hidden className="size-3.5 text-muted-foreground" />
+              {title}
+            </CollapsibleTrigger>
+            <CollapsiblePanel>
+              <pre className="mx-9 mb-4 max-w-[76ch] sm:mx-10 whitespace-pre-wrap break-words font-mono text-xs/5 text-foreground/80">
+                {contents}
+              </pre>
+            </CollapsiblePanel>
+          </Collapsible>
+        ))}
+      </SettingsSection>
       <SettingsSection
-        title={gt("Third-party notices")}
+        title={text("Third-party notices")}
         headerAction={
           manifest ? (
             <LicenseHeaderAction

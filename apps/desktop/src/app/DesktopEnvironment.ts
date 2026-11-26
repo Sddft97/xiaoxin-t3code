@@ -1,3 +1,4 @@
+import { STARDUST_WINDOWS_BRAND } from "@t3tools/shared/stardustWindowsBrand";
 import type {
   DesktopAppBranding,
   DesktopAppStageLabel,
@@ -98,7 +99,7 @@ function resolveDesktopAppStageLabel(input: {
   return isNightlyDesktopVersion(input.appVersion) ? "Nightly" : "Beta";
 }
 
-const STARDUST_DISPLAY_NAME = "T3 Stardust";
+const STARDUST_DISPLAY_NAME = "Stardust";
 
 export function resolveDesktopAppBranding(input: {
   readonly isDevelopment: boolean;
@@ -110,7 +111,8 @@ export function resolveDesktopAppBranding(input: {
     stageLabel,
     // Stardust custom build: shown in the menu bar, About panel and Hide/Quit items.
     // Only the visible name changes; app.setName (keychain, User-Agent) and userData keep the base name.
-    displayName: stageLabel === "Dev" ? `${APP_BASE_NAME} (${stageLabel})` : STARDUST_DISPLAY_NAME,
+    displayName:
+      stageLabel === "Dev" ? `${STARDUST_DISPLAY_NAME} (${stageLabel})` : STARDUST_DISPLAY_NAME,
   };
 }
 
@@ -175,7 +177,15 @@ const make = Effect.fn("desktop.environment.make")(function* (
     isDevelopment,
     appVersion: input.appVersion,
   });
-  const displayName = branding.displayName;
+  const windowsBranding =
+    input.platform === "win32"
+      ? {
+          ...branding,
+          baseName: STARDUST_WINDOWS_BRAND.displayName,
+          displayName: STARDUST_WINDOWS_BRAND.displayName,
+        }
+      : branding;
+  const displayName = windowsBranding.displayName;
   const stateDir = resolveDesktopStateDir({
     baseDir,
     isDevelopment,
@@ -229,11 +239,18 @@ const make = Effect.fn("desktop.environment.make")(function* (
     otlpExportIntervalMs: config.otlpExportIntervalMs,
     otlpHeaders: config.otlpHeaders,
     otlpProtocol: config.otlpProtocol,
-    branding,
+    branding: windowsBranding,
     displayName,
-    appUserModelId: Option.getOrElse(config.appUserModelIdOverride, () =>
-      isDevelopment ? "com.t3tools.t3code.dev" : "com.t3tools.t3code",
-    ),
+    appUserModelId:
+      input.platform === "win32" && input.isPackaged
+        ? STARDUST_WINDOWS_BRAND.appId
+        : Option.getOrElse(config.appUserModelIdOverride, () =>
+            input.platform === "win32"
+              ? `${STARDUST_WINDOWS_BRAND.appId}.dev`
+              : isDevelopment
+                ? "com.t3tools.t3code.dev"
+                : "com.t3tools.t3code",
+          ),
     linuxDesktopEntryName: resolveLinuxDesktopEntryName(isDevelopment),
     linuxApplicationsDir,
     desktopLauncherPath: config.desktopLauncherPath,

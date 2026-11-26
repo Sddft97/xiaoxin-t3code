@@ -17,6 +17,10 @@
       "vite": { "entry": [".github/**/*.test.cjs"] },
       "vitest": { "entry": [".github/**/*.test.cjs"] },
     },
+    "evals": {
+      // The grader loads these answers by path, as the server loads a definitions file.
+      "entry": ["workflow-authoring/fixtures/*.ts"],
+    },
     "scripts": {
       // Knip loads its preprocessor through a CLI option; native verification and
       // worktree setup (from t3.json) run directly. release-desktop.yml bundles the
@@ -74,6 +78,13 @@
       // The generated operations export every selection's class.
       "ignoreIssues": {
         "**/*.graphql.ts": ["exports", "types", "namespaceMembers"],
+        // Optional diagnostics and local-only server adapters remain available after the upstream sync.
+        "src/cloud/CloudLink.ts": ["exports"],
+        "src/cloud/ConnectReachability.ts": ["exports"],
+        "src/cloud/relayTracing.ts": ["exports"],
+        "src/provider/ModelManifest.ts": ["exports", "duplicates"],
+        "src/relay/AgentAwarenessRelay.ts": ["exports"],
+        "src/telemetry/ProviderDimensions.ts": ["exports"],
         "src/storageMole.ts": ["exports"],
         "src/storageMoleList.ts": ["exports"],
         "src/storageTidyModel.ts": ["exports"],
@@ -95,6 +106,7 @@
       // Electron loads these bundles by filename rather than importing them.
       "entry": [
         "gnome-extension/extension.js!",
+        "src/backend/DesktopBackendRecoveryWorker.ts!",
         "src/electron/WindowsForegroundFocusWorker.ts!",
         "src/snapShot/GlobalShiftShortcutWorker.ts!",
         "src/snapShot/RegionSnapShotWorker.ts!",
@@ -132,6 +144,7 @@
         "src/components/chat/ComposerPlanFollowUpBanner.tsx",
         "src/components/chat/DraftHeroProjectHeading.tsx",
         "src/components/chat/ThreadRepositorySections.tsx",
+        "src/components/settings/UpdateTrackSwitchDialog.tsx",
         "src/components/usage/CleanupDetails.tsx",
         "src/components/usage/cleanupOverview.module.css",
         "src/components/usage/CleanupOverview.tsx",
@@ -164,6 +177,14 @@
         "src/components/usage/quotaTopbarModel.ts": ["exports"],
         "src/components/usage/UsageAppleOverview.tsx": ["exports"],
         "src/components/usage/UsageLimitRings.tsx": ["exports"],
+        "src/branding.ts": ["exports"],
+        "src/components/chat/galaxyEffortLevels.ts": ["exports"],
+        "src/components/desktopUpdate.logic.ts": ["exports"],
+        "src/components/settings/settingsSearch.ts": ["exports"],
+        "src/components/sidebar/SidebarUpdatePill.tsx": ["exports"],
+        "src/components/sidebar/updateEverything.logic.ts": ["exports"],
+        "src/components/sidebar/useUpdateEverything.ts": ["exports"],
+        "src/hostedPairing.ts": ["exports"],
         "src/components/usage/UsageLimitSlots.tsx": ["exports"],
         "src/components/usage/UsageLimits.tsx": ["exports"],
         "src/components/usage/diskSpaceModel.ts": ["exports"],
@@ -235,7 +256,7 @@
     "packages/shared": {
       "ignore": ["src/storageBudget.ts"],
       "ignoreIssues": {
-        "src/themePalettes.ts": ["exports"],
+        "src/themePalettes.ts": ["exports", "duplicates"],
         "src/usageMerge.ts": ["exports"],
         "src/previewPins.ts": ["exports"],
       },

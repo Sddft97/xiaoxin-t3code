@@ -303,6 +303,7 @@ export default defineConfig({
         "error",
         { paths: [...RESTRICTED_IMPORT_PATHS, RESTRICTED_PULL_REQUEST_GLYPH_IMPORTS] },
       ],
+      "t3code/no-direct-platform": "error",
       "t3code/no-global-process-runtime": "error",
       "t3code/no-inline-schema-compile": "error",
       "t3code/no-low-value-comments": "error",
@@ -511,8 +512,18 @@ export default defineConfig({
         rules: { "t3code/no-raw-resize-observer": "error" },
       },
       {
+        // pnpm evaluates its platform-specific dependency hook outside the app runtime.
+        files: [".pnpmfile.cjs"],
+        rules: { "t3code/no-direct-platform": "off" },
+      },
+      {
         files: ["apps/web/src/**"],
         rules: { "shadcn/no-unknown-classes": "error" },
+      },
+      {
+        // The Galaxy slider's classes are defined in its adjacent stylesheet.
+        files: ["apps/web/src/components/chat/GalaxyEffortSlider.tsx"],
+        rules: { "shadcn/no-unknown-classes": "off" },
       },
       {
         files: ["apps/web/src/**"],
@@ -539,7 +550,11 @@ export default defineConfig({
       },
       {
         // Third-party marks must retain their exact colors.
-        files: ["apps/web/src/components/Icons.tsx", "apps/web/src/components/JetBrainsIcons.tsx"],
+        files: [
+          "apps/web/src/components/Icons.tsx",
+          "apps/web/src/components/JetBrainsIcons.tsx",
+          "apps/web/src/components/chat/ComposerChipIcons.tsx",
+        ],
         rules: { "shadcn/no-raw-colors": "off" },
       },
       {

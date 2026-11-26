@@ -129,6 +129,14 @@ describe("storage cleanup settings", () => {
   });
 });
 
+describe("ClientSettings math rendering", () => {
+  it("enables formulas by default and preserves an explicit off setting", () => {
+    expect(decodeClientSettings({}).mathRenderingEnabled).toBe(true);
+    expect(decodeClientSettings({ mathRenderingEnabled: false }).mathRenderingEnabled).toBe(false);
+    expect(decodeClientSettingsPatch({})).not.toHaveProperty("mathRenderingEnabled");
+  });
+});
+
 describe("ClientSettings terminal close confirmation", () => {
   it("keeps confirmation enabled for settings without a saved preference", () => {
     expect(decodeClientSettings({}).confirmTerminalClose).toBe(true);

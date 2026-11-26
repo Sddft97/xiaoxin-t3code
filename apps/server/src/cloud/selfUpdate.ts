@@ -8,7 +8,6 @@ import {
   type ServerSelfUpdateResult,
 } from "@t3tools/contracts";
 import * as HostProcess from "@t3tools/shared/HostProcess";
-import * as Config from "effect/Config";
 import * as Context from "effect/Context";
 import * as Effect from "effect/Effect";
 import * as Option from "effect/Option";
@@ -20,11 +19,7 @@ import * as Queue from "effect/Queue";
 import * as Stream from "effect/Stream";
 import { HttpClient } from "effect/http";
 
-import {
-  CLI_RELEASE_BASE_URL_ENV,
-  cliReleaseChannelOf,
-  crossesReleaseTrack,
-} from "@t3tools/shared/cliRelease";
+import { cliReleaseChannelOf, crossesReleaseTrack } from "@t3tools/shared/cliRelease";
 
 import packageJson from "../../package.json" with { type: "json" };
 import * as ServerConfig from "../config.ts";
@@ -36,7 +31,6 @@ import { managedUpdateMirror, managedUpdateRefusal } from "../policy/managedUpda
 import * as ProcessRunner from "../processRunner.ts";
 import {
   ensurePinnedRuntimeInstalled,
-  isUnpublishedRelease,
   pinnedRuntimePaths,
   prunePinnedRuntimes,
 } from "./pinnedRuntime.ts";
@@ -144,10 +138,6 @@ export const make = Effect.fn("cloud.server_self_update.make")(function* () {
   const platform = yield* HostProcess.Platform;
   const arch = yield* HostProcess.Architecture;
   const httpClient = yield* HttpClient.HttpClient;
-  const mirror = managedUpdateMirror(policy.document);
-  const releaseBaseUrl =
-    mirror?.feedUrl ??
-    Option.getOrUndefined(yield* Config.String(CLI_RELEASE_BASE_URL_ENV).pipe(Config.option));
   const inFlight = yield* Ref.make(false);
 
   yield* pruneRuntimesOnStart({ baseDir: serverConfig.baseDir, managed: launcher.managed }).pipe(
@@ -191,19 +181,22 @@ export const make = Effect.fn("cloud.server_self_update.make")(function* () {
         );
       }
       return yield* failWith(
-        "This server is managed by the T3 Code desktop app on its machine; update the desktop app to update it.",
+        "This server is managed by the Stardust desktop app on its machine; update the desktop app to update it.",
       );
     }
     // The target must accept the launcher that will run it, which can be older than this server.
     const launcherProtocol = launcher.protocol;
     if (capability === null || launcherProtocol === undefined) {
       return yield* failWith(
-        "Remote updates require the T3 Code background service. Run `t3 service install` on the server machine.",
+        "Remote updates require the Stardust background service. Run `t3 service install` on the server machine.",
       );
     }
 
     const unsafeCrossing = crossesTrackUnsafely(input);
     if (unsafeCrossing !== null) return yield* failWith(unsafeCrossing);
+    if (managedUpdateMirror(policy.document) !== undefined) {
+      return yield* failWith("Stardust updates use the Stardust GitHub Releases repository.");
+    }
     const targetVersion = input.targetVersion.trim();
     if (!isExactServiceVersion(targetVersion)) {
       return yield* failWith(`'${targetVersion}' is not an exact t3 version.`);
@@ -223,8 +216,6 @@ export const make = Effect.fn("cloud.server_self_update.make")(function* () {
         httpClient,
         platform,
         arch,
-        releaseBaseUrl,
-        requirePublishedRelease: mirror !== undefined,
         validate: (runtime) =>
           runStagedServicePreflight({
             runner,
@@ -237,12 +228,6 @@ export const make = Effect.fn("cloud.server_self_update.make")(function* () {
         Effect.mapError((error) => {
           if (error._tag === "PinnedRuntimePreflightBlockedError") {
             return failWith(error.reason, error);
-          }
-          if (mirror !== undefined && isUnpublishedRelease(error)) {
-            return failWith(
-              `${mirror.organization}'s update mirror has no t3@${targetVersion} for this machine.`,
-              error,
-            );
           }
           const downloadFailure = [
             error.httpStatus === undefined ? undefined : `HTTP ${error.httpStatus}`,

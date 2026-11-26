@@ -1,0 +1,158 @@
+html:root[data-theme-id="stardust"] {
+  --stardust-accent: #5b4be0;
+  --stardust-accent-hover: #4a3bc8;
+  --stardust-focus: color-mix(in srgb, var(--stardust-accent) 16%, transparent);
+  --info: #0a84ff;
+  --info-foreground: #0062cc;
+  accent-color: var(--stardust-accent);
+}
+html:root[data-theme-id="stardust"].dark {
+  --stardust-accent: #6a5af0;
+  --stardust-accent-hover: #7c6dfa;
+  --stardust-focus: color-mix(in srgb, #8d7dff 25%, transparent);
+  --info: #0a84ff;
+  --info-foreground: #64b5ff;
+  --apple-fill: rgba(160, 150, 210, 0.13);
+  --apple-fill-hover: rgba(160, 150, 210, 0.21);
+  --apple-line: rgba(235, 232, 255, 0.11);
+  --apple-hair: rgba(235, 232, 255, 0.07);
+  --apple-glass-strong: rgba(30, 29, 39, 0.96);
+  --apple-secondary: #25232f;
+}
+html:root[data-theme-id="stardust"] {
+  [data-approval-id] button[data-decision="accept"] {
+    color: white;
+  }
+  .trail-approval-actions button[data-decision="accept"] {
+    color: white;
+    background: var(--stardust-accent);
+    border-color: var(--stardust-accent);
+    box-shadow: none;
+  }
+  .trail-approval-actions button[data-decision="accept"]:hover:not(:disabled) {
+    background: var(--stardust-accent-hover);
+    border-color: var(--stardust-accent-hover);
+  }
+  [data-inbox-done-thread] .text-sidebar-foreground {
+    color: var(--sidebar-muted-foreground);
+  }
+  :is(
+    [data-slot="switch"],
+    [data-slot="checkbox-indicator"],
+    [data-slot="radio-indicator"]
+  )[data-checked] {
+    background-color: var(--stardust-accent);
+    color: white;
+  }
+  [data-slot="radio-indicator"][data-checked]::before {
+    background: white;
+  }
+}
+
+html:is([data-theme-id="harbor"], [data-theme-id="mist"], [data-theme-id="grove"]) {
+  .sidebar-stage-backdrop {
+    opacity: 0.22;
+  }
+  [data-stardust-wordmark][data-on-backdrop] {
+    color: var(--sidebar-foreground);
+  }
+}
+
+[data-stardust-particles] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* The workbench can have a Stardust palette while the composer uses its Apple materials. */
+html:root[data-theme-id="stardust"]
+  :is([data-chat-composer-stack], [data-slot="composer-shell"], [data-session-stats-popup]) {
+  --composer-send-accent: #5b4be0;
+  --primary: #e34717;
+  --v9-ac: var(--primary);
+  --v9-ac-soft: color-mix(in srgb, var(--primary) 10%, transparent);
+  --v9-ac-glow: color-mix(in srgb, var(--primary) 24%, transparent);
+  --muted-foreground: #64646c;
+  --contrast-muted-foreground: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--muted-foreground) var(--appearance-contrast-base), var(--background)),
+    var(--appearance-contrast-target) var(--appearance-contrast-boost)
+  );
+}
+
+html:root[data-theme-id="stardust"].dark
+  :is([data-chat-composer-stack], [data-slot="composer-shell"], [data-session-stats-popup]) {
+  --primary: #ff6734;
+  --background: #1c1c1e;
+  --card: #2a2a2d;
+  --surface-raised: #2a2a2d;
+  --foreground: #f5f5f7;
+  --muted-foreground: #aaaab3;
+  --apple-fill: rgba(255, 255, 255, 0.085);
+  --apple-fill-hover: rgba(255, 255, 255, 0.145);
+  --apple-line: rgba(255, 255, 255, 0.11);
+  --apple-hair: rgba(255, 255, 255, 0.07);
+  --apple-glass-strong: rgba(30, 30, 34, 0.96);
+  --apple-secondary: #2c2c32;
+}
+
+html:root[data-theme-id="stardust"][data-stardust-composer-border="b0"]
+  [data-slot="composer-host"]:focus-within {
+  transform: none;
+  box-shadow:
+    var(--apple-float-shadow),
+    0 0 0 3px var(--stardust-focus);
+}
+
+html:root[data-theme-id="stardust"]:not([data-stardust-composer-border="b0"]) {
+  --stardust-composer-line-width: 1px;
+  --stardust-composer-line: rgb(0 0 0 / 6%);
+  --stardust-composer-line-focused: rgb(0 0 0 / 10%);
+  --stardust-composer-shadow: 0 2px 9px rgb(0 0 0 / 5%);
+  --stardust-composer-shadow-focused: 0 3px 14px rgb(0 0 0 / 8%);
+
+  &.dark {
+    --stardust-composer-line: rgb(255 255 255 / 8%);
+    --stardust-composer-line-focused: rgb(255 255 255 / 13%);
+    --stardust-composer-shadow: 0 3px 12px rgb(0 0 0 / 20%);
+    --stardust-composer-shadow-focused: 0 4px 16px rgb(0 0 0 / 28%);
+  }
+
+  @media (min-resolution: 2dppx) {
+    --stardust-composer-line-width: 0.5px;
+  }
+
+  [data-slot="composer-host"] {
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* An attached banner moves the card outline from the host to the main surface. */
+  :is(
+    [data-slot="composer-host"]:not(:has([data-composer-banner-surface="attached"])),
+    [data-slot="composer-host"]:has([data-composer-banner-surface="attached"])
+      [data-chat-composer-main-surface]
+  ) {
+    --stardust-composer-edge: var(--stardust-composer-line);
+    box-shadow: var(--stardust-composer-shadow);
+
+    &:focus-within {
+      --stardust-composer-edge: var(--stardust-composer-line-focused);
+      box-shadow: var(--stardust-composer-shadow-focused);
+      outline: var(--stardust-composer-focus-outline, none);
+    }
+    &::after {
+      border-width: var(--stardust-composer-line-width);
+      border-color: var(--stardust-composer-edge);
+      box-shadow: none;
+    }
+  }
+
+  &[data-stardust-composer-border="b2"] {
+    --stardust-composer-focus-outline: 1px solid
+      color-mix(in srgb, var(--stardust-accent) 14%, transparent);
+  }
+}

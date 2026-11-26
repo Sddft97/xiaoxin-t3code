@@ -447,7 +447,7 @@ const NODE_PTY_BINARY_MISSING_EXIT_CODE = 4;
 
 const formatNodePtyProbeFailureReason = (exitCode: number): string | null =>
   exitCode === NODE_PTY_BINARY_MISSING_EXIT_CODE
-    ? "WSL support is missing from this T3 Code build: the packaged Linux node-pty binary was not included. Install a build that includes WSL support."
+    ? "WSL support is missing from this Stardust build: the packaged Linux node-pty binary was not included. Install a build that includes WSL support."
     : null;
 
 // Capture login-shell PATH because the server launches provider CLIs by name.
@@ -1119,13 +1119,50 @@ const getUserHomeImpl = (
     Effect.orElseSucceed(() => Option.none<string>()),
   );
 
+// Store/MSI WSL registers WSLService and inbox WSL registers LxssManager; either key means installed.
+const WSL_SERVICE_KEYS = [
+  "HKLM\\SYSTEM\\CurrentControlSet\\Services\\WSLService",
+  "HKLM\\SYSTEM\\CurrentControlSet\\Services\\LxssManager",
+] as const;
+const SERVICE_QUERY_TIMEOUT = Duration.seconds(5);
+
+const wslServiceRegistered = Effect.scoped(
+  Effect.gen(function* () {
+    const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
+    const registered = yield* Effect.forEach(
+      WSL_SERVICE_KEYS,
+      (key) =>
+        spawner
+          .spawn(
+            ChildProcess.make("reg.exe", ["query", key], {
+              stdin: "ignore",
+              stdout: "ignore",
+              stderr: "ignore",
+              killSignal: "SIGTERM",
+              forceKillAfter: PROCESS_TERMINATE_GRACE,
+            }),
+          )
+          .pipe(Effect.flatMap((handle) => handle.exitCode)),
+      { concurrency: "unbounded" },
+    );
+    return registered.some((exitCode) => (exitCode as unknown as number) === 0);
+  }),
+).pipe(
+  Effect.timeoutOption(SERVICE_QUERY_TIMEOUT),
+  Effect.map(Option.getOrElse(() => false)),
+  Effect.orElseSucceed(() => false),
+);
+
 export const makeIsAvailable = Effect.fn("DesktopWslEnvironment.makeIsAvailable")(function* (
   platform: NodeJS.Platform,
   windir: string,
 ): Effect.fn.Return<
   boolean,
   never,
-  FileSystem.FileSystem | Path.Path | DesktopManagedPolicy.DesktopManagedPolicy
+  | FileSystem.FileSystem
+  | Path.Path
+  | DesktopManagedPolicy.DesktopManagedPolicy
+  | ChildProcessSpawner.ChildProcessSpawner
 > {
   if (platform !== "win32") return false;
   const path = yield* Path.Path;
@@ -1134,6 +1171,8 @@ export const makeIsAvailable = Effect.fn("DesktopWslEnvironment.makeIsAvailable"
   if (!(yield* fileSystem.exists(wslExePath).pipe(Effect.orElseSucceed(() => false)))) {
     return false;
   }
+  // System32\wsl.exe is also an install stub on Windows without WSL, so check for its service.
+  if (!(yield* wslServiceRegistered)) return false;
   // A server in WSL reads Linux's policy, never this machine's, so a managed machine runs none.
   return yield* (yield* DesktopManagedPolicy.DesktopManagedPolicy).read.pipe(
     Effect.map((found) => found === undefined),
@@ -1243,15 +1282,24 @@ export const layer = Layer.effect(
       effect.pipe(Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner));
 
     // Cache availability so synchronous IPC bootstrap can read it without yielding to filesystem I/O.
-    const wslAvailable = yield* makeIsAvailable(environment.platform, windir).pipe(
-      Effect.provideService(FileSystem.FileSystem, fileSystem),
-      Effect.provideService(Path.Path, environment.path),
-      Effect.provideService(
-        DesktopManagedPolicy.DesktopManagedPolicy,
-        yield* DesktopManagedPolicy.DesktopManagedPolicy,
-      ),
-      Effect.withSpan("desktop.wsl.isAvailable"),
-    );
+    const runtimeBundled =
+      !environment.isPackaged ||
+      environment.platform !== "win32" ||
+      (yield* fileSystem
+        .exists(environment.path.join(environment.resourcesPath, "wsl-runtime.tar.gz"))
+        .pipe(Effect.orElseSucceed(() => false)));
+    const wslAvailable =
+      runtimeBundled &&
+      (yield* makeIsAvailable(environment.platform, windir).pipe(
+        Effect.provideService(FileSystem.FileSystem, fileSystem),
+        Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
+        Effect.provideService(Path.Path, environment.path),
+        Effect.provideService(
+          DesktopManagedPolicy.DesktopManagedPolicy,
+          yield* DesktopManagedPolicy.DesktopManagedPolicy,
+        ),
+        Effect.withSpan("desktop.wsl.isAvailable"),
+      ));
     const isAvailable = Effect.succeed(wslAvailable);
 
     const windowsToWslPath = (distro: string | null, windowsPath: string) =>

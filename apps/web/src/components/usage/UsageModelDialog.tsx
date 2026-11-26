@@ -3,7 +3,7 @@ import { UsageBusiestHour } from "./UsageBusiestHour";
 
 import { useUsageDateFormat } from "./useUsageDateFormat";
 import { UsageModelBars } from "./UsageModelBars";
-import { useTheme } from "../../hooks/useTheme";
+import { useAppleMaterialTheme } from "../../hooks/useTheme";
 import { UsageDetailsSheet } from "./UsageDetailsSheet";
 import { UsageCount } from "./UsageMotion";
 import { useUiText } from "~/i18n/useUiText";
@@ -60,7 +60,7 @@ export function UsageModelDialog({
   readonly onClose: () => void;
 }) {
   const uiText = useUiText();
-  const { theme } = useTheme();
+  const apple = useAppleMaterialTheme();
   const dateFormat = useUsageDateFormat();
   const usage = mergeAnsweredUsage(
     environments,
@@ -155,7 +155,7 @@ export function UsageModelDialog({
         ? copy("Unpriced")
         : copy("{value} of cost", { value: formatPercent(model.costShare) });
 
-  if (theme === "apple")
+  if (apple)
     return (
       <UsageDetailsSheet
         open

@@ -1738,3 +1738,45 @@ const make = Effect.gen(function* () {
 });
 
 export const layer = Layer.effect(CloudLink, make);
+
+const disabled = Effect.fail(
+  new ManagedLimits.ManagedPolicyRefusedError({
+    organization: "Stardust",
+    action: "hosted connections",
+  }),
+);
+const refuseHosted = Effect.fn("CloudLink.refuseHosted")(() => disabled);
+const off = Effect.fn("CloudLink.off")(() => Effect.succeed(false));
+
+export const layerDisabled = Layer.succeed(CloudLink, {
+  linkProof: refuseHosted,
+  applyRelayConfig: refuseHosted,
+  linkState: Effect.fn("CloudLink.linkState.disabled")(() =>
+    Effect.succeed({
+      linked: false,
+      linkRevoked: false,
+      cloudUserId: null,
+      relayUrl: null,
+      relayIssuer: null,
+      managedTunnelActive: false,
+      publishAgentActivity: false,
+      holdWebhooksWhileOffline: false,
+    }),
+  ),
+  unlink: Effect.fn("CloudLink.unlink.disabled")(() =>
+    Effect.succeed({ ok: true as const, endpointRuntimeStatus: { status: "disabled" } }),
+  ),
+  updatePreferences: refuseHosted,
+  updateLiveActivityPreference: refuseHosted,
+  answerHealthRequest: refuseHosted,
+  mintCredential: refuseHosted,
+  reconcileDesiredLinkIfStillDesired: Effect.fn(
+    "CloudLink.reconcileDesiredLinkIfStillDesired.disabled",
+  )(() => Effect.succeed(null)),
+  registerManagedTunnelRecovery: Effect.fn("CloudLink.registerManagedTunnelRecovery.disabled")(() =>
+    Effect.succeed({ status: "not_linked" as const }),
+  ),
+  recoverManagedTunnel: off,
+  startManagedTunnelIfOriginConfirmed: off,
+  releaseManagedTunnelOnShutdown: off,
+});

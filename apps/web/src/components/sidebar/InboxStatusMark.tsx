@@ -4,9 +4,13 @@ import type { inboxReason } from "../../workbenchInbox";
 
 export function InboxStatusMark({
   reason,
+  compact = false,
 }: {
   reason: NonNullable<ReturnType<typeof inboxReason>>;
+  compact?: boolean;
 }) {
+  const failed = reason === "运行失败";
+  const hasResult = reason === "有新结果";
   return (
     <Tooltip>
       <TooltipTrigger
@@ -14,9 +18,13 @@ export function InboxStatusMark({
           <span
             role="img"
             aria-label={inboxLabel(reason)}
-            className={`inline-flex w-2 shrink-0 items-center justify-center text-xs ${reason === "运行失败" ? "text-destructive" : reason === "有新结果" ? "text-muted-foreground" : "text-primary"}`}
+            className={
+              compact
+                ? `block size-1.5 rounded-full ${failed ? "bg-destructive" : hasResult ? "bg-success" : "bg-warning"}`
+                : `inline-flex w-2 shrink-0 items-center justify-center text-xs ${failed ? "text-destructive" : hasResult ? "text-muted-foreground" : "text-primary"}`
+            }
           >
-            {reason === "运行失败" ? "▲" : reason === "有新结果" ? "○" : "●"}
+            {compact ? null : failed ? "▲" : hasResult ? "○" : "●"}
           </span>
         }
       />

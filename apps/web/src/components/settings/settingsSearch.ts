@@ -1,5 +1,4 @@
 import { uiText } from "~/i18n";
-import { HOSTED_APP_CHANNEL } from "~/branding";
 import { isElectron } from "~/env";
 import { isMacPlatform, isWindowsPlatform, normalizeSearchText } from "~/lib/utils";
 import { STATIC_KEYBINDING_COMMANDS, type KeybindingCommand } from "@t3tools/contracts";
@@ -60,7 +59,6 @@ export interface SettingsSearchItem {
   readonly desktopOnly?: boolean;
   readonly macOnly?: boolean;
   readonly windowsOnly?: boolean;
-  readonly releaseChannelOnly?: boolean;
   readonly secretProvidersOnly?: boolean;
   readonly cloudOnly?: boolean;
   readonly environmentOnly?: boolean;
@@ -72,6 +70,7 @@ export interface SettingsSearchItem {
   readonly managedTunnelOnly?: boolean;
   readonly peerLinksOnly?: boolean;
   readonly fastWorktreeCheckoutOnly?: boolean;
+  readonly agentFeedbackOnly?: boolean;
   readonly textGeneratorsOnly?: boolean;
   readonly secondary?: boolean;
   readonly requiresThreadAutoSettlement?: boolean;
@@ -87,6 +86,7 @@ export interface SettingsSearchAvailability {
   readonly managedTunnelActive?: boolean;
   readonly hasPeerLinkHost?: boolean;
   readonly hasFastWorktreeCheckoutEnvironment?: boolean;
+  readonly hasAgentFeedbackEnvironment?: boolean;
   /** An environment without a provider allow-list, which hides text generators. */
   readonly hasTextGeneratorsEnvironment?: boolean;
   readonly hasPrimaryEnvironment?: boolean;
@@ -97,7 +97,7 @@ export const SETTINGS_SECTION_LABELS: Readonly<Record<SettingsPath, string>> = {
   "/settings/diagnostics": msg("Diagnostics"),
   "/settings/projects": msg("Projects"),
   get "/settings/memory"() {
-    return uiText("Memory.");
+    return uiText("Memory settings");
   },
   "/settings/general": msg("General"),
   "/settings/appearance": msg("Appearance"),
@@ -158,6 +158,7 @@ const ALL_SETTINGS_NAV_GROUPS: ReadonlyArray<SettingsNavGroup> = [
     paths: [
       "/settings/providers",
       "/settings/threads",
+      "/settings/memory",
       "/settings/browser",
       "/settings/devices",
       "/settings/scheduled-tasks",
@@ -268,7 +269,7 @@ export const SETTINGS_SEARCH_ITEMS = [
   {
     id: "memory",
     get title() {
-      return uiText("Memory.");
+      return uiText("Memory settings");
     },
     to: "/settings/memory",
     searchTerms: ["memory", "long-term", "记忆", "待确认", "批准"],
@@ -619,6 +620,13 @@ export const SETTINGS_SEARCH_ITEMS = [
     to: "/settings/labs",
     scope: "environment",
     searchTerms: [msg("beta link another machine vps peer agents work there delegate")],
+  },
+  {
+    id: "workflows-beta",
+    title: msg("Workflows"),
+    to: "/settings/labs",
+    scope: "environment",
+    searchTerms: [msg("beta workflow durable runs automation steps schedule webhook folder")],
   },
   {
     id: "prompt-suggestions-beta",
@@ -1030,24 +1038,11 @@ export const SETTINGS_SEARCH_ITEMS = [
     searchTerms: [msg("about check for updates download install upgrade release")],
   },
   {
-    id: "update-track",
-    title: msg("Update track"),
-    to: "/settings/about",
-    searchTerms: [msg("release channel stable latest nightly prerelease")],
-    releaseChannelOnly: true,
-  },
-  {
     id: "cli-command",
-    title: msg("t3 command"),
+    title: msg("Command-line tool"),
     to: "/settings/about",
     searchTerms: [msg("cli terminal shell path install command line")],
     desktopOnly: true,
-  },
-  {
-    id: "mobile-app",
-    title: msg("Mobile app"),
-    to: "/settings/about",
-    searchTerms: [msg("phone tablet iPhone iPad iOS Android App Store Google Play QR")],
   },
   {
     id: "welcome-page",
@@ -1055,13 +1050,6 @@ export const SETTINGS_SEARCH_ITEMS = [
     to: "/settings/about",
     primaryEnvironmentOnly: true,
     searchTerms: [msg("onboarding setup first run getting started agents import projects")],
-  },
-  {
-    id: "telemetry-opt-in",
-    title: "Share anonymous usage data",
-    to: "/settings/about",
-    scope: "environment",
-    searchTerms: ["telemetry analytics usage statistics tracking privacy opt in off default"],
   },
   {
     id: "privacy-policy",
@@ -1082,6 +1070,16 @@ export const SETTINGS_SEARCH_ITEMS = [
     title: msg("Diagnostics"),
     to: "/settings/maintenance",
     searchTerms: [msg("logs traces processes resource history failures spans cpu memory")],
+  },
+  {
+    id: "agent-feedback",
+    title: msg("Agent feedback"),
+    to: "/settings/labs",
+    scope: "environment-defaults",
+    agentFeedbackOnly: true,
+    searchTerms: [
+      msg("report bug problem t3 team send feedback agents tools automatic when i ask"),
+    ],
   },
   {
     id: "open-source-licenses",
@@ -1280,7 +1278,7 @@ export const SETTINGS_SEARCH_ITEMS = [
   },
   {
     id: "pull-request-links-open-in-app",
-    title: msg("Open pull requests in T3 Code"),
+    title: msg("Open pull requests in Stardust"),
     to: "/settings/diffs",
     searchTerms: [
       `pr commit links ${SOURCE_CONTROL_HOST_LABELS} browser external click default pull request view panel`,
@@ -1646,6 +1644,7 @@ export function getSettingsSearchTargetScope(targetId: string) {
         title: item.title,
         scope: item.scope ?? SETTINGS_CATEGORY_SCOPES[item.to],
         ...(item.requiresThreadAutoSettlement ? { requiresThreadAutoSettlement: true } : {}),
+        ...(item.agentFeedbackOnly ? { agentFeedbackOnly: true } : {}),
       }
     : null;
 }
@@ -1734,6 +1733,7 @@ export function filterAvailableSettingsSearchItems(
       (!item.peerLinksOnly || availability.hasPeerLinkHost === true) &&
       (!item.fastWorktreeCheckoutOnly ||
         availability.hasFastWorktreeCheckoutEnvironment === true) &&
+      (!item.agentFeedbackOnly || availability.hasAgentFeedbackEnvironment === true) &&
       (!item.textGeneratorsOnly || availability.hasTextGeneratorsEnvironment === true) &&
       (!item.secretProvidersOnly || availability.hasSecretProvidersEnvironment === true),
   );
@@ -1747,7 +1747,6 @@ export function settingsForThisPlatform(
   return items.filter(
     (item) =>
       (isElectron || item.desktopOnly !== true) &&
-      (!item.releaseChannelOnly || isElectron || HOSTED_APP_CHANNEL !== null) &&
       (!item.macOnly || isMacPlatform(platform)) &&
       (!item.windowsOnly || isWindowsPlatform(platform)),
   );

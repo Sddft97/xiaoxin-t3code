@@ -11,12 +11,13 @@ import * as Result from "effect/Result";
 
 import { foldLatinDiacritics } from "./path.ts";
 
-export const WORKTREE_BRANCH_PREFIX = "t3";
+export const WORKTREE_BRANCH_PREFIX = "stardust";
+export const LEGACY_WORKTREE_BRANCH_PREFIX = "t3";
 const TEMP_WORKTREE_HEX_TOKEN = "[0-9a-f]{8}";
 const TEMP_WORKTREE_UUID_V4_TOKEN =
   "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
 const TEMP_WORKTREE_BRANCH_PATTERN = new RegExp(
-  `^(?:${WORKTREE_BRANCH_PREFIX}[-/]${TEMP_WORKTREE_HEX_TOKEN}|t3code(?:[-/]${TEMP_WORKTREE_HEX_TOKEN}|\\/${TEMP_WORKTREE_UUID_V4_TOKEN}))$`,
+  `^(?:(?:${WORKTREE_BRANCH_PREFIX}|${LEGACY_WORKTREE_BRANCH_PREFIX})[-/]${TEMP_WORKTREE_HEX_TOKEN}|t3code(?:[-/]${TEMP_WORKTREE_HEX_TOKEN}|\\/${TEMP_WORKTREE_UUID_V4_TOKEN}))$`,
 );
 
 export function sanitizeBranchFragment(raw: string): string {
@@ -110,12 +111,16 @@ export function buildTemporaryWorktreeBranchName(
   return `${WORKTREE_BRANCH_PREFIX}/${token}`;
 }
 
-/** Flatten temporary t3/<hex> refs because an existing t3 branch blocks nested refs. */
+/** Flatten a temporary ref when a branch with its prefix blocks nested refs. */
 export function flattenTemporaryWorktreeBranchName(refName: string): string {
   const normalized = refName.trim().toLowerCase();
   const tokenStart = normalized.search(/[-/]/) + 1;
   const token = normalized.slice(tokenStart, tokenStart + 8);
-  return `${WORKTREE_BRANCH_PREFIX}-${token}`;
+  const prefix =
+    normalized.slice(0, tokenStart - 1) === WORKTREE_BRANCH_PREFIX
+      ? WORKTREE_BRANCH_PREFIX
+      : LEGACY_WORKTREE_BRANCH_PREFIX;
+  return `${prefix}-${token}`;
 }
 
 export function isTemporaryWorktreeBranch(refName: string): boolean {

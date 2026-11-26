@@ -184,6 +184,35 @@ describe("buildThreadActionItems", () => {
     expect(runThread).toHaveBeenCalledWith(remote);
   });
 
+  it("builds only the twelve most recently used rows for the idle palette", () => {
+    const threads = Array.from({ length: 16 }, (_, index) => {
+      const lastMessage = new Date(Date.UTC(2026, 2, index + 1)).toISOString();
+      return makeThread({
+        id: ThreadId.make(`thread-${index}`),
+        latestUserMessageAt: lastMessage,
+        latestUserAuthoredMessageAt: lastMessage,
+      });
+    });
+    const renderDescription = vi.fn(() => "Project");
+    const items = buildThreadActionItems({
+      threads,
+      activeThread: threads[15]!,
+      recentOnly: true,
+      projectByKey: new Map(),
+      icon: null,
+      renderDescription,
+      runThread: async () => undefined,
+    });
+
+    expect(items.map((item) => item.threadRef?.threadId)).toEqual(
+      threads
+        .slice(3, 15)
+        .reverse()
+        .map((thread) => thread.id),
+    );
+    expect(renderDescription).toHaveBeenCalledTimes(12);
+  });
+
   it("ranks thread title matches ahead of contextual project-name matches", () => {
     const threadItems = buildThreadActionItems({
       threads: [

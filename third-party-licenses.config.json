@@ -257,6 +257,12 @@
   ],
   "packageOverrides": [
     {
+      "name": "heic-to",
+      "version": "1.5.2",
+      "sourceUrl": "https://github.com/hoppergee/heic-to",
+      "noticeFile": "third-party-licenses/heic-to-1.5.2.txt"
+    },
+    {
       "name": "entities",
       "version": "8.1.0",
       "license": "BSD-2-Clause",

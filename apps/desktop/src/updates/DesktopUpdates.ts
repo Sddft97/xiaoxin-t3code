@@ -1436,13 +1436,13 @@ export const make = Effect.gen(function* () {
       if (stardustFeed !== undefined && nextChannel !== "latest") {
         return yield* new DesktopUpdateChannelManagedError({
           channel: nextChannel,
-          policyMessage: "T3 Stardust only offers stable releases.",
+          policyMessage: "Stardust only offers stable releases.",
         });
       }
       if (Option.isSome(channelBlockedReason(nextChannel))) {
         return yield* new DesktopUpdateChannelManagedError({
           channel: nextChannel,
-          policyMessage: policy.message ?? "Your administrator manages T3 Code updates.",
+          policyMessage: policy.message ?? "Your administrator manages Stardust updates.",
         });
       }
       // A background check holds the updater only briefly, so wait it out instead of refusing.

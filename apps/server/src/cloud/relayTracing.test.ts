@@ -30,15 +30,17 @@ const tracesTo = (policy?: ManagedPolicyDocument) =>
     Effect.map(Option.isSome),
   );
 
-it.effect("a policy with telemetry off stops relay tracing to T3 Connect", () =>
-  Effect.gen(function* () {
-    assert.isTrue(yield* tracesTo());
-    assert.isFalse(
-      yield* tracesTo({
-        schemaVersion: 1,
-        organization: "Example Corp",
-        limits: { telemetry: false },
-      }),
-    );
-  }),
+it.effect(
+  "Stardust has no relay exporter even with relay credentials and a permissive policy",
+  () =>
+    Effect.gen(function* () {
+      assert.isFalse(yield* tracesTo());
+      assert.isFalse(
+        yield* tracesTo({
+          schemaVersion: 1,
+          organization: "Example Corp",
+          limits: { telemetry: false },
+        }),
+      );
+    }),
 );

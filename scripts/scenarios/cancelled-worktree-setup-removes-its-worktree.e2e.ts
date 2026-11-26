@@ -19,6 +19,7 @@ test(
     const project = await t3.project("demo");
     const git = (...args: ReadonlyArray<string>) =>
       runPromise(run("git", args, { cwd: project })).then(({ stdout }) => stdout);
+    const branchesBefore = await git("branch", "--list");
     const connected = Promise.withResolvers<void>();
     const sockets = new Set<NodeNet.Socket>();
     const server = NodeNet.createServer((socket) => {
@@ -88,6 +89,6 @@ test(
         async () => (await git("worktree", "list", "--porcelain")).match(/^worktree /gm)?.length,
       )
       .toBe(1);
-    await expect.poll(() => git("branch", "--list", "t3/*")).toBe("");
+    await expect.poll(() => git("branch", "--list")).toBe(branchesBefore);
   },
 );

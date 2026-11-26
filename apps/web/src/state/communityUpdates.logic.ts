@@ -1,9 +1,12 @@
 import type { DesktopBridge, DesktopUpdateState } from "@t3tools/contracts";
 import { uiText } from "../i18n";
 /** Community releases are independent of upstream Electron version numbers. */
-/** The community release this build ships as. Bump with every public release. */
-export const COMMUNITY_BASE_TAG = "v1.2.3";
-export const COMMUNITY_REPOSITORY = "zds-xiaoxin/xiaoxin-t3code";
+// Earlier Mac builds stamp only their app resources, so keep their source fallback.
+const bundledVersion = import.meta.env.APP_VERSION ?? "";
+export const COMMUNITY_BASE_TAG = /^[1-9]\d*\.\d+\.\d+$/.test(bundledVersion)
+  ? `v${bundledVersion}`
+  : "v1.2.4";
+export const COMMUNITY_REPOSITORY = "Sddft97/xiaoxin-t3code";
 export const COMMUNITY_RELEASES_URL = `https://github.com/${COMMUNITY_REPOSITORY}/releases`;
 export const COMMUNITY_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 export type CommunityUpdateMode = "standard" | "custom";
@@ -41,6 +44,8 @@ function expectedMacAssetNames(tag: string, number: number): ReadonlyArray<strin
   // Published assets keep the tag's "v" (T3-Stardust-v1.2.1-macOS-arm64.zip).
   if (semver)
     return [
+      `Stardust-v${semver[1]}-macOS-arm64.zip`,
+      `Stardust-${semver[1]}-macOS-arm64.zip`,
       `T3-Stardust-v${semver[1]}-macOS-arm64.zip`,
       `T3-Stardust-${semver[1]}-macOS-arm64.zip`,
     ];
@@ -75,6 +80,10 @@ export function parseCommunityRelease(value: unknown): CommunityRelease {
       uiText("No complete, verifiable Mac Apple Silicon build is available for this release"),
     );
   // Construct trusted URLs; do not follow arbitrary URLs supplied by a response.
+  return communityReleaseFromTag(tag, number);
+}
+
+export function communityReleaseFromTag(tag: string, number: number): CommunityRelease {
   return {
     tag,
     number,
@@ -83,7 +92,7 @@ export function parseCommunityRelease(value: unknown): CommunityRelease {
   };
 }
 /**
- * `canSelfUpdate`: the desktop app can install releases itself (T3 Stardust's macOS updater).
+ * `canSelfUpdate`: the desktop app can install releases itself (Stardust's desktop updater).
  * Source mode never installs, since replacing the app can overwrite a customized fork.
  */
 export function communityUpdateActions(mode: CommunityUpdateMode, canSelfUpdate = false) {
@@ -94,7 +103,7 @@ export function communityUpdateActions(mode: CommunityUpdateMode, canSelfUpdate 
   };
 }
 
-/** True when the desktop shell runs its own updater, which Stardust builds only do on macOS. */
+/** True when the desktop shell runs its own updater, on a supported platform. */
 export function desktopCanSelfUpdate(state: DesktopUpdateState | null): boolean {
   return state !== null && state.enabled && state.status !== "disabled";
 }

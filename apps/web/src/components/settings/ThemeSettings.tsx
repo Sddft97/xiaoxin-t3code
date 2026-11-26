@@ -1,6 +1,6 @@
 import { uiText } from "~/i18n";
 
-import { SKIN_THEMES } from "@t3tools/shared/themePalettes";
+import { DESKTOP_THEMES } from "@t3tools/shared/themePalettes";
 
 import {
   CheckIcon,
@@ -26,11 +26,6 @@ import {
   type ThemeAppearance,
   type ThemeDefinition,
   type ThemeHalves,
-  T3_CHAT_THEME,
-  EMBER_THEME,
-  GROVE_THEME,
-  IRIS_THEME,
-  OCEAN_THEME,
 } from "../../themePalette";
 import {
   AlertDialog,
@@ -57,16 +52,8 @@ import {
   type ThemeMode,
 } from "./ThemePreviewCircles";
 import { ThemeWireframe } from "./ThemeWireframe";
-import { T, useGT } from "gt-react";
+import { T, useGT, useLocale } from "gt-react";
 
-const MAINTAINER_THEMES: ReadonlyArray<ThemeDefinition> = [
-  ...SKIN_THEMES,
-  T3_CHAT_THEME,
-  GROVE_THEME,
-  OCEAN_THEME,
-  EMBER_THEME,
-  IRIS_THEME,
-];
 function collectionVariantLabels(themes: ReadonlyArray<ThemeDefinition>): ReadonlyArray<string> {
   if (themes.length === 0) return [];
   const words = themes.map((theme) => theme.label.trim().split(/\s+/));
@@ -651,6 +638,7 @@ export function ThemeLibrary({
     }
     setIsThemeRemovalOpen(false);
   };
+  const locale = useLocale();
   const baseCardId = getThemeDefinition(theme)?.id ?? null;
   const lightOwner = themeHalves?.light ?? baseCardId;
   const darkOwner = themeHalves?.dark ?? baseCardId;
@@ -677,7 +665,7 @@ export function ThemeLibrary({
   const cardDefById = (id: string | null): ThemeCardDefinition => {
     if (id === null) return STANDARD_THEME_CARDS[0]!;
     const definition = getThemeDefinition(id);
-    return definition ? getThemeCardDefinition(definition) : STANDARD_THEME_CARDS[0]!;
+    return definition ? getThemeCardDefinition(definition, locale) : STANDARD_THEME_CARDS[0]!;
   };
   const pickColors = (id: string | null, appearance: ThemeAppearance) => {
     const card = cardDefById(id);
@@ -769,26 +757,8 @@ export function ThemeLibrary({
         className="grid w-full gap-2"
         style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 16rem), 1fr))" }}
       >
-        {STANDARD_THEME_CARDS.map((standardTheme) => (
-          <ThemeLibraryCard
-            activeModes={pickedModesFor(null)}
-            isActive={false}
-            key={standardTheme.id}
-            onDuplicate={() =>
-              openThemeEditor({
-                editingThemeId: null,
-                seedThemeId: null,
-                seedName: `${standardTheme.label} copy`,
-                initialAppearance,
-              })
-            }
-            onUse={() => persistTheme(appearanceMode === "system" ? "system" : appearanceMode)}
-            onUseMode={handlePairPick(null)}
-            theme={standardTheme}
-          />
-        ))}
-        {MAINTAINER_THEMES.map((maintainerTheme) => {
-          const card = getThemeCardDefinition(maintainerTheme);
+        {DESKTOP_THEMES.map((maintainerTheme) => {
+          const card = getThemeCardDefinition(maintainerTheme, locale);
           return (
             <ThemeLibraryCard
               activeModes={pickedModesFor(maintainerTheme.id)}
@@ -798,7 +768,7 @@ export function ThemeLibrary({
                 openThemeEditor({
                   editingThemeId: null,
                   seedThemeId: maintainerTheme.id,
-                  seedName: `${maintainerTheme.label} copy`,
+                  seedName: `${card.label} copy`,
                   initialAppearance,
                 })
               }

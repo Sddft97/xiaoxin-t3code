@@ -13,6 +13,7 @@ import * as SecureRandom from "effect/crypto/SecureRandom";
 import * as ManagedPolicy from "../policy/ManagedPolicy.ts";
 import { listManageableSettings } from "../policy/managedSettings.ts";
 import { macosProfile, windowsAdml, windowsAdmx } from "../policy/policyTemplates.ts";
+import { expandHomePath } from "../os-jank.ts";
 import { isProcessAlive, readPersistedServerRuntimeState } from "../serverRuntimeState.ts";
 import { projectLocationFlags, resolveCliAuthConfig } from "./config.ts";
 
@@ -48,7 +49,7 @@ export const describeRunningServer = Effect.fn("cli.policy.describeRunningServer
 ) {
   const state = yield* readPersistedServerRuntimeState(statePath);
   if (Option.isNone(state) || !isProcessAlive(state.value.pid)) {
-    return "No T3 Code server is running from this T3 home. The installed policy applies when one starts.";
+    return "No Stardust server is running from this Stardust home. The installed policy applies when one starts.";
   }
   const { pid, startedAt, managedPolicy: loaded } = state.value;
   const server = `The running server (pid ${pid}, started ${startedAt})`;
@@ -64,7 +65,7 @@ export const describeRunningServer = Effect.fn("cli.policy.describeRunningServer
     loaded === null
       ? "no policy"
       : `${loaded.organization}'s policy from ${loaded.source} (fingerprint ${loaded.fingerprint})`;
-  return `${server} loaded ${what}. Restart T3 Code to apply the installed policy.`;
+  return `${server} loaded ${what}. Restart Stardust to apply the installed policy.`;
 });
 
 const showCommand = Command.make("show", projectLocationFlags).pipe(
@@ -132,13 +133,14 @@ const templatesCommand = Command.make("templates", {
       const path = yield* Path.Path;
       let document = SAMPLE_POLICY;
       if (Option.isSome(policy)) {
-        if (!(yield* fs.exists(policy.value))) {
+        const file = yield* expandHomePath(policy.value);
+        if (!(yield* fs.exists(file))) {
           return yield* new CliError.UserError({
             cause: policy.value,
             userMessage: `No policy file at ${policy.value}.`,
           });
         }
-        const loaded = (yield* ManagedPolicy.load(policy.value)).document;
+        const loaded = (yield* ManagedPolicy.load(file)).document;
         if (loaded !== undefined) document = loaded;
       }
       const random = yield* SecureRandom.SecureRandom;

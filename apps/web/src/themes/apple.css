@@ -1,5 +1,5 @@
 /* All material overrides disappear when another palette is selected. */
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
   --surface-grain: none;
   --radius: 0.75rem;
@@ -33,7 +33,7 @@ html:root[data-theme-id="apple"] {
   --liquid-highlight: transparent;
   --liquid-shadow: var(--apple-card-shadow);
 }
-html:root[data-theme-id="apple"].dark {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark {
   --success: #30d158;
   --success-foreground: #30d158;
   --info: #ff6734;
@@ -48,7 +48,7 @@ html:root[data-theme-id="apple"].dark {
   --apple-slider: #636366;
   --apple-card-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.07), 0 6px 18px rgba(0, 0, 0, 0.35);
 }
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   body {
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -362,7 +362,7 @@ html:root[data-theme-id="apple"] {
   }
 }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
-  html:root[data-theme-id="apple"] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
     [data-slot="sidebar-inner"],
     [data-slot="sheet-popup"][data-sidebar="sidebar"] {
       background: var(--apple-secondary);
@@ -373,7 +373,7 @@ html:root[data-theme-id="apple"] {
 }
 
 /* The editable surface delegates its focus indication to the rounded card. */
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   [data-slot="composer-host"] {
     transition:
       box-shadow 0.25s cubic-bezier(0.3, 0.7, 0.2, 1),
@@ -420,21 +420,21 @@ html:root[data-theme-id="apple"] {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  html:root[data-theme-id="apple"] [data-slot="composer-host"] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-slot="composer-host"] {
     transition: none;
   }
 }
 
-html:root[data-theme-id="apple"] [data-inspector-tab-slider] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-inspector-tab-slider] {
   transition: transform 0.32s cubic-bezier(0.3, 0.7, 0.2, 1);
 }
 @media (prefers-reduced-motion: reduce) {
-  html:root[data-theme-id="apple"] [data-inspector-tab-slider] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-inspector-tab-slider] {
     transition: none;
   }
 }
 
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   --apple-capsule-shadow:
     0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05),
     0 8px 20px -8px rgba(0, 0, 0, 0.12);
@@ -543,38 +543,40 @@ html:root[data-theme-id="apple"] {
       opacity 170ms ease;
   }
 }
-html:not([data-theme-id="apple"]) [data-layout-thumb] {
+html:not(:is([data-theme-id="apple"], [data-theme-id="stardust"])) [data-layout-thumb] {
   display: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  html:root[data-theme-id="apple"] [data-layout-thumb],
-  html:root[data-theme-id="apple"] [data-liquid-quota-popup] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-layout-thumb],
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-liquid-quota-popup] {
     transition: none;
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  html:root[data-theme-id="apple"] [data-panel-layout-controls],
-  html:root[data-theme-id="apple"] [data-quota-topbar] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-panel-layout-controls],
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-quota-topbar] {
     background: rgba(255, 255, 255, 0.96);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
-  html:root[data-theme-id="apple"].dark [data-panel-layout-controls],
-  html:root[data-theme-id="apple"].dark [data-quota-topbar] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark
+    [data-panel-layout-controls],
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark [data-quota-topbar] {
     background: rgba(28, 28, 30, 0.96);
   }
 }
 
 /* The floating 100px control capsule sits 7px beyond the chat header edge. */
 @media (min-width: 768px) {
-  html:root[data-theme-id="apple"] [data-liquid-chat-header][data-right-panel-open="false"] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-liquid-chat-header][data-right-panel-open="false"] {
     padding-right: calc(100px + 8px - 7px);
   }
 }
 
 /* V9 Plan A quiet topbar mode: healthy accounts (>20%) show thin ring + short name only; <=20% reveals amber percentage. */
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   [data-quota-topbar]
   [data-quota-id]:not([data-low]):not([data-stale])
   [class*="quota-chip-value"] {
@@ -582,23 +584,28 @@ html:root[data-theme-id="apple"]
 }
 
 /* Narrow-composer responsive guard: collapse context pill text to ring-only when right sidebar/browser squeezes width. */
-html:root[data-theme-id="apple"] [data-slot="composer-host"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-slot="composer-host"] {
   container-type: inline-size;
   container-name: composer-card;
 }
 @container composer-card (max-width: 460px) {
-  html:root[data-theme-id="apple"] [data-composer-leading] [data-composer-control-label],
-  html:root[data-theme-id="apple"] [data-composer-leading] span:not(:has(svg)) {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-composer-leading]
+    [data-composer-control-label],
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-composer-leading]
+    span:not(:has(svg)) {
     display: none;
   }
 }
 
 /* External centered SessionStatsBar + Gemini-style feathered bottom dock scrim + Apple spring popovers. */
-html:root[data-theme-id="apple"] [data-session-stats-dock] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-session-stats-dock] {
   position: relative;
   padding-top: 4px;
 }
-html:root[data-theme-id="apple"] [data-session-stats-dock]::before {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-session-stats-dock]::before {
   content: "";
   position: absolute;
   inset: -20px -16px -8px -16px;
@@ -611,21 +618,23 @@ html:root[data-theme-id="apple"] [data-session-stats-dock]::before {
     var(--background) 100%
   );
 }
-html:root[data-theme-id="apple"] [data-session-stats] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-session-stats] {
   position: relative;
   border-top: 0;
 }
-html:root[data-theme-id="apple"] [data-session-stats-popup] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-session-stats-popup] {
   transform-origin: bottom center;
   transition:
     transform 220ms cubic-bezier(0.32, 0.72, 0, 1),
     opacity 160ms ease;
 }
-html:root[data-theme-id="apple"] [data-session-stats-popup][data-starting-style] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-session-stats-popup][data-starting-style] {
   opacity: 0;
   transform: translateY(6px) scale(0.94);
 }
-html:root[data-theme-id="apple"] [data-session-stats-popup][data-ending-style] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-session-stats-popup][data-ending-style] {
   opacity: 0;
   transform: translateY(6px) scale(0.94);
   transition:
@@ -634,35 +643,40 @@ html:root[data-theme-id="apple"] [data-session-stats-popup][data-ending-style] {
 }
 
 /* Redesigned V8 thin-line permission pills in composer footer (Auto / Supervised). */
-html:root[data-theme-id="apple"] [data-composer-perm-mode="auto"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-composer-perm-mode="auto"] {
   border-radius: 999px;
   padding-inline: 9px;
   background: color-mix(in srgb, #007aff 12%, transparent);
   color: #0066d6;
   box-shadow: inset 0 0 0 0.5px color-mix(in srgb, #007aff 28%, transparent);
 }
-html:root[data-theme-id="apple"] [data-composer-perm-mode="auto"]:hover {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-composer-perm-mode="auto"]:hover {
   background: color-mix(in srgb, #007aff 18%, transparent);
 }
-html:root[data-theme-id="apple"] [data-composer-perm-mode="approval-required"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-composer-perm-mode="approval-required"] {
   border-radius: 999px;
   padding-inline: 9px;
   background: color-mix(in srgb, #ff9500 13%, transparent);
   color: #b86200;
   box-shadow: inset 0 0 0 0.5px color-mix(in srgb, #ff9500 32%, transparent);
 }
-html:root[data-theme-id="apple"] [data-composer-perm-mode="approval-required"]:hover {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-composer-perm-mode="approval-required"]:hover {
   background: color-mix(in srgb, #ff9500 20%, transparent);
 }
-html:root[data-theme-id="apple"] [data-composer-perm-mode] svg {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-composer-perm-mode] svg {
   color: currentColor;
 }
-html:root[data-theme-id="apple"].dark [data-composer-perm-mode="auto"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark
+  [data-composer-perm-mode="auto"] {
   background: color-mix(in srgb, #0a84ff 18%, transparent);
   color: #64b5ff;
   box-shadow: inset 0 0 0 0.5px color-mix(in srgb, #0a84ff 34%, transparent);
 }
-html:root[data-theme-id="apple"].dark [data-composer-perm-mode="approval-required"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark
+  [data-composer-perm-mode="approval-required"] {
   background: color-mix(in srgb, #ff9f0a 16%, transparent);
   color: #ffb340;
   box-shadow: inset 0 0 0 0.5px color-mix(in srgb, #ff9f0a 34%, transparent);

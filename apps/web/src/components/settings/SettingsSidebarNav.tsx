@@ -12,6 +12,7 @@ import {
   ArchiveIcon,
   FlaskConicalIcon,
   BotIcon,
+  BrainIcon,
   createLucideIcon,
   CalendarClockIcon,
   FileDiffIcon,
@@ -66,6 +67,7 @@ import {
   useHasSecretProvidersEnvironment,
 } from "./useAvailableSettingsSearchItems";
 import { handleSettingsSectionKeyDown } from "./settingsSectionNavigation";
+import { useEnvironments } from "../../state/environments";
 import { workspaceAreaProps } from "../../lib/workspaceFocus";
 
 const SnapShotIcon = createLucideIcon("snap-shot", [
@@ -107,7 +109,7 @@ const SETTINGS_SECTION_ICONS: Readonly<
   "/settings/keybindings": KeyboardIcon,
   "/settings/snap-shot": SnapShotIcon,
   "/settings/providers": BotIcon,
-  "/settings/memory": MessagesSquareIcon,
+  "/settings/memory": BrainIcon,
   "/settings/threads": MessagesSquareIcon,
   "/settings/browser": GlobeIcon,
   "/settings/devices": SmartphoneIcon,
@@ -154,6 +156,12 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
   const [compactSearchOpen, setCompactSearchOpen] = useState(false);
   const [activeResultIndex, setActiveResultIndex] = useState(0);
   const searchableItems = useAvailableSettingsSearchItems();
+  const { environments } = useEnvironments();
+  const pendingMemoryCount = environments.reduce(
+    (count, environment) =>
+      count + (environment.serverConfig?.settings.memory?.pending.length ?? 0),
+    0,
+  );
   const navGroups = settingsNavGroups(useHasSecretProvidersEnvironment());
   const results = searchSettings(query, searchableItems, m);
   const isSearching = query.trim().length > 0;
@@ -421,8 +429,15 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
                                       !compactSearchOpen && "max-md:sr-only",
                                     )}
                                   >
-                                    {m(SETTINGS_NAV_LABELS[to])}
+                                    {to === "/settings/memory"
+                                      ? uiText("Memory settings")
+                                      : m(SETTINGS_NAV_LABELS[to])}
                                   </span>
+                                  {to === "/settings/memory" && pendingMemoryCount > 0 ? (
+                                    <span className="ml-auto rounded-full bg-annotation/15 px-1.5 text-xs text-annotation tabular-nums max-md:hidden">
+                                      {pendingMemoryCount}
+                                    </span>
+                                  ) : null}
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
                             );

@@ -1,4 +1,5 @@
 import { uiText } from "../../i18n";
+import { useUiText } from "../../i18n/useUiText";
 import { useEffect } from "react";
 import { isElectron } from "../../env";
 import { useStardustStats } from "../../state/stardustStats";
@@ -24,9 +25,9 @@ export function StardustStatsCoordinator() {
           const id = toastManager.add({
             type: "info",
             timeout: 30_000,
-            title: uiText("T3 Stardust counts active users anonymously"),
+            title: uiText("Stardust counts active users anonymously"),
             description: uiText(
-              "Once a day it sends a random install ID, the app version and your system type. No chats, accounts, projects or IP addresses are stored. You can turn it off any time in Settings → About.",
+              "Once a day it sends a random install ID, app version, OS type and CPU architecture. No chats, accounts, projects or IP addresses are stored. You can turn it off any time in Settings → About.",
             ),
             actionProps: {
               children: uiText("Turn off"),
@@ -56,17 +57,18 @@ export function StardustStatsCoordinator() {
 }
 
 export function StardustStatsRow() {
+  const copy = useUiText();
   const enabled = useStardustStats((s) => s.enabled);
   const setEnabled = useStardustStats((s) => s.setEnabled);
   return (
     <SettingsRow
-      title={uiText("Count me as an active Stardust user")}
-      description={uiText(
-        "On by default. Once a day sends a random install ID, the app version and your system type to xiaoxin666.cn so the author knows how many people use T3 Stardust. No chats, accounts, projects or IP addresses are stored.",
+      title={copy("Count me as an active Stardust user")}
+      description={copy(
+        "On by default. Sends a random install ID, app version, OS type and CPU architecture to xiaoxin666.cn once a day.",
       )}
       control={
         <Switch
-          aria-label={uiText("Count me as an active Stardust user")}
+          aria-label={copy("Count me as an active Stardust user")}
           checked={enabled}
           onCheckedChange={(checked) => setEnabled(Boolean(checked))}
         />

@@ -14,13 +14,14 @@ import { msg } from "gt-i18n";
 import { type DesktopSnapShotEvent, DEFAULT_CLIENT_SETTINGS } from "@t3tools/contracts";
 
 import * as DesktopAssets from "../app/DesktopAssets.ts";
+import * as DesktopClerk from "../app/DesktopClerk.ts";
 import * as DesktopEnvironment from "../app/DesktopEnvironment.ts";
 import * as DesktopPrimaryPaste from "../app/DesktopPrimaryPaste.ts";
 import { makeComponentLogger } from "../app/DesktopObservability.ts";
 import * as DesktopState from "../app/DesktopState.ts";
 import * as ElectronMenu from "../electron/ElectronMenu.ts";
 import * as ElectronDialog from "../electron/ElectronDialog.ts";
-import { getDesktopUrl } from "../electron/ElectronProtocol.ts";
+import { getDesktopOrigin, getDesktopUrl } from "../electron/ElectronProtocol.ts";
 import * as ElectronShell from "../electron/ElectronShell.ts";
 import * as ElectronTheme from "../electron/ElectronTheme.ts";
 import * as ElectronWindow from "../electron/ElectronWindow.ts";
@@ -45,6 +46,8 @@ import { m } from "../i18n/messages.ts";
 import * as DesktopRendererHistory from "../telemetry/DesktopRendererHistory.ts";
 import { makeQuitShortcutHandler } from "./QuitHold.ts";
 import { copyContextMenuImage } from "./ContextMenuImage.ts";
+import { installMainWindowRemoteRequestHeaderPolicy } from "./RemoteRequestHeaders.ts";
+import { WINDOWS_MICA_ARGUMENT, windowsMicaSupported } from "./WindowsWindowProfile.ts";
 
 const TITLEBAR_HEIGHT = 40;
 
@@ -286,10 +289,10 @@ function buildConnectingSplashDataUrl(
   const track = shouldUseDarkColors ? "rgba(248,250,252,0.18)" : "rgba(31,41,55,0.18)";
   const message =
     mode === "closing"
-      ? "Closing T3 Code…"
+      ? "Closing Stardust…"
       : mode === "wsl"
         ? "Connecting to WSL…"
-        : "Starting T3 Code…";
+        : "Starting Stardust…";
   const detail =
     mode === "closing"
       ? "Stopping local services. Running local tasks will be interrupted."
@@ -375,13 +378,21 @@ function syncWindowAppearance(
   hasTitleBarOverlay: boolean,
   shouldUseDarkColors: boolean,
   platform: NodeJS.Platform,
+  micaSupported: boolean,
 ): Effect.Effect<void> {
   return Effect.sync(() => {
     if (window.isDestroyed()) {
       return;
     }
 
-    window.setBackgroundColor(getInitialWindowBackgroundColor(shouldUseDarkColors));
+    const useMica =
+      micaSupported && hasTitleBarOverlay && !Electron.nativeTheme.prefersReducedTransparency;
+    window.setBackgroundColor(
+      useMica ? "#00000000" : getInitialWindowBackgroundColor(shouldUseDarkColors),
+    );
+    if (micaSupported && hasTitleBarOverlay) {
+      window.setBackgroundMaterial(useMica ? "mica" : "none");
+    }
     const { titleBarOverlay } = getWindowTitleBarOptions(shouldUseDarkColors, platform);
     if (hasTitleBarOverlay && typeof titleBarOverlay === "object") {
       window.setTitleBarOverlay(titleBarOverlay);
@@ -409,6 +420,7 @@ function bindFirstRevealTrigger(
 /** @public */
 export const make = Effect.gen(function* () {
   const environment = yield* DesktopEnvironment.DesktopEnvironment;
+  const micaSupported = windowsMicaSupported(environment.platform);
   const desktopState = yield* DesktopState.DesktopState;
   const assets = yield* DesktopAssets.DesktopAssets;
   const electronMenu = yield* ElectronMenu.ElectronMenu;
@@ -435,6 +447,7 @@ export const make = Effect.gen(function* () {
     Effect.suspend(() => pendingMainReveals.get(window) ?? electronWindow.reveal(window)),
   );
   let flushMainWindowBounds: Effect.Effect<void> = Effect.void;
+  let remoteRequestHeaderOwner: Electron.BrowserWindow | null = null;
 
   const dismissConnectingSplash = Effect.gen(function* () {
     const splash = yield* Ref.getAndSet(splashWindowRef, Option.none());
@@ -502,6 +515,7 @@ export const make = Effect.gen(function* () {
       yield* logWindowWarning("saved main window bounds could not be restored; using defaults");
     }
     if (yield* Ref.get(desktopState.quitting)) return Option.none();
+    const useMica = micaSupported && !Electron.nativeTheme.prefersReducedTransparency;
     const window = yield* electronWindow.create({
       ...initialBounds,
       minWidth: DesktopAppSettings.MIN_MAIN_WINDOW_SIZE.width,
@@ -509,12 +523,15 @@ export const make = Effect.gen(function* () {
       show: false,
       autoHideMenuBar: true,
       ...(environment.platform === "darwin" ? { disableAutoHideCursor: true } : {}),
-      backgroundColor: getInitialWindowBackgroundColor(shouldUseDarkColors),
+      ...(useMica
+        ? { backgroundMaterial: "mica" as const, backgroundColor: "#00000000" }
+        : { backgroundColor: getInitialWindowBackgroundColor(shouldUseDarkColors) }),
       ...iconOption,
       title: environment.displayName,
       ...getWindowTitleBarOptions(shouldUseDarkColors, environment.platform),
       webPreferences: {
         preload: environment.preloadPath,
+        ...(micaSupported ? { additionalArguments: [WINDOWS_MICA_ARGUMENT] } : {}),
         // Hidden-renderer throttling stalls first paint; re-enable it after the first reveal.
         backgroundThrottling: false,
         contextIsolation: true,
@@ -1063,6 +1080,19 @@ export const make = Effect.gen(function* () {
 
     // Desktop IPC only answers the main window, so register it before its renderer can call in.
     yield* electronWindow.setMain(window);
+    remoteRequestHeaderOwner = window;
+    const detachRemoteRequestHeaders = installMainWindowRemoteRequestHeaderPolicy(
+      window.webContents.session,
+      {
+        desktopOrigin: getDesktopOrigin(environment.isDevelopment),
+        mainWebContentsId: window.webContents.id,
+        clerkFrontendApiHostname: DesktopClerk.desktopClerkFrontendApiHostname,
+        devServerOrigin: Option.getOrUndefined(
+          Option.map(environment.devServerUrl, (url) => url.origin),
+        ),
+        isDevelopment: environment.isDevelopment,
+      },
+    );
     loadApplication();
     if (environment.isDevelopment) {
       window.webContents.openDevTools({ mode: "detach" });
@@ -1072,6 +1102,10 @@ export const make = Effect.gen(function* () {
       if (!backendHasStarted) mainClosedDuringStartup = true;
       clearDevelopmentLoadRetry();
       clearBoundsPersist();
+      if (remoteRequestHeaderOwner === window) {
+        remoteRequestHeaderOwner = null;
+        detachRemoteRequestHeaders();
+      }
       void runPromise(electronWindow.clearMain(Option.some(window)));
     });
 
@@ -1273,8 +1307,8 @@ export const make = Effect.gen(function* () {
             title: "Drafts are not saved",
             message: "Quit without saving draft changes?",
             detail:
-              "Keep T3 Code open to retry saving or export drafts from the composer. Quitting now can lose unsaved input and attachments.",
-            buttons: ["Keep T3 Code open", "Quit without saving"],
+              "Keep Stardust open to retry saving or export drafts from the composer. Quitting now can lose unsaved input and attachments.",
+            buttons: ["Keep Stardust open", "Quit without saving"],
             defaultId: 0,
             cancelId: 0,
             noLink: true,
@@ -1327,7 +1361,13 @@ export const make = Effect.gen(function* () {
     syncAppearance: Effect.gen(function* () {
       const shouldUseDarkColors = yield* electronTheme.shouldUseDarkColors;
       yield* electronWindow.syncAllAppearance((window, { titleBarOverlay }) =>
-        syncWindowAppearance(window, titleBarOverlay, shouldUseDarkColors, environment.platform),
+        syncWindowAppearance(
+          window,
+          titleBarOverlay,
+          shouldUseDarkColors,
+          environment.platform,
+          micaSupported,
+        ),
       );
     }).pipe(Effect.withSpan("desktop.window.syncAppearance")),
   });

@@ -108,3 +108,36 @@ it("reads sharing codes from structured errors and exact turn details", () => {
     assert.deepInclude(classifyCodexManagedError(value), { code, usageLimit: true });
   }
 });
+
+it("preserves sharing diagnostics through HTTP wrappers and classifies only known generic input messages", () => {
+  const code = "subscription_sharing_unsupported_capability";
+  const detail = JSON.stringify({
+    error: { code, param: "input", message: "Cannot use agent_message in input." },
+  });
+  assert.deepInclude(
+    classifyCodexManagedError({
+      error: {
+        data: {
+          additionalDetails: `unexpected status 400 Bad Request: ${detail}, url: https://api.openai.com/v1/responses`,
+        },
+      },
+    }),
+    { code, codexSharing: { param: "input", reason: "history" } },
+  );
+  const generic =
+    "Remove unsupported input items. Supported input items include message and additional tools.";
+  assert.isUndefined(classifyCodexManagedError(generic));
+  assert.deepInclude(classifyCodexManagedError(generic, true), {
+    code,
+    codexSharing: { reason: "unknown" },
+  });
+  assert.isUndefined(
+    classifyCodexManagedError("unexpected status 400 Bad Request: invalid prompt", true),
+  );
+  assert.deepInclude(
+    classifyCodexManagedError({
+      error: { code, param: "tools", message: "tool 'namespace' is not supported" },
+    }),
+    { code, codexSharing: { param: "tools", reason: "namespace" } },
+  );
+});

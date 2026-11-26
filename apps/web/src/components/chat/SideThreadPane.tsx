@@ -8,7 +8,7 @@ import {
 } from "@t3tools/client-runtime/state/runtime";
 import { AuthOrchestrationOperateScope, type ScopedThreadRef } from "@t3tools/contracts";
 import { threadContextRecord } from "@t3tools/shared/composerContextReferences";
-import { T, useGT } from "gt-react";
+import { useUiText } from "~/i18n/useUiText";
 import { Trash2Icon, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -49,7 +49,7 @@ export default function SideThreadPane(props: {
 }) {
   const { parentRef, surface } = props;
   const { threadId } = surface;
-  const gt = useGT();
+  const text = useUiText();
   const threadRef = scopeThreadRef(parentRef.environmentId, threadId);
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- registers the parent panel as host in the panel store
   useEffect(
@@ -101,8 +101,8 @@ export default function SideThreadPane(props: {
       const confirmed = await settlePromise(() =>
         api.dialogs.confirm(
           [
-            gt('Delete side chat "{title}"?', { title: shell.title }),
-            gt("This permanently clears its conversation history."),
+            text('Delete side chat "{title}"?', { title: shell.title }),
+            text("This permanently clears its conversation history."),
           ].join("\n"),
           { variant: "destructive" },
         ),
@@ -123,20 +123,20 @@ export default function SideThreadPane(props: {
       const error = squashAtomCommandFailure(result);
       toastManager.add({
         type: "error",
-        title: gt("Could not delete the side chat"),
+        title: text("Could not delete the side chat"),
         ...(error instanceof Error ? { description: error.message } : {}),
       });
     }
   };
 
   const title =
-    thread === null
-      ? isSideChat
-        ? gt("Side chat")
-        : gt("Subagent")
-      : isSideChat
-        ? thread.title
-        : formatSubagentDisplayTitle(thread.title);
+    isSideChat && (thread === null || thread.title === "Side chat")
+      ? text("Side chat")
+      : thread === null
+        ? text("Subagent")
+        : isSideChat
+          ? thread.title
+          : formatSubagentDisplayTitle(thread.title);
 
   return (
     <div
@@ -156,20 +156,20 @@ export default function SideThreadPane(props: {
                   aria-disabled={!canAddToChat || undefined}
                   onClick={addToChat}
                 >
-                  <T>Add to chat</T>
+                  {text("Add to chat")}
                 </Button>
               }
             />
             <TooltipPopup side="bottom">
               {canAddToChat
-                ? gt("Adds this side chat to the main thread's next message.")
-                : gt("Available after the first message.")}
+                ? text("Adds this side chat to the main thread's next message.")
+                : text("Available after the first message.")}
             </TooltipPopup>
           </Tooltip>
           <Button
             variant="ghost"
             size="icon-xs"
-            aria-label={gt("Delete side chat")}
+            aria-label={text("Delete side chat")}
             disabled={!canOperate || shell === null || deleting}
             onClick={() => void deleteSideChat()}
           >
@@ -178,7 +178,7 @@ export default function SideThreadPane(props: {
           <Button
             variant="ghost"
             size="icon-xs"
-            aria-label={gt("Close side chat")}
+            aria-label={text("Close side chat")}
             onClick={props.onClose}
           >
             <XIcon />
@@ -187,11 +187,9 @@ export default function SideThreadPane(props: {
       ) : null}
       {renderState === "missing" ? (
         <p className="p-3 text-xs text-muted-foreground">
-          {isSideChat ? (
-            <T>This side chat was deleted.</T>
-          ) : (
-            <T>This thread is no longer available.</T>
-          )}
+          {isSideChat
+            ? text("This side chat was deleted.")
+            : text("This thread is no longer available.")}
         </p>
       ) : renderState === "loading" && thread === null ? null : (
         <BackgroundThreadContext value>

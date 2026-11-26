@@ -50,6 +50,8 @@ import {
   getPreferredSystemLanguages,
   getPrimaryPasteEnabled,
   getWindowFullscreenState,
+  getOnBatteryPower,
+  installBatteryPowerForwarding,
   openExternal,
   readMedia,
   restartAudioService,
@@ -112,6 +114,8 @@ export const installDesktopIpcHandlers = Effect.fn("desktop.ipc.installHandlers"
   yield* ipc.handleSync(getPreferredSystemLanguages);
   yield* ipc.handleSync(getPrimaryPasteEnabled);
   yield* ipc.handleSync(getWindowFullscreenState);
+  yield* ipc.handle(getOnBatteryPower);
+  yield* installBatteryPowerForwarding();
   yield* ipc.handleSync(getLocalEnvironmentBootstraps);
   yield* installLocalBootstrapForwarding();
   yield* ipc.handleSync(getLocalEnvironmentEnabled);

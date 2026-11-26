@@ -26,6 +26,8 @@ import { useTheme } from "../../hooks/useTheme";
 import { useScopedSettings, useUpdateScopedSettings } from "./useScopedSettings";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
 import { Switch } from "../ui/switch";
+import { useStardustMotionPreference } from "../chat/StardustParticles";
+import { useUiText } from "~/i18n/useUiText";
 import { ThemeLibrary } from "./ThemeSettings";
 import {
   SettingResetButton,
@@ -105,6 +107,9 @@ export function AppearanceSettingsPanel() {
     themeHalves,
   } = useTheme();
   const gt = useGT();
+  const ui = useUiText();
+  const [stardustMotion, setStardustMotion] = useStardustMotionPreference();
+  const stardustMotionLabel = ui("Stardust background animation");
   const m = useMessages();
   const customThemes = useCustomThemes();
   const [isImportThemeOpen, setIsImportThemeOpen] = useState(false);
@@ -174,6 +179,20 @@ export function AppearanceSettingsPanel() {
       </SettingsSection>
 
       <SettingsSection id="appearance-interface" title={gt("Interface")}>
+        <SettingsRow
+          id="appearance-stardust-motion"
+          title={stardustMotionLabel}
+          description={ui(
+            "Animates the dark Stardust background while the window is active and plugged in.",
+          )}
+          control={
+            <Switch
+              aria-label={stardustMotionLabel}
+              checked={stardustMotion}
+              onCheckedChange={setStardustMotion}
+            />
+          }
+        />
         <SettingsRow
           {...searchableSetting("setting-appearance-contrast")}
           description={gt("Adjust the contrast of colors and borders across the interface.")}

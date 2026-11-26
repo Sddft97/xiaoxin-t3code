@@ -1,5 +1,9 @@
 import * as Schema from "effect/Schema";
-import { migrateLegacyClientSettings } from "@t3tools/shared/clientSettingsMigration";
+import {
+  migrateLegacyClientSettings,
+  migrateMathRenderingDefault,
+  stampMathDefaultMigration,
+} from "@t3tools/shared/clientSettingsMigration";
 import { ClientSettingsSchema, type ClientSettings } from "@t3tools/contracts";
 
 import {
@@ -9,6 +13,7 @@ import {
 } from "./hooks/useLocalStorage";
 
 const decodeClientSettings = Schema.decodeUnknownSync(ClientSettingsSchema);
+const encodeClientSettings = Schema.encodeSync(ClientSettingsSchema);
 const CLIENT_SETTINGS_STORAGE_KEY = "t3code:client-settings:v1";
 
 function hasWindow(): boolean {
@@ -22,8 +27,10 @@ export function readBrowserClientSettings(): ClientSettings | null {
 
   const stored = getLocalStorageItem(CLIENT_SETTINGS_STORAGE_KEY, Schema.Unknown);
   if (stored === null) return null;
+  const migrated = migrateMathRenderingDefault(stored);
+  let settings;
   try {
-    return decodeClientSettings(migrateLegacyClientSettings(stored));
+    settings = decodeClientSettings(migrateLegacyClientSettings(migrated ?? stored));
   } catch (cause) {
     throw new LocalStorageOperationError({
       operation: "decode",
@@ -31,6 +38,8 @@ export function readBrowserClientSettings(): ClientSettings | null {
       cause,
     });
   }
+  if (migrated) setLocalStorageItem(CLIENT_SETTINGS_STORAGE_KEY, migrated, Schema.Unknown);
+  return settings;
 }
 
 export function writeBrowserClientSettings(settings: ClientSettings): void {
@@ -38,7 +47,11 @@ export function writeBrowserClientSettings(settings: ClientSettings): void {
     return;
   }
 
-  setLocalStorageItem(CLIENT_SETTINGS_STORAGE_KEY, settings, ClientSettingsSchema);
+  setLocalStorageItem(
+    CLIENT_SETTINGS_STORAGE_KEY,
+    stampMathDefaultMigration(encodeClientSettings(settings)),
+    Schema.Unknown,
+  );
 }
 
 /** Storage events fire only for other tabs' writes; a null key means storage was cleared. */

@@ -1,3 +1,5 @@
+import type { OrchestrationV2ProviderFailure } from "@t3tools/contracts";
+
 const legacyFailures = {
   subscription_sharing_v2_user_not_eligible: {
     message:
@@ -58,63 +60,94 @@ const usageLimitCodes = new Set<string>([
   "subscription_sharing_workplace_individual_usage_limit_exceeded",
 ]);
 
-function unwrapError(value: unknown): unknown {
-  if (typeof value === "string") {
-    try {
-      value = JSON.parse(value);
-    } catch {
-      return value;
-    }
-  }
-  return typeof value === "object" && value !== null && "error" in value ? value.error : value;
-}
+export const CODEX_SHARING_UNSUPPORTED = "subscription_sharing_unsupported_capability";
 
 function isManagedCode(value: unknown): value is keyof typeof failures {
   return typeof value === "string" && Object.hasOwn(failures, value);
 }
 
-function sharingCode(value: unknown) {
-  const error = unwrapError(value);
-  const code = typeof error === "object" && error !== null && "code" in error ? error.code : error;
-  return isManagedCode(code) ? code : undefined;
-}
-
-export function classifyCodexManagedError(value: unknown) {
-  const error = unwrapError(value);
-  const messages =
-    typeof error === "string"
-      ? [error]
-      : typeof error === "object" && error !== null
-        ? [
-            "message" in error ? error.message : null,
-            "additionalDetails" in error ? error.additionalDetails : null,
-          ].filter((message): message is string => typeof message === "string")
-        : [];
-  const code =
-    sharingCode(error) ??
-    messages.map(sharingCode).find((code) => code !== undefined) ??
-    // Codex can stream ChatGPT's sharing-limit prose without its code.
-    (messages.some((message) =>
-      message.includes("has reached their Subscription Sharing usage limit"),
-    )
-      ? "subscription_sharing_usage_limit_exceeded"
-      : undefined);
+export function classifyCodexManagedError(
+  value: unknown,
+  managedSharing = false,
+):
+  | {
+      readonly code: keyof typeof failures;
+      readonly message: string;
+      readonly usageLimit: boolean;
+      readonly codexSharing?: NonNullable<OrchestrationV2ProviderFailure["codexSharing"]>;
+    }
+  | undefined {
+  let code: keyof typeof failures | undefined;
+  let param: "input" | "tools" | undefined;
+  const messages: string[] = [];
+  const visit = (value: unknown, depth: number) => {
+    if (depth === 0) return;
+    if (typeof value === "string") {
+      const raw = value.trim();
+      if (isManagedCode(raw)) {
+        code ??= raw;
+        return;
+      }
+      // Codex's HTTP error display wraps the JSON body with status and URL metadata.
+      const json =
+        /(?:unexpected\s+)?status 400(?: Bad Request)?:\s*(\{[\s\S]*?\})(?:,\s*url:|$)/i.exec(
+          raw,
+        )?.[1] ?? raw;
+      if (json.startsWith("{")) {
+        try {
+          visit(JSON.parse(json), depth - 1);
+          return;
+        } catch {
+          // A malformed body is ordinary text, not a structured error.
+        }
+      }
+      messages.push(raw);
+    } else if (typeof value === "object" && value !== null) {
+      if ("code" in value && isManagedCode(value.code)) code ??= value.code;
+      if ("param" in value && (value.param === "input" || value.param === "tools")) {
+        param ??= value.param;
+      }
+      for (const key of [
+        "error",
+        "data",
+        "cause",
+        "additionalDetails",
+        "errorMessage",
+        "message",
+      ]) {
+        visit(Reflect.get(value, key), depth - 1);
+      }
+    }
+  };
+  visit(value, 7);
+  const detail = messages.join(" ");
+  code ??= detail.includes("has reached their Subscription Sharing usage limit")
+    ? "subscription_sharing_usage_limit_exceeded"
+    : managedSharing &&
+        /\bunsupported input items\b/i.test(detail) &&
+        /\badditional[ _]tools\b/i.test(detail)
+      ? CODEX_SHARING_UNSUPPORTED
+      : undefined;
   if (code === undefined) return undefined;
   const failure = { ...failures[code], code, usageLimit: usageLimitCodes.has(code) };
-  const text = messages.join(" ");
-  if (code === "subscription_sharing_unsupported_capability") {
-    if (text.includes("tool 'namespace'"))
-      return {
-        ...failure,
-        message:
-          "Codex sent a tool namespace that ChatGPT sharing does not support. Use another provider for this request.",
-      };
-    if (text.includes("additional_tools"))
-      return {
-        ...failure,
-        message:
-          "Codex sent an input item that ChatGPT sharing does not support. Use another provider for this request.",
-      };
-  }
-  return failure;
+  if (code !== CODEX_SHARING_UNSUPPORTED) return failure;
+
+  const reason = /\bagent_message\b/i.test(detail)
+    ? "history"
+    : /tool ['"]namespace['"]/i.test(detail)
+      ? "namespace"
+      : /(?:input item|type) ['"]additional_tools['"]/i.test(detail)
+        ? "additional_tools"
+        : "unknown";
+  const codexSharing = { ...(param === undefined ? {} : { param }), reason } as const;
+  return {
+    ...failure,
+    codexSharing,
+    message:
+      reason === "namespace"
+        ? "Codex sent a tool namespace that ChatGPT sharing does not support. Use another provider for this request."
+        : reason === "additional_tools"
+          ? "Codex sent an input item that ChatGPT sharing does not support. Use another provider for this request."
+          : failure.message,
+  };
 }

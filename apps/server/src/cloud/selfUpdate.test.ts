@@ -275,13 +275,13 @@ it.layer(NodeServices.layer)("server self update", (it) => {
       for (const harness of [service, desktop]) {
         expect(
           (yield* harness.selfUpdate.update({ targetVersion: "1.1.0" }).pipe(Effect.flip)).reason,
-        ).toBe("Example Corp manages T3 Code updates.");
+        ).toBe("Example Corp manages Stardust updates.");
       }
       expect([...service.order, ...desktop.order]).toEqual([]);
     }),
   );
 
-  it.effect("lets a user start an update, but only to stable without nightly", () =>
+  it.effect("refuses nightly by policy and custom update mirrors before fetching", () =>
     Effect.gen(function* () {
       const { selfUpdate, order, urls } = yield* makeHarness({
         policy: {
@@ -299,17 +299,13 @@ it.layer(NodeServices.layer)("server self update", (it) => {
       expect(
         (yield* selfUpdate.update({ targetVersion: "1.2.0-nightly.20261028.1" }).pipe(Effect.flip))
           .reason,
-      ).toBe("Example Corp manages T3 Code updates. Only stable releases can be installed.");
+      ).toBe("Example Corp manages Stardust updates. Only stable releases can be installed.");
       expect(order).toEqual([]);
-      // The mirror lists only 1.1.0's archive.
       expect((yield* selfUpdate.update({ targetVersion: "1.2.0" }).pipe(Effect.flip)).reason).toBe(
-        "Example Corp's update mirror has no t3@1.2.0 for this machine.",
+        "Stardust updates use the Stardust GitHub Releases repository.",
       );
-      expect((yield* selfUpdate.update({ targetVersion: "1.1.0" })).updateId).toBe("launcher-id");
-      // The release comes from the policy's mirror, not GitHub.
-      expect(urls.length).toBeGreaterThan(0);
-      for (const url of urls)
-        expect(url).toMatch(/^https:\/\/updates\.example\.com\/t3code\/v1\.[12]\.0\//);
+      expect(order).toEqual([]);
+      expect(urls).toEqual([]);
     }),
   );
 

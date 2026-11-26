@@ -166,6 +166,8 @@ const logBackendObservabilitySettingsReadFailure = (
   );
 };
 
+import { STARDUST_WINDOWS_BRAND } from "@t3tools/shared/stardustWindowsBrand";
+
 function resourceMonitorBinaryName(platform: NodeJS.Platform): string {
   return platform === "win32" ? "t3-resource-monitor.exe" : "t3-resource-monitor";
 }
@@ -175,7 +177,10 @@ const resolveResourceMonitorPath = Effect.fn(
 )(function* () {
   const environment = yield* DesktopEnvironment.DesktopEnvironment;
   const fileSystem = yield* FileSystem.FileSystem;
-  const binaryName = resourceMonitorBinaryName(environment.platform);
+  const binaryName =
+    environment.isPackaged && environment.platform === "win32"
+      ? STARDUST_WINDOWS_BRAND.resourceMonitor
+      : resourceMonitorBinaryName(environment.platform);
   const candidates = environment.isDevelopment
     ? [
         environment.path.join(

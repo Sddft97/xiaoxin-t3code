@@ -35,11 +35,13 @@ export function InboxStrip({
   threadRef,
   prompt,
   disabled,
+  suppressed = false,
   onContinue,
 }: {
   threadRef: ScopedThreadRef;
   prompt: string;
   disabled: boolean;
+  suppressed?: boolean | undefined;
   onContinue: () => void | Promise<void>;
 }) {
   const uiText = useUiText();
@@ -93,6 +95,7 @@ export function InboxStrip({
   // a "View outputs" strip (outputs stay in the inspector's Outputs tab). Requests that need an
   // answer (approval, input, blocked board steps) still show here.
   const visible =
+    !suppressed &&
     request &&
     inboxStripState(request.reason) !== "new" &&
     (!shell || request.boardFolder || request.token === threadResumeToken(shell, request.reason)) &&

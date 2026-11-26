@@ -18,7 +18,9 @@ import type { EnvironmentId, ThreadId } from "@t3tools/contracts";
 import { useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { MessageSquareIcon } from "lucide-react";
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
+import { useStableCallback } from "~/hooks/useStableCallback";
+import { normalizeSearchText } from "~/lib/utils";
 import { useGT, useMessages } from "gt-react";
 
 import {
@@ -41,7 +43,6 @@ import { formatRelativeTimeLabel } from "../timestampFormat";
 import {
   buildThreadActionItems,
   ITEM_ICON_CLASS,
-  RECENT_THREAD_LIMIT,
   type CommandPaletteActionItem,
 } from "./CommandPalette.logic";
 import { useEnvironmentLookups, useProjectLookups } from "./CommandPaletteLookups";
@@ -51,6 +52,23 @@ import {
   ThreadRowTrailingStatus,
   ThreadSearchPullRequestNumber,
 } from "./ThreadStatusIndicators";
+export const CommandPaletteThreadSearchQuery = createContext("");
+
+function PaletteThreadPullRequest({
+  thread,
+}: {
+  thread: Parameters<typeof ThreadSearchPullRequestNumber>[0]["thread"];
+}) {
+  const query = useContext(CommandPaletteThreadSearchQuery);
+  return (
+    <ThreadSearchPullRequestNumber
+      thread={thread}
+      query={query}
+      settled={thread.settledOverride === "settled"}
+    />
+  );
+}
+
 function useProviderEntryByEnvironmentAndInstanceId() {
   const { environments } = useEnvironments();
   const primaryEnvironmentId = usePrimaryEnvironmentId();
@@ -104,8 +122,10 @@ export function useCommandPaletteThreadItems(input: {
     readonly id: ThreadId;
   } | null;
   readonly threadSearchQuery: string;
+  readonly recentOnly: boolean;
+  readonly spotlightQuery: string;
 }) {
-  const { activeThread, threadSearchQuery } = input;
+  const { activeThread, threadSearchQuery, recentOnly, spotlightQuery } = input;
   const messages = useMessages();
   const gt = useGT();
   const navigate = useNavigate();
@@ -119,10 +139,53 @@ export function useCommandPaletteThreadItems(input: {
   // Ranking is relative to when the palette opened, so rows do not reorder as time passes.
   const [now] = useState(() => Date.now());
   const { environments } = useEnvironments();
+  const runThread = useStableCallback(async (thread: (typeof threads)[number]) => {
+    // A pick sends its open with the query, always, so the server records
+    // it; the thread view then skips its own open. The open thread is no pick.
+    const isOpen =
+      activeThread?.environmentId === thread.environmentId && activeThread.id === thread.id;
+    if (threadSearchQuery.trim().length > 0 && !threadSearchQuery.startsWith(">") && !isOpen) {
+      claimThreadOpen(thread.environmentId, thread.id, Date.now());
+    }
+    if (
+      threadSearchQuery.trim().length > 0 &&
+      !threadSearchQuery.startsWith(">") &&
+      thread.lastVisitedAt !== undefined &&
+      !isOpen
+    ) {
+      void visitThread({
+        environmentId: thread.environmentId,
+        input: {
+          threadId: thread.id,
+          visitedAt: thread.updatedAt,
+          opened: true,
+          searchQuery: pickedQuery(threadSearchQuery),
+        },
+      });
+    }
+    await navigate({
+      to: "/$environmentId/$threadId",
+      params: buildThreadRouteParams(scopeThreadRef(thread.environmentId, thread.id)),
+    });
+  });
+  const serverItemIds = new Set(
+    messageSearch.matches.map((match) => `thread:${match.environmentId}:${match.threadId}`),
+  );
+  const spotlight = normalizeSearchText(spotlightQuery);
+  const tokens = spotlight ? spotlight.split(" ") : [];
+  // The root matcher only shows literal title matches beside the server results.
+  const matchingThreads = spotlight
+    ? threads.filter((thread) => {
+        if (serverItemIds.has(`thread:${thread.environmentId}:${thread.id}`)) return true;
+        const title = normalizeSearchText(thread.title);
+        return tokens.every((token) => title.includes(token));
+      })
+    : threads;
   const threadItems = buildThreadActionItems(
     {
-      threads,
+      threads: matchingThreads,
       delegatedUnderParent,
+      recentOnly,
       ...(environments.length > 1
         ? {
             environmentLabelOf: (thread: (typeof threads)[number]) =>
@@ -135,11 +198,7 @@ export function useCommandPaletteThreadItems(input: {
       renderLeadingContent: (thread) => <ThreadRowLeadingStatus thread={thread} />,
       renderTrailingContent: (thread) => (
         <>
-          <ThreadSearchPullRequestNumber
-            thread={thread}
-            query={threadSearchQuery}
-            settled={thread.settledOverride === "settled"}
-          />
+          <PaletteThreadPullRequest thread={thread} />
           <ThreadRowTrailingStatus thread={thread} />
         </>
       ),
@@ -172,36 +231,7 @@ export function useCommandPaletteThreadItems(input: {
           />
         );
       },
-      runThread: async (thread) => {
-        // A pick sends its open with the query, always, so the server records
-        // it; the thread view then skips its own open. The open thread is no pick.
-        const isOpen =
-          activeThread?.environmentId === thread.environmentId && activeThread.id === thread.id;
-        if (threadSearchQuery.trim().length > 0 && !threadSearchQuery.startsWith(">") && !isOpen) {
-          // oxlint-disable-next-line react/purity -- runs in an event handler (oxc#27309)
-          claimThreadOpen(thread.environmentId, thread.id, Date.now());
-        }
-        if (
-          threadSearchQuery.trim().length > 0 &&
-          !threadSearchQuery.startsWith(">") &&
-          thread.lastVisitedAt !== undefined &&
-          !isOpen
-        ) {
-          void visitThread({
-            environmentId: thread.environmentId,
-            input: {
-              threadId: thread.id,
-              visitedAt: thread.updatedAt,
-              opened: true,
-              searchQuery: pickedQuery(threadSearchQuery),
-            },
-          });
-        }
-        await navigate({
-          to: "/$environmentId/$threadId",
-          params: buildThreadRouteParams(scopeThreadRef(thread.environmentId, thread.id)),
-        });
-      },
+      runThread,
     },
     messages,
   );
@@ -257,9 +287,7 @@ export function useCommandPaletteThreadItems(input: {
     .slice(0, order.shown)
     .flatMap((value) => messageItemByValue.get(value) ?? []);
   const spotlightItems: CommandPaletteActionItem[] = messageSearch.matches.map((match) => {
-    const local = threadItems.find(
-      (item) => item.value === `thread:${match.environmentId}:${match.threadId}`,
-    );
+    const local = itemForMatch(match);
     const target = scopeThreadRef(match.environmentId, match.threadId);
     const subtitle = [
       projectByKey.get(`${match.environmentId}:${match.projectId}`)?.title,
@@ -329,27 +357,15 @@ export function useCommandPaletteThreadItems(input: {
       },
     };
   });
-  const serverItemIds = new Set(
-    messageSearch.matches.map((match) => `thread:${match.environmentId}:${match.threadId}`),
-  );
   const threadItemsForSearch = [
     ...spotlightItems,
     ...threadItems.filter((item) => !serverItemIds.has(item.value)),
   ];
-  const mainThreadIds = new Set(
-    threads
-      .filter((thread) => thread.lineage.relationshipToParent !== "subagent")
-      .map((thread) => `thread:${thread.environmentId}:${thread.id}`),
-  );
-  const recentThreadItems = threadItems
-    .filter((item) => mainThreadIds.has(item.value))
-    .slice(0, RECENT_THREAD_LIMIT);
   return {
     threadItems,
     threadMessageItems,
     now,
     threadItemsForSearch,
-    recentThreadItems,
     isSearchPending: messageSearch.isPending,
     isSearchFailed: messageSearch.failed,
   };

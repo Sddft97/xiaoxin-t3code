@@ -104,7 +104,7 @@ export function ResumeCard({
       data-resume-card=""
       inert={leaving}
       aria-hidden={leaving || undefined}
-      className={leaving ? "workbench-inbox-exit" : "resume-card-enter mb-2"}
+      className={leaving ? "resume-card-exit" : "resume-card-enter mb-2"}
     >
       <ComposerBanner.Root detached density="spacious">
         <div className="flex min-w-0 items-center gap-2">

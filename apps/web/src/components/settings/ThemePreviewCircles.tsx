@@ -5,6 +5,7 @@ import {
   STANDARD_THEME_PREVIEW_COLORS as SHARED_STANDARD_THEME_PREVIEW_COLORS,
   THEME_PREVIEW_RENDER_SPECS,
 } from "@t3tools/shared/themePreview";
+import { themeDisplayLabel } from "@t3tools/shared/themePalettes";
 import { cn } from "../../lib/utils";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import {
@@ -59,7 +60,7 @@ const STANDARD_THEME_PREVIEW_COLORS: Record<
 export const STANDARD_THEME_CARDS: ReadonlyArray<ThemeCardDefinition> = [
   {
     id: "default",
-    label: "T3 Code",
+    label: "Stardust",
     previews: (["light", "dark"] as const).map((mode) => ({
       mode,
       colors: STANDARD_THEME_PREVIEW_COLORS[mode],
@@ -74,10 +75,10 @@ export function previewColorsOf(
   return card.previews.find((preview) => preview.mode === mode)?.colors ?? null;
 }
 
-export function getThemeCardDefinition(theme: ThemeDefinition): ThemeCardDefinition {
+export function getThemeCardDefinition(theme: ThemeDefinition, locale = "en"): ThemeCardDefinition {
   return {
     id: theme.id,
-    label: theme.label,
+    label: themeDisplayLabel(theme, locale),
     previews: getThemeModes(theme).map((mode) => {
       const colors = getThemeColorsForMode(theme, mode) ?? theme.colors;
       return {

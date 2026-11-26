@@ -51,6 +51,7 @@ import {
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { InlineButton } from "../ui/button";
 import { DraftProjectName } from "./DraftProjectName";
+import { StardustHeroMark } from "./StardustHeroMark";
 
 import { TriageDraftHero } from "./TriageDraftHero";
 
@@ -374,7 +375,7 @@ export function DraftHeroHeadline({
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col items-center" data-stardust-heading>
-      <img src="/stardust-icon.png" alt={uiText("T3 Stardust")} className="mb-3 size-14" />
+      <StardustHeroMark />
       <h1 className="text-center text-2xl font-semibold tracking-tight">
         {hasResolvedProject && !isScratchDraft ? (
           <>

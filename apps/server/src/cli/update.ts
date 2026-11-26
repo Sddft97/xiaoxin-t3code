@@ -1,6 +1,5 @@
 import * as HostProcess from "@t3tools/shared/HostProcess";
 import {
-  CLI_RELEASE_BASE_URL_ENV,
   CLI_RELEASE_CHANNELS,
   cliReleaseIndexPageUrl,
   cliReleaseChannelOf,
@@ -76,17 +75,11 @@ export const resolveNewestVersion = Effect.fn("cli.update.resolve_newest")(funct
   channel: CliReleaseChannel,
 ) {
   const httpClient = yield* HttpClient.HttpClient;
-  const environment = yield* HostProcess.Environment;
-  const githubToken = environment.GH_TOKEN?.trim() || environment.GITHUB_TOKEN?.trim() || undefined;
   for (let page = 1; page <= RELEASE_INDEX_MAX_PAGES; page += 1) {
     const request = HttpClientRequest.get(cliReleaseIndexPageUrl(page)).pipe(
       HttpClientRequest.setHeader("Accept", "application/vnd.github+json"),
     );
-    const authenticatedRequest =
-      githubToken === undefined
-        ? request
-        : HttpClientRequest.setHeader(request, "Authorization", `Bearer ${githubToken}`);
-    const body = yield* httpClient.execute(authenticatedRequest).pipe(
+    const body = yield* httpClient.execute(request).pipe(
       Effect.flatMap(HttpClientResponse.filterStatusOk),
       Effect.flatMap((response) => response.text),
       Effect.mapError(() => new CliUpdateError({ reason: "Could not list t3 releases." })),
@@ -365,11 +358,9 @@ export const runUpdate = Effect.fn("cli.update.run")(function* (input: {
   const runner = yield* ProcessRunner.ProcessRunner;
   const platform = yield* HostProcess.Platform;
   const arch = yield* HostProcess.Architecture;
-  const environment = yield* HostProcess.Environment;
   const httpClient = yield* HttpClient.HttpClient;
   const service = yield* BootService.BootService;
   const policy = yield* ManagedPolicy.ManagedPolicy;
-  const mirror = managedUpdateMirror(policy.document);
 
   const currentVersion = packageJson.version;
   const channel = input.channel ?? cliReleaseChannelOf(currentVersion);
@@ -379,6 +370,11 @@ export const runUpdate = Effect.fn("cli.update.run")(function* (input: {
   );
   if (refusal !== undefined) {
     return yield* new CliUpdateError({ reason: refusal });
+  }
+  if (managedUpdateMirror(policy.document) !== undefined) {
+    return yield* new CliUpdateError({
+      reason: "Stardust updates use the Stardust GitHub Releases repository.",
+    });
   }
   if (input.requestedVersion !== undefined && !isExactServiceVersion(input.requestedVersion)) {
     return yield* new CliUpdateError({
@@ -390,9 +386,7 @@ export const runUpdate = Effect.fn("cli.update.run")(function* (input: {
   const targetVersion = yield* (
     input.requestedVersion !== undefined
       ? Effect.succeed(input.requestedVersion)
-      : mirror === undefined
-        ? resolveNewestVersion(channel)
-        : resolveMirrorVersion(mirror, channel)
+      : resolveNewestVersion(channel)
   ).pipe(Effect.ensuring(Effect.sync(progress.finish)));
   const targetChannel = cliReleaseChannelOf(targetVersion);
 
@@ -423,9 +417,7 @@ export const runUpdate = Effect.fn("cli.update.run")(function* (input: {
 
   const status = yield* service.status;
   // Service names are per user, so another home's unit belongs to a different install.
-  const servesThisHome =
-    status.installedBaseDir !== undefined &&
-    path.resolve(status.installedBaseDir) === path.resolve(input.baseDir);
+  const servesThisHome = status.installedBaseDir !== undefined && status.otherBaseDir === undefined;
   const serviceInstalled = status.supported && status.installed && servesThisHome;
   const foreground = yield* findForegroundServer({
     serverRuntimeStatePath: input.serverRuntimeStatePath,
@@ -507,8 +499,6 @@ export const runUpdate = Effect.fn("cli.update.run")(function* (input: {
     httpClient,
     platform,
     arch,
-    releaseBaseUrl: mirror?.feedUrl ?? (environment[CLI_RELEASE_BASE_URL_ENV]?.trim() || undefined),
-    requirePublishedRelease: mirror !== undefined,
     validate: (runtime) =>
       runStagedServicePreflight({
         runner,
@@ -543,10 +533,7 @@ export const runUpdate = Effect.fn("cli.update.run")(function* (input: {
     Effect.catchIf(isUnpublishedRelease, () =>
       Effect.fail(
         new CliUpdateError({
-          reason:
-            mirror === undefined
-              ? `No release archive was published for t3@${targetVersion}.`
-              : `${mirror.organization}'s update mirror has no t3@${targetVersion} for this machine.`,
+          reason: `No release archive was published for t3@${targetVersion}.`,
         }),
       ),
     ),

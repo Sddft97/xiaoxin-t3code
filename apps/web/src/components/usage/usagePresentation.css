@@ -21,14 +21,16 @@ html.dark:root {
     transparent 2px 5px
   );
 }
-[data-theme-id="apple"] [data-usage-card] {
+:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-card] {
   background: var(--card);
   border: 0;
   border-radius: 12px;
   box-shadow: var(--apple-card-shadow);
   padding: 14px 16px;
 }
-[data-theme-id="apple"] [data-usage-page] [data-slot="workspace-page-container"] {
+:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-usage-page]
+  [data-slot="workspace-page-container"] {
   padding: 14px 18px;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -46,7 +48,7 @@ html.dark:root {
   background: transparent !important;
   box-shadow: none !important;
 }
-[data-theme-id="apple"] [data-usage-thumb] {
+:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-thumb] {
   background: var(--apple-slider);
   box-shadow: var(--apple-slider-shadow);
 }
@@ -91,7 +93,7 @@ html.dark:root {
   height: 1em;
   line-height: 1;
 }
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   [data-usage-page] {
     background: var(--background);
   }
@@ -258,7 +260,7 @@ html:root[data-theme-id="apple"] {
   }
 }
 @media (max-width: 1000px) {
-  html:root[data-theme-id="apple"] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
     [data-usage-main-row] {
       grid-template-columns: minmax(0, 1fr) 280px;
     }
@@ -268,7 +270,7 @@ html:root[data-theme-id="apple"] {
   }
 }
 @media (max-width: 700px) {
-  html:root[data-theme-id="apple"] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
     [data-usage-overview],
     [data-usage-main-row] {
       display: flex;
@@ -287,7 +289,7 @@ html:root[data-theme-id="apple"] {
   padding: 20px;
   overflow: auto;
 }
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   [data-usage-limit-grid] {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
@@ -455,21 +457,21 @@ html:root[data-theme-id="apple"] {
   }
 }
 @media (max-width: 1000px) {
-  html:root[data-theme-id="apple"] [data-usage-limit-grid] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-limit-grid] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 600px) {
-  html:root[data-theme-id="apple"] [data-usage-limit-grid] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-limit-grid] {
     grid-template-columns: minmax(0, 1fr);
   }
-  html:root[data-theme-id="apple"] .usage-reset-week {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-reset-week {
     overflow-x: auto;
     grid-template-columns: repeat(7, 140px);
   }
 }
 
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   .usage-clean-summary h2 {
     font-size: 30px;
     font-weight: 700;
@@ -544,7 +546,7 @@ html:root[data-theme-id="apple"] {
   }
 }
 
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   .usage-clean-capacity {
     margin-block: 24px;
   }
@@ -578,7 +580,7 @@ html:root[data-theme-id="apple"] {
   }
 }
 
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   [data-usage-provider-card] {
     justify-content: flex-start;
   }
@@ -598,7 +600,7 @@ html:root[data-theme-id="apple"] {
   }
 }
 
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   [data-usage-sheet] {
     --usage-codex: var(--primary);
     --usage-claude: var(--primary);
@@ -631,12 +633,15 @@ html:root[data-theme-id="apple"] {
   }
 }
 
-html:root[data-theme-id="apple"] [data-clean-dashboard] > header button {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-clean-dashboard]
+  > header
+  button {
   height: 32px;
   border-radius: 16px;
 }
 
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   .usage-provider-list[data-spread] {
     flex: 1;
     justify-content: space-between;
@@ -692,7 +697,7 @@ html:root[data-theme-id="apple"] {
   }
 }
 
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   .usage-disk-segments {
     display: flex;
     gap: 4px;
@@ -839,7 +844,7 @@ html:root[data-theme-id="apple"] {
   }
 }
 
-html:root[data-theme-id="apple"] .usage-clean-action {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-clean-action {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -850,7 +855,7 @@ html:root[data-theme-id="apple"] .usage-clean-action {
   font-size: 12px;
   margin-top: auto;
 }
-html:root[data-theme-id="apple"] .usage-clean-action > button {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-clean-action > button {
   height: 32px;
   border-radius: 16px;
   padding-inline: 16px;
@@ -858,21 +863,23 @@ html:root[data-theme-id="apple"] .usage-clean-action > button {
   color: var(--background);
   transition: width 400ms cubic-bezier(0.32, 0.72, 0, 1);
 }
-html:root[data-theme-id="apple"] .usage-clean-action > button:disabled {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-clean-action
+  > button:disabled {
   opacity: 0.45;
 }
-html:root[data-theme-id="apple"] .usage-model-bars h3 {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-model-bars h3 {
   font-size: 15px;
   font-weight: 600;
   margin-bottom: 12px;
 }
 
-html:root[data-theme-id="apple"] .usage-capacity-segments > span {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-capacity-segments > span {
   display: block;
   height: 100%;
   min-width: 0;
 }
-html:root[data-theme-id="apple"] [data-tone="free"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-tone="free"] {
   background: var(--background);
   box-shadow: inset 0 0 0 1px var(--border);
 }
@@ -880,32 +887,36 @@ html:root[data-theme-id="apple"] [data-tone="free"] {
 .usage-sheet-content {
   overscroll-behavior: contain;
 }
-html:root[data-theme-id="apple"] [data-usage-overview] .surface-glass {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-usage-overview]
+  .surface-glass {
   z-index: 1000;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
 }
 @media (prefers-reduced-transparency: reduce) {
-  html:root[data-theme-id="apple"] .surface-glass {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .surface-glass {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     background: rgba(255, 255, 255, 0.96);
   }
-  html:root[data-theme-id="apple"].dark .surface-glass,
-  html:root[data-theme-id="apple"] [data-usage-overview] .surface-glass {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]).dark .surface-glass,
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-usage-overview]
+    .surface-glass {
     background: rgba(28, 28, 30, 0.96);
   }
 }
 
 /* C77 — usage dashboard back to the approved 方案 A mock: orange accent ramp on greys,
    section headings outside cards, equal-height rows, dot heatmap and 6-row breakdown. */
-html:root[data-theme-id="apple"] [data-usage-page] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-page] {
   --primary: #ff5a1f;
   --primary-foreground: #fff;
 }
-html.dark:root[data-theme-id="apple"] [data-usage-page] {
+html.dark:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-page] {
   --primary: #ff6a33;
 }
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   [data-usage-overview][data-apple-dashboard] {
     display: flex;
     flex-direction: column;
@@ -1273,7 +1284,7 @@ html:root[data-theme-id="apple"] {
   }
 }
 @media (max-width: 1000px) {
-  html:root[data-theme-id="apple"] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
     [data-apple-dashboard] [data-usage-main-row] {
       grid-template-columns: minmax(0, 1fr) 280px;
     }
@@ -1290,7 +1301,7 @@ html:root[data-theme-id="apple"] {
 }
 
 /* C77 limits: eyebrow + 30/700 conclusion with accent figure; Cursor notice as a thin bottom bar. */
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   .usage-limits-eyebrow {
     font-size: 12px;
     color: var(--muted-foreground);
@@ -1314,7 +1325,7 @@ html:root[data-theme-id="apple"] {
 }
 
 /* C77 cleanup page + shared controls inside the usage page (Apple theme). */
-html:root[data-theme-id="apple"] [data-usage-page] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-page] {
   .usage-clean-eyebrow {
     font-size: 12px;
     color: var(--muted-foreground);
@@ -1397,7 +1408,10 @@ html:root[data-theme-id="apple"] [data-usage-page] {
 }
 
 /* C77: history chart keeps its intrinsic height instead of scaling with the card. */
-html:root[data-theme-id="apple"] [data-usage-page] .usage-clean-history svg {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-usage-page]
+  .usage-clean-history
+  svg {
   display: block;
   width: 100%;
   height: auto;
@@ -1405,7 +1419,7 @@ html:root[data-theme-id="apple"] [data-usage-page] .usage-clean-history svg {
 }
 
 /* C77: reset calendar uses one-line chips (dot · name · time), today in accent. */
-html:root[data-theme-id="apple"] .usage-reset-week {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-reset-week {
   min-height: 120px;
   h3[data-today] {
     color: var(--primary);
@@ -1432,7 +1446,7 @@ html:root[data-theme-id="apple"] .usage-reset-week {
   }
 }
 
-html:root[data-theme-id="apple"] .usage-reset-week button {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-reset-week button {
   flex-wrap: wrap;
   row-gap: 2px;
   small {
@@ -1447,7 +1461,7 @@ html:root[data-theme-id="apple"] .usage-reset-week button {
 }
 
 /* C78: history gets its own row at a fixed height; records are a compact table. */
-html:root[data-theme-id="apple"] [data-usage-page] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-page] {
   .usage-clean-bottom {
     display: flex;
     flex-direction: column;
@@ -1622,11 +1636,15 @@ html:root[data-theme-id="apple"] [data-usage-page] {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  html:root[data-theme-id="apple"] [data-usage-page] .usage-records-chevron {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-usage-page]
+    .usage-records-chevron {
     transition: none;
   }
 }
-html:root[data-theme-id="apple"] [data-usage-page] [data-scan-limit-note] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-usage-page]
+  [data-scan-limit-note] {
   margin-top: 8px;
   font-size: 12px;
   font-weight: 400;
@@ -1634,7 +1652,9 @@ html:root[data-theme-id="apple"] [data-usage-page] [data-scan-limit-note] {
 }
 
 /* C78: each limit window row shows how long until it resets. */
-html:root[data-theme-id="apple"] .usage-limit-windows [data-limit-countdown] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-limit-windows
+  [data-limit-countdown] {
   display: block;
   margin-top: 1px;
   font-size: 11px;
@@ -1656,7 +1676,7 @@ html:root[data-theme-id="apple"] .usage-limit-windows [data-limit-countdown] {
   --usage-antigravity: color-mix(in srgb, var(--primary) 24%, var(--card));
   --usage-other: var(--muted-foreground);
 }
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   [data-usage-page],
   [data-usage-sheet],
   [data-usage-dialog],
@@ -2044,24 +2064,31 @@ html:root[data-theme-id="apple"] {
   }
 }
 @container (max-width: 360px) {
-  html:root[data-theme-id="apple"] [data-usage-sheet] .usage-model-stats {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-usage-sheet]
+    .usage-model-stats {
     grid-template-columns: minmax(0, 1fr);
   }
-  html:root[data-theme-id="apple"] [data-usage-sheet] .usage-model-stats > div {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-usage-sheet]
+    .usage-model-stats
+    > div {
     padding: 0;
     border: 0;
   }
 }
 @starting-style {
-  html:root[data-theme-id="apple"] [data-usage-sheet] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-sheet] {
     translate: calc(100% + 20px) 0;
   }
 }
 @media (max-width: 760px) {
-  html:root[data-theme-id="apple"] .usage-activity-distributions {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-activity-distributions {
     grid-template-columns: minmax(0, 1fr);
   }
-  html:root[data-theme-id="apple"] [data-apple-dashboard] .usage-ribbon {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-apple-dashboard]
+    .usage-ribbon {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -2080,13 +2107,13 @@ html:root[data-theme-id="apple"] {
   transform: scale(0.98);
 }
 
-html:root[data-theme-id="apple"] .usage-heat-row i {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-heat-row i {
   transition: transform 200ms cubic-bezier(0.32, 0.72, 0, 1);
 }
-html:root[data-theme-id="apple"] .usage-heat-row i:hover {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-heat-row i:hover {
   transform: scale(1.35);
 }
-html:root[data-theme-id="apple"] .usage-model-price-entry button {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-model-price-entry button {
   flex-shrink: 0;
   background: var(--card);
   color: var(--foreground);
@@ -2094,20 +2121,23 @@ html:root[data-theme-id="apple"] .usage-model-price-entry button {
   border-radius: 8px;
   font-size: 12px;
 }
-html:root[data-theme-id="apple"] .usage-model-price-entry {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-model-price-entry {
   justify-content: space-between;
   gap: 16px;
 }
-html:root[data-theme-id="apple"] .usage-token-column:focus-visible {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-token-column:focus-visible {
   outline: none;
 }
-html:root[data-theme-id="apple"] .usage-token-column[data-hovered] .usage-token-stack {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-token-column[data-hovered]
+  .usage-token-stack {
   outline: 1px solid var(--primary);
   outline-offset: 1px;
 }
 
 /* C81: fixed readouts and aligned cards follow the approved comparison mock. */
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   [data-usage-page] [data-slot="workspace-page-container"] {
     width: min(100%, 1280px);
     max-width: 1280px;
@@ -2501,23 +2531,30 @@ html:root[data-theme-id="apple"] {
   margin-inline: 8px;
 }
 @media (max-width: 600px) {
-  html:root[data-theme-id="apple"] [data-usage-page] [data-slot="workspace-page-container"] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-usage-page]
+    [data-slot="workspace-page-container"] {
     padding: 16px;
   }
-  html:root[data-theme-id="apple"] [data-usage-sheet] .usage-model-stats {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+    [data-usage-sheet]
+    .usage-model-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px 0;
   }
-  html:root[data-theme-id="apple"] .usage-type-row {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-type-row {
     grid-template-columns: 64px minmax(0, 1fr) 56px 56px;
     gap: 8px;
   }
 }
 
-html:root[data-theme-id="apple"] .usage-limit-windows button {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-limit-windows button {
   position: relative;
 }
-html:root[data-theme-id="apple"] .usage-limit-windows button .usage-limit-group-track {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-limit-windows
+  button
+  .usage-limit-group-track {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -2526,13 +2563,13 @@ html:root[data-theme-id="apple"] .usage-limit-windows button .usage-limit-group-
   border-radius: 999px;
   background: transparent;
 }
-html:root[data-theme-id="apple"] .usage-optical-cells {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-optical-cells {
   display: grid;
   grid-template-columns: repeat(16, 1fr);
   gap: 2px;
   align-items: center;
 }
-html:root[data-theme-id="apple"] .usage-optical-cells > em {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-optical-cells > em {
   display: block;
   height: 4px;
   border-radius: 2px;
@@ -2541,17 +2578,21 @@ html:root[data-theme-id="apple"] .usage-optical-cells > em {
     background 240ms ease,
     opacity 240ms ease;
 }
-html:root[data-theme-id="apple"] .usage-optical-cells > em[data-lit] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-optical-cells
+  > em[data-lit] {
   background: var(--primary);
 }
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   .usage-limit-windows
   button[data-low]
   .usage-optical-cells
   > em[data-lit] {
   background: var(--destructive);
 }
-html:root[data-theme-id="apple"] .usage-optical-cells > em[data-pulse] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-optical-cells
+  > em[data-pulse] {
   animation: usageCellPulse 1.8s ease-in-out infinite;
 }
 @keyframes usageCellPulse {
@@ -2563,18 +2604,19 @@ html:root[data-theme-id="apple"] .usage-optical-cells > em[data-pulse] {
     opacity: 0.42;
   }
 }
-html:root[data-theme-id="apple"] .usage-limit-ring-card {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-limit-ring-card {
   transition:
     transform 240ms cubic-bezier(0.32, 0.72, 0, 1),
     box-shadow 240ms ease;
 }
-html:root[data-theme-id="apple"] .usage-limit-ring-card:hover {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-limit-ring-card:hover {
   transform: translateY(-2px);
   box-shadow:
     0 0 0 0.5px color-mix(in srgb, var(--foreground) 12%, transparent),
     0 12px 30px -8px rgba(0, 0, 0, 0.12);
 }
-html:root[data-theme-id="apple"] .usage-limit-ring-card[data-highlighted] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-limit-ring-card[data-highlighted] {
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--foreground) 22%, transparent),
     0 14px 34px -8px rgba(0, 0, 0, 0.16);
@@ -2829,7 +2871,7 @@ html:root[data-theme-id="apple"] .usage-limit-ring-card[data-highlighted] {
   padding: 0 10px 9px;
 }
 
-html:root[data-theme-id="apple"] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) {
   [data-app-modal]:has([data-usage-page]) {
     --primary: #ff5a1f;
     --ring: color-mix(in srgb, var(--foreground) 22%, transparent);
@@ -2853,37 +2895,41 @@ html:root[data-theme-id="apple"] {
   }
 }
 
-html:root[data-theme-id="apple"] [data-usage-sheet] .usage-analysis-panel .usage-grow {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  [data-usage-sheet]
+  .usage-analysis-panel
+  .usage-grow {
   background-color: color-mix(in srgb, var(--foreground) 30%, var(--card));
 }
 
-html:root[data-theme-id="apple"] :is(.usage-axis-labels, .usage-token-labels) {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  :is(.usage-axis-labels, .usage-token-labels) {
   position: relative;
   height: 20px;
   margin-left: 64px;
   padding-left: 0;
 }
 
-html:root[data-theme-id="apple"] .usage-section-title {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-section-title {
   font-size: 17px;
   line-height: 24px;
   font-weight: 600;
 }
 
 /* C81 Round 3: fixed slots use the content width, not the window width. */
-html:root[data-theme-id="apple"] [data-usage-limit-page] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-limit-page] {
   container-type: inline-size;
 }
-html:root[data-theme-id="apple"] [data-usage-limit-grid] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-limit-grid] {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
 @container (width < 1100px) {
-  html:root[data-theme-id="apple"] [data-usage-limit-grid] {
+  html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) [data-usage-limit-grid] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-html:root[data-theme-id="apple"] .usage-limit-ring-card {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]) .usage-limit-ring-card {
   height: 388px;
   border: 0;
 }
@@ -3109,10 +3155,12 @@ html:root[data-theme-id="apple"] .usage-limit-ring-card {
   outline: 2px solid var(--primary);
   outline-offset: 4px;
 }
-html:root[data-theme-id="apple"] .usage-limit-windows [data-t3-unused] {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-limit-windows
+  [data-t3-unused] {
   color: var(--muted-foreground);
 }
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   .usage-limit-windows
   [data-t3-unused]
   .usage-limit-group-track
@@ -3213,22 +3261,27 @@ html:root[data-theme-id="apple"]
 }
 
 /* Match the visible background composer's action to the usage portal while it is open. */
-html:root[data-theme-id="apple"]:has([data-usage-page], [data-usage-portal]) {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"]):has(
+    [data-usage-page],
+    [data-usage-portal]
+  ) {
   --message-action: #ff5a1f;
   --message-action-hover: #e84d14;
 }
 
-html:root[data-theme-id="apple"] .usage-limit-windows button:has(.usage-limit-group-track) {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-limit-windows
+  button:has(.usage-limit-group-track) {
   grid-template-columns: minmax(0, 1fr) 48px 40px;
 }
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   .usage-limit-windows
   button:has(.usage-limit-group-track)
   > span:first-of-type {
   grid-column: 1;
   grid-row: 1;
 }
-html:root[data-theme-id="apple"]
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
   .usage-limit-windows
   button:has(.usage-limit-group-track)
   > strong {
@@ -3236,7 +3289,10 @@ html:root[data-theme-id="apple"]
   grid-row: 1;
   text-align: right;
 }
-html:root[data-theme-id="apple"] .usage-limit-windows button .usage-limit-group-track {
+html:root:is([data-theme-id="apple"], [data-theme-id="stardust"])
+  .usage-limit-windows
+  button
+  .usage-limit-group-track {
   position: static;
   grid-column: 2;
   grid-row: 1;
