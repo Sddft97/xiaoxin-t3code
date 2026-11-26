@@ -925,14 +925,17 @@ it("puts rows that leave together back in order and folds the tail from its own 
     />
   );
   await using screen = await render(view(["a", "b", "c", "d", "e"]));
-  const tops = ["c", "d", "e"].map((id) => inboxRow(id).offsetTop);
+  const departing = ["c", "d", "e"].map((id) => ({ id, top: inboxRow(id).offsetTop }));
   await screen.rerender(view(["a", "b"]));
   await afterMeasure();
   const order = [...inboxRow("a").parentElement!.children].map((li) =>
     li.querySelector("[data-inbox-thread]")?.getAttribute("data-inbox-thread"),
   );
   expect(order).toEqual(["a", "b", "c", "d", "e"]);
-  expect(["c", "d", "e"].map((id) => inboxRow(id).offsetTop)).toEqual(tops);
+  // Integer offsetTop can round a fractional row position differently during the fold.
+  for (const { id, top } of departing) {
+    expect(Math.abs(inboxRow(id).offsetTop - top)).toBeLessThanOrEqual(1);
+  }
 });
 
 it("brings a row back mid-exit from exactly what was on screen, and leaves again the same way", async () => {

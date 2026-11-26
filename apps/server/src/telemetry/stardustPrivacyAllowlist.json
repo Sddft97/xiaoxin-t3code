@@ -1,5 +1,15 @@
 [
   {
+    "path": "apps/mobile/app.config.ts",
+    "line": "const HOSTED_APP_HOST = \"app.t3.codes\";",
+    "reason": "iOS Universal Links and Android App Links for shared T3 Connect threads."
+  },
+  {
+    "path": "apps/mobile/app.config.ts",
+    "line": "const CLERK_RELYING_PARTY = \"clerk.t3.codes\";",
+    "reason": "iOS associated domain for the T3 Connect sign-in flow and passkeys."
+  },
+  {
     "path": "packages/shared/src/connectAuth.ts",
     "line": "export const DEFAULT_HOSTED_APP_URL = \"https://app.t3.codes\";",
     "reason": "Official T3 Connect origin for user-initiated sign-in, agent approval, and hosted links."
