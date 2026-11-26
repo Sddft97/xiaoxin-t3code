@@ -47,17 +47,22 @@ describe("UsageModelDialog", () => {
 
     const dialog = page.getByRole("dialog");
     for (const [label, value] of [
-      ["Cost", "$2.00"],
+      ["Estimated cost", "$2.00"],
       ["Tokens", "1M"],
-      ["Per 1M tokens", "$2.00"],
-      ["Cache hit", "90.0%"],
+      ["Share of tokens", "100.0%"],
     ] as const) {
       await expect
         .element(dialog.getByRole("term").getByText(label, { exact: true }))
         .toBeVisible();
       await expect
-        .element(dialog.getByRole("definition").getByText(value, { exact: true }).first())
+        .element(dialog.getByRole("definition").getByLabelText(value, { exact: true }).first())
         .toBeVisible();
     }
+    await expect
+      .element(dialog.getByRole("term").getByText("Peak hour", { exact: true }))
+      .toBeVisible();
+    await expect
+      .element(dialog.getByRole("definition").getByText("No hourly usage", { exact: true }))
+      .toBeVisible();
   });
 });

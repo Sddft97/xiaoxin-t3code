@@ -1,4 +1,3 @@
-import { applyThemePalette } from "../../themePalette";
 import { testUiLocale } from "../../../test/uiLocale";
 import {
   EnvironmentId,
@@ -107,18 +106,6 @@ it("suppresses stale and failed quota predictions while keeping last readings vi
 });
 
 it("gives each Claude login its own card, titled by its instance name", async () => {
-  const root = document.documentElement;
-  const previousTheme = root.getAttribute("data-theme-id");
-  const previousStyle = root.getAttribute("style");
-  using _theme = {
-    [Symbol.dispose]() {
-      if (previousTheme === null) root.removeAttribute("data-theme-id");
-      else root.setAttribute("data-theme-id", previousTheme);
-      if (previousStyle === null) root.removeAttribute("style");
-      else root.setAttribute("style", previousStyle);
-    },
-  };
-  applyThemePalette("grove", "dark");
   const claude = (instanceId: string, displayName: string, email: string, used: number) => ({
     ...managedChatGpt(instanceId, displayName),
     driver: ProviderDriverKind.make("claudeAgent"),
@@ -154,12 +141,19 @@ it("gives each Claude login its own card, titled by its instance name", async ()
   await using screen = await render(
     <UsageLimitsPooled presentations={presentations} now={Date.parse(checkedAt)} />,
   );
-  const cards = [...screen.container.querySelectorAll<HTMLElement>("[data-usage-card]")];
-  const titles = cards.map((card) => card.querySelector("h2")?.textContent ?? "");
-  expect(titles.filter((title) => title.startsWith("Claude 小号 Pro"))).toHaveLength(1);
-  expect(titles.filter((title) => title.startsWith("Claude 小号 3"))).toHaveLength(1);
-  expect(cards.filter((card) => card.id.startsWith("usage-limit-claudeAgent:"))).toHaveLength(2);
-  const timeline = cards.map((card) => card.textContent ?? "").join("");
-  expect(timeline).toContain("Claude 小号 3Lowest remaining 40%");
-  expect(timeline).toContain("Claude 小号 ProLowest remaining 90%");
+  const cards = [
+    ...screen.container.querySelectorAll<HTMLElement>(
+      '[data-usage-card][id^="usage-limit-claudeAgent:"]',
+    ),
+  ];
+  expect(cards).toHaveLength(2);
+  for (const [label, remaining] of [
+    ["Claude 小号 Pro", "90%"],
+    ["Claude 小号 3", "40%"],
+  ] as const) {
+    const card = cards.find((item) =>
+      item.querySelector('h2, [data-lv9="v-title"]')?.textContent?.startsWith(label),
+    );
+    expect(card?.textContent).toContain(remaining);
+  }
 });
