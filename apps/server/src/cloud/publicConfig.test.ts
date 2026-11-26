@@ -20,6 +20,13 @@ it.effect("rejects an insecure runtime relay URL override", () =>
   ),
 );
 
+it.effect("uses the production T3 Connect hosted app by default", () =>
+  Effect.gen(function* () {
+    const origin = yield* hostedAppUrlConfig.pipe(provideEnv({}));
+    assert.equal(origin, "https://app.t3.codes");
+  }),
+);
+
 it.effect("rejects malformed or insecure hosted app URLs", () =>
   Effect.gen(function* () {
     for (const value of [

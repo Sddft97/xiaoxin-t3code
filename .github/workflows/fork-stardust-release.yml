@@ -175,6 +175,7 @@ jobs:
           UPSTREAM_TAG: ${{ needs.sync.outputs.upstream_tag }}
         run: node scripts/prepare-fork-stardust-package.mjs release/fork "$TAG" "$UPSTREAM_TAG"
       - name: Smoke test the signed update bundle
+        id: smoke
         env:
           TAG: ${{ needs.sync.outputs.tag }}
         timeout-minutes: 12
@@ -189,6 +190,14 @@ jobs:
           grep -Eq '^ +link +' "$RUNNER_TEMP/fork-connect-help.txt"
           node scripts/stardust-release/smoke.ts --version "${TAG#v}" \
             --executable "$app/Contents/MacOS/$executable" --output "$RUNNER_TEMP/fork-smoke-evidence"
+
+      - name: Upload package smoke diagnostics
+        if: failure() && steps.smoke.outcome == 'failure'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fork-smoke-evidence
+          path: ${{ runner.temp }}/fork-smoke-evidence
+          if-no-files-found: ignore
 
       - name: Require successful CI for the packaged commit
         env:

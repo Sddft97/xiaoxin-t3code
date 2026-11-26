@@ -72,8 +72,7 @@ try {
     const thread = page.locator("li[data-thread-item]", { hasText: THREAD_TITLE });
     if (!(await thread.isVisible())) {
       await page
-        .locator('[data-project-item="thread-category:unsorted"]')
-        .getByRole("button", { name: "Unsorted", exact: true })
+        .locator('[data-project-item="thread-category:unsorted"] [data-sidebar="menu-button"]')
         .click({ timeout: STEP_TIMEOUT_MS });
     }
     await thread.waitFor({ timeout: STEP_TIMEOUT_MS });

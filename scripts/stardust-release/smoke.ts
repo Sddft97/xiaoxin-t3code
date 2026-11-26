@@ -381,8 +381,7 @@ try {
       }
       if (!(await firstThread.first().isVisible())) {
         await page
-          .getByText(/^(待归类|Uncategorized)$/)
-          .first()
+          .locator('[data-project-item="thread-category:unsorted"] [data-sidebar="menu-button"]')
           .click();
       }
       const secondThread = page.locator("li[data-thread-item]", { hasText: "Second thread" });
