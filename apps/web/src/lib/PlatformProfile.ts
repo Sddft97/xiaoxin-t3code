@@ -7,7 +7,9 @@ const isWindowsDesktop = isElectron && id === "windows";
 
 export const platformProfile = {
   id,
-  platform,
+  get platform() {
+    return typeof navigator === "undefined" ? platform : navigator.platform;
+  },
   modLabel: id === "mac" ? "⌘" : "Ctrl",
   isWindowsDesktop,
   interfaceStyle: isWindowsDesktop ? "windows" : "default",

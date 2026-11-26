@@ -1,3 +1,4 @@
+import { applyThemePalette } from "../../themePalette";
 import { testUiLocale } from "../../../test/uiLocale";
 import {
   EnvironmentId,
@@ -106,6 +107,18 @@ it("suppresses stale and failed quota predictions while keeping last readings vi
 });
 
 it("gives each Claude login its own card, titled by its instance name", async () => {
+  const root = document.documentElement;
+  const previousTheme = root.getAttribute("data-theme-id");
+  const previousStyle = root.getAttribute("style");
+  using _theme = {
+    [Symbol.dispose]() {
+      if (previousTheme === null) root.removeAttribute("data-theme-id");
+      else root.setAttribute("data-theme-id", previousTheme);
+      if (previousStyle === null) root.removeAttribute("style");
+      else root.setAttribute("style", previousStyle);
+    },
+  };
+  applyThemePalette("grove", "dark");
   const claude = (instanceId: string, displayName: string, email: string, used: number) => ({
     ...managedChatGpt(instanceId, displayName),
     driver: ProviderDriverKind.make("claudeAgent"),

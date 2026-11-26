@@ -1,3 +1,4 @@
+import { useUiText } from "~/i18n/useUiText";
 import { findErrorTraceId, thrownErrorMessage } from "@t3tools/client-runtime/errors";
 import {
   isAtomCommandInterrupted,

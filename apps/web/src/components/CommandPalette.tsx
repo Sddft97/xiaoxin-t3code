@@ -1,3 +1,4 @@
+import { platformProfile } from "~/lib/PlatformProfile";
 import { buildProjectActionItems } from "./CommandPalette.logic";
 import { useLegacySidebarEnabled } from "../hooks/useSettings";
 import { getThreadSortTimestamp } from "@t3tools/client-runtime/state/thread-sort";

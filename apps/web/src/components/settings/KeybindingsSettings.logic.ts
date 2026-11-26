@@ -1,3 +1,4 @@
+import { platformProfile } from "~/lib/PlatformProfile";
 import {
   STATIC_KEYBINDING_COMMANDS,
   type ClientSettings,

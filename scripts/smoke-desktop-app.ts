@@ -57,8 +57,16 @@ try {
   });
   // A backend that never starts leaves no window, or only the "could not start" window, so the
   // thread wait below fails either way and its screenshot shows the startup error.
-  step = "waiting for the first window";
-  const page = await app.firstWindow({ timeout: STEP_TIMEOUT_MS });
+  step = "waiting for the main window";
+  const deadline = Date.now() + STEP_TIMEOUT_MS;
+  const mainWindow = () =>
+    app!.windows().find((window) => window.url().startsWith("t3code://app/"));
+  let page = mainWindow();
+  while (!page && Date.now() < deadline) {
+    await NodeTimersPromises.setTimeout(100);
+    page = mainWindow();
+  }
+  if (!page) throw new Error("The main desktop window did not open.");
   try {
     step = `finding "${THREAD_TITLE}" in the sidebar`;
     const thread = page.locator("li[data-thread-item]", { hasText: THREAD_TITLE });
