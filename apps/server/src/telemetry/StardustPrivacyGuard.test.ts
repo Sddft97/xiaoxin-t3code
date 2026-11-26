@@ -108,7 +108,7 @@ describe("Stardust privacy source guard", () => {
     ]);
   });
 
-  it("permits only individually documented non-network references", async () => {
+  it("permits only individually documented hosted service references", async () => {
     const seen = new Set<string>();
     const violations: string[] = [];
     const allowed = new Map(allowlist.map((entry) => [`${entry.path}\0${entry.line}`, entry]));

@@ -1,5 +1,10 @@
 [
   {
+    "path": "packages/shared/src/connectAuth.ts",
+    "line": "export const DEFAULT_HOSTED_APP_URL = \"https://app.t3.codes\";",
+    "reason": "Official T3 Connect origin for user-initiated sign-in, agent approval, and hosted links."
+  },
+  {
     "path": "packages/shared/src/threadLinks.ts",
     "line": "const HOSTED_PREFIX = \"https://app.t3.codes/threads/\";",
     "reason": "Recognizes older pasted links locally."
@@ -17,7 +22,7 @@
   {
     "path": "infra/relay/src/monitoring.ts",
     "line": "`    kind == \"client\" and url startswith \"https://relay.t3.codes/v1/environments/\" and url endswith \"/connect\", \"3. Relay connect, minting a host credential\",`,",
-    "reason": "Archived upstream infrastructure query for historical spans. The relay is not part of the Stardust product."
+    "reason": "Archived upstream infrastructure query for historical relay spans."
   },
   {
     "path": "apps/web/src/components/settings/TelemetryExportSettings.tsx",
