@@ -58,11 +58,11 @@ try {
   // A backend that never starts leaves no window, or only the "could not start" window, so the
   // thread wait below fails either way and its screenshot shows the startup error.
   step = "waiting for the main window";
-  const deadline = Date.now() + STEP_TIMEOUT_MS;
+  const deadline = performance.now() + STEP_TIMEOUT_MS;
   const mainWindow = () =>
     app!.windows().find((window) => window.url().startsWith("t3code://app/"));
   let page = mainWindow();
-  while (!page && Date.now() < deadline) {
+  while (!page && performance.now() < deadline) {
     await NodeTimersPromises.setTimeout(100);
     page = mainWindow();
   }
@@ -70,6 +70,12 @@ try {
   try {
     step = `finding "${THREAD_TITLE}" in the sidebar`;
     const thread = page.locator("li[data-thread-item]", { hasText: THREAD_TITLE });
+    if (!(await thread.isVisible())) {
+      await page
+        .locator('[data-project-item="thread-category:unsorted"]')
+        .getByRole("button", { name: "Unsorted", exact: true })
+        .click({ timeout: STEP_TIMEOUT_MS });
+    }
     await thread.waitFor({ timeout: STEP_TIMEOUT_MS });
     step = "opening the thread";
     await thread.click();
