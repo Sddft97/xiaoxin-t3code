@@ -117,12 +117,6 @@ const makePrimaryBroker = Effect.fn("clientRuntime.connection.broker.makePrimary
   });
 });
 
-const hostedConnectionDisabled = () =>
-  new ConnectionBlockedError({
-    reason: "configuration",
-    ...translatableDetail(msg("Hosted connections are unavailable in Stardust.")),
-  });
-
 const makeBearerBroker = Effect.fn("clientRuntime.connection.broker.makeBearer")(function* () {
   const credentials = yield* ConnectionCredentialStore.ConnectionCredentialStore;
   const remote = yield* RemoteEnvironmentAuthorization.RemoteEnvironmentAuthorization;
@@ -151,7 +145,11 @@ const makeBearerBroker = Effect.fn("clientRuntime.connection.broker.makeBearer")
       });
     }
     if (profile.authorization === "t3-connect") {
-      return yield* hostedConnectionDisabled();
+      const authorized = yield* remote.authorizeDpop({
+        expectedEnvironmentId: target.environmentId,
+        directEndpoint: { httpBaseUrl: profile.httpBaseUrl, wsBaseUrl: profile.wsBaseUrl },
+      });
+      return { ...authorized, target } satisfies PreparedConnection;
     }
     const credential = yield* credentials.get(credentialConnectionId(target.connectionId)).pipe(
       Effect.flatMap(
@@ -260,6 +258,7 @@ export const make = Effect.gen(function* () {
   const primary = yield* makePrimaryBroker();
   const bearer = yield* makeBearerBroker();
   const ssh = yield* makeSshBroker();
+  const remote = yield* RemoteEnvironmentAuthorization.RemoteEnvironmentAuthorization;
   const httpClient = yield* HttpClient.HttpClient;
 
   const authorize = Effect.fn("clientRuntime.connection.broker.authorize")(function* (
@@ -279,7 +278,10 @@ export const make = Effect.gen(function* () {
         case "BearerConnectionTarget":
           return bearer({ ...entry, target });
         case "RelayConnectionTarget":
-          return Effect.fail(hostedConnectionDisabled());
+          return remote.authorizeDpop({ expectedEnvironmentId: target.environmentId }).pipe(
+            Effect.map((authorized) => ({ ...authorized, target })),
+            Effect.withSpan("clientRuntime.connection.broker.relay"),
+          );
         case "SshConnectionTarget":
           return ssh({ ...entry, target });
       }

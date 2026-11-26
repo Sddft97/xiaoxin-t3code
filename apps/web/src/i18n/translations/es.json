@@ -532,7 +532,6 @@
   "1d195c550f6dea22": "Este entorno no tiene un endpoint de conexión guardado.",
   "c0794944a743d980": "Esa dirección dice ser {host}, que ya está guardado. Añádela como ruta desde los ajustes de ese entorno.",
   "7eabeed193759388": "El orden de rutas debe incluir cada ruta guardada una vez.",
-  "06c545463700574b": "Las conexiones alojadas no están disponibles en Stardust.",
   "18de69e3b6ac3891": "El perfil de conexión {connectionId} no es una conexión bearer.",
   "0a84ce2f4fb90d82": "El perfil de conexión {connectionId} no es una conexión SSH.",
   "468d32c6b30df608": "Tailscale HTTPS",

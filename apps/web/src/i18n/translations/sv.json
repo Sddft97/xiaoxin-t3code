@@ -532,7 +532,6 @@
   "1d195c550f6dea22": "Den här miljön har ingen sparad anslutningsslutpunkt.",
   "c0794944a743d980": "Den adressen påstår sig vara {host}, som redan är sparad. Lägg till den som en rutt från den miljöns inställningar i stället.",
   "7eabeed193759388": "Ruttordningen måste ta med varje sparad rutt en gång.",
-  "06c545463700574b": "Värdbaserade anslutningar är inte tillgängliga i Stardust.",
   "18de69e3b6ac3891": "Anslutningsprofilen {connectionId} är ingen bearer-anslutning.",
   "0a84ce2f4fb90d82": "Anslutningsprofilen {connectionId} är ingen SSH-anslutning.",
   "468d32c6b30df608": "Tailscale HTTPS",

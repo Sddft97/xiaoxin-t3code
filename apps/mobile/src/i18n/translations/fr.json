@@ -532,7 +532,6 @@
   "1d195c550f6dea22": "Cet environnement n’a pas de point de terminaison de connexion enregistré.",
   "c0794944a743d980": "Cette adresse prétend être {host}, déjà enregistré. Ajoutez-la plutôt comme route depuis les paramètres de cet environnement.",
   "7eabeed193759388": "L’ordre des routes doit lister chaque route enregistrée une seule fois.",
-  "06c545463700574b": "Les connexions hébergées ne sont pas disponibles dans Stardust.",
   "18de69e3b6ac3891": "Le profil de connexion {connectionId} n’est pas une connexion bearer.",
   "0a84ce2f4fb90d82": "Le profil de connexion {connectionId} n’est pas une connexion SSH.",
   "468d32c6b30df608": "Tailscale HTTPS",

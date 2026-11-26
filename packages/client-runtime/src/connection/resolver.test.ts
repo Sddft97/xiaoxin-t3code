@@ -14,6 +14,7 @@ import * as ClientCapabilities from "../platform/capabilities.ts";
 import * as RemoteEnvironmentAuthorization from "../authorization/service.ts";
 import {
   BearerConnectionCredential,
+  BearerConnectionProfile,
   type ConnectionCatalogEntry,
   SshConnectionProfile,
   type ConnectionCredential,
@@ -21,8 +22,10 @@ import {
 } from "./catalog.ts";
 import * as ConnectionCredentialStore from "./credentialStore.ts";
 import {
+  BearerConnectionTarget,
   ConnectionTransientError,
   PrimaryConnectionTarget,
+  RelayConnectionTarget,
   SshConnectionTarget,
   type ConnectionTarget,
 } from "./model.ts";
@@ -171,6 +174,58 @@ const makeDependencies = Effect.fn("TestConnectionResolver.makeDependencies")((o
 });
 
 describe("ConnectionResolver", () => {
+  it.effect.each(["relay", "learned-direct"] as const)(
+    "prepares a saved T3 Connect route using %s authorization",
+    (route) =>
+      Effect.gen(function* () {
+        const identity = { environmentId: ENVIRONMENT_ID, label: "Saved environment" };
+        const target =
+          route === "relay"
+            ? new RelayConnectionTarget(identity)
+            : new BearerConnectionTarget({ ...identity, connectionId: "learned-route" });
+        const layerBroker = yield* makeDependencies({
+          authorizeDpop: (input) =>
+            Effect.sync(() => {
+              expect(input).toEqual({
+                expectedEnvironmentId: ENVIRONMENT_ID,
+                ...(route === "learned-direct" && { directEndpoint: ENDPOINT }),
+              });
+              return {
+                ...identity,
+                httpBaseUrl: ENDPOINT.httpBaseUrl,
+                socketUrl: `${ENDPOINT.wsBaseUrl}/ws?wsTicket=dpop`,
+                httpAuthorization: {
+                  _tag: "Dpop" as const,
+                  accessToken: "test-token",
+                  expiresAtEpochMs: Number.MAX_SAFE_INTEGER,
+                },
+              };
+            }),
+        });
+        const broker = yield* ConnectionResolver.ConnectionResolver.pipe(
+          Effect.provide(layerBroker),
+        );
+        const profile =
+          target._tag === "BearerConnectionTarget"
+            ? Option.some(
+                new BearerConnectionProfile({
+                  ...identity,
+                  ...ENDPOINT,
+                  connectionId: target.connectionId,
+                  authorization: "t3-connect",
+                  learned: true,
+                }),
+              )
+            : Option.none();
+
+        const prepared = yield* broker.prepare(catalogEntry(target, profile));
+
+        expect(prepared.target).toEqual(target);
+        expect(prepared.httpAuthorization?._tag).toBe("Dpop");
+        expect(new URL(prepared.socketUrl).searchParams.get("wsTicket")).toBe("dpop");
+      }),
+  );
+
   it.effect("blocks an old host during discovery before opening orchestration RPC", () =>
     Effect.gen(function* () {
       const layerBroker = yield* makeDependencies({ descriptorProtocolVersion: null });

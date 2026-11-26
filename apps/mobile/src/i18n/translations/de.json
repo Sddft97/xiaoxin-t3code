@@ -532,7 +532,6 @@
   "1d195c550f6dea22": "Diese Umgebung hat keinen gespeicherten Verbindungsendpunkt.",
   "c0794944a743d980": "Diese Adresse gibt sich als {host} aus, das bereits gespeichert ist. Füge sie stattdessen in den Einstellungen dieser Umgebung als Route hinzu.",
   "7eabeed193759388": "Die Routenreihenfolge muss jede gespeicherte Route genau einmal enthalten.",
-  "06c545463700574b": "Gehostete Verbindungen sind in Stardust nicht verfügbar.",
   "18de69e3b6ac3891": "Verbindungsprofil {connectionId} ist keine Bearer-Verbindung.",
   "0a84ce2f4fb90d82": "Verbindungsprofil {connectionId} ist keine SSH-Verbindung.",
   "468d32c6b30df608": "Tailscale HTTPS",
