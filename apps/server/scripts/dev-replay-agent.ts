@@ -282,8 +282,9 @@ function runAgent(): void {
         "status" in params.update &&
         params.update.status === "completed"
       ) {
-        await sleep(30_000, signal);
-        if (signal.aborted) return;
+        // The packaged smoke captures the active turn before exercising cancellation.
+        await untilAbort(new Promise<never>(() => undefined), signal);
+        return "cancelled";
       }
     }
   };
