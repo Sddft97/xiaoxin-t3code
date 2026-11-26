@@ -125,7 +125,7 @@ async function readBundleCommunityVersion(
       "utf8",
     );
     const info = parseStardustBuildInfo(raw);
-    if (info) return info.communityVersion;
+    if (info) return info.forkReleaseVersion;
   } catch {}
   try {
     const shortVersion = await execFile("/usr/bin/plutil", [
