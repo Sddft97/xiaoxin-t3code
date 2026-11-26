@@ -8,10 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       upstream_tag:
-        description: Existing upstream Stardust release tag to package
-        required: true
+        description: Upstream Stardust release tag (defaults to the latest release)
+        required: false
         type: string
-        default: v1.2.3
 
 permissions:
   contents: write
@@ -29,6 +28,8 @@ jobs:
     outputs:
       tag: ${{ steps.version.outputs.tag }}
       upstream_tag: ${{ steps.version.outputs.upstream_tag }}
+      skip: ${{ steps.version.outputs.skip }}
+      source_sha: ${{ steps.source.outputs.sha }}
     steps:
       - name: Resolve the upstream Stardust release
         id: version
@@ -39,9 +40,9 @@ jobs:
         run: |
           set -euo pipefail
           if [[ -n "$REQUESTED_TAG" ]]; then
-            gh api "repos/zds-xiaoxin/xiaoxin-t3code/releases/tags/$REQUESTED_TAG" > "$RUNNER_TEMP/release.json"
+            gh api "repos/zds-xiaoxin/stardust/releases/tags/$REQUESTED_TAG" > "$RUNNER_TEMP/release.json"
           else
-            gh api repos/zds-xiaoxin/xiaoxin-t3code/releases/latest > "$RUNNER_TEMP/release.json"
+            gh api repos/zds-xiaoxin/stardust/releases/latest > "$RUNNER_TEMP/release.json"
           fi
           node -e '
             const fs = require("node:fs");
@@ -52,9 +53,9 @@ jobs:
             const tag = `v${match[1]}.${match[2]}.${Number(match[3]) + 1}`;
             fs.appendFileSync(process.env.GITHUB_OUTPUT, `upstream_tag=${release.tag_name}\ntag=${tag}\nupstream_version=${upstreamVersion}\n`);
           '
-          gh api "repos/zds-xiaoxin/xiaoxin-t3code/git/ref/tags/$(node -p 'require(process.env.RUNNER_TEMP + "/release.json").tag_name')" > "$RUNNER_TEMP/upstream-commit.json"
+          gh api "repos/zds-xiaoxin/stardust/git/ref/tags/$(node -p 'require(process.env.RUNNER_TEMP + "/release.json").tag_name')" > "$RUNNER_TEMP/upstream-commit.json"
           if [[ "$(node -p 'require(process.env.RUNNER_TEMP + "/upstream-commit.json").object.type')" == tag ]]; then
-            gh api "repos/zds-xiaoxin/xiaoxin-t3code/git/tags/$(node -p 'require(process.env.RUNNER_TEMP + "/upstream-commit.json").object.sha')" > "$RUNNER_TEMP/upstream-commit.json"
+            gh api "repos/zds-xiaoxin/stardust/git/tags/$(node -p 'require(process.env.RUNNER_TEMP + "/upstream-commit.json").object.sha')" > "$RUNNER_TEMP/upstream-commit.json"
           fi
           node -e '
             const fs = require("node:fs");
@@ -71,6 +72,7 @@ jobs:
           fi
 
       - name: Checkout the fork
+        if: steps.version.outputs.skip != 'true'
         uses: actions/checkout@v6
         with:
           ref: main
@@ -87,15 +89,20 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git remote add upstream https://github.com/zds-xiaoxin/xiaoxin-t3code.git
+          git remote add upstream https://github.com/zds-xiaoxin/stardust.git
           git fetch upstream "$UPSTREAM_COMMIT"
           # Already-integrated upstream releases produce no second merge commit.
           if ! git merge-base --is-ancestor "$UPSTREAM_COMMIT" HEAD; then
+            if ! git merge-base HEAD "$UPSTREAM_COMMIT" > /dev/null; then
+              echo "::error::Stardust $UPSTREAM_TAG has independent Git history. Integrate its source into the fork before publishing."
+              exit 1
+            fi
             git merge --no-ff "$UPSTREAM_COMMIT" -m "chore: merge Stardust $UPSTREAM_TAG into the fork"
             git push origin main
           fi
 
       - name: Verify the fork customizations survive every merge
+        id: source
         if: steps.version.outputs.skip != 'true'
         shell: bash
         run: |
@@ -105,17 +112,19 @@ jobs:
           grep -q 'resolvePublicConfig(baseEnv, localEnv, rootEnv, exampleEnv)' scripts/lib/public-config.ts
           test "$(git show "${{ steps.version.outputs.upstream_commit }}:scripts/lib/public-config.ts" | grep -c 'resolvePublicConfig(baseEnv, localEnv, rootEnv)')" -gt 0
 
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
   build:
     name: Build fork macOS arm64 update
     needs: sync
-    if: needs.sync.outputs.skip != 'true'
+    if: needs.sync.outputs.skip == 'false'
     runs-on: macos-latest
     timeout-minutes: 90
     steps:
       - name: Checkout merged fork source
         uses: actions/checkout@v6
         with:
-          ref: main
+          ref: ${{ needs.sync.outputs.source_sha }}
           fetch-depth: 0
 
       - name: Setup Vite+

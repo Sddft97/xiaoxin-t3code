@@ -9,21 +9,21 @@ if (!directory || !/^v[1-9]\d{0,5}\.\d{1,5}\.\d{1,5}$/.test(expectedTag ?? "") |
   );
 }
 
-const upstreamVersion = upstreamTag.replace(/^v/, "");
+const releaseVersion = expectedTag.slice(1);
 const sourceZip = NodeFS.readdirSync(directory).find((name) =>
   /^T3-Code-.*-arm64\.zip$/.test(name),
 );
 if (!sourceZip) throw new Error(`No packaged arm64 ZIP found in ${directory}`);
 
-const fileName = `T3-Stardust-${expectedTag.slice(1)}-macOS-arm64.zip`;
+const fileName = `T3-Stardust-${releaseVersion}-macOS-arm64.zip`;
 const upstreamExtract = NodeFS.mkdtempSync(
   NodePath.join(NodePath.dirname(directory), "fork-shell-"),
 );
 const extracted = NodeFS.mkdtempSync(NodePath.join(NodePath.dirname(directory), "fork-package-"));
 try {
-  const shellZip = NodePath.join(upstreamExtract, `T3-Stardust-${upstreamTag}-macOS-arm64.zip`);
+  const shellZip = NodePath.join(upstreamExtract, `Stardust-${upstreamTag}-macOS-arm64.zip`);
   download(
-    `https://github.com/zds-xiaoxin/xiaoxin-t3code/releases/download/${upstreamTag}/T3-Stardust-${upstreamTag}-macOS-arm64.zip`,
+    `https://github.com/zds-xiaoxin/stardust/releases/download/${upstreamTag}/Stardust-${upstreamTag}-macOS-arm64.zip`,
     shellZip,
   );
   run("/usr/bin/ditto", ["-x", "-k", shellZip, upstreamExtract]);
@@ -41,7 +41,7 @@ try {
   for (const [key, value] of [
     ["CFBundleDisplayName", "T3 Stardust"],
     ["CFBundleName", "T3 Stardust"],
-    ["CFBundleShortVersionString", expectedTag.slice(1)],
+    ["CFBundleShortVersionString", releaseVersion],
     ["CFBundleVersion", expectedTag],
   ])
     run("/usr/bin/plutil", ["-replace", key, "-string", value, plist]);
@@ -65,8 +65,9 @@ try {
     `${JSON.stringify(
       {
         schema: 1,
-        communityVersion: upstreamVersion,
-        forkReleaseVersion: expectedTag.slice(1),
+        // Installed v1.2.4 checks communityVersion against the fork release tag.
+        communityVersion: releaseVersion,
+        forkReleaseVersion: releaseVersion,
         customBuild: `fork-${upstreamTag}`,
         releaseVersion: expectedTag,
         publicRelease: false,
