@@ -1,8 +1,8 @@
 export const STARDUST_THEME_ID = "stardust";
-export const MOBILE_DEFAULT_THEME_ID = "t3-chat";
+export const MOBILE_DEFAULT_THEME_ID = "t3-code";
 export const ENABLE_STARDUST_THEME_MIGRATION = true;
 
-export const BUILT_IN_THEME_IDS = ["grove", "ocean", "ember"] as const;
+export const BUILT_IN_THEME_IDS = ["t3-chat", "grove", "ocean", "ember", "iris"] as const;
 const SKIN_THEME_IDS = ["harbor", "mist", "graphite", "ink", "apple"] as const;
 export const MOBILE_THEME_IDS = [MOBILE_DEFAULT_THEME_ID, ...BUILT_IN_THEME_IDS] as const;
 
@@ -42,8 +42,6 @@ export const RESERVED_THEME_IDS: ReadonlySet<string> = new Set([
   STARDUST_THEME_ID,
   ...BUILT_IN_THEME_IDS,
   ...SKIN_THEME_IDS,
-  "t3-chat",
-  "iris",
   ...Object.keys(LEGACY_THEME_ID_ALIASES),
   ...Object.keys(STARDUST_THEME_MIGRATION),
 ]);
@@ -1703,9 +1701,11 @@ export const SKIN_THEMES: ReadonlyArray<ThemeDefinition> = [
 ];
 
 export const BUILT_IN_THEMES: ReadonlyArray<ThemeDefinition> = [
-  OCEAN_THEME,
+  T3_CHAT_THEME,
   GROVE_THEME,
+  OCEAN_THEME,
   EMBER_THEME,
+  IRIS_THEME,
 ];
 
 export const DESKTOP_THEMES: ReadonlyArray<ThemeDefinition> = [
