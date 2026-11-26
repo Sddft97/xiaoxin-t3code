@@ -9,12 +9,13 @@ if (!directory || !/^v[1-9]\d{0,5}\.\d{1,5}\.\d{1,5}$/.test(expectedTag ?? "") |
   );
 }
 
-const fileName = `T3-Stardust-${expectedTag.slice(1)}-macOS-arm64.zip`;
+const upstreamVersion = upstreamTag.replace(/^v/, "");
 const sourceZip = NodeFS.readdirSync(directory).find((name) =>
   /^T3-Code-.*-arm64\.zip$/.test(name),
 );
 if (!sourceZip) throw new Error(`No packaged arm64 ZIP found in ${directory}`);
 
+const fileName = `T3-Stardust-${expectedTag.slice(1)}-macOS-arm64.zip`;
 const upstreamExtract = NodeFS.mkdtempSync(
   NodePath.join(NodePath.dirname(directory), "fork-shell-"),
 );
@@ -64,7 +65,8 @@ try {
     `${JSON.stringify(
       {
         schema: 1,
-        communityVersion: expectedTag.slice(1),
+        communityVersion: upstreamVersion,
+        forkReleaseVersion: expectedTag.slice(1),
         customBuild: `fork-${upstreamTag}`,
         releaseVersion: expectedTag,
         publicRelease: false,

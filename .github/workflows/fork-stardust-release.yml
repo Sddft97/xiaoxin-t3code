@@ -48,8 +48,9 @@ jobs:
             const release = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + "/release.json", "utf8"));
             const match = /^v([1-9]\d{0,5})\.(\d{1,5})\.(\d{1,5})$/.exec(release.tag_name || "");
             if (!match || release.draft || release.prerelease) throw new Error("Expected a stable Stardust release");
-            const version = `${match[1]}.${match[2]}.${Number(match[3]) + 1}`;
-            fs.appendFileSync(process.env.GITHUB_OUTPUT, `upstream_tag=${release.tag_name}\ntag=v${version}\nupstream_version=${match.slice(1).join(".")}\n`);
+            const upstreamVersion = match.slice(1, 4).join(".");
+            const tag = `v${match[1]}.${match[2]}.${Number(match[3]) + 1}`;
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `upstream_tag=${release.tag_name}\ntag=${tag}\nupstream_version=${upstreamVersion}\n`);
           '
           gh api "repos/zds-xiaoxin/xiaoxin-t3code/git/ref/tags/$(node -p 'require(process.env.RUNNER_TEMP + "/release.json").tag_name')" > "$RUNNER_TEMP/upstream-commit.json"
           if [[ "$(node -p 'require(process.env.RUNNER_TEMP + "/upstream-commit.json").object.type')" == tag ]]; then
@@ -61,8 +62,9 @@ jobs:
             if (ref.object.type !== "commit") throw new Error(`Expected a commit-tagged release, got ${ref.object.type}`);
             fs.appendFileSync(process.env.GITHUB_OUTPUT, `upstream_commit=${ref.object.sha}\n`);
           '
-          if gh release view "$(node -p '"v" + require(process.env.RUNNER_TEMP + "/release.json").tag_name.slice(1).replace(/(\d+)$/, (_, patch) => Number(patch) + 1)')" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            echo 'This fork release is already published; no package will be replaced.'
+          releaseTag=$(node -p '"v" + require(process.env.RUNNER_TEMP + "/release.json").tag_name.slice(1).replace(/(\d+)$/, (_, patch) => Number(patch) + 1)')
+          if gh release view "$releaseTag" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "This fork release is already published; no package will be replaced."
             echo 'skip=true' >> "$GITHUB_OUTPUT"
           else
             echo 'skip=false' >> "$GITHUB_OUTPUT"
@@ -86,7 +88,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git remote add upstream https://github.com/zds-xiaoxin/xiaoxin-t3code.git
-          git fetch --no-tags --depth=1 upstream "$UPSTREAM_COMMIT"
+          git fetch upstream "$UPSTREAM_COMMIT"
           # Already-integrated upstream releases produce no second merge commit.
           if ! git merge-base --is-ancestor "$UPSTREAM_COMMIT" HEAD; then
             git merge --no-ff "$UPSTREAM_COMMIT" -m "chore: merge Stardust $UPSTREAM_TAG into the fork"

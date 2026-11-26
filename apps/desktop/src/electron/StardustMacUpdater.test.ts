@@ -110,6 +110,7 @@ function makeFixture(options: FakeOptions = {}) {
   const deps: StardustMacUpdaterDeps = {
     buildInfo: {
       communityVersion: options.runningVersion ?? "1.2.1",
+      forkReleaseVersion: options.runningVersion ?? "1.2.1",
       customBuild: "C109-stardust",
     },
     currentAppPath,

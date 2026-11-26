@@ -112,8 +112,10 @@ export function normalizeStardustVersion(value: string): string | null {
 }
 
 export interface StardustBuildInfo {
-  /** The public release this build corresponds to, e.g. `1.2.1`. */
+  /** The public upstream release this build corresponds to, e.g. `1.2.1`. */
   readonly communityVersion: string;
+  /** The fork update release being run, e.g. `1.2.4-fork.1`; plain for upstream packages. */
+  readonly forkReleaseVersion: string;
   /** Local build label such as `C109-stardust`; public zips carry one too. */
   readonly customBuild: string | null;
 }
@@ -133,8 +135,13 @@ export function parseStardustBuildInfo(raw: string): StardustBuildInfo | null {
       ? normalizeStardustVersion(record.communityVersion)
       : null;
   if (communityVersion === null) return null;
+  const forkReleaseVersion =
+    typeof record.forkReleaseVersion === "string"
+      ? normalizeStardustVersion(record.forkReleaseVersion)
+      : null;
   return {
     communityVersion,
+    forkReleaseVersion: forkReleaseVersion ?? communityVersion,
     customBuild:
       typeof record.customBuild === "string" && record.customBuild.trim().length > 0
         ? record.customBuild.trim()

@@ -59,6 +59,7 @@ describe("Stardust versions", () => {
     expect(parseStardustVersion("0.1.11")).toBeNull();
     expect(parseStardustVersion("0.1.11-nightly.20261122.4756")).toBeNull();
     expect(parseStardustVersion("1.2.2-beta.1")).toBeNull();
+    expect(parseStardustVersion("1.2.4-fork.1")).toBeNull();
     expect(parseStardustVersion("C109-stardust")).toBeNull();
   });
 
@@ -71,6 +72,8 @@ describe("Stardust versions", () => {
     expect(isStardustUpgrade("2.0.0", "1.99.99")).toBe(true);
     // Equal or older: never offered, also to local builds carrying newer code.
     expect(isStardustUpgrade("1.2.1", "1.2.1")).toBe(false);
+    expect(isStardustUpgrade("1.2.5", "1.2.4")).toBe(true);
+    expect(isStardustUpgrade("1.2.4", "1.2.5")).toBe(false);
     expect(isStardustUpgrade("1.2.0", "1.2.1")).toBe(false);
     expect(isStardustUpgrade("garbage", "1.2.1")).toBe(false);
   });
@@ -79,9 +82,26 @@ describe("Stardust versions", () => {
     const info = parseStardustBuildInfo(
       JSON.stringify({ customBuild: "C109-stardust", communityVersion: "1.2.1", schema: 105 }),
     );
-    expect(info).toEqual({ communityVersion: "1.2.1", customBuild: "C109-stardust" });
+    expect(info).toEqual({
+      communityVersion: "1.2.1",
+      forkReleaseVersion: "1.2.1",
+      customBuild: "C109-stardust",
+    });
     expect(parseStardustBuildInfo(JSON.stringify({ customBuild: "C1" }))).toBeNull();
     expect(parseStardustBuildInfo("{not json")).toBeNull();
+    expect(
+      parseStardustBuildInfo(
+        JSON.stringify({
+          communityVersion: "1.2.4",
+          forkReleaseVersion: "1.2.5",
+          customBuild: "fork-v1.2.4",
+        }),
+      ),
+    ).toEqual({
+      communityVersion: "1.2.4",
+      forkReleaseVersion: "1.2.5",
+      customBuild: "fork-v1.2.4",
+    });
     expect(parseStardustBuildInfo(JSON.stringify({ communityVersion: "0.1.11" }))).toBeNull();
   });
 });
@@ -99,6 +119,14 @@ describe("parseStardustRelease", () => {
     });
     expect(release.releaseNotes).toContain("T3 星尘版 v1.2.2");
     expect(release.releaseDate).toBe("2026-11-22T09:50:42Z");
+  });
+
+  it("accepts the next fork package version for a new upstream release", () => {
+    const value = githubRelease("1.2.5");
+    const release = parseStardustRelease(value);
+    expect(release.version).toBe("1.2.5");
+    expect(isStardustUpgrade(release.version, "1.2.4")).toBe(true);
+    expect(release.asset.name).toBe("T3-Stardust-v1.2.5-macOS-arm64.zip");
   });
 
   it("accepts the asset name without the v prefix", () => {

@@ -302,7 +302,7 @@ export function makeStardustMacUpdater(deps: StardustMacUpdaterDeps) {
   const events = new NodeEvents.EventEmitter();
   const paths = stardustUpdatePaths(deps.homeDirectory);
   const now = deps.now ?? Date.now;
-  const runningVersion = deps.buildInfo.communityVersion;
+  const runningVersion = deps.buildInfo.forkReleaseVersion;
   let latest: StardustRelease | null = null;
   let prepared: PreparedUpdate | null = null;
   let autoInstallOnAppQuit = false;
