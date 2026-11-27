@@ -31,10 +31,10 @@ import { m, type MessageResolver } from "~/i18n/messages";
 import { tickTextContent } from "~/lib/tickTextContent";
 import { BackgroundWorkDetails } from "./BackgroundWorkDetails";
 import { Button, InlineButton } from "../ui/button";
-import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import type { ComposerBannerStackItem } from "./ComposerBannerStack";
 import type { ThreadNowItem } from "./ThreadNow";
+import { SharedTooltipTrigger } from "../ui/shared-tooltip";
 
 export function extensionStatusBannerItem(
   statuses: NonNullable<OrchestrationV2ProviderSession["extensionStatuses"]>,
@@ -244,6 +244,7 @@ export function backgroundWorkNowItem(
   const startedAtMs = only?.startedAtMs ?? null;
   return {
     id: `background-work:${input.threadId}`,
+    titleText: presentation.title,
     icon: rows.every(isCommand) ? <TerminalIcon /> : <CircleDashedIcon />,
     title:
       only && typeof only.label !== "string" && only.task.label !== only.task.kind ? (
@@ -315,21 +316,21 @@ export function branchMismatchBannerItem(
 ): ComposerBannerStackItem {
   const { mismatch } = input;
   const branchTooltip = (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <code className="min-w-0 truncate font-medium text-foreground">
-            {mismatch.threadBranch}
-          </code>
-        }
-      />
-      <TooltipPopup side="top">
-        <T>
-          This thread last ran on <Var>{mismatch.threadBranch}</Var>. Sending will continue on{" "}
-          <Var>{mismatch.currentBranch}</Var>.
-        </T>
-      </TooltipPopup>
-    </Tooltip>
+    <SharedTooltipTrigger
+      render={
+        <code className="min-w-0 truncate font-medium text-foreground">
+          {mismatch.threadBranch}
+        </code>
+      }
+      label={
+        <>
+          <T>
+            This thread last ran on <Var>{mismatch.threadBranch}</Var>. Sending will continue on{" "}
+            <Var>{mismatch.currentBranch}</Var>.
+          </T>
+        </>
+      }
+    />
   );
   return {
     id: `branch-mismatch:${input.mismatchKey}`,

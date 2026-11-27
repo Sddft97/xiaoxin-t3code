@@ -60,6 +60,7 @@ export class DesktopEnvironment extends Context.Service<
     readonly clientAssetsDir: string;
     readonly backendCwd: string;
     readonly preloadPath: string;
+    readonly previewPickPreloadPath: string;
     readonly compileCachePath: string;
     readonly appUpdateYmlPath: string;
     readonly devServerUrl: Option.Option<URL>;
@@ -111,7 +112,8 @@ export function resolveDesktopAppBranding(input: {
     stageLabel,
     // Stardust custom build: shown in the menu bar, About panel and Hide/Quit items.
     // Only the visible name changes; app.setName (keychain, User-Agent) and userData keep the base name.
-    displayName: stageLabel === "Dev" ? `${STARDUST_DISPLAY_NAME} (${stageLabel})` : STARDUST_DISPLAY_NAME,
+    displayName:
+      stageLabel === "Dev" ? `${STARDUST_DISPLAY_NAME} (${stageLabel})` : STARDUST_DISPLAY_NAME,
   };
 }
 
@@ -176,9 +178,14 @@ const make = Effect.fn("desktop.environment.make")(function* (
     isDevelopment,
     appVersion: input.appVersion,
   });
-  const windowsBranding = input.platform === "win32"
-    ? { ...branding, baseName: STARDUST_WINDOWS_BRAND.displayName, displayName: STARDUST_WINDOWS_BRAND.displayName }
-    : branding;
+  const windowsBranding =
+    input.platform === "win32"
+      ? {
+          ...branding,
+          baseName: STARDUST_WINDOWS_BRAND.displayName,
+          displayName: STARDUST_WINDOWS_BRAND.displayName,
+        }
+      : branding;
   const displayName = windowsBranding.displayName;
   const stateDir = resolveDesktopStateDir({
     baseDir,
@@ -219,6 +226,7 @@ const make = Effect.fn("desktop.environment.make")(function* (
     clientAssetsDir: path.join(serverRoot, "apps/server/dist/client"),
     backendCwd: input.isPackaged ? homeDirectory : appRoot,
     preloadPath: path.join(input.dirname, "preload.cjs"),
+    previewPickPreloadPath: path.join(input.dirname, "preview-pick-preload.cjs"),
     compileCachePath: path.join(input.dirname, "compileCache.cjs"),
     appUpdateYmlPath: input.isPackaged
       ? path.join(resourcesPath, "app-update.yml")
@@ -235,13 +243,16 @@ const make = Effect.fn("desktop.environment.make")(function* (
     otlpProtocol: config.otlpProtocol,
     branding: windowsBranding,
     displayName,
-    appUserModelId: input.platform === "win32" && input.isPackaged
-      ? STARDUST_WINDOWS_BRAND.appId
-      : Option.getOrElse(config.appUserModelIdOverride, () =>
-          input.platform === "win32"
-            ? `${STARDUST_WINDOWS_BRAND.appId}.dev`
-            : isDevelopment ? "com.t3tools.t3code.dev" : "com.t3tools.t3code",
-        ),
+    appUserModelId:
+      input.platform === "win32" && input.isPackaged
+        ? STARDUST_WINDOWS_BRAND.appId
+        : Option.getOrElse(config.appUserModelIdOverride, () =>
+            input.platform === "win32"
+              ? `${STARDUST_WINDOWS_BRAND.appId}.dev`
+              : isDevelopment
+                ? "com.t3tools.t3code.dev"
+                : "com.t3tools.t3code",
+          ),
     linuxDesktopEntryName: resolveLinuxDesktopEntryName(isDevelopment),
     linuxApplicationsDir,
     desktopLauncherPath: config.desktopLauncherPath,

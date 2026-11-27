@@ -1,41 +1,21 @@
-import type { StorageTidyScan, StorageTidyState, StorageTidyVolume } from "@t3tools/contracts";
-import { ShieldCheckIcon } from "lucide-react";
+import type { StorageTidyState, StorageTidyVolume } from "@t3tools/contracts";
+import { CheckIcon, HardDriveIcon, ScanLineIcon, ShieldCheckIcon } from "lucide-react";
+import { useId } from "react";
 
 import { useUiText } from "~/i18n/useUiText";
 import { cn } from "~/lib/utils";
 import { formatBytes } from "../../lib/formatBytes";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
-import { StorageTidyDonut, type DonutSegment } from "./StorageTidyDonut";
-import { itemsByTier, sumBytes, usedPercent } from "./storageTidyModel";
-
-export const TIER_COLORS = {
-  safe: "var(--success)",
-  review: "var(--warning)",
-  remind: "color-mix(in srgb, var(--muted-foreground) 60%, transparent)",
-  used: "color-mix(in srgb, var(--foreground) 82%, transparent)",
-} as const;
-
-export function volumeSegments(
-  volume: StorageTidyVolume,
-  scan: StorageTidyScan | null,
-): DonutSegment[] {
-  const total = volume.totalBytes ?? 0;
-  const used = Math.max(0, total - volume.freeBytes);
-  const tiers = itemsByTier(scan);
-  const safe = sumBytes(tiers.safe);
-  const review = sumBytes(tiers.review);
-  const remind = sumBytes(tiers.remind);
-  const known = Math.min(used, safe + review + remind);
-  const scale = safe + review + remind > 0 ? known / (safe + review + remind) : 0;
-  return [
-    { id: "safe", value: safe * scale, color: TIER_COLORS.safe },
-    { id: "review", value: review * scale, color: TIER_COLORS.review },
-    { id: "remind", value: remind * scale, color: TIER_COLORS.remind },
-    { id: "used", value: used - known, color: TIER_COLORS.used },
-    { id: "free", value: volume.freeBytes, color: "var(--muted)", outline: true },
-  ];
-}
+import { Tooltip, TooltipTrigger, TooltipPopup } from "../ui/tooltip";
+import {
+  capacityFill,
+  capacityHint,
+  StorageCapacityBar,
+  volumeCapacity,
+} from "./StorageCapacityBar";
+import { usedPercent } from "./storageTidyModel";
 
 export function VolumeCards({
   volumes,
@@ -47,37 +27,52 @@ export function VolumeCards({
   readonly onSelect: (path: string) => void;
 }) {
   const t = useUiText();
+  const volumeTips = useId();
   return (
-    <div className="flex flex-wrap justify-end gap-2.5" role="tablist" aria-label={t("Disks")}>
-      {volumes.map((volume) => {
+    <div className="flex min-w-0 max-w-full flex-wrap gap-2" role="tablist" aria-label={t("Disks")}>
+      {volumes.map((volume, index) => {
         const percent = usedPercent(volume);
         const active = volume.path === activePath;
-        const low = percent !== null && percent >= 95;
         return (
-          <button
-            key={volume.path}
-            type="button"
-            role="tab"
-            aria-selected={active}
-            onClick={() => onSelect(volume.path)}
-            className={cn(
-              "min-w-40 rounded-xl border bg-card px-3.5 py-2.5 text-left shadow-xs/5 transition-colors",
-              active ? "border-primary ring-1 ring-primary/40" : "border-border hover:bg-accent/40",
-            )}
-          >
-            <div className="text-sm font-semibold">{volume.name}</div>
-            <div className="mt-0.5 text-2xs text-muted-foreground">
-              {volume.internal ? t("Internal") : t("External")}
-              {percent === null ? "" : ` · ${t("Used {percent}%", { percent })}`}
-              {` · ${t("{size} free", { size: formatBytes(volume.freeBytes) })}`}
-            </div>
-            <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-muted">
-              <div
-                className={cn("h-full rounded-full", low ? "bg-destructive" : "bg-foreground/70")}
-                style={{ width: `${percent ?? 0}%` }}
-              />
-            </div>
-          </button>
+          <Tooltip key={volume.path}>
+            <TooltipTrigger
+              render={
+                <button
+                  type="button"
+                  role="tab"
+                  aria-describedby={`${volumeTips}-${index}`}
+                  aria-selected={active}
+                  onClick={() => onSelect(volume.path)}
+                  className={cn(
+                    "min-w-0 max-w-full rounded-xl border bg-card px-3 py-2 text-left outline-none transition-colors motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                    active ? "border-ring/50 bg-accent/60" : "border-border hover:bg-accent/40",
+                  )}
+                />
+              }
+            >
+              <span className="flex min-w-0 items-center gap-2 text-sm font-medium">
+                {active ? (
+                  <CheckIcon aria-hidden className="size-3.5 shrink-0 text-info-foreground" />
+                ) : (
+                  <HardDriveIcon aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
+                )}
+                <span className="truncate">{volume.name}</span>
+              </span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                {volume.internal ? t("Internal") : t("External")}
+                {percent !== null && (
+                  <span className={percent >= 95 ? "text-destructive-foreground" : undefined}>
+                    {" "}
+                    · {t("Used {percent}%", { percent })}
+                  </span>
+                )}
+                {` · ${t("{size} free", { size: formatBytes(volume.freeBytes) })}`}
+              </span>
+            </TooltipTrigger>
+            <TooltipPopup role="tooltip" id={`${volumeTips}-${index}`}>
+              {volume.path}
+            </TooltipPopup>
+          </Tooltip>
         );
       })}
     </div>
@@ -98,121 +93,179 @@ export function StorageTidyOverview({
   readonly onScan: () => void;
 }) {
   const t = useUiText();
+  const scanLabelId = useId();
+  const durationId = useId();
   if (!volume)
     return (
       <p role="status" className="text-sm text-muted-foreground">
         {t("Disk information is not available yet.")}
       </p>
     );
-  const total = volume.totalBytes ?? 0;
-  const used = Math.max(0, total - volume.freeBytes);
   const percent = usedPercent(volume);
-  const progress = state.progress.total > 0 ? state.progress.checked / state.progress.total : 0;
   const scan = state.scan;
-  const tiers = itemsByTier(scan);
-  const tierBytes = {
-    safe: sumBytes(tiers.safe),
-    review: sumBytes(tiers.review),
-    remind: sumBytes(tiers.remind),
-  };
-  const known = Math.min(used, tierBytes.safe + tierBytes.review + tierBytes.remind);
+  const capacity = volumeCapacity(volume, scan);
+  const label = t("Capacity of {name}", { name: volume.name });
   return (
-    <div className="grid items-center gap-x-10 gap-y-6 md:grid-cols-[300px_minmax(0,1fr)]">
-      <StorageTidyDonut
-        segments={volumeSegments(volume, scan)}
-        busy={scanning}
-        {...(scanning ? { progress } : {})}
-        label={t("Capacity of {name}", { name: volume.name })}
-      >
-        <button
-          type="button"
-          className="flex size-30 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-full bg-primary text-lg font-semibold text-primary-foreground shadow-lg shadow-primary/30 outline-none transition-transform hover:scale-[1.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-64 disabled:hover:scale-100"
-          disabled={disabled || scanning}
-          onClick={onScan}
-        >
-          {scanning ? (
-            <>
-              <Spinner size="lg" />
-              <span className="text-xs font-normal">{t("Scanning…")}</span>
-            </>
-          ) : (
-            <>
-              <span>{scan ? t("Scan again") : t("Scan")}</span>
-              <span className="text-2xs font-normal opacity-80">{t("About 30 seconds")}</span>
-            </>
-          )}
-        </button>
-      </StorageTidyDonut>
-      <div className="min-w-0 space-y-3.5">
-        <p className="text-xs text-muted-foreground">
-          {volume.name} · {t("{size} total", { size: formatBytes(total) })}
-        </p>
-        <p className="text-3xl font-bold tracking-tight tabular-nums">
-          {t("{used} used", { used: formatBytes(used) })},{" "}
-          <span className="font-semibold text-muted-foreground">
-            {t("{free} free", { free: formatBytes(volume.freeBytes) })}
-          </span>
-        </p>
-        {percent !== null && percent >= 80 ? (
-          <Badge variant="warning" size="lg">
-            {t("Used {percent}%", { percent })}
-          </Badge>
+    <section className="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-xs/5">
+      <div className="space-y-4 p-4 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <div className="min-w-0 space-y-1">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span className="break-all font-medium text-card-foreground">{volume.name}</span>
+              {volume.totalBytes !== null && (
+                <span>· {t("{size} total", { size: formatBytes(volume.totalBytes) })}</span>
+              )}
+              {percent !== null && percent >= 80 ? (
+                <Badge variant="warning" size="sm">
+                  {t("Used {percent}%", { percent })}
+                </Badge>
+              ) : null}
+            </div>
+            <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1 tabular-nums">
+              {percent !== null && (
+                <strong className="text-xl font-semibold tracking-tight">
+                  {t("{used} used", { used: formatBytes(capacity.used) })}
+                </strong>
+              )}
+              <span className="text-sm text-muted-foreground">
+                {t("{free} free", { free: formatBytes(volume.freeBytes) })}
+              </span>
+            </p>
+          </div>
+          <div className="flex items-center gap-2.5">
+            {!scanning && (
+              <span id={durationId} className="text-xs text-muted-foreground">
+                {t("About 30 seconds")}
+              </span>
+            )}
+            <Button
+              variant={scan ? "outline" : "default"}
+              disabled={disabled || scanning}
+              onClick={onScan}
+              aria-labelledby={scanning ? scanLabelId : `${scanLabelId} ${durationId}`}
+            >
+              {scanning ? <Spinner /> : <ScanLineIcon aria-hidden />}
+              <span id={scanLabelId}>
+                {scanning ? t("Scanning…") : scan ? t("Scan again") : t("Scan")}
+              </span>
+            </Button>
+          </div>
+        </div>
+        {percent !== null && (
+          <StorageCapacityBar
+            label={label}
+            segments={capacity.segments}
+            totalBytes={volume.totalBytes}
+            otherUsed={Boolean(scan)}
+          />
+        )}
+        {scan ? (
+          <dl className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,8rem),1fr))] gap-x-3 gap-y-3">
+            <CapacityFigure
+              total={volume.totalBytes}
+              tone="safe"
+              label={t("Safe to clean")}
+              bytes={capacity.safe}
+            />
+            <CapacityFigure
+              total={volume.totalBytes}
+              tone="review"
+              label={t("Take a look")}
+              bytes={capacity.review}
+            />
+            <CapacityFigure
+              total={volume.totalBytes}
+              tone="remind"
+              label={t("Remind only")}
+              bytes={capacity.remind}
+            />
+            {percent !== null && (
+              <CapacityFigure
+                total={volume.totalBytes}
+                tone="used"
+                label={t("Other used space")}
+                bytes={capacity.other}
+              />
+            )}
+            <CapacityFigure
+              total={volume.totalBytes}
+              tone="free"
+              label={t("Free")}
+              bytes={volume.freeBytes}
+            />
+          </dl>
         ) : null}
-        <ul className="divide-y divide-border/60 text-sm">
-          {scan ? (
-            <>
-              <LegendRow color={TIER_COLORS.safe} name={t("Safe to clean")} value={formatBytes(tierBytes.safe)} ratio={total ? tierBytes.safe / total : 0} />
-              <LegendRow color={TIER_COLORS.review} name={t("Take a look")} value={formatBytes(tierBytes.review)} ratio={total ? tierBytes.review / total : 0} />
-              <LegendRow color={TIER_COLORS.remind} name={t("Remind only")} value={formatBytes(tierBytes.remind)} ratio={total ? tierBytes.remind / total : 0} />
-              <LegendRow color={TIER_COLORS.used} name={t("Other used space")} value={formatBytes(Math.max(0, used - known))} ratio={total ? Math.max(0, used - known) / total : 0} />
-            </>
-          ) : (
-            <LegendRow color={TIER_COLORS.used} name={t("Used")} value={formatBytes(used)} ratio={total ? used / total : 0} />
-          )}
-          <LegendRow color="var(--muted)" outline name={t("Free")} value={formatBytes(volume.freeBytes)} ratio={total ? volume.freeBytes / total : 0} />
-        </ul>
-        <p className="flex items-start gap-2 text-xs text-muted-foreground">
-          <ShieldCheckIcon className="mt-0.5 size-3.5 shrink-0" />
-          <span>
-            {scan
-              ? t("Sizes below were measured by the scan just now. Nothing has been changed yet.")
-              : t(
-                  "Press Scan to start. Scanning only reads; it never changes a file. You choose what to clean afterwards. Before worktrees and build backups are cleaned, screenshots, previews and uncommitted changes are rescued first.",
-                )}
-          </span>
-        </p>
+        {scanning && state.progress.total > 0 ? (
+          <progress
+            aria-label={t("Scanning…")}
+            value={state.progress.checked}
+            max={state.progress.total}
+            className="block h-1 w-full accent-primary"
+          />
+        ) : null}
       </div>
-    </div>
+      <p className="flex items-start gap-2 border-t border-border/60 bg-muted/30 px-4 py-3 text-xs leading-relaxed text-muted-foreground sm:px-5">
+        <ShieldCheckIcon aria-hidden className="mt-0.5 size-3.5 shrink-0" />
+        <span>
+          {scan
+            ? t("Sizes below were measured by the scan just now. Nothing has been changed yet.")
+            : t(
+                "Press Scan to start. Scanning only reads; it never changes a file. You choose what to clean afterwards. Before worktrees and build backups are cleaned, screenshots, previews and uncommitted changes are rescued first.",
+              )}
+        </span>
+      </p>
+    </section>
   );
 }
 
-function LegendRow({
-  color,
-  name,
-  value,
-  ratio,
-  outline = false,
+function CapacityFigure({
+  tone,
+  label,
+  bytes,
+  total,
 }: {
-  readonly color: string;
-  readonly name: string;
-  readonly value: string;
-  readonly ratio: number;
-  readonly outline?: boolean;
+  readonly tone: "safe" | "review" | "remind" | "used" | "free";
+  readonly label: string;
+  readonly bytes: number;
+  readonly total: number | null;
 }) {
+  const tipId = useId();
   return (
-    <li className="flex items-center gap-3 py-2.5">
-      <span
-        className={cn("size-2.5 shrink-0 rounded-sm", outline && "border border-primary")}
-        style={outline ? undefined : { backgroundColor: color }}
-      />
-      <span className="flex-1">{name}</span>
-      <span className="tabular-nums text-muted-foreground">{value}</span>
-      <span className="h-1 w-28 overflow-hidden rounded-full bg-muted">
-        <span
-          className="block h-full rounded-full bg-foreground/60"
-          style={{ width: `${Math.min(100, ratio * 100)}%` }}
-        />
-      </span>
-    </li>
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <div
+            tabIndex={0}
+            aria-describedby={tipId}
+            className="min-w-0 w-fit rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          />
+        }
+      >
+        <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span
+            aria-hidden
+            className={cn(
+              "size-2 shrink-0 rounded-xs forced-colors:forced-color-adjust-none",
+              capacityFill[tone],
+              tone === "free" && "border border-input",
+            )}
+          />
+          {label}
+        </dt>
+        <dd
+          className={cn(
+            "mt-1 tabular-nums",
+            tone === "safe" || tone === "review"
+              ? "text-base font-semibold"
+              : "text-sm text-muted-foreground",
+          )}
+        >
+          {formatBytes(bytes)}
+        </dd>
+      </TooltipTrigger>
+      <TooltipPopup role="tooltip" id={tipId}>
+        {capacityHint(label, bytes, total)}
+      </TooltipPopup>
+    </Tooltip>
   );
 }

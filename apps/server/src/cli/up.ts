@@ -20,6 +20,7 @@ import * as ManagedLimits from "../policy/managedLimits.ts";
 import * as ManagedPolicy from "../policy/ManagedPolicy.ts";
 import { projectLocationFlags, resolveCliAuthConfig } from "./config.ts";
 import {
+  connectSubcommands,
   disconnectCloud,
   headlessFlag,
   linkEnvironmentForConnect,
@@ -503,6 +504,7 @@ export const connectCommand = Command.make("connect", {
       { quietLogs: true },
     ),
   ),
+  Command.withSubcommands(connectSubcommands),
 );
 
 /** `t3 status --json`, for scripts and agents. */

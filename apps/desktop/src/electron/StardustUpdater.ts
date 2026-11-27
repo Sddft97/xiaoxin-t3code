@@ -61,7 +61,8 @@ interface StardustInstaller {
   readonly beforeDownload: (
     release: StardustRelease,
   ) => Promise<(payloadPath: string, versionDir: string) => Promise<string>>;
-  readonly start: (update: PreparedUpdate, relaunch: boolean) => void;
+  /** May settle once the installer process is confirmed running; the app quits only after that. */
+  readonly start: (update: PreparedUpdate, relaunch: boolean) => void | Promise<void>;
   readonly onRegularQuit?: () => void;
 }
 
@@ -213,7 +214,10 @@ export function makeStardustUpdater(deps: StardustUpdaterDeps, installer: Stardu
       prepared.release.asset.name === release.asset.name &&
       NodeFS.existsSync(prepared.payloadPath)
     ) {
-      events.emit("update-downloaded", updateInfo(release));
+      events.emit("update-downloaded", {
+        ...updateInfo(release),
+        downloadedFile: prepared.payloadPath,
+      });
       return;
     }
     const prepare = await installer.beforeDownload(release);
@@ -256,7 +260,10 @@ export function makeStardustUpdater(deps: StardustUpdaterDeps, installer: Stardu
       await NodeFS.promises.rm(versionDir, { recursive: true, force: true }).catch(() => {});
       throw error;
     }
-    events.emit("update-downloaded", updateInfo(release));
+    events.emit("update-downloaded", {
+      ...updateInfo(release),
+      downloadedFile: prepared.payloadPath,
+    });
   };
 
   let inFlightDownload: Promise<void> | undefined;
@@ -265,21 +272,28 @@ export function makeStardustUpdater(deps: StardustUpdaterDeps, installer: Stardu
       inFlightDownload = undefined;
     }));
 
-  const startInstaller = (relaunch: boolean): void => {
+  const startInstaller = async (relaunch: boolean): Promise<void> => {
     const update = prepared;
     if (installerStarted) return;
     if (!update || !NodeFS.existsSync(update.payloadPath)) {
       throw new StardustUpdateError("no-download");
     }
-    installer.start(update, relaunch);
+    // Claimed before the launch settles so a quit in the meantime does not start a second one.
     installerStarted = true;
+    try {
+      await installer.start(update, relaunch);
+    } catch (error) {
+      installerStarted = false;
+      throw error;
+    }
   };
 
   const removeWillQuit = deps.onWillQuit(() => {
     if (installerStarted) return;
     try {
       if (autoInstallOnAppQuit && prepared) {
-        startInstaller(false);
+        // Nothing to report at quit; the download stays and the next session offers it again.
+        startInstaller(false).catch(() => {});
         return;
       }
       if (!prepared) installer.onRegularQuit?.();
@@ -319,9 +333,10 @@ export function makeStardustUpdater(deps: StardustUpdaterDeps, installer: Stardu
       isSilent,
       isForceRunAfter,
     }) {
-      return Effect.try({
-        try: () => {
-          startInstaller(true);
+      // Quit only once the installer is running, so a failed launch leaves the app open to report it.
+      return Effect.tryPromise({
+        try: async () => {
+          await startInstaller(true);
           deps.quitApp();
         },
         catch: (cause) =>

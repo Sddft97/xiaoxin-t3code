@@ -10,7 +10,7 @@ import { cn } from "~/lib/utils";
 import "./composerV9.css";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
-import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { SharedTooltipTrigger } from "../ui/shared-tooltip";
 
 function V9MicIcon() {
   return (
@@ -97,7 +97,11 @@ function RecordingStatus(props: {
 
   return (
     <span data-v9-voice-recording-pill>
-      <span aria-hidden="true" data-v9-voice-bars style={{ transform: `scaleY(${gain.toFixed(2)})` }}>
+      <span
+        aria-hidden="true"
+        data-v9-voice-bars
+        style={{ transform: `scaleY(${gain.toFixed(2)})` }}
+      >
         <i />
         <i />
         <i />
@@ -119,13 +123,15 @@ function ShortcutTooltip(props: {
   children: ReactElement;
 }) {
   return (
-    <Tooltip>
-      <TooltipTrigger render={props.children} />
-      <TooltipPopup side="top">
-        {props.label}
-        {props.shortcut ? ` (${props.shortcut})` : ""}
-      </TooltipPopup>
-    </Tooltip>
+    <SharedTooltipTrigger
+      render={props.children}
+      label={
+        <>
+          {props.label}
+          {props.shortcut ? ` (${props.shortcut})` : ""}
+        </>
+      }
+    />
   );
 }
 

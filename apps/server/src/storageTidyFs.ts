@@ -84,14 +84,14 @@ export async function measureTree(root: string, options: MeasureOptions): Promis
     measure.latest = Math.max(measure.latest, st.mtimeMs);
     if (st.isFile()) {
       measure.files++;
-      if (st.nlink === 1) measure.bytes += st.blocks * 512;
+      if (st.nlink === 1) measure.bytes += (st.blocks ?? Math.ceil(st.size / 512)) * 512;
       if (options.tallyAssets && isRescueAsset(current.relative)) {
         measure.assets++;
         measure.assetBytes += st.size;
       }
       continue;
     }
-    measure.bytes += st.blocks * 512;
+    measure.bytes += (st.blocks ?? Math.ceil(st.size / 512)) * 512;
     const names = await NodeFSP.readdir(current.path);
     if (names.length + nodes > options.maxNodes) throw new TidyGuardError("scan-budget");
     for (let start = 0; start < names.length; start += 256) {

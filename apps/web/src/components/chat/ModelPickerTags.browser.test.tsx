@@ -209,6 +209,10 @@ it("renders real-data speed/price tags and respects low-quota priority in ModelP
       (node) => node.textContent,
     );
     expect(metas).toEqual(["4 档 · 剩 98%", "3 档 · 极速低价"]);
+    const selected = screen.getByRole("option", { name: /Gemini 4 Neon/ }).element();
+    const other = screen.getByRole("option", { name: /Gemini 3.8 Flash/ }).element();
+    expect(selected.querySelectorAll("[data-v9-mp-check]")).toHaveLength(1);
+    expect(other.querySelector("[data-v9-mp-check]")).toBeNull();
 
     // V9 Spotlight search box with its icon, Chinese placeholder, and shortcut hint.
     const search = document.querySelector("[data-v9-mp-search]");

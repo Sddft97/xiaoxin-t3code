@@ -14,7 +14,7 @@ const installerName = "T3-Stardust-v1.3.1-Windows-x64-Setup.exe";
 const bytes = "fixture installer content";
 const sha256 = NodeCrypto.createHash("sha256").update(bytes).digest("hex");
 
-function withFixture(tamper: boolean) {
+function withFixture(tamper: boolean, launch: () => Promise<void> = async () => {}) {
   return Effect.acquireRelease(
     Effect.sync(() => {
       const localAppData = NodeFS.mkdtempSync(
@@ -54,6 +54,7 @@ function withFixture(tamper: boolean) {
         onWillQuit: () => () => {},
         spawnInstaller: (script) => {
           scripts.push(script);
+          return launch();
         },
       });
       return { ...fixture, localAppData, scripts, requests, quitCount: () => quitCount };
@@ -84,6 +85,15 @@ it.effect("verifies a legacy Windows asset before handing off to per-user setup"
     expect(fixture.scripts[0]).toContain("O''Brien");
     expect(fixture.scripts[0]).toContain("'/S', '--updated', '/currentuser'");
     expect(fixture.scripts[0]).toContain(sha256);
+    const script = fixture.scripts[0]!;
+    expect(script).toContain('$backup = "$previousBackup-$(New-Guid)"');
+    expect(script).toContain("Remove-Item -LiteralPath $backup, $previousBackup");
+    expect(script).toContain("$attempt -lt 30");
+    expect(script).toContain("$_.Path.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)");
+    expect(script).toContain("$dir.TrimEnd('\\') + '\\'");
+    expect(script).toMatch(/Wait-InstallProcesses\s+\$ready = \$true\s+\$result = Start-Process/);
+    expect(script).toMatch(/Wait-InstallProcesses\s+Invoke-WithFileRetries/);
+    expect(script).toContain("-Raw -Encoding UTF8");
   }),
 );
 
@@ -105,4 +115,57 @@ it.effect("rejects tampered bytes and leaves no Windows installer to run", () =>
     expect(fixture.scripts).toEqual([]);
     expect(fixture.quitCount()).toBe(0);
   }),
+);
+
+it.effect("stays open and can retry when the installer helper fails to start", () =>
+  Effect.gen(function* () {
+    let attempts = 0;
+    const fixture = yield* withFixture(false, async () => {
+      attempts += 1;
+      if (attempts === 1) throw new Error("spawn EACCES");
+    });
+    yield* fixture.service.checkForUpdates;
+    yield* fixture.service.downloadUpdate;
+    const install = fixture.service
+      .quitAndInstall({ isSilent: true, isForceRunAfter: true })
+      .pipe(Effect.exit);
+    expect(Exit.isFailure(yield* install)).toBe(true);
+    expect(fixture.quitCount()).toBe(0);
+    expect(Exit.isSuccess(yield* install)).toBe(true);
+    expect(fixture.quitCount()).toBe(1);
+    expect(fixture.scripts).toHaveLength(2);
+  }),
+);
+
+it.effect(
+  "reports the cached installer on every download event and fetches it again when removed",
+  () =>
+    Effect.gen(function* () {
+      const fixture = yield* withFixture(false);
+      const downloadedFiles: Array<string | undefined> = [];
+      yield* fixture.service.on("update-downloaded", (info: { downloadedFile?: string }) => {
+        downloadedFiles.push(info.downloadedFile);
+      });
+      yield* fixture.service.checkForUpdates;
+      yield* fixture.service.downloadUpdate;
+      const installer = NodePath.join(
+        fixture.localAppData,
+        "Stardust",
+        "updates",
+        "1.3.1",
+        installerName,
+      );
+      expect(downloadedFiles).toEqual([installer]);
+      expect(NodeFS.existsSync(installer)).toBe(true);
+
+      yield* fixture.service.downloadUpdate;
+      expect(fixture.requests).toHaveLength(2);
+      expect(downloadedFiles).toEqual([installer, installer]);
+
+      NodeFS.rmSync(installer);
+      yield* fixture.service.downloadUpdate;
+      expect(fixture.requests).toHaveLength(3);
+      expect(downloadedFiles).toEqual([installer, installer, installer]);
+      expect(NodeFS.existsSync(installer)).toBe(true);
+    }),
 );

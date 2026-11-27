@@ -1,6 +1,6 @@
-import type { StorageTidyItem, StorageTidyState, StorageTidyTier, StorageTidyVolume } from "@t3tools/contracts";
+import type { StorageTidyItem, StorageTidyState, StorageTidyTier } from "@t3tools/contracts";
 import { ChevronRightIcon, CopyIcon, LifeBuoyIcon, PackageIcon } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
 import { useUiText } from "~/i18n/useUiText";
 import { cn } from "~/lib/utils";
@@ -8,8 +8,19 @@ import { formatBytes } from "../../lib/formatBytes";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
+import { WorkspacePageContainer } from "../WorkspacePageContainer";
+import { Collapsible, CollapsibleTrigger, CollapsiblePanel } from "../ui/collapsible";
+import {
+  AlertDialog,
+  AlertDialogClose,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogPopup,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 import { Switch } from "../ui/switch";
-import { TIER_COLORS } from "./StorageTidyOverview";
+import { capacityFill } from "./StorageCapacityBar";
 import { blockedCopy, itemCopy, relativeDays } from "./storageTidyCopy";
 import {
   MOLE_REPOSITORY_URL,
@@ -77,7 +88,7 @@ function TierHeading({
     <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
       <div className="min-w-0 max-w-[44rem]">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
-          <span className="size-2.5 rounded-full" style={{ backgroundColor: TIER_COLORS[tier] }} />
+          <span className={cn("size-2 rounded-full", capacityFill[tier])} />
           {title}
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">{description}</p>
@@ -87,14 +98,20 @@ function TierHeading({
         {selectable.length > 0 ? (
           <>
             <span className="text-muted-foreground tabular-nums">
-              {t("{selected} of {total} selected", { selected: chosen.length, total: selectable.length })}
+              {t("{selected} of {total} selected", {
+                selected: chosen.length,
+                total: selectable.length,
+              })}
             </span>
             <label className="flex cursor-pointer items-center gap-1.5 text-muted-foreground">
               <Checkbox
                 checked={chosen.length === selectable.length}
                 indeterminate={chosen.length > 0 && chosen.length < selectable.length}
                 onCheckedChange={(checked) =>
-                  onToggleAll(selectable.map((item) => item.id), checked === true)
+                  onToggleAll(
+                    selectable.map((item) => item.id),
+                    checked === true,
+                  )
                 }
                 aria-label={t("Select all in {tier}", { tier: title })}
               />
@@ -128,12 +145,17 @@ export function TidyItemRow({
   readonly nowMs: number;
 }) {
   const t = useUiText();
-  const [open, setOpen] = useState(false);
   const copy = itemCopy(t, item);
   const selectable = isSelectable(item);
   const reason = item.tier === "remind" ? blockedCopy(t, item) : "";
   return (
-    <li data-testid="tidy-item" data-tier={item.tier} data-kind={item.kind} className="border-b border-border/60 last:border-b-0">
+    <Collapsible
+      render={<li />}
+      data-testid="tidy-item"
+      data-tier={item.tier}
+      data-kind={item.kind}
+      className="border-b border-border/60 last:border-b-0"
+    >
       <div className="flex items-center gap-3 px-4 py-3">
         <Checkbox
           checked={selected}
@@ -141,21 +163,24 @@ export function TidyItemRow({
           onCheckedChange={(checked) => onToggle(item.id, checked === true)}
           aria-label={t("Select {name}", { name: copy.title })}
         />
-        <button
-          type="button"
-          className="flex min-w-0 flex-1 items-center gap-3 text-left"
-          aria-expanded={open}
-          onClick={() => setOpen((value) => !value)}
-        >
+        <CollapsibleTrigger className="group flex min-w-0 flex-1 items-center gap-3 rounded-sm text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
           <span className="min-w-0 flex-1">
             <span className="flex flex-wrap items-center gap-2">
               <span className="truncate text-sm font-semibold">{copy.title}</span>
-              {copy.badge ? <Badge variant="info" size="sm">{copy.badge}</Badge> : null}
+              {copy.badge ? (
+                <Badge variant="info" size="sm">
+                  {copy.badge}
+                </Badge>
+              ) : null}
               {item.disposal === "trash" ? (
-                <Badge variant="warning" size="sm">{t("Trash")}</Badge>
+                <Badge variant="warning" size="sm">
+                  {t("Trash")}
+                </Badge>
               ) : null}
               {item.dirtyFiles > 0 && item.tier === "review" ? (
-                <Badge variant="warning" size="sm">{t("Uncommitted · rescued first")}</Badge>
+                <Badge variant="warning" size="sm">
+                  {t("Uncommitted · rescued first")}
+                </Badge>
               ) : null}
             </span>
             <span className="mt-0.5 block truncate text-xs text-muted-foreground">
@@ -165,10 +190,10 @@ export function TidyItemRow({
           <span className="text-right tabular-nums">
             <span className="block text-sm font-semibold">{formatBytes(item.bytes)}</span>
           </span>
-          <ChevronRightIcon className={cn("size-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-90")} />
-        </button>
+          <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground transition-transform group-aria-expanded:rotate-90 motion-reduce:transition-none" />
+        </CollapsibleTrigger>
       </div>
-      {open ? (
+      <CollapsiblePanel>
         <dl className="grid gap-x-8 gap-y-3 border-t border-border/40 bg-muted/30 px-4 py-3.5 pl-11 sm:grid-cols-2">
           <Fact label={t("What it is")}>{copy.what}</Fact>
           <Fact label={t("Produced by")}>{copy.tool}</Fact>
@@ -178,36 +203,49 @@ export function TidyItemRow({
             {item.fileCount > 0 ? ` · ${t("{count} files", { count: item.fileCount })}` : ""}
           </Fact>
           <Fact label={item.tier === "remind" ? t("Why it is left alone") : t("Why it can go")}>
-            {item.tier === "remind" ? (reason || copy.why) : copy.why}
+            {item.tier === "remind" ? reason || copy.why : copy.why}
           </Fact>
           {copy.recover ? <Fact label={t("How to get it back")}>{copy.recover}</Fact> : null}
           <div className="sm:col-span-2">
-            <Fact label={item.pathCount > 1 ? t("Paths ({count})", { count: item.pathCount }) : t("Path")}>
+            <Fact
+              label={
+                item.pathCount > 1 ? t("Paths ({count})", { count: item.pathCount }) : t("Path")
+              }
+            >
               <span className="block space-y-0.5 font-mono text-2xs text-muted-foreground">
                 {item.paths.map((path) => (
-                  <span key={path} className="block break-all">{path}</span>
+                  <span key={path} className="block break-all">
+                    {path}
+                  </span>
                 ))}
                 {item.pathCount > item.paths.length ? (
-                  <span className="block">{t("and {count} more", { count: item.pathCount - item.paths.length })}</span>
+                  <span className="block">
+                    {t("and {count} more", { count: item.pathCount - item.paths.length })}
+                  </span>
                 ) : null}
               </span>
             </Fact>
           </div>
         </dl>
-      ) : null}
-    </li>
+      </CollapsiblePanel>
+    </Collapsible>
   );
 }
 
 function MoleMissingRow({ onCopy }: { readonly onCopy: () => void }) {
   const t = useUiText();
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-border bg-muted/20 px-4 py-3" data-testid="mole-missing">
+    <div
+      className="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-border bg-muted/20 px-4 py-3"
+      data-testid="mole-missing"
+    >
       <PackageIcon className="size-4 shrink-0 text-muted-foreground" />
       <div className="min-w-0 flex-1 text-sm">
         <div className="font-medium">{t("Mole is not installed")}</div>
         <div className="text-xs text-muted-foreground">
-          {t("Install it to add a list of system and app caches here. Nothing is installed automatically.")}
+          {t(
+            "Install it to add a list of system and app caches here. Nothing is installed automatically.",
+          )}
         </div>
       </div>
       <Button size="xs" variant="outline" onClick={onCopy}>
@@ -244,28 +282,39 @@ function RescueCard({
   if (!preview || (preview.assets === 0 && preview.dirtyRepos.length === 0)) return null;
   const dirtyFiles = preview.dirtyRepos.reduce((n, repo) => n + repo.files, 0);
   return (
-    <section className="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-xs/5" data-testid="rescue-card">
+    <section
+      className="flex gap-4 rounded-xl border border-border bg-card p-5 shadow-xs/5"
+      data-testid="rescue-card"
+    >
       <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
         <LifeBuoyIcon className="size-5" />
       </span>
       <div className="min-w-0 flex-1 space-y-2">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <h3 className="text-base font-semibold">{t("Rescue first, then clean")}</h3>
-          <Badge variant="info" size="sm">{t("Runs before deleting")}</Badge>
+          <Badge variant="info" size="sm">
+            {t("Runs before deleting")}
+          </Badge>
         </div>
         <p className="text-sm text-muted-foreground">
-          {t("Before deleting, this saves a copy: {assets} visual assets · {repos} places with uncommitted changes ({files} files) → {path}", {
-            assets: preview.assets.toLocaleString(),
-            repos: preview.dirtyRepos.length,
-            files: dirtyFiles.toLocaleString(),
-            path: `${state.rescueRoot}/${dateLabel}`,
-          })}
+          {t(
+            "Before deleting, this saves a copy: {assets} visual assets · {repos} places with uncommitted changes ({files} files) → {path}",
+            {
+              assets: preview.assets.toLocaleString(),
+              repos: preview.dirtyRepos.length,
+              files: dirtyFiles.toLocaleString(),
+              path: `${state.rescueRoot}/${dateLabel}`,
+            },
+          )}
         </p>
         <p className="text-xs text-muted-foreground">
-          {t("The current selection rescues {count} assets ({size}). Folders with uncommitted changes only appear in Take a look, never in Safe to clean.", {
-            count: summary.rescueAssets.toLocaleString(),
-            size: formatBytes(summary.rescueBytes),
-          })}
+          {t(
+            "The current selection rescues {count} assets ({size}). Folders with uncommitted changes only appear in Take a look, never in Safe to clean.",
+            {
+              count: summary.rescueAssets.toLocaleString(),
+              size: formatBytes(summary.rescueBytes),
+            },
+          )}
         </p>
         {preview.dirtyRepos.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
@@ -277,7 +326,11 @@ function RescueCard({
           </div>
         ) : null}
       </div>
-      <Switch checked={enabled} onCheckedChange={onChange} aria-label={t("Rescue first, then clean")} />
+      <Switch
+        checked={enabled}
+        onCheckedChange={onChange}
+        aria-label={t("Rescue first, then clean")}
+      />
     </section>
   );
 }
@@ -288,82 +341,166 @@ export function ActionBar({
   busy,
   onExecute,
   onRescan,
-  volume,
 }: {
   readonly summary: ReturnType<typeof selectionSummary>;
   readonly rescueEnabled: boolean;
   readonly busy: boolean;
   readonly onExecute: () => void;
   readonly onRescan: () => void;
-  readonly volume: StorageTidyVolume | undefined;
 }) {
   const t = useUiText();
+  const [confirming, setConfirming] = useState(false);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const action = summary.hasTrash
+    ? summary.freeNow === 0
+      ? t("Move to Trash")
+      : t("Clean selected")
+    : t("Delete and free the space");
+  const hasRescue = summary.rescueAssets > 0 || summary.dirtyFiles > 0;
   return (
     <div
-      className="sticky bottom-4 z-10 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-border bg-popover/95 px-5 py-3.5 shadow-lg backdrop-blur"
-      data-testid="tidy-action-bar"
+      data-active={summary.count > 0 || undefined}
+      className="relative shrink-0 before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-4 before:bg-linear-to-t before:from-background before:to-transparent before:opacity-0 before:transition-opacity data-active:before:opacity-100 motion-reduce:before:transition-none"
     >
-      <div className="min-w-0 flex-1 space-y-0.5">
-        <div className="flex items-center gap-2 text-sm">
-          <span className="font-semibold">{t("{count} items selected", { count: summary.count })}</span>
-          <span className="tabular-nums text-muted-foreground">{formatBytes(summary.bytes)}</span>
-          {rescueEnabled && (summary.rescueAssets > 0 || summary.dirtyFiles > 0) ? (
-            <Badge variant="info" size="sm">{t("Rescue first")}</Badge>
-          ) : null}
-        </div>
-        <div className="text-xs text-muted-foreground tabular-nums">
-          {t("Freed now")} <b className="text-foreground">{formatBytes(summary.freeNow)}</b>
-          {summary.hasTrash ? (
-            <> · {t("In Trash {size}, freed in 7 days", { size: formatBytes(summary.pending) })}</>
-          ) : null}
-        </div>
-        {summary.freeAfter !== null && volume ? (
-          <div className="text-xs text-muted-foreground tabular-nums">
-            {t("About {free} free afterwards", { free: formatBytes(summary.freeAfter) })}
-            {summary.usedPercentAfter !== null ? ` · ${t("Used {percent}%", { percent: summary.usedPercentAfter })}` : ""}
+      <Collapsible open={summary.count > 0}>
+        <CollapsiblePanel className="group/dock">
+          <div className="scrollbar-gutter-both overflow-y-hidden transition-[opacity,translate] duration-200 ease-out starting:translate-y-2 starting:opacity-0 group-data-ending-style/dock:translate-y-2 group-data-ending-style/dock:opacity-0 motion-reduce:transition-none">
+            <WorkspacePageContainer width="wide" className="py-2 sm:pb-3">
+              <div
+                className="mx-auto flex w-full max-w-[920px] flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-xl border border-border/70 bg-card/90 px-4 py-2.5 shadow-xs/5"
+                data-testid="tidy-action-bar"
+              >
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="font-semibold">
+                      {t("{count} items selected", { count: summary.count })}
+                    </span>
+                    <span className="tabular-nums text-muted-foreground">
+                      {formatBytes(summary.bytes)}
+                    </span>
+                    {rescueEnabled && hasRescue ? (
+                      <Badge variant="info" size="sm">
+                        {t("Rescue first")}
+                      </Badge>
+                    ) : null}
+                  </div>
+                  <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground tabular-nums">
+                    <span>
+                      {t("Freed now")}{" "}
+                      <b className="text-foreground">{formatBytes(summary.freeNow)}</b>
+                      {summary.hasTrash ? (
+                        <>
+                          {" "}
+                          ·{" "}
+                          {t("In Trash {size}, freed in 7 days", {
+                            size: formatBytes(summary.pending),
+                          })}
+                        </>
+                      ) : null}
+                    </span>
+                    {summary.freeAfter !== null ? (
+                      <span>
+                        {t("About {free} free afterwards", {
+                          free: formatBytes(summary.freeAfter),
+                        })}
+                        {summary.usedPercentAfter !== null
+                          ? ` · ${t("Used {percent}%", { percent: summary.usedPercentAfter })}`
+                          : ""}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button variant="ghost" onClick={onRescan} disabled={busy}>
+                    {t("Scan again")}
+                  </Button>
+                  <Button
+                    ref={trigger}
+                    disabled={busy || summary.count === 0}
+                    onClick={() => setConfirming(true)}
+                  >
+                    {action}
+                  </Button>
+                </div>
+                <AlertDialog open={confirming && summary.count > 0} onOpenChange={setConfirming}>
+                  <AlertDialogPopup finalFocus={trigger}>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        {t("Clean {count} selected items?", { count: summary.count })}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription render={<div />} className="space-y-2">
+                        {summary.freeNow > 0 && (
+                          <p>
+                            {t(
+                              "Items totaling {size} will be deleted directly. This part cannot be undone.",
+                              { size: formatBytes(summary.freeNow) },
+                            )}
+                          </p>
+                        )}
+                        {summary.hasTrash && (
+                          <p>
+                            {t("In Trash {size}, freed in 7 days", {
+                              size: formatBytes(summary.pending),
+                            })}
+                          </p>
+                        )}
+                        {hasRescue && (
+                          <p>
+                            {rescueEnabled
+                              ? t("Selected assets and changes will be rescued before cleanup.")
+                              : t("Rescue is turned off for this cleanup.")}
+                          </p>
+                        )}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogClose render={<Button variant="outline" />}>
+                        {t("Cancel")}
+                      </AlertDialogClose>
+                      <Button
+                        variant="destructive"
+                        disabled={busy || summary.count === 0}
+                        onClick={() => {
+                          setConfirming(false);
+                          onExecute();
+                        }}
+                      >
+                        {action}
+                      </Button>
+                    </AlertDialogFooter>
+                  </AlertDialogPopup>
+                </AlertDialog>
+              </div>
+            </WorkspacePageContainer>
           </div>
-        ) : null}
-      </div>
-      <Button variant="ghost" onClick={onRescan} disabled={busy}>{t("Scan again")}</Button>
-      <Button size="lg" disabled={busy || summary.count === 0} onClick={onExecute}>
-        {summary.hasTrash && summary.freeNow === 0
-          ? t("Move to Trash")
-          : summary.hasTrash
-            ? t("Clean selected")
-            : t("Delete and free the space")}
-      </Button>
+        </CollapsiblePanel>
+      </Collapsible>
     </div>
   );
 }
 
 export function StorageTidyResults({
   state,
-  volume,
+  summary,
   selected,
   rescueEnabled,
-  busy,
   nowMs,
   dateLabel,
   onToggle,
   onToggleMany,
   onRescueChange,
-  onExecute,
-  onRescan,
   onCopyMoleInstall,
   settingsHint,
 }: {
   readonly state: StorageTidyState;
-  readonly volume: StorageTidyVolume | undefined;
+  readonly summary: ReturnType<typeof selectionSummary>;
   readonly selected: ReadonlySet<string>;
   readonly rescueEnabled: boolean;
-  readonly busy: boolean;
   readonly nowMs: number;
   readonly dateLabel: string;
   readonly onToggle: (id: string, checked: boolean) => void;
   readonly onToggleMany: (ids: ReadonlyArray<string>, checked: boolean) => void;
   readonly onRescueChange: (enabled: boolean) => void;
-  readonly onExecute: () => void;
-  readonly onRescan: () => void;
   readonly onCopyMoleInstall: () => void;
   readonly settingsHint?: ReactNode;
 }) {
@@ -371,24 +508,42 @@ export function StorageTidyResults({
   const scan = state.scan;
   if (!scan) return null;
   const tiers = itemsByTier(scan);
-  const summary = selectionSummary(scan.items, selected, volume);
   const sections: ReadonlyArray<StorageTidyTier> = ["safe", "review", "remind"];
   return (
     <div className="space-y-8" data-testid="tidy-results">
-      <RescueCard state={state} summary={summary} enabled={rescueEnabled} onChange={onRescueChange} dateLabel={dateLabel} />
+      <RescueCard
+        state={state}
+        summary={summary}
+        enabled={rescueEnabled}
+        onChange={onRescueChange}
+        dateLabel={dateLabel}
+      />
       {sections.map((tier) => {
         const items = tiers[tier];
         const groups = groupItems(items);
         const moleRow =
-          tier === "safe" && scan.mole.status === "missing" ? <MoleMissingRow onCopy={onCopyMoleInstall} /> : null;
+          tier === "safe" && scan.mole.status === "missing" ? (
+            <MoleMissingRow onCopy={onCopyMoleInstall} />
+          ) : null;
         const moleFailed =
           tier === "safe" && scan.mole.status === "failed" ? (
-            <p className="rounded-xl border border-dashed border-border px-4 py-3 text-xs text-muted-foreground" data-testid="mole-failed">
-              {t("Mole could not finish its preview, so its cache list is missing. The rest of the scan is unaffected.")}
+            <p
+              className="rounded-xl border border-dashed border-border px-4 py-3 text-xs text-muted-foreground"
+              data-testid="mole-failed"
+            >
+              {t(
+                "Mole could not finish its preview, so its cache list is missing. The rest of the scan is unaffected.",
+              )}
               {scan.mole.message ? ` (${scan.mole.message})` : ""}
             </p>
           ) : null;
-        if (items.length === 0 && !moleRow && !moleFailed && !(tier === "review" && scan.buildDirectoryMissing)) return null;
+        if (
+          items.length === 0 &&
+          !moleRow &&
+          !moleFailed &&
+          !(tier === "review" && scan.buildDirectoryMissing)
+        )
+          return null;
         return (
           <section key={tier} className="space-y-3" data-testid={`tidy-tier-${tier}`}>
             <TierHeading tier={tier} items={items} selected={selected} onToggleAll={onToggleMany} />
@@ -402,9 +557,15 @@ export function StorageTidyResults({
                       : ""}
                   </h3>
                 ) : null}
-                <ul className="overflow-hidden rounded-2xl border border-border bg-card shadow-xs/5">
+                <ul className="overflow-hidden rounded-xl border border-border bg-card shadow-xs/5">
                   {groupRows.map((item) => (
-                    <TidyItemRow key={item.id} item={item} selected={selected.has(item.id)} onToggle={onToggle} nowMs={nowMs} />
+                    <TidyItemRow
+                      key={item.id}
+                      item={item}
+                      selected={selected.has(item.id)}
+                      onToggle={onToggle}
+                      nowMs={nowMs}
+                    />
                   ))}
                 </ul>
               </div>
@@ -417,11 +578,12 @@ export function StorageTidyResults({
       })}
       {scan.truncated ? (
         <p className="text-xs text-muted-foreground" role="status">
-          {t("The scan stopped at its time limit, so this list may be incomplete. Scan again to continue.")}
+          {t(
+            "The scan stopped at its time limit, so this list may be incomplete. Scan again to continue.",
+          )}
         </p>
       ) : null}
       <StorageTidyNotes />
-      <ActionBar summary={summary} rescueEnabled={rescueEnabled} busy={busy} onExecute={onExecute} onRescan={onRescan} volume={volume} />
     </div>
   );
 }

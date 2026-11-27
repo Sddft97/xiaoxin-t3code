@@ -1,3 +1,4 @@
+import { normalizeSearchText } from "~/lib/utils";
 import { uiText } from "../i18n";
 import { scopedThreadKey, scopeThreadRef } from "@t3tools/client-runtime/environment";
 import { findForMessageMatch, openThreadFindOnQuery } from "./chat/threadFindStore";
@@ -18,9 +19,7 @@ import type { EnvironmentId, ThreadId } from "@t3tools/contracts";
 import { useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { MessageSquareIcon } from "lucide-react";
-import { createContext, useContext, useState } from "react";
-import { useStableCallback } from "~/hooks/useStableCallback";
-import { normalizeSearchText } from "~/lib/utils";
+import { createContext, use, useState } from "react";
 import { useGT, useMessages } from "gt-react";
 
 import {
@@ -37,9 +36,11 @@ import {
 import { useThreadSearch } from "../state/queries";
 import { primaryServerProvidersAtom } from "../state/server";
 import { threadEnvironment } from "../state/threads";
+import { useStableCallback } from "../hooks/useStableCallback";
 import { useAtomCommand } from "../state/use-atom-command";
 import { buildThreadRouteParams } from "../threadRoutes";
 import { formatRelativeTimeLabel } from "../timestampFormat";
+import type { SidebarThreadSummary } from "../types";
 import {
   buildThreadActionItems,
   ITEM_ICON_CLASS,
@@ -52,23 +53,6 @@ import {
   ThreadRowTrailingStatus,
   ThreadSearchPullRequestNumber,
 } from "./ThreadStatusIndicators";
-export const CommandPaletteThreadSearchQuery = createContext("");
-
-function PaletteThreadPullRequest({
-  thread,
-}: {
-  thread: Parameters<typeof ThreadSearchPullRequestNumber>[0]["thread"];
-}) {
-  const query = useContext(CommandPaletteThreadSearchQuery);
-  return (
-    <ThreadSearchPullRequestNumber
-      thread={thread}
-      query={query}
-      settled={thread.settledOverride === "settled"}
-    />
-  );
-}
-
 function useProviderEntryByEnvironmentAndInstanceId() {
   const { environments } = useEnvironments();
   const primaryEnvironmentId = usePrimaryEnvironmentId();
@@ -90,6 +74,23 @@ function useProviderEntryByEnvironmentAndInstanceId() {
     }),
   );
 }
+
+/**
+ * The query thread rows match a pull request number against. A context, so typing re-renders
+ * only the number, not every thread row.
+ */
+export const CommandPaletteThreadQueryContext = createContext("");
+
+function PaletteThreadPullRequestNumber({ thread }: { thread: SidebarThreadSummary }) {
+  return (
+    <ThreadSearchPullRequestNumber
+      thread={thread}
+      query={use(CommandPaletteThreadQueryContext)}
+      settled={thread.settledOverride === "settled"}
+    />
+  );
+}
+
 function useConnectedThreadSearch(query: string) {
   const { environments } = useEnvironments();
   const { projectEnvironmentLocationById } = useEnvironmentLookups();
@@ -112,78 +113,30 @@ function useConnectedThreadSearch(query: string) {
     environmentLabels === undefined ? { spotlight: true } : { environmentLabels, spotlight: true },
   );
 }
+
+type PaletteActiveThread = { readonly environmentId: EnvironmentId; readonly id: ThreadId };
+
 /**
- * Every visible thread as a palette item, plus, for a non-empty
- * `threadSearchQuery`, the threads whose messages match, best first.
+ * Every visible thread as a palette item. Its own hook, so the rows are cached on the
+ * threads alone and keep their identity while the query changes.
  */
-export function useCommandPaletteThreadItems(input: {
-  readonly activeThread: {
-    readonly environmentId: EnvironmentId;
-    readonly id: ThreadId;
-  } | null;
-  readonly threadSearchQuery: string;
+function useThreadActionItems(input: {
+  readonly activeThread: PaletteActiveThread | null;
   readonly recentOnly: boolean;
-  readonly spotlightQuery: string;
+  readonly runThread: (thread: SidebarThreadSummary) => Promise<void>;
 }) {
-  const { activeThread, threadSearchQuery, recentOnly, spotlightQuery } = input;
+  const { activeThread, runThread, recentOnly } = input;
   const messages = useMessages();
   const gt = useGT();
-  const navigate = useNavigate();
   const threads = useVisibleThreadShells();
   const delegatedUnderParent = useDelegatedUnderParent();
+  const { environments } = useEnvironments();
   const { projectEnvironmentLocationById } = useEnvironmentLookups();
   const providerEntryByEnvironmentAndInstanceId = useProviderEntryByEnvironmentAndInstanceId();
-  const messageSearch = useConnectedThreadSearch(threadSearchQuery);
   const { projectByKey } = useProjectLookups();
-  const visitThread = useAtomCommand(threadEnvironment.visit, { reportFailure: false });
-  // Ranking is relative to when the palette opened, so rows do not reorder as time passes.
-  const [now] = useState(() => Date.now());
-  const { environments } = useEnvironments();
-  const runThread = useStableCallback(async (thread: (typeof threads)[number]) => {
-    // A pick sends its open with the query, always, so the server records
-    // it; the thread view then skips its own open. The open thread is no pick.
-    const isOpen =
-      activeThread?.environmentId === thread.environmentId && activeThread.id === thread.id;
-    if (threadSearchQuery.trim().length > 0 && !threadSearchQuery.startsWith(">") && !isOpen) {
-      claimThreadOpen(thread.environmentId, thread.id, Date.now());
-    }
-    if (
-      threadSearchQuery.trim().length > 0 &&
-      !threadSearchQuery.startsWith(">") &&
-      thread.lastVisitedAt !== undefined &&
-      !isOpen
-    ) {
-      void visitThread({
-        environmentId: thread.environmentId,
-        input: {
-          threadId: thread.id,
-          visitedAt: thread.updatedAt,
-          opened: true,
-          searchQuery: pickedQuery(threadSearchQuery),
-        },
-      });
-    }
-    await navigate({
-      to: "/$environmentId/$threadId",
-      params: buildThreadRouteParams(scopeThreadRef(thread.environmentId, thread.id)),
-    });
-  });
-  const serverItemIds = new Set(
-    messageSearch.matches.map((match) => `thread:${match.environmentId}:${match.threadId}`),
-  );
-  const spotlight = normalizeSearchText(spotlightQuery);
-  const tokens = spotlight ? spotlight.split(" ") : [];
-  // The root matcher only shows literal title matches beside the server results.
-  const matchingThreads = spotlight
-    ? threads.filter((thread) => {
-        if (serverItemIds.has(`thread:${thread.environmentId}:${thread.id}`)) return true;
-        const title = normalizeSearchText(thread.title);
-        return tokens.every((token) => title.includes(token));
-      })
-    : threads;
-  const threadItems = buildThreadActionItems(
+  return buildThreadActionItems(
     {
-      threads: matchingThreads,
+      threads,
       delegatedUnderParent,
       recentOnly,
       ...(environments.length > 1
@@ -198,7 +151,7 @@ export function useCommandPaletteThreadItems(input: {
       renderLeadingContent: (thread) => <ThreadRowLeadingStatus thread={thread} />,
       renderTrailingContent: (thread) => (
         <>
-          <PaletteThreadPullRequest thread={thread} />
+          <PaletteThreadPullRequestNumber thread={thread} />
           <ThreadRowTrailingStatus thread={thread} />
         </>
       ),
@@ -235,6 +188,59 @@ export function useCommandPaletteThreadItems(input: {
     },
     messages,
   );
+}
+
+/**
+ * Every visible thread as a palette item, plus, for a non-empty
+ * `threadSearchQuery`, the threads whose messages match, best first.
+ */
+export function useCommandPaletteThreadItems(input: {
+  readonly activeThread: PaletteActiveThread | null;
+  readonly threadSearchQuery: string;
+  readonly recentOnly: boolean;
+  readonly spotlightQuery: string;
+}) {
+  const { activeThread, threadSearchQuery, recentOnly, spotlightQuery } = input;
+  const messages = useMessages();
+  const navigate = useNavigate();
+  const messageSearch = useConnectedThreadSearch(threadSearchQuery);
+  const visitThread = useAtomCommand(threadEnvironment.visit, { reportFailure: false });
+  // Ranking is relative to when the palette opened, so rows do not reorder as time passes.
+  const [now] = useState(() => Date.now());
+  // Rows already shown keep their places when a slower environment answers.
+  const [shownOrder, setShownOrder] = useState<ShownOrder | null>(null);
+  // Reads the query when picked, so the rows need not be rebuilt on every keystroke.
+  const runThread = useStableCallback(async (thread: SidebarThreadSummary) => {
+    // A pick sends its open with the query, always, so the server records
+    // it; the thread view then skips its own open. The open thread is no pick.
+    const isOpen =
+      activeThread?.environmentId === thread.environmentId && activeThread.id === thread.id;
+    if (threadSearchQuery.trim().length > 0 && !threadSearchQuery.startsWith(">") && !isOpen) {
+      claimThreadOpen(thread.environmentId, thread.id, Date.now());
+    }
+    if (
+      threadSearchQuery.trim().length > 0 &&
+      !threadSearchQuery.startsWith(">") &&
+      thread.lastVisitedAt !== undefined &&
+      !isOpen
+    ) {
+      void visitThread({
+        environmentId: thread.environmentId,
+        input: {
+          threadId: thread.id,
+          visitedAt: thread.updatedAt,
+          opened: true,
+          searchQuery: pickedQuery(threadSearchQuery),
+        },
+      });
+    }
+    await navigate({
+      to: "/$environmentId/$threadId",
+      params: buildThreadRouteParams(scopeThreadRef(thread.environmentId, thread.id)),
+    });
+  });
+  const threadItems = useThreadActionItems({ activeThread, runThread, recentOnly });
+  const { projectByKey } = useProjectLookups();
 
   const itemByValue = new Map(threadItems.map((item) => [item.value, item]));
   const itemForMatch = (match: EnvironmentThreadSearchMatch) =>
@@ -273,8 +279,7 @@ export function useCommandPaletteThreadItems(input: {
       },
     ];
   });
-  // Rows already shown keep their places when a slower environment answers.
-  const [shownOrder, setShownOrder] = useState<ShownOrder | null>(null);
+
   const order = nextShownOrder(
     shownOrder,
     messageSearch.query,
@@ -357,9 +362,17 @@ export function useCommandPaletteThreadItems(input: {
       },
     };
   });
+  const serverItemIds = new Set(spotlightItems.map((item) => item.value));
+  const tokens = normalizeSearchText(spotlightQuery).split(" ").filter(Boolean);
   const threadItemsForSearch = [
     ...spotlightItems,
-    ...threadItems.filter((item) => !serverItemIds.has(item.value)),
+    ...threadItems.filter(
+      (item) =>
+        !serverItemIds.has(item.value) &&
+        tokens.every((token) =>
+          normalizeSearchText(item.searchTitle ?? item.threadSearch?.title ?? "").includes(token),
+        ),
+    ),
   ];
   return {
     threadItems,

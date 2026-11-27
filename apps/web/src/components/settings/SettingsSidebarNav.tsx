@@ -53,6 +53,7 @@ import {
   SidebarInput,
 } from "../ui/sidebar";
 import { scrollToSettingsTarget } from "./settingsLayout";
+import { useSettingsSectionPrefetch } from "./useSettingsSectionPrefetch";
 import {
   searchSettings,
   revealSettingsSearchTarget,
@@ -148,6 +149,7 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
   const m = useMessages();
   const navArea = workspaceAreaProps("settings-nav", 0, gt("Settings sections"));
   const navigate = useNavigate();
+  const preloadSection = useSettingsSectionPrefetch();
   const currentHash = useLocation({ select: (location) => location.hash });
   const activePath = SETTINGS_DETAIL_PAGE_PARENTS[pathname] ?? pathname;
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -158,7 +160,8 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
   const searchableItems = useAvailableSettingsSearchItems();
   const { environments } = useEnvironments();
   const pendingMemoryCount = environments.reduce(
-    (count, environment) => count + (environment.serverConfig?.settings.memory?.pending.length ?? 0),
+    (count, environment) =>
+      count + (environment.serverConfig?.settings.memory?.pending.length ?? 0),
     0,
   );
   const navGroups = settingsNavGroups(useHasSecretProvidersEnvironment());
@@ -245,7 +248,7 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
   };
   const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.nativeEvent.isComposing || event.keyCode === 229) return;
-    if (event.key === "Escape" && isSearching) {
+    if (event.key === "Escape" && (query || event.repeat)) {
       event.preventDefault();
       event.stopPropagation();
       clearSearch();
@@ -254,12 +257,18 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
     if (results.length === 0) return;
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      setActiveResultIndex((activeResultIndex + 1) % results.length);
+      const next = (activeResultIndex + 1) % results.length;
+      setActiveResultIndex(next);
+      const result = results[next];
+      if (result) preloadSection(result.to);
       return;
     }
     if (event.key === "ArrowUp") {
       event.preventDefault();
-      setActiveResultIndex((activeResultIndex - 1 + results.length) % results.length);
+      const next = (activeResultIndex - 1 + results.length) % results.length;
+      setActiveResultIndex(next);
+      const result = results[next];
+      if (result) preloadSection(result.to);
       return;
     }
     if (event.key === "Enter") {
@@ -363,6 +372,7 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
                       isActive={index === activeResultIndex}
                       className="h-auto min-h-10 items-start"
                       onMouseMove={() => setActiveResultIndex(index)}
+                      onPointerEnter={() => preloadSection(item.to)}
                       onClick={() => handleSearchResultClick(item)}
                     >
                       <SettingsSectionIcon to={item.to} />
@@ -412,14 +422,15 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
                         <SidebarMenu>
                           {group.paths.map((to) => {
                             const Icon = SETTINGS_SECTION_ICONS[to];
-                            const isActive =
-                              activePath === to || activePath.startsWith(`${to}/`);
+                            const isActive = activePath === to || activePath.startsWith(`${to}/`);
                             return (
                               <SidebarMenuItem key={to}>
                                 <SidebarMenuButton
                                   data-settings-section={to}
                                   aria-current={isActive ? "page" : undefined}
                                   isActive={isActive}
+                                  onPointerEnter={() => preloadSection(to)}
+                                  onFocus={() => preloadSection(to)}
                                   onClick={() => handleSectionClick(to)}
                                 >
                                   <Icon />
@@ -429,7 +440,9 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
                                       !compactSearchOpen && "max-md:sr-only",
                                     )}
                                   >
-                                    {to === "/settings/memory" ? uiText("Memory settings") : m(SETTINGS_NAV_LABELS[to])}
+                                    {to === "/settings/memory"
+                                      ? uiText("Memory settings")
+                                      : m(SETTINGS_NAV_LABELS[to])}
                                   </span>
                                   {to === "/settings/memory" && pendingMemoryCount > 0 ? (
                                     <span className="ml-auto rounded-full bg-[#007aff]/15 px-1.5 text-xs tabular-nums text-[#005ac4] dark:text-[#64aaff] max-md:hidden">

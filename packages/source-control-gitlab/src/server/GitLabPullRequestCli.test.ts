@@ -1804,6 +1804,68 @@ layer("GitLabPullRequestCli.layer", (it) => {
     }),
   );
 
+  it.effect("approves at the head the caller reviewed", () =>
+    Effect.gen(function* () {
+      mockedExecute.mockReturnValue(Effect.succeed(output("{}")));
+      const cli = yield* GitLabPullRequestCli.GitLabPullRequestCli;
+      const approval = {
+        cwd: "/w",
+        repository: "acme/web",
+        number: 7,
+        verdict: "approve" as const,
+        body: "",
+        comments: [],
+      };
+
+      yield* cli.submitReview({ ...approval, expectedHeadSha: "0a1b2c3d4e5f" });
+      expect(argsOfCall(0)[1]).toContain("merge_requests/7/approve");
+      expect(JSON.parse(callAt(0).stdin ?? "{}")).toEqual({ sha: "0a1b2c3d4e5f" });
+
+      yield* cli.submitReview(approval);
+      expect(argsOfCall(1)[1]).toContain("merge_requests/7/approve");
+      expect(callAt(1).stdin).toBeUndefined();
+    }),
+  );
+
+  it.effect("posts no line comment when the head is no longer the one the caller reviewed", () =>
+    Effect.gen(function* () {
+      mockedExecute.mockReturnValueOnce(
+        Effect.succeed(
+          output(
+            JSON.stringify({
+              iid: 7,
+              title: "t",
+              web_url: "https://gitlab.com/acme/web/-/merge_requests/7",
+              source_branch: "feat",
+              target_branch: "main",
+              created_at: "2026-07-01T00:00:00Z",
+              updated_at: "2026-07-01T00:00:00Z",
+              diff_refs: { base_sha: "base", head_sha: "newer-head", start_sha: "start" },
+            }),
+          ),
+        ),
+      );
+      mockedExecute.mockReturnValue(Effect.succeed(output("{}")));
+      const cli = yield* GitLabPullRequestCli.GitLabPullRequestCli;
+
+      const refused = yield* Effect.flip(
+        cli.submitReview({
+          cwd: "/w",
+          repository: "acme/web",
+          number: 7,
+          verdict: "approve",
+          body: "Looks right.",
+          expectedHeadSha: "reviewed-head",
+          comments: [{ path: "src/b.ts", position: { kind: "added", newLine: 12 }, body: "nit" }],
+        }),
+      );
+
+      expect(refused.message).toContain("the head is now newer-head, not reviewed-head");
+      expect(mockedExecute).toHaveBeenCalledTimes(1);
+      expect(argsOfCall(0)[1]).toContain("merge_requests/7");
+    }),
+  );
+
   it.effect("requests changes as a reviewer and reports what GitLab refused", () =>
     Effect.gen(function* () {
       mockedExecute
@@ -1929,13 +1991,15 @@ layer("GitLabPullRequestCli.layer", (it) => {
     }),
   );
 
-  it.effect("shows a failed child pipeline that left the head pipeline green", () =>
+  it.effect("shows a failed child pipeline on the selected GitLab host", () =>
     Effect.gen(function* () {
+      const host = "gitlab.example.test";
       mockedExecute.mockImplementation((request) => {
         switch (request.args[1]) {
           case "graphql":
             return Effect.succeed(output("{}"));
           case "projects/12/pipelines/31/bridges?per_page=100":
+            if (request.host !== host) return Effect.succeed(output("[]"));
             return Effect.succeed(
               output(
                 JSON.stringify([
@@ -1944,7 +2008,7 @@ layer("GitLabPullRequestCli.layer", (it) => {
                     status: "success",
                     downstream_pipeline: {
                       status: "failed",
-                      web_url: "https://gitlab.com/bilal/web/-/pipelines/32",
+                      web_url: `https://${host}/bilal/web/-/pipelines/32`,
                     },
                   },
                   { name: "docs", status: "created", downstream_pipeline: null },
@@ -1955,12 +2019,13 @@ layer("GitLabPullRequestCli.layer", (it) => {
             return Effect.succeed(
               output(
                 mergeRequestJson({
+                  web_url: `https://${host}/acme/web/-/merge_requests/7`,
                   // A fork's pipeline runs in the source project, so its id is not the target's.
                   head_pipeline: {
                     id: 31,
                     project_id: 12,
                     status: "success",
-                    web_url: "https://gitlab.com/bilal/web/-/pipelines/31",
+                    web_url: `https://${host}/bilal/web/-/pipelines/31`,
                   },
                 }),
               ),
@@ -1971,13 +2036,14 @@ layer("GitLabPullRequestCli.layer", (it) => {
 
       const detail = yield* cli.getMergeRequestDetail({
         cwd: "/w",
+        host,
         repository: "acme/web",
         number: 7,
       });
 
       expect(detail.checks.map((check) => [check.name, check.status, check.url])).toEqual([
-        ["Pipeline", "success", "https://gitlab.com/bilal/web/-/pipelines/31"],
-        ["deploy", "failure", "https://gitlab.com/bilal/web/-/pipelines/32"],
+        ["Pipeline", "success", `https://${host}/bilal/web/-/pipelines/31`],
+        ["deploy", "failure", `https://${host}/bilal/web/-/pipelines/32`],
       ]);
     }),
   );

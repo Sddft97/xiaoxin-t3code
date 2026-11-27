@@ -86,6 +86,7 @@ import { Menu, MenuPopup, MenuTrigger } from "../ui/menu";
 import { Switch } from "../ui/switch";
 import { stackedThreadToast, toastManager } from "../ui/toast";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { SharedTooltipTrigger } from "../ui/shared-tooltip";
 import { Button } from "../ui/button";
 import { EnvironmentMachineIcon } from "../EnvironmentMachineIcon";
 import { type ServerClientSessionRecord } from "~/environments/primary";
@@ -1007,14 +1008,6 @@ function ConnectionsSettingsContent({
   };
 
   const renderWslRow = () => {
-    if (platformProfile.isWindowsDesktop && canManageLocalBackend) {
-      return (
-        <SettingsRow
-          {...searchableSetting("wsl-backend")}
-          description={uiText("WSL is currently unavailable on Windows.")}
-        />
-      );
-    }
     if (!desktopWslState) {
       if (
         isWslSettingsRowVisible({ state: null, error: desktopWslError }) &&
@@ -1041,7 +1034,14 @@ function ConnectionsSettingsContent({
       return null;
     }
     if (!isWslSettingsRowVisible({ state: desktopWslState, error: desktopWslError })) {
-      return null;
+      // Builds without the WSL runtime say so; ones that ship it, or that hold a WSL
+      // preference to clear, fall through to the real controls below.
+      return platformProfile.isWindowsDesktop && canManageLocalBackend ? (
+        <SettingsRow
+          {...searchableSetting("wsl-backend")}
+          description={uiText("WSL is currently unavailable on Windows.")}
+        />
+      ) : null;
     }
     if (!desktopWslState.available) {
       return (
@@ -1269,25 +1269,25 @@ function ConnectionsSettingsContent({
       control={
         !desktopBridge &&
         (currentAuthPolicy === "remote-reachable" || currentAuthPolicy === "loopback-browser") ? (
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <span className="inline-flex">
-                  <Switch
-                    checked={isLocalBackendNetworkAccessible}
-                    disabled
-                    aria-label={gt("Enable network access")}
-                  />
-                </span>
-              }
-            />
-            <TooltipPopup side="top">
-              <T>
-                Network exposure changes restart the backend and must be controlled where the server
-                process is launched.
-              </T>
-            </TooltipPopup>
-          </Tooltip>
+          <SharedTooltipTrigger
+            render={
+              <span className="inline-flex">
+                <Switch
+                  checked={isLocalBackendNetworkAccessible}
+                  disabled
+                  aria-label={gt("Enable network access")}
+                />
+              </span>
+            }
+            label={
+              <>
+                <T>
+                  Network exposure changes restart the backend and must be controlled where the
+                  server process is launched.
+                </T>
+              </>
+            }
+          />
         ) : undefined
       }
     />

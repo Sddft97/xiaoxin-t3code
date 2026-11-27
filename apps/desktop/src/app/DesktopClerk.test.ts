@@ -36,7 +36,6 @@ vi.mock("@clerk/electron", () => ({
 vi.mock("@clerk/electron/storage", () => ({
   storage: storageMock,
 }));
-import * as Exit from "effect/Exit";
 import * as FileSystem from "effect/FileSystem";
 import * as ElectronApp from "../electron/ElectronApp.ts";
 import * as ElectronShell from "../electron/ElectronShell.ts";
@@ -64,9 +63,10 @@ const layerDesktopClerk = (
     copyText: () => Effect.void,
   },
   listeners = new Map<string, (...args: unknown[]) => void>(),
+  stateDir = clerkStateDir,
 ) => {
   const environment = DesktopEnvironment.DesktopEnvironment.of({
-    stateDir: clerkStateDir,
+    stateDir,
     isDevelopment,
     appDataDirectory: "/tmp/app-data",
     platform,
@@ -81,9 +81,10 @@ const layerDesktopClerk = (
       events.push("requestSingleInstanceLock");
       return requestSingleInstanceLockMock();
     }),
-    quit: Effect.sync(() => {
-      events.push("quit");
-    }),
+    exit: (code: number) =>
+      Effect.sync(() => {
+        events.push(`exit:${code}`);
+      }),
     on: (name: string, listener: (...args: unknown[]) => void) =>
       Effect.acquireRelease(
         Effect.sync(() => {
@@ -170,9 +171,24 @@ describe("DesktopClerk", () => {
       assert.deepEqual(storageMock.mock.calls, [
         [{ path: NodePath.join(NodePath.resolve(clerkStateDir), "clerk") }],
       ]);
-      assert.notStrictEqual(createClerkBridgeMock.mock.calls[0]?.[0]?.storage, storageAdapter);
+      assert.strictEqual(createClerkBridgeMock.mock.calls[0]?.[0]?.storage, storageAdapter);
     },
   );
+
+  it.effect("keeps Clerk tokens under a relative state directory instead of userData", () => {
+    storageMock.mockReturnValue(storageAdapter);
+    createClerkBridgeMock.mockReturnValue({ cleanup: vi.fn(), isPrimaryInstance: true });
+
+    return Effect.sync(() => {
+      assert.deepEqual(storageMock.mock.calls, [
+        [{ path: NodePath.resolve("relative-state", "clerk") }],
+      ]);
+    }).pipe(
+      Effect.provide(
+        layerDesktopClerk(true, [], "darwin", undefined, undefined, undefined, "relative-state"),
+      ),
+    );
+  });
 
   it.effect.each(["before configure", "after configure"] as const)(
     "reveals the running window when a second instance launches %s",
@@ -280,13 +296,15 @@ describe("DesktopClerk", () => {
             ),
           ),
         );
-        const exit = yield* Effect.exit(Effect.scoped(Layer.build(runtime)));
+        const launch = yield* Effect.scoped(Layer.build(runtime)).pipe(
+          Effect.forkChild({ startImmediately: true }),
+        );
 
-        assert.isTrue(Exit.hasInterrupts(exit));
+        assert.isUndefined(launch.pollUnsafe());
         assert.deepEqual(events, [
           "setPath:userData:/tmp/app-data/t3code-v2",
           "requestSingleInstanceLock",
-          "quit",
+          "exit:0",
         ]);
         assert.equal(createClerkBridgeMock.mock.calls.length, 0);
         assert.equal(storageMock.mock.calls.length, 0);

@@ -370,7 +370,7 @@ function CleanupResults({
       {report.omittedCount > 0 && (
         <p className="px-3 py-2.5 text-xs text-muted-foreground sm:px-4">
           {gt(
-            "{omitted, plural, one {{environment}: {count} more results.} other {{environment}: {count} more results.}}",
+            "{omitted, plural, one {{environment}: {count} more result.} other {{environment}: {count} more results.}}",
             {
               omitted: report.omittedCount,
               environment: environmentLabel,
@@ -505,6 +505,7 @@ function CleanupSection() {
         }),
     ).finally(() => setPending(false));
   };
+  if (supportedIds.length === 0) return null;
   return (
     <SettingsSection id="storage-cleanup" title={gt("Cleanup")} variant="plain">
       <SettingsGroup>
@@ -812,8 +813,9 @@ export function WorktreeCleanupSection() {
                 }
               />
               {connectedEnvironments.every(
-                (environment) =>
-                  environment.serverConfig?.environment.capabilities.storageCleanupRun === true,
+                ({ serverConfig }) =>
+                  serverConfig?.environment.capabilities.storageCleanupRun === true ||
+                  serverConfig?.environment.capabilities.projectWorktreeCleanup === true,
               ) && (
                 <SettingsRow
                   {...setting("storage-worktree-keep-when")}
@@ -915,17 +917,17 @@ export function StorageCleanupSections() {
   if (!supportsStorageCleanup(connectedEnvironments)) {
     return (
       <>
-        {databaseStorageNotice}
         <SettingsSection id="storage-artifacts" title={gt("Artifacts and logs")} variant="plain">
           <StorageCleanupScopeNotice />
         </SettingsSection>
+        {databaseStorageNotice}
       </>
     );
   }
 
+  // Machines report their databases after the page renders, so the notice goes last to push nothing down.
   return (
     <>
-      {databaseStorageNotice}
       <SettingsSection id="storage-artifacts" title={gt("Artifacts and logs")}>
         <AnimatedHeight>
           <SettingsRow
@@ -967,6 +969,7 @@ export function StorageCleanupSections() {
         </AnimatedHeight>
       </SettingsSection>
       <CleanupSection />
+      {databaseStorageNotice}
     </>
   );
 }

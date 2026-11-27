@@ -95,9 +95,10 @@ export async function inspectCleanupTree(
       throw new Error("包含链接、跨卷或特殊文件，保留原件");
     if (process.getuid && st.uid !== process.getuid()) throw new Error("非当前用户所有，保留原件");
     latest = Math.max(latest, st.mtimeMs);
-    bytes += st.blocks * 512;
+    const allocatedBytes = (st.blocks ?? Math.ceil(st.size / 512)) * 512;
+    bytes += allocatedBytes;
     const child = NodePath.relative(target, p).split(NodePath.sep)[0];
-    if (child) childBytes.set(child, (childBytes.get(child) ?? 0) + st.blocks * 512);
+    if (child) childBytes.set(child, (childBytes.get(child) ?? 0) + allocatedBytes);
     hash.update(JSON.stringify([p, st.dev, st.ino, st.size, st.mtimeMs, st.ctimeMs]));
     if (st.isDirectory()) {
       const children = await NodeFSP.readdir(p);

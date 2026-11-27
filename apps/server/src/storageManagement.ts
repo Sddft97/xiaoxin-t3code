@@ -42,8 +42,17 @@ export class StorageManagement extends Context.Service<
 >()("t3/storageManagement") {}
 
 const make = Effect.gen(function* () {
+  if ((yield* HostProcess.Platform) !== "darwin") {
+    const unavailable = Effect.fail(
+      new StorageManagementError({ message: "unsupported-platform" }),
+    );
+    return StorageManagement.of({
+      inspect: Effect.fn("StorageManagement.inspect")(() => unavailable),
+      manage: Effect.fn("StorageManagement.manage")(() => unavailable),
+    });
+  }
+
   const config = yield* ServerConfig.ServerConfig;
-  const platform = yield* HostProcess.Platform;
   const cleanup = yield* StorageCleanup.StorageCleanup;
   const scope = yield* Scope.Scope;
   const settings = yield* ServerSettings.ServerSettingsService;
@@ -80,10 +89,6 @@ const make = Effect.gen(function* () {
     return yield* Effect.tryPromise({
       try: (signal) =>
         new Promise<unknown>((resolve, reject) => {
-          if (platform !== "darwin") {
-            reject(new Error("当前归档操作需要 macOS 的 Python 3；不会执行清理"));
-            return;
-          }
           if (signal.aborted) {
             reject(new Error("归档操作已取消"));
             return;

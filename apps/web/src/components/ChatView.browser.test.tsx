@@ -48,6 +48,7 @@ import {
   assistantItem,
   dispatchedCommands,
   emitThreadEvent,
+  emitVcsStatus,
   hasPendingAssetUrl,
   installFakeEnvironment,
   rejectPendingCommand,
@@ -110,7 +111,7 @@ function holdRpc<Input>(method: string, end: Effect.Effect<never, Error>) {
   return { calls, release, [Symbol.dispose]: () => answer[Symbol.dispose]() };
 }
 
-// The socket is the only fake layer; see test/appScenarios.renders.tsx.
+// The socket is the only fake layer.
 vi.mock("../../../../packages/client-runtime/src/connection/driver.ts", async (importOriginal) => {
   const [actual, { fakeDriver }, Layer] = await Promise.all([
     importOriginal<{ readonly ConnectionDriver: Context.Key<unknown, FakeDriver> }>(),
@@ -138,6 +139,46 @@ vi.mock(import("~/rpc/requestLatencyState"), async (original) => ({
   trackRpcRequestSent: () => {},
 }));
 
+it("opening Settings without a page event closes the composer model picker and permissions menu", async () => {
+  using _locale = testUiLocale("en");
+  await page.viewport(1440, 900);
+  using _environment = installFakeEnvironment([]);
+  __setClientSettingsForTests({
+    ...DEFAULT_CLIENT_SETTINGS,
+    onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
+  });
+  const draftId = DraftId.make("draft-29219");
+  useComposerDraftStore
+    .getState()
+    .setProjectDraftThreadId(scopeProjectRef(ENVIRONMENT_ID, PROJECT_ID), draftId, {
+      threadId: ThreadId.make("thread-29219"),
+    });
+
+  const router = getRouter(createMemoryHistory({ initialEntries: [`/draft/${draftId}`] }));
+  await router.load();
+  await using _app = await render(<AppRoot router={router} />, {
+    // AppRoot brings its own router.
+    router: false,
+  });
+  await expect.element(page.getByTestId("composer-editor")).toBeVisible();
+  const trigger = page.elementLocator(
+    document.querySelector<HTMLButtonElement>("button[data-chat-provider-model-picker]") ??
+      document.querySelector<HTMLButtonElement>("[data-chat-provider-model-picker] button")!,
+  );
+  await userEvent.click(trigger);
+  const search = page.getByPlaceholder("Search models...");
+  await expect.element(search).toBeVisible();
+
+  const permissions = page.getByRole("radiogroup", { name: "Permissions" });
+  await expect.element(permissions).toBeVisible();
+
+  // The desktop menu's open-settings accelerator navigates with no key or pointer event in the page.
+  await act(() => router.navigate({ to: "/settings" }));
+  await expect.element(page.getByRole("dialog", { name: "Settings" })).toBeVisible();
+  await expect.element(search).not.toBeInTheDocument();
+  await expect.element(permissions).not.toBeInTheDocument();
+});
+
 it("opens a linked Linear issue from an inactive thread's sidebar badge", async () => {
   const style = document.createElement("style");
   style.textContent = stylesheet;
@@ -157,7 +198,7 @@ it("opens a linked Linear issue from an inactive thread's sidebar badge", async 
     url: "https://linear.app/example/issue/WEB-123/add-keyboard-support",
     source: "manual",
     linkedAt: "2026-01-01T00:00:00.000Z",
-    displayKey: issueRef.key,
+    displayKey: "#123",
     title: "Add keyboard support",
   };
   const completed = {
@@ -170,7 +211,22 @@ it("opens a linked Linear issue from an inactive thread's sidebar badge", async 
   const grouped = threadWithHistory("issue-grouped", 1);
   using _environment = installFakeEnvironment([
     first,
-    { ...linked, issues: [issue] },
+    {
+      ...linked,
+      issues: [issue],
+      pullRequests: [
+        {
+          host: "github.com",
+          repository: "pingdotgg/t3code",
+          number: 124,
+          url: "https://github.com/pingdotgg/t3code/pull/124",
+          source: "manual",
+          linkedAt: "2026-01-01T00:00:00.000Z",
+          snapshot: null,
+          stack: null,
+        },
+      ],
+    },
     { ...grouped, issues: [completed, issue] },
   ]);
   const liveTitle = "Add keyboard shortcuts to the sidebar";
@@ -237,10 +293,21 @@ it("opens a linked Linear issue from an inactive thread's sidebar badge", async 
     name: `Issue ${issue.displayKey}: ${issue.title}, Open`,
   });
   await expect.element(badge).toBeVisible();
-  expect(badge.element().querySelector("svg")).toHaveClass(/text-emerald-600/);
+  expect(badge.element().querySelector("span")).toHaveClass(/text-emerald-600/);
+  expect(badge.element()).toHaveTextContent("123");
+  expect(badge.element()).not.toHaveTextContent("#");
+  const prBadge = page.getByRole("link", { name: "PR #124, status pending" });
+  await expect.element(prBadge).toHaveTextContent("124");
+  for (const control of [badge, prBadge]) {
+    expect(control.element().querySelector("span")).toHaveClass(
+      "contents",
+      "text-xs",
+      "tabular-nums",
+    );
+  }
   const groupedBadge = page.getByRole("button", { name: "2 linked issues" });
   await vi.waitFor(() =>
-    expect(groupedBadge.element().querySelector("svg")).toHaveClass(/text-emerald-600/),
+    expect(groupedBadge.element().querySelector("span")).toHaveClass(/text-emerald-600/),
   );
   await userEvent.hover(badge);
   const issueName = `Issue ${issue.displayKey}: ${liveTitle}`;
@@ -412,6 +479,133 @@ it("a new draft does not load its reserved thread before the server lists it", a
     .filter((url) => url.includes(`/api/orchestration/threads/${threadId}/`));
   // A 404 here marks the thread deleted, and the view never loads it once the send creates it.
   expect(threadRequests).toEqual([]);
+});
+
+it("greets a new draft in Stardust's own words, with the project name in the sentence", async () => {
+  using _locale = testUiLocale("zh-CN");
+  using _style = captureWorkbenchStyle();
+  await page.viewport(1280, 800);
+  using _environment = installFakeEnvironment([]);
+  __setClientSettingsForTests({
+    ...DEFAULT_CLIENT_SETTINGS,
+    language: "zh",
+    onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
+  });
+  startI18n();
+  await whenLocaleReady();
+  const draftId = DraftId.make("draft-stardust-greeting");
+  useComposerDraftStore
+    .getState()
+    .setProjectDraftThreadId(scopeProjectRef(ENVIRONMENT_ID, PROJECT_ID), draftId, {
+      threadId: ThreadId.make("thread-stardust-greeting"),
+    });
+  const router = getRouter(createMemoryHistory({ initialEntries: [`/draft/${draftId}`] }));
+  await router.load();
+  await using _app = await render(<AppRoot router={router} />, { router: false });
+
+  const heading = page.getByRole("heading", { level: 1 });
+  await expect.element(heading).toBeVisible();
+  await vi.waitFor(() => {
+    const text = heading.element().textContent ?? "";
+    expect(JSON.stringify(text)).toMatch(/星尘已就位。今天在render点亮什么？/);
+  });
+  await expect.element(page.getByText("把想法交给星尘，慢慢聚成星系。")).toBeVisible();
+});
+
+const draftGitStatus = (isRepo: boolean) => ({
+  isRepo,
+  hasPrimaryRemote: isRepo,
+  isDefaultRef: isRepo,
+  refName: isRepo ? "main" : null,
+  hasWorkingTreeChanges: false,
+  workingTree: { files: [], insertions: 0, deletions: 0 },
+});
+
+it("syncs the draft workspace and base branch with thread details in both directions", async () => {
+  using _locale = testUiLocale("en");
+  using _environment = installFakeEnvironment([]);
+  using _refs = answerRpc(WS_METHODS.vcsListRefs, () =>
+    Effect.succeed({
+      isRepo: true,
+      hasPrimaryRemote: true,
+      totalCount: 2,
+      nextCursor: null,
+      refs: ["main", "demo-feature"].map((name) => ({
+        name,
+        current: name === "main",
+        isDefault: name === "main",
+        isRemote: false,
+        worktreePath: null,
+      })),
+    }),
+  );
+  __setClientSettingsForTests({
+    ...DEFAULT_CLIENT_SETTINGS,
+    onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
+  });
+  await page.viewport(1440, 960);
+  const draftId = DraftId.make("draft-workspace-sync");
+  useComposerDraftStore
+    .getState()
+    .setProjectDraftThreadId(scopeProjectRef(ENVIRONMENT_ID, PROJECT_ID), draftId, {
+      threadId: ThreadId.make("thread-workspace-sync"),
+    });
+  const router = getRouter(createMemoryHistory({ initialEntries: [`/draft/${draftId}`] }));
+  await router.load();
+  await using _app = await render(<AppRoot router={router} />, { router: false });
+
+  const workspace = page.getByRole("button", { name: /^Workspace:/ });
+  const hint = page.getByText("A separate branch is created when you send the first message");
+  const base = page.getByRole("combobox", { name: /^Branch: From / }).first();
+  await expect.element(page.getByRole("button", { name: /^Location: render/ })).toBeVisible();
+  await act(() => emitVcsStatus({ _tag: "snapshot", local: draftGitStatus(true), remote: null }));
+  await expect.element(workspace).toHaveTextContent("Workspace: Current checkout");
+  await expect.element(hint).not.toBeInTheDocument();
+  await userEvent.click(workspace);
+  await userEvent.click(page.getByRole("menuitemradio", { name: "New worktree" }));
+  await expect.element(workspace).toHaveTextContent("Workspace: New worktree");
+  await expect.element(base).toHaveTextContent("From main (remote)");
+  await expect.element(hint).toBeVisible();
+
+  const details = page.getByRole("region", { name: "Thread details" });
+  const panelWorkspace = details.getByRole("button", { name: /^Run context:.*New worktree/ });
+  if (!panelWorkspace.query()) {
+    await userEvent.click(page.getByRole("button", { name: "Toggle thread details panel" }));
+  }
+  const panelBase = details.getByRole("combobox", { name: /^Branch:/ });
+  await expect.element(panelWorkspace).toBeVisible();
+  await userEvent.click(panelBase);
+  await userEvent.click(page.getByRole("option", { name: "demo-feature" }));
+  await expect.element(base).toHaveTextContent("From demo-feature (remote)");
+
+  await userEvent.click(panelWorkspace);
+  await userEvent.click(page.getByRole("menuitemradio", { name: "Current checkout" }));
+  await expect.element(workspace).toHaveTextContent("Workspace: Current checkout");
+  await expect.element(hint).not.toBeInTheDocument();
+
+  await act(() => emitVcsStatus({ _tag: "localUpdated", local: draftGitStatus(false) }));
+  await expect.element(workspace).not.toBeInTheDocument();
+  await expect.element(page.getByRole("button", { name: /^Location: render/ })).toBeVisible();
+});
+
+it("hides the draft workspace controls after the first message", async () => {
+  using _locale = testUiLocale("en");
+  const thread = threadWithHistory("thread-workspace-started", 1);
+  using _environment = installFakeEnvironment([thread]);
+  __setClientSettingsForTests({
+    ...DEFAULT_CLIENT_SETTINGS,
+    onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
+  });
+  const router = getRouter(
+    createMemoryHistory({ initialEntries: [`/${ENVIRONMENT_ID}/${thread.id}`] }),
+  );
+  await router.load();
+  await using _app = await render(<AppRoot router={router} />, { router: false });
+  await expect.element(page.getByText(`Answer 0 for ${thread.id}.`)).toBeVisible();
+  await expect.element(page.getByRole("button", { name: /^Workspace:/ })).not.toBeInTheDocument();
+  await expect
+    .element(page.getByText("A separate branch is created when you send the first message"))
+    .not.toBeInTheDocument();
 });
 
 class FixtureSendError extends Schema.TaggedError<FixtureSendError>()("FixtureSendError", {
@@ -1346,4 +1540,4 @@ it("opens a side chat with the selected reply quoted and focuses the draft witho
       element: pane,
     });
   }
-}, 30_000);
+});

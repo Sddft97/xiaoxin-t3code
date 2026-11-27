@@ -1,8 +1,9 @@
 import { CircleAlertIcon, RefreshCwIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 
 import { threadSyncLabel, type ThreadSyncPhase } from "../../threadSync";
 import { cn } from "~/lib/utils";
+import { TaskTitleTooltip } from "./TaskTitleTooltip";
 import { useMessages } from "gt-react";
 
 /** A line of thread state for the end of the timeline. */
@@ -10,6 +11,7 @@ export interface ThreadNowItem {
   readonly id: string;
   readonly icon: ReactNode;
   readonly title: ReactNode;
+  readonly titleText?: string;
   readonly description?: ReactNode;
   readonly actions?: ReactNode;
 }
@@ -23,7 +25,7 @@ const lineClassName = cn(
 );
 
 /** One line of thread state at the end of the timeline: icon, title, detail, then actions. */
-function ThreadNowLine({
+export function ThreadNowLine({
   item,
   announce = false,
 }: {
@@ -31,6 +33,21 @@ function ThreadNowLine({
   /** Announces the line when it appears; only for something that needs the user. */
   readonly announce?: boolean;
 }) {
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const titleText = item.titleText ?? (typeof item.title === "string" ? item.title : undefined);
+  const title = (
+    <span ref={titleRef} className="min-w-0 truncate">
+      {item.title}
+      {item.description ? (
+        <>
+          {" "}
+          <span className="ms-0.5 text-muted-foreground/60 light:text-muted-foreground/80">
+            {item.description}
+          </span>
+        </>
+      ) : null}
+    </span>
+  );
   return (
     <div
       role={announce ? "alert" : undefined}
@@ -40,17 +57,11 @@ function ThreadNowLine({
       <span aria-hidden className="flex size-3.5 shrink-0 self-center items-center justify-center">
         {item.icon}
       </span>
-      <span className="min-w-0 truncate">
-        {item.title}
-        {item.description ? (
-          <>
-            {" "}
-            <span className="ms-0.5 text-muted-foreground/60 light:text-muted-foreground/80">
-              {item.description}
-            </span>
-          </>
-        ) : null}
-      </span>
+      {titleText ? (
+        <TaskTitleTooltip label={titleText} textRef={titleRef} trigger={title} />
+      ) : (
+        title
+      )}
       {item.actions ? (
         <span className="ms-1.5 flex shrink-0 items-baseline gap-2.5">{item.actions}</span>
       ) : null}

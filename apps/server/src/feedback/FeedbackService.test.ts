@@ -452,7 +452,10 @@ it.effect("scrubs the caller's private values and stores feedback locally", () =
       expect(closed.conversationTrace).toBeUndefined();
 
       yield* Ref.set(telemetry, true);
-      const localReport = yield* feedback.submit({ ...input, subject: "t3 thread show" }, fromThread);
+      const localReport = yield* feedback.submit(
+        { ...input, subject: "t3 thread show" },
+        fromThread,
+      );
       expect(localReport).toMatchObject({ sent: false, subject: "t3 thread show" });
       yield* feedback.submit({ ...input, subject: " general " }, { source: "cli" });
       expect(yield* Ref.get(events)).toEqual([]);

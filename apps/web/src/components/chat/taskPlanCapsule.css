@@ -4,22 +4,21 @@
  * the one around it by the 6px pad), integer type sizes (13/12/11), no looping animation. */
 .plan-anchor {
   position: relative;
-  height: 0;
   z-index: 20;
   container-type: inline-size;
 }
 .plan-anchor-slot {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 8px;
   display: flex;
   justify-content: center;
   pointer-events: none;
 }
+.plan-anchor-slot:has(.plan-capsule) {
+  padding-bottom: 8px;
+}
 /* 32px circular scroll-to-end button sharing the float-anchor coordinate frame */
 .scroll-end-button {
   position: absolute;
-  bottom: 4px;
+  bottom: 12px;
   left: calc(50% - 16px);
   display: inline-flex;
   align-items: center;
@@ -731,10 +730,10 @@ html[data-theme-id="porcelain"] .plan-shadow {
 }
 @media (prefers-reduced-motion: reduce) {
   .plan-capsule {
-    --plan-open: 160ms;
-    --plan-close: 160ms;
-    --plan-detail-open: 160ms;
-    --plan-detail-close: 160ms;
+    --plan-open: 0ms;
+    --plan-close: 0ms;
+    --plan-detail-open: 0ms;
+    --plan-detail-close: 0ms;
     --plan-shift: 0px;
   }
   .plan-ring-arc,
@@ -957,47 +956,12 @@ html:is([data-theme-id="apple"], [data-theme-id="stardust"]) .plan-hint {
   display: none;
 }
 html:is([data-theme-id="apple"], [data-theme-id="stardust"]) .plan-panel {
-  display: block;
   width: 100%;
-  position: absolute;
-  bottom: 44px;
-  left: 0;
-  transform-origin: bottom center;
-  opacity: 0;
-  transform: translateY(12px) scale(0.92);
-  filter: blur(4px);
-  pointer-events: none;
-  visibility: hidden;
-  transition:
-    transform 360ms var(--apple-spring, cubic-bezier(0.3, 0.7, 0.2, 1)),
-    opacity 220ms ease,
-    filter 220ms ease,
-    visibility 0s 220ms;
-}
-html:is([data-theme-id="apple"], [data-theme-id="stardust"])
-  .plan-capsule[data-open="true"]
-  .plan-panel {
-  position: relative;
-  bottom: auto;
-  left: auto;
-  margin-bottom: 8px;
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0px);
-  pointer-events: auto;
-  visibility: visible;
-  transition:
-    transform 360ms var(--apple-spring, cubic-bezier(0.3, 0.7, 0.2, 1)),
-    opacity 220ms ease,
-    filter 220ms ease,
-    visibility 0s;
-}
-html:is([data-theme-id="apple"], [data-theme-id="stardust"]) .plan-panel-clip {
-  overflow: visible;
 }
 html:is([data-theme-id="apple"], [data-theme-id="stardust"]) .plan-panel-body {
+  margin-bottom: 8px;
   width: 100%;
-  max-height: min(480px, calc(100dvh - 120px));
+  max-height: min(480px, 50dvh);
   background: var(--apple-glass-strong, rgba(255, 255, 255, 0.95));
   -webkit-backdrop-filter: blur(26px) saturate(1.7);
   backdrop-filter: blur(26px) saturate(1.7);
@@ -1010,9 +974,7 @@ html:is([data-theme-id="apple"], [data-theme-id="stardust"]) .plan-panel-body {
   );
   border: 0.5px solid var(--apple-line, rgba(0, 0, 0, 0.085));
   overflow: hidden;
-  opacity: 1;
-  visibility: visible;
-  transition: none;
+  pointer-events: auto;
 }
 html:is([data-theme-id="apple"], [data-theme-id="stardust"]) .plan-panel-head {
   display: flex;
@@ -1338,5 +1300,8 @@ html:is([data-theme-id="apple"], [data-theme-id="stardust"]) .plan-count {
   html:is([data-theme-id="apple"], [data-theme-id="stardust"]) .plan-bar,
   html:is([data-theme-id="apple"], [data-theme-id="stardust"]) .plan-segments i {
     transition: none;
+  }
+  html:is([data-theme-id="apple"], [data-theme-id="stardust"]) .plan-bar:hover {
+    transform: none;
   }
 }

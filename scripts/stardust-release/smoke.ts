@@ -4,6 +4,7 @@ import * as NodeChildProcess from "node:child_process";
 import * as NodeCrypto from "node:crypto";
 import * as NodeFS from "node:fs";
 import * as NodeHttp from "node:http";
+import * as NodeModule from "node:module";
 import * as NodeOS from "node:os";
 import * as NodePath from "node:path";
 import * as NodeSqlite from "node:sqlite";
@@ -48,6 +49,56 @@ const resources = NodePath.resolve(
   windows ? "resources" : "../Resources",
 );
 const repoRoot = NodePath.join(import.meta.dirname, "../..");
+const desktopRequire = NodeModule.createRequire(
+  NodePath.join(repoRoot, "apps/desktop/package.json"),
+);
+const builderRequire = NodeModule.createRequire(desktopRequire.resolve("electron-builder"));
+const builderLibRequire = NodeModule.createRequire(builderRequire.resolve("app-builder-lib"));
+const { flipFuses, FuseV1Options, FuseVersion, getCurrentFuseWire } =
+  builderLibRequire("@electron/fuses");
+const inspectorFuse = FuseV1Options.EnableNodeCliInspectArguments;
+const disabledFuse = "0".charCodeAt(0);
+const enabledFuse = "1".charCodeAt(0);
+
+async function preparePlaywrightCopy(directory: string) {
+  const original = windows
+    ? NodePath.dirname(executable)
+    : NodePath.resolve(executable, "../../..");
+  const relativeExe = NodePath.relative(original, executable);
+  const originalFuseTarget = windows ? executable : original;
+  const originalWire = await getCurrentFuseWire(originalFuseTarget);
+  NodeAssert.equal(
+    originalWire[inspectorFuse],
+    disabledFuse,
+    "The release app must disable the Node inspector fuse.",
+  );
+
+  // Playwright's Electron driver needs the Node inspector even for app launch. Keep the
+  // ZIP and installed app unmodified and instrument only a disposable CI application copy.
+  const copy = NodePath.join(directory, NodePath.basename(original));
+  const copiedExecutable = NodePath.join(copy, relativeExe);
+  if (windows) {
+    NodeFS.cpSync(original, copy, { recursive: true, force: false, errorOnExist: true });
+  } else {
+    NodeChildProcess.execFileSync("/usr/bin/ditto", [original, copy]);
+  }
+  const copyFuseTarget = windows ? copiedExecutable : copy;
+  await flipFuses(copyFuseTarget, {
+    version: FuseVersion.V1,
+    [inspectorFuse]: true,
+    resetAdHocDarwinSignature: !windows,
+  });
+  NodeAssert.deepEqual(await getCurrentFuseWire(copyFuseTarget), {
+    ...originalWire,
+    [inspectorFuse]: enabledFuse,
+  });
+  if (!windows) {
+    NodeChildProcess.execFileSync("/usr/bin/codesign", ["--verify", "--deep", "--strict", copy]);
+  }
+  NodeAssert.deepEqual(await getCurrentFuseWire(originalFuseTarget), originalWire);
+  console.log("Release inspector fuse verified off. Prepared disposable Playwright copy.");
+  return copiedExecutable;
+}
 for (const name of ["LICENSE", "NOTICE"]) {
   NodeAssert.deepEqual(
     NodeFS.readFileSync(NodePath.join(resources, name)),
@@ -253,14 +304,16 @@ async function openRoute(page: Page, route: string) {
 }
 
 async function withApp(
+  smokeExecutable: string,
   theme: string,
   seed: boolean,
   run: (app: ElectronApplication, page: Page) => Promise<void>,
 ) {
   const home = NodePath.join(scratch, `${theme}-${seed ? "seeded" : "fresh"}`);
   initializeHome(home, seed);
+  console.log(`Launching Playwright copy: ${theme}, ${seed ? "seeded" : "fresh"}.`);
   const app = await _electron.launch({
-    executablePath: executable,
+    executablePath: smokeExecutable,
     args: ["--no-sandbox"],
     env: {
       ...process.env,
@@ -335,6 +388,7 @@ async function withApp(
 }
 
 try {
+  const smokeExecutable = await preparePlaywrightCopy(scratch);
   NodeFS.mkdirSync(NodePath.join(workspace, "src"), { recursive: true });
   NodeFS.writeFileSync(NodePath.join(workspace, "src/math.ts"), "export const sum = 1 + 1;\n");
   for (const theme of ["light", "dark"]) {
@@ -349,13 +403,13 @@ try {
         theme,
       ]);
     }
-    await withApp(theme, false, async (_app, page) => {
+    await withApp(smokeExecutable, theme, false, async (_app, page) => {
       await page
         .getByRole("heading", { name: /Welcome to Stardust|欢迎使用星尘/ })
         .waitFor({ timeout: 60_000 });
       await capture(page, `first-launch-${theme}`);
     });
-    await withApp(theme, true, async (app, page) => {
+    await withApp(smokeExecutable, theme, true, async (app, page) => {
       if (page.url().endsWith("#/welcome")) {
         await page.getByRole("button", { name: /^(Get started|Start|开始)$/ }).click();
       }
@@ -448,6 +502,16 @@ try {
       await openRoute(page, "/settings/general");
       await page.locator("#notifications").waitFor({ timeout: 60_000 });
       await capture(page, `general-${theme}`);
+      if (windows) {
+        const storageLink = page.locator('[data-settings-section="/settings/storage"]');
+        NodeAssert.equal(await storageLink.count(), 0);
+        await openRoute(page, "/settings/storage");
+        await page
+          .getByRole("heading", {
+            name: /^(Storage & cleanup is macOS-only for now|存储与清理目前仅支持 macOS)$/,
+          })
+          .waitFor({ timeout: 15_000 });
+      }
       await openRoute(page, "/settings/keybindings");
       const shortcutLabel = page.getByText(windows ? /^(Ctrl|Control)$/ : /^⌘$/).first();
       await shortcutLabel.waitFor({ timeout: 15_000 });
@@ -510,7 +574,14 @@ try {
   NodeFS.writeFileSync(
     NodePath.join(output, "smoke.json"),
     JSON.stringify(
-      { platform, version, fixtureRequests, ...(windows ? { windowsEvidence } : {}) },
+      {
+        platform,
+        version,
+        fixtureRequests,
+        releaseInspectorDisabled: true,
+        playwrightCopy: true,
+        ...(windows ? { windowsEvidence } : {}),
+      },
       null,
       2,
     ),

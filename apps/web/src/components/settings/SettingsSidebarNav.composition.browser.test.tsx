@@ -6,6 +6,7 @@ import { testUiLocale } from "../../../test/uiLocale";
 import { act, render } from "../../../test/render";
 import { ToastProvider } from "../ui/toast";
 import { useMemoryProposalNotification } from "./useMemoryProposalNotification";
+import { AppRouteModal } from "../AppRouteModal";
 import { SidebarProvider } from "../ui/sidebar";
 import { SettingsSidebarNav } from "./SettingsSidebarNav";
 import { settingsNavGroups, SETTINGS_SECTION_LABELS } from "./settingsSearch";
@@ -14,7 +15,13 @@ const memory = vi.hoisted(() => ({ pending: [] as { id: string }[] }));
 vi.mock("../../state/environments", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../../state/environments")>()),
   useEnvironments: () => ({
-    environments: [{ environmentId: "memory-test", serverConfig: { settings: { memory } } }],
+    environments: [
+      {
+        environmentId: "memory-test",
+        connection: { phase: "connected" },
+        serverConfig: { environment: { capabilities: {} }, settings: { memory } },
+      },
+    ],
   }),
 }));
 
@@ -24,6 +31,7 @@ vi.mock("./useAvailableSettingsSearchItems", () => ({
   ],
   useHasSecretProvidersEnvironment: () => false,
 }));
+vi.mock("../chat/GlobalVoiceInputIndicator", () => ({ GlobalVoiceInputIndicator: () => null }));
 
 it("ignores composing keys in the search", async () => {
   await page.viewport(1280, 800);
@@ -56,6 +64,41 @@ it("ignores composing keys in the search", async () => {
   await vi.waitFor(() =>
     expect(screen.router?.state.location.pathname).toBe("/settings/appearance"),
   );
+});
+
+it("Esc clears a search of spaces and a held Esc keeps Settings open", async () => {
+  await using _screen = await render(
+    <AppRouteModal label="Settings">
+      <SidebarProvider defaultOpen>
+        <SettingsSidebarNav pathname="/settings/general" />
+      </SidebarProvider>
+    </AppRouteModal>,
+    { router: "/settings/general" },
+  );
+  const settings = page.getByRole("dialog", { name: "Settings" });
+  const search = page.getByRole("combobox", { name: "Search settings" });
+  await expect.element(settings).toHaveFocus();
+
+  for (const text of ["theme", "   "]) {
+    await search.fill(text);
+    await userEvent.keyboard("{Escape}");
+    await expect.element(search).toHaveValue("");
+    await expect.element(search).toHaveFocus();
+    await act(() =>
+      search.element().dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Escape",
+          repeat: true,
+          bubbles: true,
+          cancelable: true,
+        }),
+      ),
+    );
+    await expect.element(settings).toHaveAttribute("data-open");
+  }
+
+  await userEvent.keyboard("{Escape}");
+  await expect.element(settings).not.toBeInTheDocument();
 });
 
 function renderNav() {
@@ -126,37 +169,46 @@ it.each([1280, 390])("names each group by a heading outside it at %ipx wide", as
   expect(page.getByRole("tree").query()).toBeNull();
 });
 
-
-it.each(["light", "dark"] as const)("shows the memory entry under 智能体 in %s mode", async (theme) => {
-  using _locale = testUiLocale("zh-CN");
-  await page.viewport(1100, 900);
-  document.documentElement.classList.toggle("dark", theme === "dark");
-  const container = document.createElement("div");
-  container.dataset.testid = "memory-sidebar-frame";
-  container.className = "h-screen w-64 bg-sidebar text-sidebar-foreground";
-  memory.pending = [{ id: "pending-proposal" }];
-  try {
-    await using screen = await render(
-      <SidebarProvider defaultOpen>
-        <SettingsSidebarNav pathname="/settings/memory" />
-      </SidebarProvider>,
-      { router: "/settings/memory", container },
-    );
-    const agents = screen.getByRole("group", { name: "智能体" });
-    const memoryEntry = agents.getByRole("button", { name: /记忆/ });
-    await expect.element(memoryEntry).toBeVisible();
-    expect(memoryEntry.element().textContent).toMatch(/记忆\s*1/);
-    expect(memoryEntry.element().getAttribute("aria-current")).toBe("page");
-    const previousRow = memoryEntry.element().closest("li")?.previousElementSibling;
-    expect(previousRow?.querySelector("[data-settings-section]")?.getAttribute("data-settings-section")).toBe("/settings/threads");
-    if (import.meta.env.VITE_STARDUST_FIX_SHOTS) {
-      await page.screenshot({ path: `${import.meta.env.VITE_STARDUST_FIX_SHOTS}/01-memory-sidebar-${theme}.png`, element: page.getByTestId("memory-sidebar-frame") });
+it.each(["light", "dark"] as const)(
+  "shows the memory entry under 智能体 in %s mode",
+  async (theme) => {
+    using _locale = testUiLocale("zh-CN");
+    await page.viewport(1100, 900);
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    const container = document.createElement("div");
+    container.dataset.testid = "memory-sidebar-frame";
+    container.className = "h-screen w-64 bg-sidebar text-sidebar-foreground";
+    memory.pending = [{ id: "pending-proposal" }];
+    try {
+      await using screen = await render(
+        <SidebarProvider defaultOpen>
+          <SettingsSidebarNav pathname="/settings/memory" />
+        </SidebarProvider>,
+        { router: "/settings/memory", container },
+      );
+      const agents = screen.getByRole("group", { name: "智能体" });
+      const memoryEntry = agents.getByRole("button", { name: /记忆/ });
+      await expect.element(memoryEntry).toBeVisible();
+      expect(memoryEntry.element().textContent).toMatch(/记忆\s*1/);
+      expect(memoryEntry.element().getAttribute("aria-current")).toBe("page");
+      const previousRow = memoryEntry.element().closest("li")?.previousElementSibling;
+      expect(
+        previousRow
+          ?.querySelector("[data-settings-section]")
+          ?.getAttribute("data-settings-section"),
+      ).toBe("/settings/threads");
+      if (import.meta.env.VITE_STARDUST_FIX_SHOTS) {
+        await page.screenshot({
+          path: `${import.meta.env.VITE_STARDUST_FIX_SHOTS}/01-memory-sidebar-${theme}.png`,
+          element: page.getByTestId("memory-sidebar-frame"),
+        });
+      }
+    } finally {
+      memory.pending = [];
+      document.documentElement.classList.remove("dark");
     }
-  } finally {
-    memory.pending = [];
-    document.documentElement.classList.remove("dark");
-  }
-});
+  },
+);
 
 function MemoryNotice() {
   useMemoryProposalNotification();
@@ -167,7 +219,11 @@ it("offers review and dismiss for a new memory proposal", async () => {
   using _locale = testUiLocale("zh-CN");
   await page.viewport(1050, 620);
   memory.pending = [];
-  const renderNotice = () => <ToastProvider><MemoryNotice /></ToastProvider>;
+  const renderNotice = () => (
+    <ToastProvider>
+      <MemoryNotice />
+    </ToastProvider>
+  );
   await using screen = await render(renderNotice(), { router: "/settings/general" });
   const emit = async (id: string) => {
     memory.pending = [{ id }];

@@ -649,12 +649,17 @@ const connectLinkCommand = Command.make("link", {
         yield* Console.log("T3 Connect\n");
         const linked = yield* linkEnvironmentForConnect(flags);
         if (linked) {
-          const serveCommand = yield* resolveHostCliHint("serve", flags.baseDir);
-          yield* Console.log(
-            flags.publishOnly
-              ? `✓ Authorized${connectedAs(linked.identity)}\n\nNext\n  Start Stardust to publish agent activity (no managed tunnel).`
-              : `✓ Authorized${connectedAs(linked.identity)}\n\nNext\n  Start the server with \`${serveCommand}\` to make this machine reachable.`,
-          );
+          const config = yield* ServerConfig.ServerConfig;
+          const running = yield* readLiveServerRuntimeState(config.serverRuntimeStatePath);
+          const purpose = flags.publishOnly
+            ? "publish agent activity (no managed tunnel)"
+            : "make this machine reachable";
+          const next = Option.isSome(running)
+            ? `A Stardust server is already running. Restart it to ${purpose}: run \`${yield* resolveHostCliHint("service restart", flags.baseDir)}\` for the background service, or stop the server and start it again.`
+            : flags.publishOnly
+              ? `Start Stardust to ${purpose}.`
+              : `Start the server with \`${yield* resolveHostCliHint("serve", flags.baseDir)}\` to ${purpose}.`;
+          yield* Console.log(`✓ Authorized${connectedAs(linked.identity)}\n\nNext\n  ${next}`);
         }
       }),
     ),
@@ -817,7 +822,7 @@ const connectLogoutCommand = Command.make("logout", {
 );
 
 // `t3 connect` itself is `t3 up --connect`, in up.ts.
-const upstreamConnectSubcommands = [
+export const connectSubcommands = [
   connectLoginCommand,
   connectLinkCommand,
   connectPublishCommand,
@@ -825,5 +830,3 @@ const upstreamConnectSubcommands = [
   connectUnlinkCommand,
   connectLogoutCommand,
 ] as const;
-
-export const connectSubcommands: ReadonlyArray<(typeof upstreamConnectSubcommands)[number]> = [];

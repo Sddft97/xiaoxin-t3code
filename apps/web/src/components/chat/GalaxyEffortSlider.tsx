@@ -1,14 +1,16 @@
-import { useEffect, useRef, type PointerEvent } from "react";
+/* oxlint-disable shadcn/no-unknown-classes -- The galaxy skin uses the local galaxyEffort.css stylesheet. */
+import { useEffect, useRef, type CSSProperties, type PointerEvent } from "react";
 import { useUiText } from "~/i18n/useUiText";
 import { useRenderedAppearance } from "../../hooks/useTheme";
 import { StardustMark } from "../sidebar/StardustMark";
 import type { CosmicEffortOption } from "./CosmicEffortSlider";
-import { GalaxyEffortCanvas } from "./galaxyEffortCanvas";
 import {
   GALAXY_EFFORT_LABELS,
   galaxyEffortStops,
   namedGalaxyEffortLevel,
 } from "./galaxyEffortLevels";
+import { GalaxyEffortFace } from "./GalaxyEffortFace";
+import { effortThumbInset as thumbInset, mountEffortMotion } from "./galaxyEffortMotion";
 import "./galaxyEffort.css";
 
 export function GalaxyEffortSlider({
@@ -38,38 +40,68 @@ export function GalaxyEffortSlider({
     : "";
   const label = ui("Reasoning effort");
   const host = useRef<HTMLDivElement>(null);
-  const engine = useRef<GalaxyEffortCanvas | null>(null);
-  const initialLevel = useRef(level);
+  const burst = useRef<HTMLSpanElement>(null);
+  const previousChoice = useRef(choice?.id);
+  const position = options.length > 5 ? index / (options.length - 1) : level / 4;
 
-  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- attach the r5 canvas to the mounted model popup
+  const initialPosition = useRef(position);
+  const motion = useRef<ReturnType<typeof mountEffortMotion> | null>(null);
+  const dragBounds = useRef<DOMRect | null>(null);
+
+  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- connect the decorative canvas and SVG to the popup lifecycle
   useEffect(() => {
     if (!host.current) return;
-    const renderer = new GalaxyEffortCanvas(host.current, initialLevel.current);
-    engine.current = renderer;
+    const scene = mountEffortMotion(host.current, initialPosition.current);
+    motion.current = scene;
     return () => {
-      engine.current = null;
-      renderer.destroy();
+      scene.dispose();
+      motion.current = null;
     };
-  }, [appearance]);
+  }, []);
 
-  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- update the canvas on keyboard, pointer or saved effort changes
+  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- sync external selection and appearance to the imperative scene
   useEffect(() => {
-    initialLevel.current = level;
-    engine.current?.setValue(level);
-  }, [appearance, level]);
+    motion.current?.setAppearance(appearance === "light");
+    if (!dragBounds.current) motion.current?.move(position, false);
+  }, [position, appearance]);
+
+  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- play a single glint when the selected option changes
+  useEffect(() => {
+    const changed = previousChoice.current !== choice?.id;
+    previousChoice.current = choice?.id;
+    if (
+      !changed ||
+      !host.current?.hasAttribute("data-awake") ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    const glint = burst.current?.animate(
+      [
+        { opacity: 0, transform: "scale(.64)" },
+        { opacity: 1, offset: 0.28 },
+        { opacity: 0, transform: "scale(1.18)" },
+      ],
+      { duration: 360, easing: "ease-out" },
+    );
+    return () => glint?.cancel();
+  }, [choice?.id]);
 
   function select(next: number) {
     const option = options[Math.min(options.length - 1, Math.max(0, next))];
     if (option && option.id !== value) onChange(option.id);
   }
 
-  function move(event: PointerEvent<HTMLDivElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const inset = 22.2;
-    const target = 4 * ((event.clientX - rect.left - inset) / (rect.width - 2 * inset));
+  function move(event: PointerEvent<HTMLDivElement>, follow: boolean) {
+    const rect = dragBounds.current;
+    if (!rect) return;
+    const pointerRatio =
+      (event.clientX - rect.left - thumbInset) / Math.max(1, rect.width - 2 * thumbInset);
+    const ratio = Math.min((stops.at(-1) ?? 4) / 4, Math.max((stops[0] ?? 0) / 4, pointerRatio));
+    const target = 4 * ratio;
+    motion.current?.move(ratio, true, follow);
     const next =
       options.length > 5
-        ? Math.round((target / 4) * (options.length - 1))
+        ? Math.round(ratio * (options.length - 1))
         : stops.reduce(
             (nearest, stop, i) =>
               Math.abs(stop - target) < Math.abs(stops[nearest]! - target) ? i : nearest,
@@ -79,7 +111,15 @@ export function GalaxyEffortSlider({
   }
 
   return (
-    <div className="gx" data-mode={appearance} data-lv={level} ref={host}>
+    <div
+      className="gx"
+      data-mode={appearance}
+      data-lv={level}
+      ref={host}
+      onPointerEnter={() => motion.current?.wake()}
+      onPointerMove={() => motion.current?.wake()}
+      onFocus={() => motion.current?.wake()}
+    >
       <div className="gx-row">
         <span className="gx-t">
           <StardustMark className="gx-ico" />
@@ -87,6 +127,13 @@ export function GalaxyEffortSlider({
         </span>
         <div
           className="gx-stage"
+          style={
+            {
+              "--gx-stop": position,
+              "--gx-level": level,
+              "--gx-inset": `${thumbInset}px`,
+            } as CSSProperties
+          }
           role="slider"
           tabIndex={disabled ? -1 : 0}
           aria-label={label}
@@ -112,40 +159,35 @@ export function GalaxyEffortSlider({
             if (next === null) return;
             event.preventDefault();
             event.stopPropagation();
-            engine.current?.wake();
             select(next);
           }}
-          onPointerEnter={() => {
-            if (!disabled) engine.current?.wake();
-          }}
           onPointerDown={(event) => {
-            if (disabled || event.button !== 0) return;
-            engine.current?.wake();
+            if (disabled || !event.isPrimary || event.button !== 0) return;
             event.currentTarget.focus({ preventScroll: true });
+            dragBounds.current = event.currentTarget.getBoundingClientRect();
+            event.currentTarget.dataset.dragging = "";
             event.currentTarget.setPointerCapture(event.pointerId);
-            move(event);
+            move(event, false);
           }}
           onPointerMove={(event) => {
-            if (disabled) return;
-            engine.current?.wake();
-            if (event.currentTarget.hasPointerCapture(event.pointerId)) move(event);
+            if (!disabled && event.currentTarget.hasPointerCapture(event.pointerId))
+              move(event, true);
+          }}
+          onLostPointerCapture={(event) => {
+            delete event.currentTarget.dataset.dragging;
+            dragBounds.current = null;
+            motion.current?.move(position, false);
           }}
         >
-          <div className="gx-ch" aria-hidden>
-            <i className="gx-nb nb1" data-an="aur" />
-            <i className="gx-nb nb2" data-an="aur" />
-            {[1, 2, 3, 4, 5].map((i) => (
-              <i key={i} className={`gx-sf sf${i}`} data-an="star" />
-            ))}
-            <div className="gx-auw">
-              <i className="gx-aur au1" data-an="aur" />
-              <i className="gx-aur au2" data-an="aur" />
+          <div className="gx-ch" aria-hidden />
+          <div className="gx-fill" aria-hidden />
+          <canvas className="gx-sky" aria-hidden />
+          <div className="gx-thumb" aria-hidden>
+            <div className="gx-mascot">
+              <GalaxyEffortFace />
             </div>
-            <div className="gx-rimw">
-              <i className="gx-rim" data-an="rim" />
-            </div>
+            <span className="gx-burst" ref={burst} />
           </div>
-          <canvas aria-hidden />
         </div>
         <b className="gx-v">{text}</b>
       </div>

@@ -1,4 +1,8 @@
-import { EnvironmentId, type StorageTidyActionInput, type StorageTidyState } from "@t3tools/contracts";
+import {
+  EnvironmentId,
+  type StorageTidyActionInput,
+  type StorageTidyState,
+} from "@t3tools/contracts";
 import { page } from "vite-plus/test/browser";
 import { expect, it, vi } from "vite-plus/test";
 
@@ -28,16 +32,20 @@ vi.mock(import("~/state/server"), async (original) => {
     serverEnvironment: {
       ...actual.serverEnvironment,
       storageTidyState: (() => queried) as never,
-      storageTidyAct: { ...actual.serverEnvironment.storageTidyAct, permissionAtom: () => Atom.make(true) } as never,
+      storageTidyAct: {
+        ...actual.serverEnvironment.storageTidyAct,
+        permissionAtom: () => Atom.make(true),
+      } as never,
     },
   };
 });
 vi.mock(import("~/state/use-atom-command"), async (original) => ({
   ...(await original()),
-  useAtomCommand: (() => (value: unknown) => (hoisted.run as (v: unknown) => unknown)(value)) as never,
+  useAtomCommand: (() => (value: unknown) =>
+    (hoisted.run as (v: unknown) => unknown)(value)) as never,
 }));
 
-import { StorageTidyEnvironment } from "./StorageTidyPage";
+import { StorageTidyEnvironment, StorageTidySettingsPanel } from "./StorageTidyPage";
 
 const ENVIRONMENT = EnvironmentId.make("workstation");
 
@@ -58,6 +66,8 @@ it("scan → results → clean sends only ids the user chose, never reminders", 
   // A 看一眼 item joins the preselected 放心清 items.
   await page.getByRole("checkbox", { name: "选择 Codex 会话记录" }).click();
   await page.getByRole("button", { name: "清理已选项" }).click();
+  expect(calls).toEqual([{ action: "scan" }]);
+  await page.getByRole("alertdialog").getByRole("button", { name: "清理已选项" }).click();
   const execute = calls.find((call) => call.action === "execute");
   if (execute?.action !== "execute") throw new Error("execute was not sent");
   expect(execute.rescue).toBe(true);
@@ -71,9 +81,36 @@ it("scan → results → clean sends only ids the user chose, never reminders", 
 
 it("the usage page keeps only a small disk-free chip that links to the page", async () => {
   using _locale = testUiLocale("zh-CN");
-  await using screen = await render(<UsageDiskChip environmentId={ENVIRONMENT} />);
-  const chip = screen.container.querySelector<HTMLAnchorElement>('[data-testid="usage-disk-chip"]')!;
-  expect(chip.textContent).toContain("磁盘剩余 40.0 GB");
-  expect(chip.getAttribute("href")).toBe("/settings/storage");
-  expect(fixtureState.volumes[0]?.internal).toBe(true);
+  const platform = vi.spyOn(navigator, "platform", "get").mockReturnValue("MacIntel");
+  try {
+    await using screen = await render(<UsageDiskChip environmentId={ENVIRONMENT} />);
+    const chip = screen.container.querySelector<HTMLAnchorElement>(
+      '[data-testid="usage-disk-chip"]',
+    )!;
+    expect(chip.textContent).toContain("磁盘剩余 40.0 GB");
+    expect(chip.getAttribute("href")).toBe("/settings/storage");
+    expect(fixtureState.volumes[0]?.internal).toBe(true);
+  } finally {
+    platform.mockRestore();
+  }
+});
+
+it("Windows shows the storage placeholder and omits the usage disk chip", async () => {
+  using _locale = testUiLocale("zh-CN");
+  const platform = vi.spyOn(navigator, "platform", "get").mockReturnValue("Win32");
+  try {
+    await using screen = await render(
+      <>
+        <StorageTidySettingsPanel />
+        <UsageDiskChip environmentId={ENVIRONMENT} />
+      </>,
+      { router: "/settings/storage" },
+    );
+    await expect
+      .element(page.getByRole("heading", { name: "存储与清理目前仅支持 macOS" }))
+      .toBeVisible();
+    expect(screen.container.querySelector('[data-testid="usage-disk-chip"]')).toBeNull();
+  } finally {
+    platform.mockRestore();
+  }
 });

@@ -13,10 +13,12 @@ import { useEffect, useState } from "react";
 
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { useUiText } from "~/i18n/useUiText";
+import { platformProfile } from "~/lib/PlatformProfile";
 import { usePrimaryEnvironmentId } from "../../state/environments";
 import { serverEnvironment } from "../../state/server";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { toastManager } from "../ui/toast";
+import { Empty, EmptyHeader, EmptyTitle } from "../ui/empty";
 import { SettingsPageContainer } from "../settings/settingsLayout";
 import { useSettingsScope } from "../settings/SettingsScopeContext";
 import { StorageTidyView, type StorageTidyViewMode } from "./StorageTidyView";
@@ -28,7 +30,9 @@ type Translate = ReturnType<typeof useUiText>;
 function errorCopy(t: Translate, code: string): string {
   switch (code) {
     case "build-directory-invalid":
-      return t("That folder cannot be used. Choose an existing folder on this computer, other than your home folder or the disk root.");
+      return t(
+        "That folder cannot be used. Choose an existing folder on this computer, other than your home folder or the disk root.",
+      );
     case "busy":
       return t("Another cleanup step is still running. Try again in a moment.");
     case "scan-required":
@@ -37,7 +41,9 @@ function errorCopy(t: Translate, code: string): string {
     case "not-recoverable":
       return t("This cleanup can no longer be undone.");
     case "nothing-restored":
-      return t("Nothing could be put back. The items may have been emptied from Trash or the original folders changed.");
+      return t(
+        "Nothing could be put back. The items may have been emptied from Trash or the original folders changed.",
+      );
     case "archive-missing":
       return t("The archive folder could not be found.");
     default:
@@ -45,18 +51,49 @@ function errorCopy(t: Translate, code: string): string {
   }
 }
 
-export function StorageTidySettingsPanel() {
-  const { environment } = useSettingsScope();
-  const primary = usePrimaryEnvironmentId();
-  const environmentId = environment?.environmentId ?? primary;
+function StorageTidyUnavailable() {
+  const t = useUiText();
   return (
     <SettingsPageContainer width="wide">
-      {environmentId ? <StorageTidyEnvironment key={environmentId} environmentId={environmentId} /> : null}
+      <Empty size="compact">
+        <EmptyHeader>
+          <EmptyTitle role="heading" aria-level={1}>
+            {t("Storage & cleanup is macOS-only for now")}
+          </EmptyTitle>
+        </EmptyHeader>
+      </Empty>
     </SettingsPageContainer>
   );
 }
 
-export function StorageTidyEnvironment({ environmentId }: { readonly environmentId: EnvironmentId }) {
+export function StorageTidySettingsPanel() {
+  return platformProfile.id === "mac" ? (
+    <MacStorageTidySettingsPanel />
+  ) : (
+    <StorageTidyUnavailable />
+  );
+}
+
+function MacStorageTidySettingsPanel() {
+  const { environment } = useSettingsScope();
+  const primary = usePrimaryEnvironmentId();
+  const environmentId = environment?.environmentId ?? primary;
+  const serverPlatform = environment?.serverConfig?.environment.platform.os;
+  if (serverPlatform !== undefined && serverPlatform !== "darwin") {
+    return <StorageTidyUnavailable />;
+  }
+  return environmentId ? (
+    <StorageTidyEnvironment key={environmentId} environmentId={environmentId} />
+  ) : (
+    <SettingsPageContainer width="wide">{null}</SettingsPageContainer>
+  );
+}
+
+export function StorageTidyEnvironment({
+  environmentId,
+}: {
+  readonly environmentId: EnvironmentId;
+}) {
   const t = useUiText();
   const atom = serverEnvironment.storageTidyState({ environmentId, input: {} });
   const result = useAtomValue(atom);
@@ -65,9 +102,14 @@ export function StorageTidyEnvironment({ environmentId }: { readonly environment
   const permitted = useAtomValue(serverEnvironment.storageTidyAct.permissionAtom(environmentId));
   const run = useAtomCommand(serverEnvironment.storageTidyAct, { reportFailure: false });
   // A command returns the fresh state at once; it holds until the query is read again.
-  const [override, setOverride] = useState<{ base: StorageTidyState | null; value: StorageTidyState } | null>(null);
+  const [override, setOverride] = useState<{
+    base: StorageTidyState | null;
+    value: StorageTidyState;
+  } | null>(null);
   const state = override && override.base === queried ? override.value : queried;
-  const [selection, setSelection] = useState<{ scanKey: string; ids: ReadonlySet<string> } | null>(null);
+  const [selection, setSelection] = useState<{ scanKey: string; ids: ReadonlySet<string> } | null>(
+    null,
+  );
   const [rescueOverride, setRescueOverride] = useState<boolean | null>(null);
   const [volumePath, setVolumePath] = useState("");
   const [submittedAt, setSubmittedAt] = useState<number | null>(null);
@@ -108,37 +150,50 @@ export function StorageTidyEnvironment({ environmentId }: { readonly environment
     return () => window.clearInterval(timer);
   }, [polling, refresh]);
 
-  const act = useStableCallback(async (input: StorageTidyActionInput, onFailure?: (message: string) => void) => {
-    setPending(true);
-    setError(null);
-    try {
-      const outcome = await run({ environmentId, input });
-      if (outcome._tag === "Success") {
-        setOverride({ base: queried, value: outcome.value });
-        setNowMs(Date.now());
-        refresh();
-        return true;
+  const act = useStableCallback(
+    async (input: StorageTidyActionInput, onFailure?: (message: string) => void) => {
+      setPending(true);
+      setError(null);
+      try {
+        const outcome = await run({ environmentId, input });
+        if (outcome._tag === "Success") {
+          setOverride({ base: queried, value: outcome.value });
+          setNowMs(Date.now());
+          refresh();
+          return true;
+        }
+        const failure = squashAtomCommandFailure(outcome);
+        const code =
+          failure instanceof Error
+            ? failure.message
+            : String((failure as { message?: unknown })?.message ?? failure);
+        (onFailure ?? setError)(errorCopy(t, code));
+      } catch (cause) {
+        (onFailure ?? setError)(errorCopy(t, String(cause)));
+      } finally {
+        setPending(false);
       }
-      const failure = squashAtomCommandFailure(outcome);
-      const code = failure instanceof Error ? failure.message : String((failure as { message?: unknown })?.message ?? failure);
-      (onFailure ?? setError)(errorCopy(t, code));
-    } catch (cause) {
-      (onFailure ?? setError)(errorCopy(t, String(cause)));
-    } finally {
-      setPending(false);
-    }
-    return false;
-  });
+      return false;
+    },
+  );
 
   if (!state)
     return (
-      <p role="status" className="text-sm text-muted-foreground">
-        {t(result._tag === "Failure" ? "Storage information is unavailable. Nothing was changed." : "Reading storage information…")}
-      </p>
+      <SettingsPageContainer width="wide">
+        <p role="status" className="text-sm text-muted-foreground">
+          {t(
+            result._tag === "Failure"
+              ? "Storage information is unavailable. Nothing was changed."
+              : "Reading storage information…",
+          )}
+        </p>
+      </SettingsPageContainer>
     );
   const scanKey = state.scan?.scannedAt ?? "";
   const selected =
-    selection && selection.scanKey === scanKey ? selection.ids : defaultSelection(state.scan?.items ?? []);
+    selection && selection.scanKey === scanKey
+      ? selection.ids
+      : defaultSelection(state.scan?.items ?? []);
   const setSelected = (ids: ReadonlySet<string>) => setSelection({ scanKey, ids });
   const rescueEnabled = rescueOverride ?? state.settings.rescueFirst;
   return (
@@ -176,20 +231,34 @@ export function StorageTidyEnvironment({ environmentId }: { readonly environment
       }}
       onExecute={() => {
         setSubmittedAt(Date.now());
-        void act({ action: "execute", itemIds: [...selected], rescue: rescueEnabled }).then((ok) => {
-          if (!ok) setSubmittedAt(null);
-        });
+        void act({ action: "execute", itemIds: [...selected], rescue: rescueEnabled }).then(
+          (ok) => {
+            if (!ok) setSubmittedAt(null);
+          },
+        );
       }}
       onUndo={(op: StorageTidyOperation) => void act({ action: "undo", operationId: op.id })}
-      onOpenArchive={(op: StorageTidyOperation) => void act({ action: "open-archive", operationId: op.id })}
+      onOpenArchive={(op: StorageTidyOperation) =>
+        void act({ action: "open-archive", operationId: op.id })
+      }
       onFinish={() => {
         if (operation) setDismissed(operation.id);
         setSubmittedAt(null);
       }}
       onCopyMoleInstall={() => {
         void navigator.clipboard.writeText(MOLE_INSTALL_COMMAND).then(
-          () => toastManager.add({ type: "success", title: t("Command copied"), description: MOLE_INSTALL_COMMAND }),
-          () => toastManager.add({ type: "error", title: t("Could not copy the command"), description: MOLE_INSTALL_COMMAND }),
+          () =>
+            toastManager.add({
+              type: "success",
+              title: t("Command copied"),
+              description: MOLE_INSTALL_COMMAND,
+            }),
+          () =>
+            toastManager.add({
+              type: "error",
+              title: t("Could not copy the command"),
+              description: MOLE_INSTALL_COMMAND,
+            }),
         );
       }}
       onSettingsChange={(patch: Partial<StorageTidySettings>) => {
@@ -199,4 +268,3 @@ export function StorageTidyEnvironment({ environmentId }: { readonly environment
     />
   );
 }
-

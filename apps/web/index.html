@@ -39,7 +39,10 @@
           customDefaults: DEFAULT_THEME_PALETTES,
         } = /* theme-boot-data */ null;
         const BUILT_IN_THEME_MODES = Object.fromEntries(
-          Object.entries(BUILT_IN_THEME_PALETTES).map(([id, palettes]) => [id, Object.keys(palettes)]),
+          Object.entries(BUILT_IN_THEME_PALETTES).map(([id, palettes]) => [
+            id,
+            Object.keys(palettes),
+          ]),
         );
         const normalizeThemeId = (id) => {
           const alias = Object.hasOwn(LEGACY_THEME_IDS, id) ? LEGACY_THEME_IDS[id] : id;
@@ -128,7 +131,8 @@
           const normalized = usesDefault ? defaultThemeId : normalizeThemeId(storedTheme);
           const selectedPaletteId = normalized ?? "";
           const knownBuiltIn = Object.hasOwn(BUILT_IN_THEME_MODES, selectedPaletteId);
-          const customTheme = !usesDefault && !knownBuiltIn ? findCustomTheme(selectedPaletteId) : null;
+          const customTheme =
+            !usesDefault && !knownBuiltIn ? findCustomTheme(selectedPaletteId) : null;
           const themeModes = knownBuiltIn
             ? BUILT_IN_THEME_MODES[selectedPaletteId]
             : customTheme
@@ -137,11 +141,13 @@
                 )
               : null;
           const isKnownTheme = usesDefault || themeModes !== null;
-          const theme = isKnownTheme && storedTheme && storedTheme !== "t3-code" ? storedTheme : "system";
+          const theme =
+            isKnownTheme && storedTheme && storedTheme !== "t3-code" ? storedTheme : "system";
           const themeId = isKnownTheme ? selectedPaletteId : (defaultThemeId ?? "");
           const isThemed = themeId !== "";
           const availableModes = themeModes ?? (isThemed ? BUILT_IN_THEME_MODES[themeId] : null);
-          const baseAppearance = customTheme?.appearance ?? (availableModes?.length === 1 ? availableModes[0] : "light");
+          const baseAppearance =
+            customTheme?.appearance ?? (availableModes?.length === 1 ? availableModes[0] : "light");
           const systemMode = prefersDark ? "dark" : "light";
           const storedAppearanceMode = window.localStorage.getItem(
             THEME_APPEARANCE_MODE_STORAGE_KEY,
@@ -171,7 +177,9 @@
             const candidate = isRecord(halvesRaw) ? halvesRaw[wantedMode] : null;
             if (typeof candidate === "string") {
               const halfId = normalizeThemeId(candidate);
-              const halfBuiltIn = Object.hasOwn(BUILT_IN_THEME_MODES, halfId) ? BUILT_IN_THEME_MODES[halfId] : null;
+              const halfBuiltIn = Object.hasOwn(BUILT_IN_THEME_MODES, halfId)
+                ? BUILT_IN_THEME_MODES[halfId]
+                : null;
               const halfCustom = halfBuiltIn ? null : findCustomTheme(halfId);
               const halfModes =
                 halfBuiltIn ??
@@ -247,7 +255,8 @@
           }
           // A resolved half is a selection even when the base theme is gone
           // (deleting the base leaves the mix pointing at a real theme).
-          const hasSelection = isThemed || halfThemeId !== null || (isKnownTheme && storedTheme !== null);
+          const hasSelection =
+            isThemed || halfThemeId !== null || (isKnownTheme && storedTheme !== null);
           if (hasSelection) {
             document.documentElement.dataset.themeSelected = "true";
           } else {
@@ -336,6 +345,15 @@
         width: 64px;
         height: 64px;
         object-fit: contain;
+      }
+
+      #boot-shell-progress {
+        position: absolute;
+        top: 100%;
+        width: min(360px, 80vw);
+        text-align: center;
+        font: 13px system-ui;
+        opacity: 0.7;
       }
 
       /* App CSS locks body and #root scrolling once main loads, so the error screen scrolls itself. */
@@ -583,9 +601,29 @@
       <div id="boot-shell">
         <div id="boot-shell-card" aria-label="Stardust splash screen">
           <img id="boot-shell-logo" src="/apple-touch-icon.png" alt="Stardust" />
+          <p id="boot-shell-progress" role="status" aria-live="polite"></p>
         </div>
       </div>
     </div>
+    <script>
+      const migrationLabel = document.getElementById("boot-shell-progress");
+      const readMigrationProgress = window.desktopBridge?.getDatabaseMigrationProgress;
+      if (readMigrationProgress && migrationLabel) {
+        const updateMigrationProgress = async () => {
+          if (!migrationLabel.isConnected) return;
+          try {
+            const progress = await readMigrationProgress();
+            migrationLabel.textContent = progress
+              ? `Upgrading database (${progress.current} of ${progress.total})`
+              : "";
+          } catch {
+            migrationLabel.textContent = "";
+          }
+          if (migrationLabel.isConnected) setTimeout(updateMigrationProgress, 1000);
+        };
+        void updateMigrationProgress();
+      }
+    </script>
     <script type="module" src="/src/bootstrap.ts"></script>
   </body>
 </html>

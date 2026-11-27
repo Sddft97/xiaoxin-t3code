@@ -4,30 +4,25 @@ import { useTaskBoard } from "~/taskBoard";
 import { useVisibleThreadShells } from "~/state/entities";
 import { recentProjectThreads, startThreadStatus } from "./stardustStartModel";
 import type { DraftId } from "~/composerDraftStore";
-import { composerDraftHasUserContent, useComposerDraftStore } from "~/composerDraftStore";
+import { useComposerDraftStore } from "~/composerDraftStore";
 import { resolveEnvironmentMachineKind, type ScopedProjectRef } from "@t3tools/contracts";
 import { scopedProjectKey, scopeProjectRef } from "@t3tools/client-runtime/environment";
 import { isScratchProject } from "@t3tools/client-runtime/state/projects";
 import { T, useGT } from "gt-react";
 import { FolderPlusIcon } from "lucide-react";
 import { useAtomValue } from "@effect/atom-react";
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
 import { openCommandPalette } from "~/commandPaletteBus";
 import { shortcutLabelForCommand } from "~/keybindings";
 import { primaryServerKeybindingsAtom } from "~/state/server";
 import { useNewThreadHandler } from "~/hooks/useHandleNewThread";
 import { useOrderWhileOpen } from "~/hooks/useOrderWhileOpen";
+import { moveDraftToProject } from "~/lib/moveDraftToProject";
 import { useProjectPin } from "~/hooks/useProjectGroupUpdate";
 import { useScratchProject } from "~/hooks/useScratchProject";
 import { isTriagePrompt } from "@t3tools/shared/triagePrompt";
-import { useClientSettings } from "~/hooks/useSettings";
-import { seedDraftModelSelection } from "~/lib/seedDraftModelSelection";
-import {
-  deriveLogicalProjectKeyFromSettings,
-  pickableProjectGroups,
-  selectProjectGroupingSettings,
-} from "@t3tools/client-runtime/state/project-grouping";
+import { pickableProjectGroups } from "@t3tools/client-runtime/state/project-grouping";
 import {
   buildSidebarProjectPickerEntries,
   projectGroupsSpanEnvironments,
@@ -48,7 +43,8 @@ import {
   ComboboxTrigger,
   useComboboxFilter,
 } from "../ui/combobox";
-import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { Tooltip, TooltipPopup, TooltipScrollDismissArea, TooltipTrigger } from "../ui/tooltip";
+import { SharedTooltipTrigger } from "../ui/shared-tooltip";
 import { InlineButton } from "../ui/button";
 import { DraftProjectName } from "./DraftProjectName";
 import { StardustHeroMark } from "./StardustHeroMark";
@@ -60,6 +56,20 @@ const ADD_PROJECT_VALUE = "add-project";
 interface PickerItem {
   readonly value: string;
   readonly label: string;
+}
+
+// Stands in for the project picker so the translated sentence decides where the name goes.
+const PROJECT_SLOT = "\u0000project\u0000";
+
+function withProjectNode(sentence: string, project: ReactNode): ReactNode {
+  const [before = "", after = ""] = sentence.split(PROJECT_SLOT);
+  return (
+    <>
+      {before}
+      {project}
+      {after}
+    </>
+  );
 }
 
 interface DraftHeroHeadlineProps {
@@ -87,16 +97,11 @@ export function DraftHeroHeadline({
   const projects = useProjects();
   const { environments } = useEnvironments();
   const primaryEnvironmentId = usePrimaryEnvironmentId();
-  const projectGroupingSettings = useClientSettings(selectProjectGroupingSettings);
-  const setLogicalProjectDraftThreadId = useComposerDraftStore(
-    (store) => store.setLogicalProjectDraftThreadId,
-  );
-  const getComposerDraft = useComposerDraftStore((store) => store.getComposerDraft);
   // A boolean, so typing in a draft does not re-render the hero.
   const isTriageDraftPrompt = useComposerDraftStore((store) =>
     draftId ? isTriagePrompt(store.getComposerDraft(draftId)?.prompt ?? "") : false,
   );
-  const openAddProject = () => openCommandPalette({ open: "add-project" });
+  const openAddProject = () => openCommandPalette({ open: "add-project", draftId });
   const { scratchEnvironmentId, scratchWorkspaceRootFor, openScratchProject } = useScratchProject();
   const openProjectDraft = useNewThreadHandler();
   const keybindings = useAtomValue(primaryServerKeybindingsAtom);
@@ -188,19 +193,14 @@ export function DraftHeroHeadline({
       ? `${session.environmentId}:${session.projectId}:${session.logicalProjectKey}`
       : null;
   };
-  // Retargeting an empty draft would overwrite the project's draft and strand browser tabs.
-  const selectProject = (project: (typeof projects)[number], logicalProjectKey: string) => {
+  const selectProject = (project: (typeof projects)[number]) => {
     if (!draftId) {
       return;
     }
     pendingScratchRef.current = null;
-    const projectRef = scopeProjectRef(project.environmentId, project.id);
-    if (!composerDraftHasUserContent(getComposerDraft(draftId))) {
-      void openProjectDraft(projectRef);
-      return;
+    if (!moveDraftToProject(draftId, project)) {
+      void openProjectDraft(scopeProjectRef(project.environmentId, project.id));
     }
-    setLogicalProjectDraftThreadId(logicalProjectKey, projectRef, draftId);
-    seedDraftModelSelection(draftId, projectRef);
   };
   const startScratch = async (): Promise<boolean> => {
     if (scratchTargetEnvironmentId === null || isScratchDraft) {
@@ -214,7 +214,7 @@ export function DraftHeroHeadline({
       return false;
     }
     pendingScratchRef.current = null;
-    selectProject(project, deriveLogicalProjectKeyFromSettings(project, projectGroupingSettings));
+    selectProject(project);
     return true;
   };
 
@@ -245,7 +245,7 @@ export function DraftHeroHeadline({
         if (!entry || item.value === activeProjectKey) {
           return;
         }
-        selectProject(entry.targetProject, entry.group.projectKey);
+        selectProject(entry.targetProject);
       }}
     >
       <Tooltip>
@@ -269,7 +269,11 @@ export function DraftHeroHeadline({
           <TooltipPopup side="top">{activeProjectTitle}</TooltipPopup>
         ) : null}
       </Tooltip>
-      <ComboboxPopup align="center" className="w-72 overflow-hidden">
+      <ComboboxPopup
+        align="center"
+        className="w-72 overflow-hidden"
+        render={<TooltipScrollDismissArea holdPositionOnExit />}
+      >
         <ComboboxSearchInput
           aria-label={gt("Search projects")}
           placeholder={gt("Search projects...")}
@@ -299,12 +303,12 @@ export function DraftHeroHeadline({
                 ) : entry ? (
                   <ProjectFavicon project={entry.group} className="size-4 shrink-0" />
                 ) : null}
-                <Tooltip>
-                  <TooltipTrigger render={<span className="min-w-0 flex-1 text-sm" />}>
-                    <DraftProjectName value={item.label} />
-                  </TooltipTrigger>
-                  <TooltipPopup side="top">{item.label}</TooltipPopup>
-                </Tooltip>
+                <SharedTooltipTrigger
+                  render={<span className="min-w-0 flex-1 text-sm" />}
+                  label={item.label}
+                >
+                  <DraftProjectName value={item.label} />
+                </SharedTooltipTrigger>
                 {entry && canPinProjectGroup(entry.group) ? (
                   <ProjectPinButton
                     name={entry.group.displayName}
@@ -377,20 +381,25 @@ export function DraftHeroHeadline({
     <div className="mx-auto flex w-full max-w-5xl flex-col items-center" data-stardust-heading>
       <StardustHeroMark />
       <h1 className="text-center text-2xl font-semibold tracking-tight">
-        {hasResolvedProject && !isScratchDraft ? (
-          <>
-            {uiText("{greeting}, what would you like to do in", { greeting: uiText(greeting) })}{" "}
-            <span className="stardust-project-name">{projectSelector}</span> {uiText("today?")}
-          </>
-        ) : (
-          uiText("{greeting}, what would you like to do today?", { greeting: uiText(greeting) })
-        )}
+        <span className="block">
+          {uiText("{greeting}, Stardust is ready.", { greeting: uiText(greeting) })}
+        </span>
+        <span className="block">
+          {hasResolvedProject && !isScratchDraft
+            ? withProjectNode(
+                uiText("What will you light up in {project} today?", {
+                  project: PROJECT_SLOT,
+                }),
+                <span className="stardust-project-name mx-1.5">{projectSelector}</span>,
+              )
+            : uiText("Which star shall we start from?")}
+        </span>
       </h1>
-      {hasContinuation ? (
-        <p className="mt-2 text-sm text-muted-foreground">
-          {uiText("Start something new, or continue below")}
-        </p>
-      ) : null}
+      <p className="mt-2 text-sm text-muted-foreground">
+        {hasContinuation
+          ? uiText("Start something new, or continue below")
+          : uiText("Hand your ideas to Stardust and watch them gather into galaxies.")}
+      </p>
       {!hasResolvedProject && !isScratchDraft ? (
         <div className="mt-2">{projectSelector}</div>
       ) : null}

@@ -9,6 +9,7 @@ import * as HostProcess from "@t3tools/shared/HostProcess";
 import { assert, describe, it } from "@effect/vitest";
 import * as Deferred from "effect/Deferred";
 import * as Effect from "effect/Effect";
+import * as Exit from "effect/Exit";
 import * as FileSystem from "effect/FileSystem";
 import * as Layer from "effect/Layer";
 import * as Path from "effect/Path";
@@ -357,6 +358,7 @@ describe("environment theme", () => {
     () =>
       Effect.gen(function* () {
         const resumeProbes = yield* Deferred.make<void>();
+        const linkedWatchReady = yield* Deferred.make<void>();
         let linkedEntry: string | undefined;
         let moveAfterListing: Effect.Effect<void> | undefined;
         let holdProbes = false;
@@ -393,6 +395,8 @@ describe("environment theme", () => {
               ["Shared Light"],
             );
 
+            yield* Deferred.await(linkedWatchReady);
+
             // The next listing succeeds, then the tree moves before its files are opened.
             moveAfterListing = Effect.orDie(fs.rename(active, previous));
             holdProbes = true;
@@ -409,6 +413,21 @@ describe("environment theme", () => {
             wrapFileSystem: (fs) =>
               FileSystem.FileSystem.of({
                 ...fs,
+                watch: (directory, options) =>
+                  Stream.unwrap(
+                    Effect.gen(function* () {
+                      const link = yield* Effect.option(fs.readLink(directory));
+                      return fs.watch(directory, {
+                        ...options,
+                        onReady: () => {
+                          options?.onReady?.();
+                          if (directory === linkedEntry && link._tag === "Some") {
+                            Deferred.doneUnsafe(linkedWatchReady, Exit.void);
+                          }
+                        },
+                      });
+                    }),
+                  ),
                 readDirectory: (directory, options) =>
                   fs.readDirectory(directory, options).pipe(
                     Effect.tap(() => {

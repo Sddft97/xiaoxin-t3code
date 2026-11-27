@@ -68,10 +68,10 @@ import {
   useSidebar,
   useSidebarVisibility,
 } from "./ui/sidebar";
-import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
 import { appAtomRegistry } from "../rpc/atomRegistry";
 import { registerCommands, registerMenuAction } from "../shortcuts/dispatcher";
 import { resolveThreadRouteRef } from "../threadRoutes";
+import { SharedTooltipTrigger } from "./ui/shared-tooltip";
 
 const MACOS_TRAFFIC_LIGHTS_LEFT_INSET = "var(--desktop-window-controls-inset, 90px)";
 
@@ -392,31 +392,30 @@ function SidebarControl({ showSidebar }: { readonly showSidebar: boolean }) {
     <div
       ref={appShellCommandsRef}
       className={cn(
-        "pointer-events-none fixed left-[var(--workspace-controls-left)] top-[var(--workspace-controls-top)] z-50 ml-px flex h-[var(--workspace-topbar-height)] items-center",
+        "pointer-events-none fixed left-[var(--workspace-controls-left)] top-[var(--workspace-fixed-controls-top,var(--workspace-controls-top))] z-50 ml-px flex h-[var(--workspace-topbar-height)] items-center",
         mobileSidebarSheetMounted && "hidden",
       )}
       data-sidebar-control=""
     >
       {showSidebar ? (
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <SidebarTrigger
-                variant={isSidebarVisible && stageBackdropVariant ? "media-navigation" : "ghost"}
-                className={cn(
-                  "pointer-events-auto",
-                  isSidebarVisible && stageBackdropVariant && "relative top-auto translate-y-0",
-                )}
-                aria-label={gt("Toggle main sidebar")}
-              />
-            }
-          />
-          <TooltipPopup side="bottom">
-            {shortcutLabel
+        <SharedTooltipTrigger
+          render={
+            <SidebarTrigger
+              variant={isSidebarVisible && stageBackdropVariant ? "media-navigation" : "ghost"}
+              className={cn(
+                "pointer-events-auto",
+                isSidebarVisible && stageBackdropVariant && "relative top-auto translate-y-0",
+              )}
+              aria-label={gt("Toggle main sidebar")}
+            />
+          }
+          label={
+            shortcutLabel
               ? gt("Toggle main sidebar ({shortcut})", { shortcut: shortcutLabel })
-              : gt("Toggle main sidebar")}
-          </TooltipPopup>
-        </Tooltip>
+              : gt("Toggle main sidebar")
+          }
+          side="bottom"
+        />
       ) : null}
     </div>
   );
@@ -463,9 +462,7 @@ export function AppSidebarLayout({
     readWindowFullscreen,
   );
   const windowControlsInsetStyle = (
-    isMacosDesktop && !isWindowFullscreen
-      ? { "--workspace-controls-left": MACOS_TRAFFIC_LIGHTS_LEFT_INSET }
-      : {}
+    isMacosDesktop ? { "--workspace-controls-left": MACOS_TRAFFIC_LIGHTS_LEFT_INSET } : {}
   ) as CSSProperties;
   const sidebarProviderStyle = {
     "--sidebar-width": `${clampThreadSidebarWidth(sidebarWidth, sidebarMinimumWidth, sidebarMaximumWidth)}px`,
@@ -479,6 +476,7 @@ export function AppSidebarLayout({
         suspended={workbenchMode === "focus" && !pathname.startsWith("/settings")}
         onResume={() => useWorkbenchMode.getState().setMode(useWorkbenchMode.getState().resumeMode)}
         className="h-dvh! min-h-0!"
+        data-macos-native-fullscreen={isMacosDesktop && isWindowFullscreen ? "" : undefined}
         data-panel-animations={routePanelAnimationsActive ? "true" : "false"}
         storageKey="chat_thread_sidebar_open"
         style={sidebarProviderStyle}
@@ -494,6 +492,7 @@ export function AppSidebarLayout({
               role="navigation"
               aria-label={gt("Threads")}
               resizable={{
+                collapseOnResize: true,
                 maxWidth: sidebarMaximumWidth,
                 minWidth: sidebarMinimumWidth,
                 shouldAcceptWidth: ({ currentWidth, nextWidth, wrapper }) =>

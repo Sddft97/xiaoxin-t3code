@@ -1,6 +1,6 @@
-import { useId } from "react";
+import { type ReactNode, useId } from "react";
 
-export const STARDUST_STAR_PATH =
+const STARDUST_STAR_PATH =
   "M475.4 324.7Q512 265 548.6 324.7L581.3 378Q600.2 408.6 635.2 417.1L696 431.7Q764 448.1 718.6 501.4L678 549Q654.7 576.4 657.5 612.2L662.3 674.6Q667.8 744.4 603.1 717.6L545.3 693.8Q512 680 478.7 693.8L420.9 717.6Q356.2 744.4 361.7 674.6L366.5 612.2Q369.3 576.4 346 549L305.4 501.4Q260 448.1 328 431.7L388.8 417.1Q423.8 408.6 442.7 378Z";
 
 const STARDUST_EYE_PATH =
@@ -9,7 +9,9 @@ const STARDUST_EYE_PATH =
 export function StardustMark({
   className,
   tone = "brand",
+  children,
 }: {
+  children?: ReactNode;
   className?: string;
   tone?: "neutral" | "brand";
 }) {
@@ -33,10 +35,11 @@ export function StardustMark({
         </linearGradient>
       </defs>
       <path
-        d={STARDUST_STAR_PATH + STARDUST_EYE_PATH}
+        d={children ? STARDUST_STAR_PATH : STARDUST_STAR_PATH + STARDUST_EYE_PATH}
         fillRule="evenodd"
         fill={tone === "brand" ? `url(#${id}-tint)` : "currentColor"}
       />
+      {children}
     </svg>
   );
 }
