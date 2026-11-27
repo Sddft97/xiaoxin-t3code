@@ -29,7 +29,7 @@ import { AppRoot } from "~/AppRoot";
 import "~/components/ChatView";
 import { DraftId, useComposerDraftStore } from "~/composerDraftStore";
 import { selectThreadDiffPanelSelection, useDiffPanelStore } from "~/diffPanelStore";
-import { __setClientSettingsForTests } from "~/hooks/useSettings";
+import { __setClientSettingsForTests, getClientSettings } from "~/hooks/useSettings";
 import { startI18n, whenLocaleReady } from "~/i18n/runtime";
 import stylesheet from "~/index.css?inline";
 import { environmentContextRecord } from "~/lib/composerContextRecords";
@@ -60,6 +60,20 @@ import {
 } from "../../test/fakeEnvironment";
 import { act, fakeTimers, render } from "../../test/render";
 import { testUiLocale } from "../../test/uiLocale";
+
+async function useChineseAppLocale(): Promise<AsyncDisposable> {
+  const previous = getClientSettings();
+  __setClientSettingsForTests({ ...previous, language: "zh" });
+  startI18n();
+  await whenLocaleReady();
+  return {
+    async [Symbol.asyncDispose]() {
+      __setClientSettingsForTests(previous);
+      startI18n();
+      await whenLocaleReady();
+    },
+  };
+}
 
 const PNG = Uint8Array.from(
   atob(
@@ -181,6 +195,8 @@ it("opening Settings without a page event closes the composer model picker and p
 });
 
 it("opens a linked Linear issue from an inactive thread's sidebar badge", async () => {
+  // This fixture advertises issue support, unlike the previous fake server.
+  appAtomRegistry.reset();
   const style = document.createElement("style");
   style.textContent = stylesheet;
   document.head.append(style);
@@ -279,6 +295,7 @@ it("opens a linked Linear issue from an inactive thread's sidebar badge", async 
   });
   __setClientSettingsForTests({
     ...DEFAULT_CLIENT_SETTINGS,
+    legacySidebarEnabled: false,
     onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
   });
   await page.viewport(1400, 900);
@@ -491,17 +508,14 @@ it("a new draft does not load its reserved thread before the server lists it", a
 });
 
 it("greets a new draft in Stardust's own words, with the project name in the sentence", async () => {
-  using _locale = testUiLocale("zh-CN");
   using _style = captureWorkbenchStyle();
   await page.viewport(1280, 800);
   using _environment = installFakeEnvironment([]);
   __setClientSettingsForTests({
     ...DEFAULT_CLIENT_SETTINGS,
-    language: "zh",
     onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
   });
-  startI18n();
-  await whenLocaleReady();
+  await using _locale = await useChineseAppLocale();
   const draftId = DraftId.make("draft-stardust-greeting");
   useComposerDraftStore
     .getState()
@@ -532,6 +546,8 @@ const draftGitStatus = (isRepo: boolean) => ({
 
 it("syncs the draft workspace and base branch with thread details in both directions", async () => {
   using _locale = testUiLocale("en");
+  // Earlier fixtures leave unhandled ref requests pending in the shared registry.
+  appAtomRegistry.reset();
   using _environment = installFakeEnvironment([]);
   using _refs = answerRpc(WS_METHODS.vcsListRefs, () =>
     Effect.succeed({
@@ -1465,18 +1481,15 @@ function captureWorkbenchStyle() {
 }
 
 it("opens a side chat with the selected reply quoted and focuses the draft without sending", async () => {
-  using _locale = testUiLocale("zh-CN");
   using _style = captureWorkbenchStyle();
   await page.viewport(1440, 900);
   const thread = threadWithHistory("selection-side-chat", 1);
   using _environment = installFakeEnvironment([thread], { acceptCommands: true });
   __setClientSettingsForTests({
     ...DEFAULT_CLIENT_SETTINGS,
-    language: "zh",
     onboardingCompletedAt: "2026-01-01T00:00:00.000Z",
   });
-  startI18n();
-  await whenLocaleReady();
+  await using _locale = await useChineseAppLocale();
   const router = getRouter(
     createMemoryHistory({ initialEntries: [`/${ENVIRONMENT_ID}/${thread.id}`] }),
   );
