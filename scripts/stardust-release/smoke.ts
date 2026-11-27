@@ -314,7 +314,7 @@ async function withApp(
   console.log(`Launching Playwright copy: ${theme}, ${seed ? "seeded" : "fresh"}.`);
   const app = await _electron.launch({
     executablePath: smokeExecutable,
-    args: ["--no-sandbox"],
+    args: ["--no-sandbox", ...(windows ? [] : ["--use-mock-keychain"])],
     env: {
       ...process.env,
       T3CODE_HOME: home,

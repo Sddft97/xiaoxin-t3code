@@ -15,7 +15,7 @@ import * as ServerConfig from "../config.ts";
  * Who an install belongs to, from strongest to weakest. `connect` is the T3
  * Connect account. `device` is a client device that connected.
  */
-export const TelemetryOwnerSource = Schema.Literals(["connect", "device"]);
+const TelemetryOwnerSource = Schema.Literals(["connect", "device"]);
 export type TelemetryOwnerSource = typeof TelemetryOwnerSource.Type;
 
 export interface TelemetryOwner {
@@ -36,7 +36,7 @@ class TelemetryIdentityReadError extends Schema.TaggedError<TelemetryIdentityRea
   }
 }
 
-export class TelemetryAnonymousIdGenerationError extends Schema.TaggedError<TelemetryAnonymousIdGenerationError>()(
+class TelemetryAnonymousIdGenerationError extends Schema.TaggedError<TelemetryAnonymousIdGenerationError>()(
   "TelemetryAnonymousIdGenerationError",
   {
     filePath: Schema.String,
@@ -48,7 +48,7 @@ export class TelemetryAnonymousIdGenerationError extends Schema.TaggedError<Tele
   }
 }
 
-export class TelemetryAnonymousIdPersistenceError extends Schema.TaggedError<TelemetryAnonymousIdPersistenceError>()(
+class TelemetryAnonymousIdPersistenceError extends Schema.TaggedError<TelemetryAnonymousIdPersistenceError>()(
   "TelemetryAnonymousIdPersistenceError",
   {
     filePath: Schema.String,

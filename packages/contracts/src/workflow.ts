@@ -190,7 +190,7 @@ export type WorkflowCounts = typeof WorkflowCounts.Type;
 export type WorkflowRunsSnapshot = typeof WorkflowRunsSnapshot.Type;
 
 /** What changed in the runs list since the last frame a watcher was sent. */
-export const WorkflowRunsChange = Schema.TaggedStruct("changed", {
+const WorkflowRunsChange = Schema.TaggedStruct("changed", {
   /** Runs new to the list or different from what was last sent. */
   runs: Schema.Array(WorkflowRun),
   /** Runs that left the list. */
