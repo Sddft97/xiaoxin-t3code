@@ -160,6 +160,7 @@ export function StorageTidyEnvironment({
           setOverride({ base: queried, value: outcome.value });
           setNowMs(Date.now());
           refresh();
+          setPending(false);
           return true;
         }
         const failure = squashAtomCommandFailure(outcome);
@@ -170,9 +171,8 @@ export function StorageTidyEnvironment({
         (onFailure ?? setError)(errorCopy(t, code));
       } catch (cause) {
         (onFailure ?? setError)(errorCopy(t, String(cause)));
-      } finally {
-        setPending(false);
       }
+      setPending(false);
       return false;
     },
   );

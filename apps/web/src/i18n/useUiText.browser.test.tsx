@@ -118,7 +118,7 @@ it("renders Chinese conversation, task, sidebar, composer and plugin system copy
     await expect.element(screen.getByText(label, { exact: true })).toBeVisible();
   await expect
     .element(screen.getByRole("textbox", { name: "输入" }))
-    .toHaveAttribute("placeholder", "问点什么… @ 文件、$ 技能、/ 命令");
+    .toHaveAttribute("placeholder", "告诉星尘你的想法… @ 文件 · $ 技能 · / 命令");
   const visible = screen.container.innerText;
   expect(visible).not.toMatch(
     /Ran \d|Tasks \d|Waiting|Ask anything|\d+m \d+s|requires OAuth|Cancelled because/,
