@@ -123,6 +123,7 @@ import { useUpdateEnvironmentSettings } from "~/hooks/useSettings";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { environmentIdsKey } from "~/state/environmentAtomList";
 import { environmentUpdateStatesAtom, serverEnvironment } from "~/state/server";
+import { serviceUpdateVersionAtom, serviceUpdateVersionsAtom } from "~/state/npmRelease";
 import {
   ServerUpdateAction,
   ServerUpdateProgress,
@@ -303,13 +304,23 @@ function ConnectionsSettingsContent({
       environmentIdsKey(savedEnvironments.map(({ environmentId }) => environmentId)),
     ),
   );
+  const savedServiceUpdateVersions = useAtomValue(
+    serviceUpdateVersionsAtom(
+      environmentIdsKey(savedEnvironments.map(({ environmentId }) => environmentId)),
+    ),
+  );
   const savedServerUpdateStates = savedEnvironments.map((environment, index) => ({
     environment,
     updateStatus: savedUpdateStates[index]!.status,
+    serviceUpdateVersion: savedServiceUpdateVersions[index] ?? null,
   }));
   const savedServerUpdateTargets = savedServerUpdateStates.flatMap(
-    ({ environment, updateStatus }): ServerUpdateTarget[] => {
-      const mismatch = resolveServerConfigVersionMismatch(environment.serverConfig, m);
+    ({ environment, updateStatus, serviceUpdateVersion }): ServerUpdateTarget[] => {
+      const mismatch = resolveServerConfigVersionMismatch(
+        environment.serverConfig,
+        m,
+        serviceUpdateVersion,
+      );
       const selfUpdate = resolveServerSelfUpdateCapability(environment.serverConfig);
       const desktopAppUpdate = supportsDesktopAppUpdate(environment.serverConfig);
       if (
@@ -422,7 +433,12 @@ function ConnectionsSettingsContent({
     "remoteClients",
     m,
   );
-  const primaryVersionMismatch = resolveServerConfigVersionMismatch(primaryServerConfig, m);
+  const primaryServiceUpdateVersion = useAtomValue(serviceUpdateVersionAtom(primaryEnvironmentId));
+  const primaryVersionMismatch = resolveServerConfigVersionMismatch(
+    primaryServerConfig,
+    m,
+    primaryServiceUpdateVersion,
+  );
   const primaryServerUpdateState = useAtomValue(
     serverEnvironment.updateStateAtom(primaryEnvironmentId),
   );
@@ -1391,7 +1407,9 @@ function ConnectionsSettingsContent({
                             })
                       }
                     />
-                  ) : primaryServerUpdateState.status === "idle" && primaryServerConfig ? (
+                  ) : primaryServerUpdateState.status === "idle" &&
+                    primaryServerConfig &&
+                    resolveServerSelfUpdateCapability(primaryServerConfig) !== "boot-service" ? (
                     <LocalVersionStatusLabel />
                   ) : undefined
                 }

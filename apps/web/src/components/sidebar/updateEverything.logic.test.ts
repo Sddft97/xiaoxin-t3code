@@ -41,6 +41,7 @@ function machine(
     hostedByThisApp: false,
     canMaintain: true,
     updateState: { status: "idle" },
+    serviceUpdateVersion: "0.0.50",
     ...overrides,
   };
 }
@@ -51,7 +52,9 @@ describe("collectServerUpdateTargets", () => {
       [
         machine("this-app", "0.0.40", "desktop-managed", { hostedByThisApp: true }),
         machine("service", "0.0.40", "boot-service"),
-        machine("nightly-service", "0.0.49-nightly.20261001.3", "boot-service"),
+        machine("nightly-service", "0.0.49-nightly.20261001.3", "boot-service", {
+          serviceUpdateVersion: "0.0.49-nightly.20261001.4",
+        }),
         machine("other-desktop", "0.0.49-nightly.20261001.3", "desktop-managed"),
         machine("offline", "0.0.40", "boot-service", { connected: false }),
         machine("never-connected", "0.0.40", "boot-service", { serverConfig: null }),
@@ -73,16 +76,31 @@ describe("collectServerUpdateTargets", () => {
 
     expect(targets.map((target) => [target.serverLabel, target.targetVersion])).toEqual([
       ["service", "0.0.50"],
+      ["nightly-service", "0.0.49-nightly.20261001.4"],
       ["other-desktop", "0.0.50"],
     ]);
     expect(skipped.map((entry) => [entry.label, entry.reason])).toEqual([
-      ["nightly-service", "on the nightly channel"],
       ["offline", "not connected"],
       ["never-connected", "not connected"],
       ["no-scope", "no permission"],
       ["busy", "already updating"],
       ["manual", "needs a manual update"],
     ]);
+  });
+
+  it("keeps the desktop release out of the boot-service update plan", () => {
+    const { targets, skipped } = collectServerUpdateTargets(
+      [
+        machine("current", "0.1.13", "boot-service", { serviceUpdateVersion: "0.1.13" }),
+        machine("unknown", "0.1.13", "boot-service", { serviceUpdateVersion: null }),
+        machine("newer", "0.1.13", "boot-service", { serviceUpdateVersion: "0.1.14" }),
+      ],
+      "1.2.5",
+    );
+    expect(targets.map(({ serverLabel, targetVersion }) => [serverLabel, targetVersion])).toEqual([
+      ["newer", "0.1.14"],
+    ]);
+    expect(skipped).toEqual([]);
   });
 
   it("does not offer a Nightly build to a Stable desktop app, whose own feed has nothing newer", () => {
@@ -129,6 +147,7 @@ describe("collectServerUpdateTargets", () => {
       collectServerUpdateTargets(
         machines.map((entry) => ({
           ...entry,
+          serviceUpdateVersion: "0.0.50-nightly.20261028.1",
           serverConfig: {
             ...entry.serverConfig,
             environment: {

@@ -65,6 +65,7 @@ import { useManagedPolicy } from "~/state/managedPolicy";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { useUpdateEnvironmentSettings } from "~/hooks/useSettings";
 import { serverEnvironment } from "~/state/server";
+import { serviceUpdateVersionAtom } from "~/state/npmRelease";
 import {
   OutdatedServerUpdateAction,
   ServerUpdateAction,
@@ -189,7 +190,12 @@ export function SavedBackendListRow({
       );
     },
   });
-  const versionMismatch = resolveServerConfigVersionMismatch(environment.serverConfig, messages);
+  const serviceUpdateVersion = useAtomValue(serviceUpdateVersionAtom(environmentId));
+  const versionMismatch = resolveServerConfigVersionMismatch(
+    environment.serverConfig,
+    messages,
+    serviceUpdateVersion,
+  );
   const serverUpdateState = useAtomValue(serverEnvironment.updateStateAtom(environmentId));
   const resumingServerUpdate =
     serverUpdateState.status === "running" && serverUpdateState.stage === "resuming";
@@ -393,6 +399,7 @@ export function SavedBackendListRow({
             $context: "names a Stardust server inside sentences such as {serverLabel} updated",
           })}
           fromVersion={lastDescriptor?.serverVersion}
+          selfUpdate={lastDescriptor?.capabilities.serverSelfUpdate}
           targetVersion={APP_VERSION}
           label={serverUpdateState.status === "failed" ? gt("Retry update") : gt("Update")}
         />

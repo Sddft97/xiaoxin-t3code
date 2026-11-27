@@ -6,6 +6,7 @@ import type {
 } from "@t3tools/contracts";
 import type { ServerUpdateState } from "@t3tools/client-runtime/state/server";
 import { compareSemverVersions, parseSemver } from "@t3tools/shared/semver";
+import { isNewerCliServiceRelease } from "@t3tools/shared/cliRelease";
 import * as Schema from "effect/Schema";
 import { msg } from "gt-react";
 
@@ -85,7 +86,24 @@ export function resolveVersionMismatch(
 export function resolveServerConfigVersionMismatch(
   serverConfig: Pick<ServerConfig, "environment"> | null | undefined,
   resolve: MessageResolver = m,
+  serviceUpdateVersion: string | null = null,
 ): VersionMismatch | null {
+  const server = serverConfig?.environment;
+  if (server?.capabilities.serverSelfUpdate === "boot-service") {
+    return serviceUpdateVersion !== null &&
+      isNewerCliServiceRelease(server.serverVersion, serviceUpdateVersion)
+      ? {
+          clientVersion: serviceUpdateVersion,
+          serverVersion: server.serverVersion,
+          hint: resolve(
+            msg("Update available: {serverVersion} → {clientVersion}", {
+              serverVersion: server.serverVersion,
+              clientVersion: serviceUpdateVersion,
+            }),
+          ),
+        }
+      : null;
+  }
   return resolveVersionMismatch(serverConfig?.environment.serverVersion, APP_VERSION, resolve);
 }
 

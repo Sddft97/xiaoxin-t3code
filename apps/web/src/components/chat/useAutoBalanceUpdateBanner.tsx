@@ -6,6 +6,7 @@ import { useState } from "react";
 import { environmentIdsKey } from "~/state/environmentAtomList";
 import type { EnvironmentPresentation } from "~/state/environments";
 import { environmentUpdateStatesAtom } from "~/state/server";
+import { serviceUpdateVersionsAtom } from "~/state/npmRelease";
 import {
   buildVersionMismatchDismissalKey,
   dismissServerUpdateFailure,
@@ -31,20 +32,24 @@ export function useAutoBalanceUpdateBanner(
 ): ComposerBannerStackItem | null {
   const gt = useGT();
   const m = useMessages();
-  const updateStates = useAtomValue(
-    environmentUpdateStatesAtom(
-      environmentIdsKey(environments.map(({ environmentId }) => environmentId)),
-    ),
-  );
+  const ids = environmentIdsKey(environments.map(({ environmentId }) => environmentId));
+  const updateStates = useAtomValue(environmentUpdateStatesAtom(ids));
+  const serviceUpdateVersions = useAtomValue(serviceUpdateVersionsAtom(ids));
   const states = environments.flatMap((environment, index) => {
     const state = updateStates[index];
-    return state ? [{ environment, state }] : [];
+    return state
+      ? [{ environment, state, serviceUpdateVersion: serviceUpdateVersions[index] ?? null }]
+      : [];
   });
   const [dismissedNotices, setDismissedNotices] = useState<ReadonlySet<string | ServerUpdateState>>(
     () => new Set(),
   );
-  const machines = states.flatMap(({ environment, state }) => {
-    const mismatch = resolveServerConfigVersionMismatch(environment.serverConfig, m);
+  const machines = states.flatMap(({ environment, state, serviceUpdateVersion }) => {
+    const mismatch = resolveServerConfigVersionMismatch(
+      environment.serverConfig,
+      m,
+      serviceUpdateVersion,
+    );
     const dismissKey = mismatch
       ? buildVersionMismatchDismissalKey(environment.environmentId, mismatch)
       : null;
@@ -65,9 +70,17 @@ export function useAutoBalanceUpdateBanner(
         selfUpdate,
         installation: environment.serverConfig?.environment.capabilities.serverInstallation,
         desktopAppUpdate,
-        targetVersion: state.status === "idle" ? mismatch!.clientVersion : state.targetVersion,
+        targetVersion:
+          state.status === "idle"
+            ? mismatch!.clientVersion
+            : selfUpdate === "boot-service" && state.status === "failed" && mismatch
+              ? mismatch.clientVersion
+              : state.targetVersion,
         connected: environment.connection.phase === "connected",
-        remoteUpdate: selfUpdate !== null && (selfUpdate !== "desktop-managed" || desktopAppUpdate),
+        remoteUpdate:
+          selfUpdate !== null &&
+          (selfUpdate !== "desktop-managed" || desktopAppUpdate) &&
+          (selfUpdate !== "boot-service" || mismatch !== null),
         state,
         dismissKey,
       },

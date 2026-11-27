@@ -342,6 +342,7 @@ function SidebarUpdateControl() {
       setIsCheckAnimationLatched(true);
       setCheckAnimationKey((key) => key + 1);
     }
+    everything.refreshServiceUpdates();
     const appCheck = bridge
       .checkForUpdate()
       .then((result) => {

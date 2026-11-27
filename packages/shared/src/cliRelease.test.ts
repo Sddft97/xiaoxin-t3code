@@ -1,8 +1,30 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { cliArchiveTarCommand, newestCliReleaseVersion, parseChecksums } from "./cliRelease.ts";
+import {
+  cliArchiveTarCommand,
+  cliServiceUpdateSpec,
+  isNewerCliServiceRelease,
+  newestCliReleaseVersion,
+  parseChecksums,
+} from "./cliRelease.ts";
 
 describe("cliRelease", () => {
+  it("selects newer releases on the service's registry track", () => {
+    expect(cliServiceUpdateSpec("0.1.13")).toBe("latest");
+    expect(cliServiceUpdateSpec("0.1.14-nightly.20261127.1")).toBe("nightly");
+    expect(cliServiceUpdateSpec("0.1.14-preview.20261127.1")).toBeUndefined();
+    expect(cliServiceUpdateSpec("dev")).toBeUndefined();
+    expect(isNewerCliServiceRelease("0.1.13", "0.1.14")).toBe(true);
+    expect(isNewerCliServiceRelease("0.1.13", "0.1.13")).toBe(false);
+    expect(isNewerCliServiceRelease("0.1.13", "0.1.12")).toBe(false);
+    expect(isNewerCliServiceRelease("0.1.13", "0.1.14-rc.1")).toBe(false);
+    expect(isNewerCliServiceRelease("0.1.13", "0.1.14-nightly.20261127.1")).toBe(false);
+    expect(isNewerCliServiceRelease("0.1.14-nightly.20261127.1", "0.1.14")).toBe(false);
+    expect(
+      isNewerCliServiceRelease("0.1.14-nightly.20261127.9", "0.1.14-nightly.20261127.10"),
+    ).toBe(true);
+  });
+
   it("parses sha256sum output including binary-mode markers", () => {
     const checksums = parseChecksums(
       [

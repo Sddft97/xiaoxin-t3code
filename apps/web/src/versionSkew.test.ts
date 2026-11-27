@@ -1,4 +1,4 @@
-import { EnvironmentId } from "@t3tools/contracts";
+import { EnvironmentId, type ServerConfig } from "@t3tools/contracts";
 import type { ServerUpdateState } from "@t3tools/client-runtime/state/server";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
@@ -13,6 +13,7 @@ import {
   isServerUpdateFailureDismissed,
   isVersionMismatchDismissed,
   manualServerUpdateCommand,
+  resolveServerConfigVersionMismatch,
   resolveVersionMismatch,
 } from "./versionSkew";
 
@@ -77,6 +78,26 @@ describe("versionSkew", () => {
   it("does not warn when the server is ahead of the client", () => {
     expect(resolveVersionMismatch("0.0.35")).toBeNull();
     expect(resolveVersionMismatch("9.9.9")).toBeNull();
+  });
+
+  it("offers only the boot service's own newer release regardless of the desktop version", () => {
+    branding.APP_VERSION = "1.2.5";
+    const config = {
+      environment: {
+        environmentId: EnvironmentId.make("service"),
+        label: "Service",
+        platform: { os: "darwin", arch: "arm64" },
+        serverVersion: "0.1.13",
+        capabilities: { repositoryIdentity: true, serverSelfUpdate: "boot-service" },
+      },
+    } satisfies Pick<ServerConfig, "environment">;
+
+    expect(resolveServerConfigVersionMismatch(config)).toBeNull();
+    expect(resolveServerConfigVersionMismatch(config, undefined, "0.1.13")).toBeNull();
+    expect(resolveServerConfigVersionMismatch(config, undefined, "0.1.14")).toMatchObject({
+      serverVersion: "0.1.13",
+      clientVersion: "0.1.14",
+    });
   });
 
   it("does not warn when a nightly and a stable build share a core version", () => {

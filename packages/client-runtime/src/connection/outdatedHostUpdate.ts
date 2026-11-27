@@ -8,6 +8,7 @@ import {
   type ServerSelfUpdateResult,
   WS_METHODS,
 } from "@t3tools/contracts";
+import { cliServiceUpdateSpec, isNewerCliServiceRelease } from "@t3tools/shared/cliRelease";
 import * as Duration from "effect/Duration";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
@@ -76,14 +77,14 @@ export const describeOutdatedHost = (environmentId: EnvironmentId) =>
 
 /**
  * The normal session refuses to open against such a host, so this opens a bare
- * socket and calls only the self-update RPCs, whose wire shape has not changed
- * across protocol versions.
+ * socket for release lookup and the self-update RPCs.
  */
 export const updateOutdatedHost = Effect.fn("clientRuntime.connection.updateOutdatedHost")(
   function* (
     environmentId: EnvironmentId,
-    input: ServerSelfUpdateInput,
-    onStage: (stage: OutdatedHostUpdateStage) => Effect.Effect<void>,
+    requestedUpdate: ServerSelfUpdateInput,
+    onStage: (stage: OutdatedHostUpdateStage, targetVersion: string) => Effect.Effect<void>,
+    followServiceChannel = false,
   ) {
     const registry = yield* EnvironmentRegistry.EnvironmentRegistry;
     const webSocketConstructor = yield* Socket.WebSocketConstructor;
@@ -108,10 +109,14 @@ export const updateOutdatedHost = Effect.fn("clientRuntime.connection.updateOutd
     }
 
     const capabilities = descriptor.capabilities;
+    const useServiceRelease =
+      followServiceChannel && capabilities.serverSelfUpdate === "boot-service";
+    const spec = useServiceRelease ? cliServiceUpdateSpec(descriptor.serverVersion) : undefined;
     if (
       capabilities.serverSelfUpdate === undefined ||
       (capabilities.serverSelfUpdate === "desktop-managed" &&
-        capabilities.desktopAppUpdate !== true)
+        capabilities.desktopAppUpdate !== true) ||
+      (useServiceRelease && (capabilities.npmReleaseLookup !== true || spec === undefined))
     ) {
       return yield* new OutdatedHostUpdateError({
         environmentId,
@@ -147,6 +152,23 @@ export const updateOutdatedHost = Effect.fn("clientRuntime.connection.updateOutd
           ),
         );
         const client = yield* makeWsRpcProtocolClient.pipe(Effect.provide(protocolContext));
+        let input = requestedUpdate;
+        if (spec !== undefined) {
+          const release = yield* client[WS_METHODS.serverGetNpmRelease]({ spec }).pipe(
+            Effect.timeout("15 seconds"),
+          );
+          if (
+            release === null ||
+            !isNewerCliServiceRelease(descriptor.serverVersion, release.version)
+          ) {
+            return yield* new OutdatedHostUpdateError({
+              environmentId,
+              ...translatableMessage(msg("Already up to date")),
+            });
+          }
+          input = { ...requestedUpdate, targetVersion: release.version };
+        }
+        if (followServiceChannel) yield* onStage("downloading", input.targetVersion);
 
         const updateResult: ServerSelfUpdateResult =
           capabilities.serverSelfUpdateProgress === true
@@ -161,7 +183,7 @@ export const updateOutdatedHost = Effect.fn("clientRuntime.connection.updateOutd
                       ? Ref.set(terminal, Option.some(event.result))
                       : Effect.sync(() => {
                           receivedProgress = true;
-                        }).pipe(Effect.andThen(onStage(event.stage))),
+                        }).pipe(Effect.andThen(onStage(event.stage, input.targetVersion))),
                   ),
                   Effect.exit,
                 );
@@ -212,7 +234,7 @@ export const updateOutdatedHost = Effect.fn("clientRuntime.connection.updateOutd
       }),
     ).pipe(Effect.mapError(localizeServerSelfUpdateError));
 
-    yield* onStage("resuming");
+    yield* onStage("resuming", result.targetVersion);
     const pollUrls = [
       prepared.httpBaseUrl,
       ...connectionRoutes(entry).flatMap((route) => routeHttpBaseUrl(route) ?? []),

@@ -451,12 +451,14 @@ export function OutdatedServerUpdateAction({
   environmentId,
   serverLabel,
   fromVersion,
+  selfUpdate,
   targetVersion,
   label,
 }: {
   readonly environmentId: EnvironmentId;
   readonly serverLabel: string;
   readonly fromVersion: string | undefined;
+  readonly selfUpdate: ServerSelfUpdateCapability | undefined;
   readonly targetVersion: string;
   readonly label?: string;
 }) {
@@ -469,6 +471,7 @@ export function OutdatedServerUpdateAction({
       environmentId,
       input: { targetVersion },
       ...(fromVersion === undefined ? {} : { fromVersion }),
+      followServiceChannel: selfUpdate === undefined || selfUpdate === "boot-service",
     });
     pendingUpdateEnvironmentIds.delete(environmentId);
     if (result._tag === "Failure") {
@@ -486,7 +489,11 @@ export function OutdatedServerUpdateAction({
       description: m(msg("Reconnected on t3@{version}.", { version: result.value.targetVersion })),
     });
   };
-  if (fromVersion !== undefined && crossesReleaseTrack(fromVersion, targetVersion)) {
+  if (
+    selfUpdate !== "boot-service" &&
+    fromVersion !== undefined &&
+    crossesReleaseTrack(fromVersion, targetVersion)
+  ) {
     return <CrossTrackNote />;
   }
   return (

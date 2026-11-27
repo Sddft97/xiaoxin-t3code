@@ -8,7 +8,8 @@ import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
 import { vi } from "vite-plus/test";
 
-import { npmReleaseAtom, npmReleaseFailureMessage } from "./npmRelease";
+import { environmentIdsKey } from "./environmentAtomList";
+import { npmReleaseAtom, npmReleaseFailureMessage, serviceUpdateVersionsAtom } from "./npmRelease";
 import { primaryEnvironmentIdAtom } from "./primaryEnvironment";
 import { serverEnvironment } from "./server";
 
@@ -20,6 +21,10 @@ vi.mock("./presentation", () => ({
 }));
 vi.mock("./primaryEnvironment", () => ({
   primaryEnvironmentIdAtom: Atom.make<EnvironmentId | null>(null),
+}));
+vi.mock("./session", () => ({
+  environmentSession: { sessionStateAtom: () => Atom.make(AsyncResult.initial()) },
+  sessionHasScope: () => true,
 }));
 
 const version = "0.0.46-nightly.20261012.3021";
@@ -130,6 +135,65 @@ it.effect("resolves track metadata through a supporting server when there is no 
     }
   }),
 );
+
+it("checks each boot service through its own session and registry tag", async () => {
+  const query = setup();
+  const stable = configFor(first);
+  const nightly = configFor(second);
+  const stableVersion = "0.1.13";
+  const nextNightly = "0.0.46-nightly.20261012.3022";
+  const configs = new Map([
+    [
+      first,
+      Atom.make({
+        ...stable,
+        environment: {
+          ...stable.environment,
+          serverVersion: stableVersion,
+          capabilities: {
+            ...stable.environment.capabilities,
+            serverSelfUpdate: "boot-service" as const,
+          },
+        },
+      }),
+    ],
+    [
+      second,
+      Atom.make({
+        ...nightly,
+        environment: {
+          ...nightly.environment,
+          capabilities: {
+            ...nightly.environment.capabilities,
+            serverSelfUpdate: "boot-service" as const,
+          },
+        },
+      }),
+    ],
+  ]);
+  vi.mocked(serverEnvironment.configValueAtom).mockImplementation(
+    (id) => configs.get(id!) ?? Atom.make(null),
+  );
+  const stableRelease = Atom.make(AsyncResult.success({ version: stableVersion }));
+  query.mockImplementation(({ environmentId }) =>
+    environmentId === first
+      ? stableRelease
+      : Atom.make(AsyncResult.success({ version: nextNightly })),
+  );
+  const registry = AtomRegistry.make();
+  const versions = serviceUpdateVersionsAtom(environmentIdsKey([first, second]));
+  const unmount = registry.mount(versions);
+  try {
+    await vi.waitFor(() => expect(registry.get(versions)).toEqual([null, nextNightly]));
+    expect(query).toHaveBeenCalledWith({ environmentId: first, input: { spec: "latest" } });
+    expect(query).toHaveBeenCalledWith({ environmentId: second, input: { spec: "nightly" } });
+    registry.set(stableRelease, AsyncResult.success({ version: "0.1.14" }));
+    await vi.waitFor(() => expect(registry.get(versions)).toEqual(["0.1.14", nextNightly]));
+  } finally {
+    unmount();
+    registry.dispose();
+  }
+});
 
 it.effect("does not call an unsupported RPC or fetch public npm for an older primary server", () =>
   Effect.gen(function* () {

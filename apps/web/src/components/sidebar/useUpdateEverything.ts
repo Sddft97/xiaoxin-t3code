@@ -1,6 +1,7 @@
 import { msg, useMessages } from "gt-react";
-import { useAtomValue } from "@effect/atom-react";
+import { RegistryContext, useAtomValue } from "@effect/atom-react";
 import { PROVIDER_DISPLAY_NAMES } from "@t3tools/contracts";
+import { useContext } from "react";
 
 import { APP_VERSION } from "~/branding";
 import { isDesktopLocalConnectionTarget } from "~/connection/desktopLocal";
@@ -9,6 +10,7 @@ import { useEnvironments } from "~/state/environments";
 import { environmentIdsKey } from "~/state/environmentAtomList";
 import { environmentUpdateStatesAtom, serverEnvironment } from "~/state/server";
 import { environmentSessionStatesAtom } from "~/state/session";
+import { serviceUpdateQueryAtom, serviceUpdateVersionsAtom } from "~/state/npmRelease";
 import { useAtomCommand } from "~/state/use-atom-command";
 import { getProviderUpdateRunOutcome } from "../ProviderUpdateLaunchNotification.logic";
 import { useProviderUpdates } from "../ProviderUpdatesAction";
@@ -42,6 +44,7 @@ export function isHostedByThisApp(
 ) {
   return (
     isElectron &&
+    environment.serverConfig?.environment.capabilities.serverSelfUpdate !== "boot-service" &&
     (environment.entry.target._tag === "PrimaryConnectionTarget" ||
       isDesktopLocalConnectionTarget(environment.entry.target))
   );
@@ -56,10 +59,12 @@ export function useUpdateEverything(
 ) {
   const targetVersion = localUpdateVersion ?? APP_VERSION;
   const { environments } = useEnvironments();
+  const registry = useContext(RegistryContext);
   const resolve = useMessages();
   const environmentIds = environmentIdsKey(environments.map(({ environmentId }) => environmentId));
   const sessionStates = useAtomValue(environmentSessionStatesAtom(environmentIds));
   const updateStates = useAtomValue(environmentUpdateStatesAtom(environmentIds));
+  const serviceUpdateVersions = useAtomValue(serviceUpdateVersionsAtom(environmentIds));
   const machines = environments.map((environment, index) => ({
     environmentId: environment.environmentId,
     label: environment.label,
@@ -68,6 +73,7 @@ export function useUpdateEverything(
     hostedByThisApp: isHostedByThisApp(environment),
     canMaintain: canUpdateServer(sessionStates[index]!),
     updateState: updateStates[index]!,
+    serviceUpdateVersion: serviceUpdateVersions[index] ?? null,
   }));
   const { targets: servers, skipped } = channelSwitch
     ? collectChannelSwitchTargets(machines, channelSwitch, resolve)
@@ -104,6 +110,13 @@ export function useUpdateEverything(
     hasUpdates: servers.length > 0 || providers.machines.length > 0,
     ...view,
     restarts,
+    refreshServiceUpdates: () => {
+      for (const machine of machines) {
+        if (!machine.connected) continue;
+        const service = registry.get(serviceUpdateQueryAtom(machine.environmentId));
+        if (service !== null) registry.refresh(service.query);
+      }
+    },
     run: async ({
       downloadLocal,
       installLocal,

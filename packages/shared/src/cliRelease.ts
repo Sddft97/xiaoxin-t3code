@@ -1,7 +1,7 @@
 import * as Option from "effect/Option";
 import * as Schema from "effect/Schema";
 
-import { compareSemverVersions } from "./semver.ts";
+import { compareSemverVersions, parseSemver } from "./semver.ts";
 
 const CLI_RELEASE_REPOSITORY = "zds-xiaoxin/stardust";
 export const CLI_RELEASES_PAGE_URL = `https://github.com/${CLI_RELEASE_REPOSITORY}/releases`;
@@ -88,6 +88,24 @@ export const CLI_RELEASE_CHANNELS: ReadonlyArray<CliReleaseChannel> = [
 export function cliReleaseChannelOf(version: string): CliReleaseChannel {
   const channel = /^[^-+]+-(nightly|preview)\.\d{8}\.\d+$/.exec(version)?.[1];
   return channel === "nightly" || channel === "preview" ? channel : "stable";
+}
+
+/** Registry dist-tags for normal service updates. Preview builds have no dist-tag. */
+export function cliServiceUpdateSpec(version: string): "latest" | "nightly" | undefined {
+  const parsed = parseSemver(version);
+  if (parsed === null) return undefined;
+  const channel = cliReleaseChannelOf(version);
+  if (channel === "nightly") return "nightly";
+  return channel === "stable" && parsed.prerelease.length === 0 ? "latest" : undefined;
+}
+
+export function isNewerCliServiceRelease(current: string, offered: string): boolean {
+  const spec = cliServiceUpdateSpec(current);
+  return (
+    spec !== undefined &&
+    cliServiceUpdateSpec(offered) === spec &&
+    compareSemverVersions(offered, current) > 0
+  );
 }
 
 /** Whether updating between these versions crosses Stable and Nightly. Preview builds cross nothing.

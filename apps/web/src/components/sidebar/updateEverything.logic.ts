@@ -9,7 +9,11 @@ import {
   type ServerConfig,
   type ServerSelfUpdateCapability,
 } from "@t3tools/contracts";
-import { cliReleaseChannelOf, desktopUpdateChannelOf } from "@t3tools/shared/cliRelease";
+import {
+  cliReleaseChannelOf,
+  desktopUpdateChannelOf,
+  isNewerCliServiceRelease,
+} from "@t3tools/shared/cliRelease";
 import { compareSemverVersions } from "@t3tools/shared/semver";
 import { msg } from "gt-react";
 
@@ -33,6 +37,7 @@ export interface UpdateEverythingMachine {
   readonly hostedByThisApp: boolean;
   readonly canMaintain: boolean;
   readonly updateState: ServerUpdateState;
+  readonly serviceUpdateVersion?: string | null;
 }
 
 export interface RestartingMachine {
@@ -72,10 +77,10 @@ export interface SkippedMachine {
 
 /** Skip current and app-hosted servers; the latter update with the app and would relaunch mid-run.
  * Desktop-managed servers use their own feed. Each server's updater checks that it can install the
- * release before it restarts, so no registry precheck runs here. */
+ * release before it restarts. Boot services supply the version found on their own channel. */
 export function collectServerUpdateTargets(
   machines: ReadonlyArray<UpdateEverythingMachine>,
-  targetVersion: string,
+  desktopVersion: string,
   resolve: MessageResolver = m,
 ): {
   readonly targets: ServerUpdateTarget[];
@@ -86,9 +91,15 @@ export function collectServerUpdateTargets(
   for (const machine of machines) {
     const config = machine.serverConfig;
     if (machine.hostedByThisApp) continue;
+    const selfUpdate = resolveServerSelfUpdateCapability(config);
+    const targetVersion =
+      selfUpdate === "boot-service" ? machine.serviceUpdateVersion : desktopVersion;
+    if (targetVersion == null) continue;
     if (
       config !== null &&
-      resolveVersionMismatch(config.environment.serverVersion, targetVersion) === null
+      (selfUpdate === "boot-service"
+        ? !isNewerCliServiceRelease(config.environment.serverVersion, targetVersion)
+        : resolveVersionMismatch(config.environment.serverVersion, targetVersion) === null)
     ) {
       continue;
     }
@@ -99,7 +110,6 @@ export function collectServerUpdateTargets(
       skip(unavailable ?? resolve(msg("not connected")));
       continue;
     }
-    const selfUpdate = resolveServerSelfUpdateCapability(config);
     const managedDenial = managedMachineUpdateDenial(
       config,
       selfUpdate === "desktop-managed" ? undefined : targetVersion,
@@ -734,6 +744,7 @@ export interface UpdateEverythingRow {
   readonly environmentId: EnvironmentId | null;
   readonly label: string;
   readonly app: "this-app" | "server" | "desktop-app" | null;
+  readonly serviceVersion?: string;
   readonly skipped: string | null;
   readonly providers: ReadonlyArray<string>;
 }
@@ -899,6 +910,7 @@ export function describeUpdateEverything(
   for (const server of plan.servers) {
     update(server.environmentId, server.serverLabel, {
       app: server.selfUpdate === "desktop-managed" ? "desktop-app" : "server",
+      ...(server.selfUpdate === "boot-service" ? { serviceVersion: server.targetVersion } : {}),
     });
   }
   for (const machine of plan.providerMachines) {
@@ -912,7 +924,7 @@ export function describeUpdateEverything(
     summary,
     version:
       plan.localVersion ??
-      plan.servers.find((server) => server.selfUpdate !== "desktop-managed")?.targetVersion ??
+      plan.servers.find((server) => server.selfUpdate === "respawn")?.targetVersion ??
       null,
     providerCount,
     rows: Array.from(rows.values()),

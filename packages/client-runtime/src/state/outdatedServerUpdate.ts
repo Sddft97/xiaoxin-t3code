@@ -18,6 +18,7 @@ export interface OutdatedServerUpdateTarget {
   readonly input: ServerSelfUpdateInput;
   /** From the host descriptor when known; an outdated host never delivers a server config. */
   readonly fromVersion?: string;
+  readonly followServiceChannel?: boolean;
 }
 
 export function createOutdatedServerDescriptionCommand<E>(
@@ -55,16 +56,24 @@ export function createOutdatedServerUpdateCommand<E>(
       atomRegistry,
     ) {
       const stateAtom = serverUpdateStateAtom(target.environmentId);
-      const targetVersion = target.input.targetVersion;
-      const fromVersion = target.fromVersion ?? targetVersion;
+      const fromVersion = target.fromVersion ?? target.input.targetVersion;
+      let targetVersion = target.followServiceChannel ? fromVersion : target.input.targetVersion;
       let currentStage: ServerUpdateStage = "downloading";
-      const setStage = (stage: ServerUpdateStage) =>
+      const setStage = (stage: ServerUpdateStage, version: string) =>
         Effect.sync(() => {
           currentStage = stage;
+          targetVersion = version;
           atomRegistry.set(stateAtom, { status: "running", stage, fromVersion, targetVersion });
         });
-      return setStage(currentStage).pipe(
-        Effect.andThen(updateOutdatedHost(target.environmentId, target.input, setStage)),
+      return setStage(currentStage, targetVersion).pipe(
+        Effect.andThen(
+          updateOutdatedHost(
+            target.environmentId,
+            target.input,
+            setStage,
+            target.followServiceChannel,
+          ),
+        ),
         Effect.onExit((exit) =>
           Effect.sync(() => {
             if (Exit.isSuccess(exit) || Cause.hasInterruptsOnly(exit.cause)) {

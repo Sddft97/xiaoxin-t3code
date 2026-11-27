@@ -1,6 +1,7 @@
 import { T, msg, useGT, useMessages } from "gt-react";
 import { thrownErrorMessage } from "@t3tools/client-runtime/errors";
 import { m } from "~/i18n/messages";
+import { serviceUpdateVersionAtom } from "~/state/npmRelease";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { type EnvironmentId } from "@t3tools/contracts";
 import { type EnvironmentConnectionPresentation } from "@t3tools/client-runtime/connection";
@@ -140,7 +141,12 @@ export function useSystemComposerBanners(input: SystemComposerBannersInput) {
     handleDisconnectActiveEnvironment,
   );
   const autoBalanceUpdateBanner = useAutoBalanceUpdateBanner(autoUpdateEnvironments);
-  const versionMismatch = resolveServerConfigVersionMismatch(serverConfig, messages);
+  const serviceUpdateVersion = useAtomValue(serviceUpdateVersionAtom(activeThreadEnvironmentId));
+  const versionMismatch = resolveServerConfigVersionMismatch(
+    serverConfig,
+    messages,
+    serviceUpdateVersion,
+  );
   const versionMismatchServerName =
     hasMultipleRegisteredEnvironments && activeThreadEnvironmentId !== null
       ? (activeEnvironment?.label ?? serverConfig?.environment.label ?? activeThreadEnvironmentId)
