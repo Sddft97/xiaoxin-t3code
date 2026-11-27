@@ -14,7 +14,7 @@ import {
   FolderIcon,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
-import { DiffStatLabel, hasNonZeroStat } from "./DiffStatLabel";
+import { DiffStatLabel } from "./DiffStatLabel";
 import { PierreEntryIcon } from "./PierreEntryIcon";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
@@ -25,6 +25,10 @@ import { repositoryFilePath } from "@t3tools/client-runtime/state/thread-reposit
 const EMPTY_DIRECTORY_OVERRIDES: Record<string, boolean> = {};
 const VIRTUALIZE_AFTER_ROWS = 250;
 const ROW_OVERSCAN = 8;
+
+function hasNonZeroStat(stat: { additions: number; deletions: number } | undefined): boolean {
+  return stat !== undefined && (stat.additions > 0 || stat.deletions > 0);
+}
 
 interface ChangedFileRow {
   node: TurnDiffTreeNode;

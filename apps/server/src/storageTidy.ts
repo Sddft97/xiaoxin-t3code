@@ -632,7 +632,7 @@ export function createStorageTidyEngine(deps: TidyDeps) {
               stamps.push({
                 path,
                 latest: st.mtimeMs,
-                bytes: st.blocks * 512,
+                bytes: (st.blocks ?? Math.ceil(st.size / 512)) * 512,
                 files: 1,
                 dev: st.dev,
                 assets: 0,

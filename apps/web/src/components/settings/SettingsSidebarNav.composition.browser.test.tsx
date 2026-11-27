@@ -6,6 +6,7 @@ import { testUiLocale } from "../../../test/uiLocale";
 import { act, render } from "../../../test/render";
 import { ToastProvider } from "../ui/toast";
 import { useMemoryProposalNotification } from "./useMemoryProposalNotification";
+import { AppRouteModal } from "../AppRouteModal";
 import { SidebarProvider } from "../ui/sidebar";
 import { SettingsSidebarNav } from "./SettingsSidebarNav";
 import { settingsNavGroups, SETTINGS_SECTION_LABELS } from "./settingsSearch";
@@ -14,7 +15,13 @@ const memory = vi.hoisted(() => ({ pending: [] as { id: string }[] }));
 vi.mock("../../state/environments", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../../state/environments")>()),
   useEnvironments: () => ({
-    environments: [{ environmentId: "memory-test", serverConfig: { settings: { memory } } }],
+    environments: [
+      {
+        environmentId: "memory-test",
+        connection: { phase: "connected" },
+        serverConfig: { environment: { capabilities: {} }, settings: { memory } },
+      },
+    ],
   }),
 }));
 
@@ -24,6 +31,7 @@ vi.mock("./useAvailableSettingsSearchItems", () => ({
   ],
   useHasSecretProvidersEnvironment: () => false,
 }));
+vi.mock("../chat/GlobalVoiceInputIndicator", () => ({ GlobalVoiceInputIndicator: () => null }));
 
 it("ignores composing keys in the search", async () => {
   await page.viewport(1280, 800);
@@ -56,6 +64,41 @@ it("ignores composing keys in the search", async () => {
   await vi.waitFor(() =>
     expect(screen.router?.state.location.pathname).toBe("/settings/appearance"),
   );
+});
+
+it("Esc clears a search of spaces and a held Esc keeps Settings open", async () => {
+  await using _screen = await render(
+    <AppRouteModal label="Settings">
+      <SidebarProvider defaultOpen>
+        <SettingsSidebarNav pathname="/settings/general" />
+      </SidebarProvider>
+    </AppRouteModal>,
+    { router: "/settings/general" },
+  );
+  const settings = page.getByRole("dialog", { name: "Settings" });
+  const search = page.getByRole("combobox", { name: "Search settings" });
+  await expect.element(settings).toHaveFocus();
+
+  for (const text of ["theme", "   "]) {
+    await search.fill(text);
+    await userEvent.keyboard("{Escape}");
+    await expect.element(search).toHaveValue("");
+    await expect.element(search).toHaveFocus();
+    await act(() =>
+      search.element().dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Escape",
+          repeat: true,
+          bubbles: true,
+          cancelable: true,
+        }),
+      ),
+    );
+    await expect.element(settings).toHaveAttribute("data-open");
+  }
+
+  await userEvent.keyboard("{Escape}");
+  await expect.element(settings).not.toBeInTheDocument();
 });
 
 function renderNav() {

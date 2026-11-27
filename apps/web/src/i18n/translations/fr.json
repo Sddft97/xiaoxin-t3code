@@ -20,11 +20,16 @@
   "2aa1c01bf8014725": "{organization} limite les fils au mode Acceptation auto des modifications.",
   "89563a8fff8bb751": "{organization} limite les fils au mode Auto.",
   "5b7ff1208620c2c2": "{organization} limite les fils au mode Accès complet.",
+  "069e0382ff2496f5": "Les paramètres Claude de votre organisation désactivent le mode Auto.",
+  "8ccf7e0def66d339": "Vos paramètres Claude désactivent le mode Auto.",
+  "04ac2410d2cc0666": "Les paramètres Claude de ce projet désactivent le mode Auto.",
+  "7e27789f5d58960e": "Les paramètres de Claude désactivent le mode Auto.",
   "9bf017edd3847eb1": "La politique de {organization} n’autorise pas la connexion depuis d’autres appareils.",
   "ef9533bcc048f17b": "La politique de {organization} n’autorise pas T3 Connect.",
   "986b0873f913a840": "La politique de {organization} n’autorise pas les tâches webhook.",
   "eebc538e25b09fe2": "La politique de {organization} n’autorise pas l’import des cookies du navigateur.",
   "7642a133db05f164": "La stratégie de {organization} n’autorise pas l’ouverture des serveurs locaux de cette machine sur d’autres appareils.",
+  "e0856d6a402ad821": "La politique de {organization} n’autorise pas les commandes de disposition des worktrees des projets.",
   "39f6771b49f9b3b6": "Utiliser la valeur par défaut",
   "45bb0e90e1c42046": "À votre retour",
   "d8fa0a55446bbb0d": "Avant l’expiration du cache (bêta)",
@@ -66,7 +71,7 @@
   "2f6e4f7cd364da73": "Résultat attendu",
   "9d11c93d4035de3e": "Résultat obtenu",
   "c87d0595693704f9": "Solution de repli",
-  "d7a4ea6ce5af44e0": "{speaker} · {count} caractères",
+  "ed5c85bb4aecb472": "{count, plural, one {{speaker} · {count} caractère} other {{speaker} · {count} caractères}}",
   "f5114fb9c40fd929": "Vous",
   "cd03eb1b84271c02": "Agent",
   "bfe1a60f3f9c60fb": "Tour {turn} · {what}",
@@ -405,6 +410,7 @@
   "834ca879c14c167b": "En cours",
   "582d6df7dfab86fb": "En pause",
   "ea6583ce92507ee3": "En veille",
+  "7150557773b3818b": "En file d’attente",
   "7ea8cb8af281ce93": "En attente",
   "1347868f2523140e": "Terminée",
   "57d76c4614054271": "Arrêtée",
@@ -416,6 +422,7 @@
   "d3890f4eb1508781": "Exécute ses propres étapes",
   "3e7ced10c9482af0": "{step} est en cours",
   "237e1bcb1cf1bdec": "En veille à {step}",
+  "efbeb3993ee2c3f5": "En attente de {pool}",
   "3f7b17ac5a20c8d2": "Exécute {run}",
   "0306f5f324b8aaa5": "{count} exécutions en cours",
   "e8fd779b84a202a2": "En attente",
@@ -430,19 +437,19 @@
   "960aa0b106793f99": "Impossible de charger la clé d’autorisation de l’environnement.",
   "facb167869d93774": "Délai dépassé lors du renouvellement des identifiants de l’environnement.",
   "5f68899450a25421": "Ce client n’est pas pris en charge par ce serveur. Mettez à jour votre app ou utilisez une version compatible pour vous connecter à {host}.",
-  "64d380898f3dc4ee": "Ce client nécessite un serveur plus récent. Mettez à jour Stardust sur {host} pour vous connecter.",
+  "64d380898f3dc4ee": "Ce client nécessite un serveur plus récent. Mettez à jour T3 Code sur {host} pour vous connecter.",
   "b7554d48eece78bf": "Cet appareil est hors ligne",
   "ad2b3faedb0bd846": "Cet appareil charge encore sa connexion T3 Connect",
   "150d1298d7e12a18": "{host} attend que quelqu’un approuve cet appareil",
-  "64e8bf8f894e8d4b": "{host} utilise une ancienne version de Stardust",
+  "64e8bf8f894e8d4b": "{host} utilise une ancienne version de T3 Code",
   "7978b128f836c1ca": "L’horloge de cet appareil est décalée",
   "26f98026953e6835": "{host} n’est pas associé à votre compte T3 Connect",
   "df82277b5fdf21ad": "T3 Connect a renvoyé une erreur",
   "d2c536acf6fef486": "Le tunnel de {host} est encore en cours de configuration",
   "4e554b7a57549e72": "T3 Connect n’est pas activé sur {host}",
   "919dcd4227cf751a": "Le tunnel de {host} est hors ligne",
-  "34e205f55d30b081": "Le tunnel fonctionne, mais Stardust sur {host} n’a pas répondu",
-  "ff444db47a6c5d7b": "Stardust sur {host} a envoyé une réponse inattendue",
+  "34e205f55d30b081": "Le tunnel fonctionne, mais T3 Code sur {host} n’a pas répondu",
+  "ff444db47a6c5d7b": "T3 Code sur {host} a envoyé une réponse inattendue",
   "382dbe658dff5a11": "L’adresse du tunnel de {host} n’a pas pu être résolue",
   "7b15ef746f8fe359": "La connexion sécurisée au tunnel de {host} a échoué",
   "6545cbf2f3aca443": "Le tunnel de {host} a refusé la connexion",
@@ -452,27 +459,27 @@
   "fbd2d87881e54615": "Cet appareil ne parvient pas à joindre T3 Connect",
   "7ac7d2bd5d3c3b74": "Cet appareil ne parvient pas à joindre le tunnel de {host}",
   "9cf0001d0c442fe2": "T3 Connect n’a pas pu joindre le tunnel de {host}",
-  "e7d37a933a7e89f5": "Stardust sur {host} n’a pas accepté cet appareil",
-  "b7e1fa98dd44a903": "Stardust sur {host} n’a pas répondu",
+  "e7d37a933a7e89f5": "T3 Code sur {host} n’a pas accepté cet appareil",
+  "b7e1fa98dd44a903": "T3 Code sur {host} n’a pas répondu",
   "5d11910833c27d35": "Sur {host}, vérifiez Paramètres > Partage et accès ou exécutez `t3 connect status`.",
-  "b73e30d8d9cf80ae": "Connectez cet appareil à Internet. Stardust se reconnecte tout seul.",
-  "c8a0daf6db0928f3": "Patientez un instant. Stardust réessaie tout seul.",
-  "25bb53e6f08b6ce6": "Si l’attente se prolonge, rechargez ou redémarrez Stardust sur cet appareil.",
+  "b73e30d8d9cf80ae": "Connectez cet appareil à Internet. T3 Code se reconnecte tout seul.",
+  "c8a0daf6db0928f3": "Patientez un instant. T3 Code réessaie tout seul.",
+  "25bb53e6f08b6ce6": "Si l’attente se prolonge, rechargez ou redémarrez T3 Code sur cet appareil.",
   "570aaeb32dc600a7": "Sur un appareil déjà connecté à {host}, ouvrez Paramètres > Partage et accès et approuvez l’appareil qui affiche {code}.",
   "08a2d57d02f30799": "Sur un appareil déjà connecté à {host}, ouvrez Paramètres > Partage et accès et approuvez cet appareil.",
   "9cc57bb41f513f35": "Ou exécutez `t3 auth connect-device approve {code}` sur {host}.",
-  "6c043146ff104471": "Mettez à jour Stardust sur {host}.",
+  "6c043146ff104471": "Mettez à jour T3 Code sur {host}.",
   "3c35e0980e06bfa6": "Activez la date et l’heure automatiques sur cet appareil et sur {host}, puis réessayez.",
   "0f441d0e53f2e965": "Vérifiez que cet appareil est connecté au même compte T3 Connect que l’hôte.",
   "1e02d6062710ffb3": "Sur {host}, ouvrez Paramètres > Partage et accès et activez T3 Connect.",
-  "3ca9e905a0e76944": "Patientez une minute. Stardust réessaie tout seul.",
-  "62d01449990d28a4": "Patientez quelques minutes. Stardust réessaie tout seul.",
+  "3ca9e905a0e76944": "Patientez une minute. T3 Code réessaie tout seul.",
+  "62d01449990d28a4": "Patientez quelques minutes. T3 Code réessaie tout seul.",
   "6c9d04c73fe1eb63": "Si l’échec persiste, copiez les diagnostics et signalez-le.",
-  "6671e2adfb0e35b3": "Vérifiez que {host} est allumé et que Stardust y est lancé.",
+  "6671e2adfb0e35b3": "Vérifiez que {host} est allumé et que T3 Code y est lancé.",
   "3c988e8ceac72484": "Un VPN ou un nœud de sortie Tailscale sur {host} peut bloquer le tunnel (port 7844). Désactivez-le ou autorisez le tunnel.",
-  "b5aacc0b9163c0e3": "Ouvrez ou redémarrez Stardust sur {host}.",
+  "b5aacc0b9163c0e3": "Ouvrez ou redémarrez T3 Code sur {host}.",
   "a80f88e893129bd9": "Vérifiez que {host} est allumé et en ligne.",
-  "a11d4c010567faac": "Redémarrez Stardust sur cet appareil.",
+  "a11d4c010567faac": "Redémarrez T3 Code sur cet appareil.",
   "6a1d53c7bee371aa": "Si l’échec persiste, retirez {host} de cet appareil puis ajoutez-le à nouveau.",
   "41dd22a83e2fa219": "Déconnectez-vous de T3 Connect, puis reconnectez-vous.",
   "a569ba31753e80a3": "Vérifiez la connexion Internet de cet appareil.",
@@ -480,11 +487,11 @@
   "13d74302502bdb92": "Un VPN, un pare-feu ou un filtre DNS sur cet appareil peut bloquer le tunnel.",
   "6538d9af1dc853bc": "Essayez un autre réseau, ou ajoutez une route directe comme une adresse Tailscale.",
   "e950948b20d099cf": "La connexion de cet appareil à {host} a expiré ou a été révoquée. Appairez-le à nouveau avec un nouveau lien d’appairage depuis {host}.",
-  "964a38e20cc7ecda": "Vérifiez que Stardust est lancé sur {host}.",
+  "964a38e20cc7ecda": "Vérifiez que T3 Code est lancé sur {host}.",
   "00fcb4f22434502b": "Réessayez. Si l’échec persiste, copiez les diagnostics.",
   "589f3050d8371c67": "Cet appareil",
   "f8561e25d9a3d132": "Tunnel de {host}",
-  "11e2222747466460": "Stardust sur {host}",
+  "11e2222747466460": "T3 Code sur {host}",
   "3d1e8943c6f1623f": "Cause",
   "68c94644988bb4d7": "Statut HTTP",
   "c86eb684e1531ef8": "Tentatives",
@@ -498,7 +505,7 @@
   "bc24c300d53d61c5": "{host} n’a répondu sur aucune route enregistrée.",
   "b0dd3cd876937ca8": "Le profil de connexion {connectionId} n’est pas disponible.",
   "5ce46783e79ca9d1": "Les identifiants de connexion {connectionId} ne sont pas disponibles.",
-  "0bda0cac7f5acc20": "L’environnement connecté {actual} ne correspond pas à {expected}.",
+  "b39d1428ec8b23f5": "Cette adresse exécute désormais une autre installation de T3 Code ({actual}, et non {expected}). Supprimez cette connexion et ajoutez-la à nouveau.",
   "ea0d3e4e51d5706f": "Les identifiants de l’environnement ne sont pas valides.",
   "7283ebfd16d09677": "Les identifiants de l’environnement n’accordent pas l’accès requis.",
   "d3e9a9cb543b4b7b": "L’environnement a rejeté la demande d’authentification.",
@@ -514,8 +521,9 @@
   "693cb5c4fb40f109": "Seuls les environnements bearer enregistrés peuvent être modifiés.",
   "5f5844b910cb1544": "Les identifiants bearer enregistrés ne sont pas disponibles.",
   "51b0133f1ed3cf5c": "Le libellé de l’environnement ne peut pas être vide.",
-  "3aa15bfbe1920376": "Mettez à jour Stardust sur {host} manuellement ; il ne peut pas se mettre à jour seul.",
-  "71907f57b7ec64d5": "{host} n’est pas revenu sur une version compatible de Stardust.",
+  "3aa15bfbe1920376": "Mettez à jour T3 Code sur {host} manuellement ; il ne peut pas se mettre à jour seul.",
+  "adb9c574404d1db8": "Déjà à jour",
+  "71907f57b7ec64d5": "{host} n’est pas revenu sur une version compatible de T3 Code.",
   "e77ac580a4ddcd3b": "Disponible",
   "a980c44b06fc7b26": "Hors ligne",
   "fef710ef9d9e365d": "Connexion...",
@@ -615,7 +623,7 @@
   "d4258d4b87cf0ab1": "Le relais a rencontré une erreur interne ({reason}).",
   "796de796c15cf68f": "Le relais a expiré avant de terminer la requête (HTTP 504). Réessayez dans quelques minutes. Si l’échec persiste, copiez l’ID de trace lorsque vous le signalez.",
   "34e963f61ae55b28": "Le relais a renvoyé un HTTP {status} inattendu.",
-  "e17ef8aff174e6fe": "Hors ligne depuis un moment, son tunnel T3 Connect a donc été supprimé. Lancez Stardust sur cet ordinateur et mettez-le à jour vers la dernière version pour vous reconnecter.",
+  "e17ef8aff174e6fe": "Hors ligne depuis un moment, son tunnel T3 Connect a donc été supprimé. Lancez T3 Code sur cet ordinateur et mettez-le à jour vers la dernière version pour vous reconnecter.",
   "e07aeb67f54ee2c4": "Impossible de charger la clé de preuve DPoP du relais.",
   "0d7264480ef70038": "Délai dépassé pour l’échange du jeton d’accès DPoP du relais.",
   "b396dce04e615665": "Délai dépassé pour la liste des environnements du relais.",
@@ -687,6 +695,7 @@
   "56b4ff3993c93eca": "{host} a envoyé une configuration de serveur incompatible.",
   "368c4d4f99c66bfb": "Mettez à jour le client et le serveur vers des versions compatibles.",
   "e5fd422e445391fc": "Échec de l’envoi. Touchez pour réessayer.",
+  "13b14784f8707ddd": "0 octet",
   "b2bc6bd92ea24e5c": "{size} Mo",
   "88f84178edbb7f57": "{size} Ko",
   "5a78fd0a1d8e9945": "{count} Mo",
@@ -703,7 +712,7 @@
   "28d9a7709f6be166": "Les versions n’ont pas été vérifiées. Reconnectez l’hôte et vérifiez les versions.",
   "bb86986ccd77751a": "Mise à jour en attente. Les outils requis s’installeront automatiquement à leur prochaine utilisation. L’hôte doit avoir accès au réseau ; une installation plus ancienne n’est pas utilisée en secours.",
   "27120a57b27c8f12": "Les outils requis s’installent automatiquement quand ils sont nécessaires. Vérifier les versions n’installe ni ne lance rien.",
-  "69c618154e02084f": "Le serveur Stardust de cet environnement choisit les versions des outils d’appareil pour lui-même et ses hôtes SSH. Mettez à jour ce serveur pour recevoir des versions plus récentes ; mettre à jour uniquement votre navigateur ou l’app mobile ne met pas à jour un serveur distant.",
+  "69c618154e02084f": "Le serveur T3 de cet environnement choisit les versions des outils d’appareil pour lui-même et ses hôtes SSH. Mettez à jour ce serveur pour recevoir des versions plus récentes ; mettre à jour uniquement votre navigateur ou l’app mobile ne met pas à jour un serveur distant.",
   "2f7a7712ac730d09": "Aucun signataire DPoP n’est disponible pour autoriser la requête vers l’environnement.",
   "2271933ad114dfd2": "Impossible de créer la preuve d’autorisation de la requête vers l’environnement.",
   "63691126fe3aa03a": "L’environnement n’est pas connecté.",
@@ -775,7 +784,7 @@
   "4f076ebbf1c8846e": "Cela retire uniquement les entrées de projet, pas les fichiers sur le disque.",
   "19b8f3ad79efb9e1": "Les autres entrées de ce projet regroupé ne sont pas affectées.",
   "2207c69b042b2e37": "Cette action est irréversible.",
-  "0b3de745be8aee67": "Cette session d’environnement n’est plus valide (invalid_credential). Actualisez la page ou quittez et rouvrez Stardust.",
+  "0b3de745be8aee67": "Cette session d’environnement n’est plus valide (invalid_credential). Actualisez la page ou quittez et rouvrez T3 Code.",
   "a414f5045fa2e8da": "L’environnement n’a pas répondu à la requête de PR.",
   "e1b5268aa311f464": "L’environnement a été supprimé.",
   "00d50f88c665cc51": "La connexion HTTP de l’environnement n’est pas prête.",
@@ -818,6 +827,7 @@
   "21872f69ccbc711d": "Démarrage des serveurs MCP de {provider}",
   "fedaa29ff8815a77": "Chargement des hooks de {provider}",
   "57025ae4de5beb57": "Chargement des règles et des skills de {provider}",
+  "1cbfbcad9f0d04fe": "Reprise de la session de {provider}",
   "4729a188600f1501": "Connexion à {provider}",
   "8c8977097681630f": "Démarrage de {provider}",
   "f1d27d127ab27ac6": "Démarrage",
@@ -872,9 +882,13 @@
   "05b16c85cb1e18bd": "Aucun dépôt",
   "04ea9e0e663983fd": "Tous les dépôts",
   "c07bd24ff49e85d9": "{count, plural, one {{count} dépôt} other {{count} dépôts}}",
+  "1b799ebfa94c2408": "Approbation des hooks de push",
+  "81d703184fe5112e": "Exécuter les hooks de push de ce dépôt ?",
+  "027b0d65c7a67af6": "Fichier de hook",
+  "ade585910165bb52": "Hook configuré",
   "e94aa66471dae6aa": "Pourquoi cette question ?",
   "228a325b5708e675": "L’accès complet ignore les approbations, mais une règle « ask » dans les paramètres de l’agent correspond à cette action ; il demande donc quand même. Supprimez ou restreignez cette règle pour ne plus voir ces demandes.",
-  "3f9101f696c738a8": "L’accès complet ignore les approbations, mais l’agent s’arrête quand même pour quelques contrôles de sécurité qui lui sont propres et qu’aucun paramètre ne peut ignorer, comme une suppression dont il ne peut pas vérifier le chemin. Stardust ne peut pas les désactiver ; vérifiez donc la demande et approuvez-la si elle correspond à ce que vous attendez.",
+  "3f9101f696c738a8": "L’accès complet ignore les approbations, mais l’agent s’arrête quand même pour quelques contrôles de sécurité qui lui sont propres et qu’aucun paramètre ne peut ignorer, comme une suppression dont il ne peut pas vérifier le chemin. T3 Code ne peut pas les désactiver ; vérifiez donc la demande et approuvez-la si elle correspond à ce que vous attendez.",
   "508591c3b632b254": "{count, plural, one {Dans {count} jour} other {Dans {count} jours}}",
   "b6e3cd6c7a081b8c": "{count, plural, one {Dans {count} heure} other {Dans {count} heures}}",
   "3b8e428bf67b3a2d": "{count, plural, one {Dans {count} minute} other {Dans {count} minutes}}",
@@ -1003,15 +1017,15 @@
   "ad8172e048016a67": "{status, select, inProgress {Mise à jour d’une tâche planifiée} completed {Tâche planifiée mise à jour} failed {Impossible de mettre à jour une tâche planifiée} declined {Refus de mettre à jour une tâche planifiée} stopped {Arrêt de la mise à jour d’une tâche planifiée} other {Mise à jour d’une tâche planifiée}}",
   "3983da99adfa059f": "{status, select, inProgress {Suppression d’une tâche planifiée} completed {Suppression d’une tâche planifiée demandée} failed {Impossible de supprimer une tâche planifiée} declined {Refus de supprimer une tâche planifiée} stopped {Arrêt de la suppression d’une tâche planifiée} other {Suppression d’une tâche planifiée}}",
   "2e5bcbeed3f7c7d5": "{status, select, inProgress {Demande d’un secret} completed {Secret demandé} failed {Impossible de demander un secret} declined {Refus de demander un secret} stopped {Arrêt de la demande d’un secret} other {Demande d’un secret}}",
-  "64103dee63e54d6a": "{status, select, inProgress {Création de fils Stardust} completed {Fils Stardust créés} failed {Impossible de créer des fils Stardust} declined {Refus de créer des fils Stardust} stopped {Arrêt de la création de fils Stardust} other {Création de fils Stardust}}",
-  "0a7ec36662b6eff7": "{status, select, inProgress {Démarrage d’un fil Stardust} completed {Fil Stardust démarré} failed {Impossible de démarrer un fil Stardust} declined {Refus de démarrer un fil Stardust} stopped {Arrêt du démarrage d’un fil Stardust} other {Démarrage d’un fil Stardust}}",
-  "091b32b694a56e46": "{status, select, inProgress {Liste des fils Stardust} completed {Fils Stardust listés} failed {Impossible de lister les fils Stardust} declined {Refus de lister les fils Stardust} stopped {Arrêt de la liste des fils Stardust} other {Liste des fils Stardust}}",
-  "c9964791c2b5e1ae": "{status, select, inProgress {Lecture d’un fil Stardust} completed {Fil Stardust lu} failed {Impossible de lire un fil Stardust} declined {Refus de lire un fil Stardust} stopped {Arrêt de la lecture d’un fil Stardust} other {Lecture d’un fil Stardust}}",
-  "11f8fa5c63041915": "{status, select, inProgress {Envoi vers un fil Stardust} completed {Envoyé vers un fil Stardust} failed {Impossible d’envoyer vers un fil Stardust} declined {Refus d’envoyer vers un fil Stardust} stopped {Arrêt de l’envoi vers un fil Stardust} other {Envoi vers un fil Stardust}}",
-  "9a30dcc6b7680d28": "{status, select, inProgress {Attente d’un fil Stardust} completed {Fil Stardust attendu} failed {Impossible d’attendre un fil Stardust} declined {Refus d’attendre un fil Stardust} stopped {Arrêt de l’attente d’un fil Stardust} other {Attente d’un fil Stardust}}",
+  "64103dee63e54d6a": "{status, select, inProgress {Création de fils T3} completed {Fils T3 créés} failed {Impossible de créer des fils T3} declined {Refus de créer des fils T3} stopped {Arrêt de la création de fils T3} other {Création de fils T3}}",
+  "0a7ec36662b6eff7": "{status, select, inProgress {Démarrage d’un fil T3} completed {Fil T3 démarré} failed {Impossible de démarrer un fil T3} declined {Refus de démarrer un fil T3} stopped {Arrêt du démarrage d’un fil T3} other {Démarrage d’un fil T3}}",
+  "091b32b694a56e46": "{status, select, inProgress {Liste des fils T3} completed {Fils T3 listés} failed {Impossible de lister les fils T3} declined {Refus de lister les fils T3} stopped {Arrêt de la liste des fils T3} other {Liste des fils T3}}",
+  "c9964791c2b5e1ae": "{status, select, inProgress {Lecture d’un fil T3} completed {Fil T3 lu} failed {Impossible de lire un fil T3} declined {Refus de lire un fil T3} stopped {Arrêt de la lecture d’un fil T3} other {Lecture d’un fil T3}}",
+  "11f8fa5c63041915": "{status, select, inProgress {Envoi vers un fil T3} completed {Envoyé vers un fil T3} failed {Impossible d’envoyer vers un fil T3} declined {Refus d’envoyer vers un fil T3} stopped {Arrêt de l’envoi vers un fil T3} other {Envoi vers un fil T3}}",
+  "9a30dcc6b7680d28": "{status, select, inProgress {Attente d’un fil T3} completed {Fil T3 attendu} failed {Impossible d’attendre un fil T3} declined {Refus d’attendre un fil T3} stopped {Arrêt de l’attente d’un fil T3} other {Attente d’un fil T3}}",
   "9a6cfe52bf7474e3": "{status, select, inProgress {Arrêt d’un workflow} completed {Arrêt d’un workflow demandé} failed {Impossible d’arrêter un workflow} declined {Refus d’arrêter un workflow} stopped {Interruption de l’arrêt d’un workflow} other {Arrêt d’un workflow}}",
   "c442e0a7c4299554": "{status, select, inProgress {Mise à jour des attentes en arrière-plan} completed {Attentes en arrière-plan mises à jour} failed {Impossible de mettre à jour les attentes en arrière-plan} declined {Refus de mettre à jour les attentes en arrière-plan} stopped {Arrêt de la mise à jour des attentes en arrière-plan} other {Mise à jour des attentes en arrière-plan}}",
-  "56753cad0f6ffa6e": "{status, select, inProgress {Interruption d’un fil Stardust} completed {Interruption d’un fil Stardust demandée} failed {Impossible d’interrompre un fil Stardust} declined {Refus d’interrompre un fil Stardust} stopped {Arrêt de l’interruption d’un fil Stardust} other {Interruption d’un fil Stardust}}",
+  "56753cad0f6ffa6e": "{status, select, inProgress {Interruption d’un fil T3} completed {Interruption d’un fil T3 demandée} failed {Impossible d’interrompre un fil T3} declined {Refus d’interrompre un fil T3} stopped {Arrêt de l’interruption d’un fil T3} other {Interruption d’un fil T3}}",
   "1656e79608b8d13e": "{status, select, inProgress {Transfert du fil vers un worktree git} completed {Fil transféré vers un worktree git} failed {Impossible de transférer le fil vers un worktree git} declined {Refus de transférer le fil vers un worktree git} stopped {Arrêt du transfert du fil vers un worktree git} other {Transfert du fil vers un worktree git}}",
   "bfab58e83d64783d": "{status, select, inProgress {Récupération du statut du worktree du fil} completed {Statut du worktree du fil récupéré} failed {Impossible de récupérer le statut du worktree du fil} declined {Refus de récupérer le statut du worktree du fil} stopped {Arrêt de la récupération du statut du worktree du fil} other {Récupération du statut du worktree du fil}}",
   "fc34b0e6c9243ae6": "{status, select, inProgress {Récupération du statut du navigateur d’aperçu} completed {Statut du navigateur d’aperçu récupéré} failed {Impossible de récupérer le statut du navigateur d’aperçu} declined {Refus de récupérer le statut du navigateur d’aperçu} stopped {Arrêt de la récupération du statut du navigateur d’aperçu} other {Récupération du statut du navigateur d’aperçu}}",
@@ -1058,7 +1072,7 @@
   "e1a8104deda845e8": "{status, select, inProgress {Recherche dans le contenu des fils} completed {Contenu des fils recherché} failed {Impossible de rechercher dans le contenu des fils} declined {Refus de rechercher dans le contenu des fils} stopped {Arrêt de la recherche dans le contenu des fils} other {Recherche dans le contenu des fils}}",
   "0b64c9ece7beac84": "{status, select, inProgress {Lecture des transferts de fil} completed {Transferts de fil lus} failed {Impossible de lire les transferts de fil} declined {Refus de lire les transferts de fil} stopped {Arrêt de la lecture des transferts de fil} other {Lecture des transferts de fil}}",
   "be359ad2daa518d5": "{status, select, inProgress {Organisation d’un fil} completed {Fil organisé} failed {Impossible d’organiser un fil} declined {Refus d’organiser un fil} stopped {Arrêt de l’organisation d’un fil} other {Organisation d’un fil}}",
-  "2c7c576cb8cff44f": "{status, select, inProgress {Mise à jour des métadonnées d’un fil Stardust} completed {Métadonnées du fil Stardust mises à jour} failed {Impossible de mettre à jour les métadonnées d’un fil Stardust} declined {Refus de mettre à jour les métadonnées d’un fil Stardust} stopped {Arrêt de la mise à jour des métadonnées d’un fil Stardust} other {Mise à jour des métadonnées d’un fil Stardust}}",
+  "2c7c576cb8cff44f": "{status, select, inProgress {Mise à jour des métadonnées d’un fil T3} completed {Métadonnées du fil T3 mises à jour} failed {Impossible de mettre à jour les métadonnées d’un fil T3} declined {Refus de mettre à jour les métadonnées d’un fil T3} stopped {Arrêt de la mise à jour des métadonnées d’un fil T3} other {Mise à jour des métadonnées d’un fil T3}}",
   "3c3133980286c94e": "{status, select, inProgress {Liste des branches de l’espace de travail} completed {Branches de l’espace de travail listées} failed {Impossible de lister les branches de l’espace de travail} declined {Refus de lister les branches de l’espace de travail} stopped {Arrêt de la liste des branches de l’espace de travail} other {Liste des branches de l’espace de travail}}",
   "2eb79ae96a3f08b8": "{status, select, inProgress {Liste des onglets d’aperçu} completed {Onglets d’aperçu listés} failed {Impossible de lister les onglets d’aperçu} declined {Refus de lister les onglets d’aperçu} stopped {Arrêt de la liste des onglets d’aperçu} other {Liste des onglets d’aperçu}}",
   "2eea47957955b2f3": "{status, select, inProgress {Fermeture d’un onglet d’aperçu} completed {Onglet d’aperçu fermé} failed {Impossible de fermer un onglet d’aperçu} declined {Refus de fermer un onglet d’aperçu} stopped {Arrêt de la fermeture d’un onglet d’aperçu} other {Fermeture d’un onglet d’aperçu}}",
@@ -1156,7 +1170,7 @@
   "925416c7a6459d5c": "Ce lien désigne une pull request que Stardust ne peut pas lire.",
   "df1915cc1c939ef9": "Ce lien ne contient aucun prompt.",
   "b901183273710f78": "Ce lien désigne un dépôt que Stardust ne peut pas lire.",
-  "207267a58d3542ba": "Une fois l’enregistrement arrêté, {environment} l’envoie à OpenRouter. OpenRouter choisit qui exécute votre modèle. Stardust demande une conservation nulle des données ; votre compte OpenRouter peut autoriser une conservation à des fins de sécurité.",
+  "207267a58d3542ba": "Une fois l’enregistrement arrêté, {environment} l’envoie à OpenRouter. OpenRouter choisit qui exécute votre modèle. T3 demande une conservation nulle des données ; votre compte OpenRouter peut autoriser une conservation à des fins de sécurité.",
   "81b64c298285297c": "Une fois l’enregistrement arrêté, {environment} envoie votre enregistrement et des indications de vocabulaire, y compris les noms de projets, à {provider}.",
   "615ce9f2edf7208f": "Associer une pull request",
   "4ece383dad280e57": "Associer des pull requests",
@@ -1193,15 +1207,15 @@
   "7c6d982ac7206fff": "Mettre à jour une tâche planifiée",
   "6c5a5c1fc484b994": "Supprimer une tâche planifiée",
   "76ed47bc9da51cc4": "Demander un secret",
-  "30a8c0f9a6576ee8": "Créer des fils Stardust",
-  "557ba6282ab349d7": "Démarrer un fil Stardust",
-  "55cb2eb842d7b91b": "Lister les fils Stardust",
-  "96249620a43e7e9e": "Lire un fil Stardust",
-  "5d935e12e0833489": "Envoyer vers un fil Stardust",
-  "dd0cfbfec90e795b": "Attendre un fil Stardust",
+  "30a8c0f9a6576ee8": "Créer des fils T3",
+  "557ba6282ab349d7": "Démarrer un fil T3",
+  "55cb2eb842d7b91b": "Lister les fils T3",
+  "96249620a43e7e9e": "Lire un fil T3",
+  "5d935e12e0833489": "Envoyer vers un fil T3",
+  "dd0cfbfec90e795b": "Attendre un fil T3",
   "4c114e8efb34f0e6": "Arrêter un workflow",
   "ff41ed44675c0388": "Mettre à jour les attentes en arrière-plan",
-  "9d65078ad69d11ff": "Interrompre un fil Stardust",
+  "9d65078ad69d11ff": "Interrompre un fil T3",
   "b8f29a57d98e0842": "Transférer le fil vers un worktree git",
   "214b538f1253466c": "Récupérer le statut du worktree du fil",
   "512a4723a4ed98a4": "Récupérer le statut du navigateur d’aperçu",
@@ -1248,7 +1262,7 @@
   "239f30c38e1d3e76": "Rechercher dans le contenu des fils",
   "f36654f4bd1c14f4": "Lire les transferts de fil",
   "cdf532d3300f1bd4": "Organiser un fil",
-  "5f2369d5ff9ada4c": "Mettre à jour les métadonnées d’un fil Stardust",
+  "5f2369d5ff9ada4c": "Mettre à jour les métadonnées d’un fil T3",
   "d7e4d133cc051025": "Lister les branches de l’espace de travail",
   "0d2de20595847b47": "Lister les onglets d’aperçu",
   "a65e8408c7f89599": "Fermer un onglet d’aperçu",
@@ -1297,7 +1311,7 @@
   "c13753167634f7aa": "Fichier lu",
   "5ce648cd03020fd9": "Lecture de {path} +{count} autres",
   "5d6c2898401c94e6": "Lecture de {path}",
-  "612170d804b03320": "{count, plural, one {{count} enregistrement d’utilisation mal formé ou incohérent a été ignoré ; l’utilisation peut être incomplète.} other {{count} enregistrements d’utilisation mal formés ou incohérents ont été ignorés ; l’utilisation peut être incomplète.}}",
+  "69150fe436b3a0c2": "{count, plural, one {{count} enregistrement d’utilisation mal formé ou incohérent a été ignoré ; l’utilisation peut être incomplète.} other {{count} enregistrements d’utilisation mal formés ou incohérents ont été ignorés ; l’utilisation peut être incomplète.}}",
   "ee448ceb6820ce2f": "{environment} utilise une ancienne version du serveur et est exclu des totaux.",
   "732708950237004e": "Ce client est plus ancien que le serveur de {environment} ; son utilisation est exclue des totaux.",
   "9758c2ede06aa19b": "{hour} aujourd’hui",
@@ -1332,7 +1346,7 @@
   "c47ebef856c52c5f": "réinitialisation dans {duration}",
   "aeac6844ac2cde59": "Texte brut",
   "d1d2b3130458bf2e": "Assembleur",
-  "06ca993fa4236249": "Demandez ce que vous voulez. @ fichiers, $ skills, / commandes",
+  "9e25f0ed481ee573": "Tell Stardust your idea… @ files, $ skills, / commands",
   "279a7589a1c78b0d": "Menu contextuel",
   "54f1a9e3c9e146cd": "Éditeur",
   "c3b46a31a4d3999b": "Ouvrir dans l’éditeur",
@@ -1342,9 +1356,9 @@
   "a9b663922945a4fa": "Cette connexion ne peut pas ouvrir d’éditeur sur cet environnement.",
   "868596d482a1a2bd": "Ouvrir",
   "f58caaa68c09fbeb": "Ouvrir avec",
+  "75b6d7c3bc9c72da": "Impossible d’ouvrir dans {editor}",
   "415d9fed5542d278": "Impossible d’ouvrir le fichier",
   "1d1bbe5b700afe63": "Impossible d’afficher le fichier",
-  "75b6d7c3bc9c72da": "Impossible d’ouvrir dans {editor}",
   "31dc19d033af2774": "Impossible d’ouvrir le lien.",
   "029d8d0201aed231": "Impossible d’ouvrir les Réglages Système.",
   "9af3083226778d3c": "Open VSX a renvoyé des détails de thème mal formés.",
@@ -1518,9 +1532,12 @@
   "85632ff85a7d923d": "Le fichier n’est pas disponible sur cet ordinateur.",
   "3d2036743bbda4c9": "Impossible de faire glisser le fichier",
   "a5df28a112e62bc3": "Versions incompatibles. Essayez d’aligner le client et le serveur sur la même version de Stardust.",
+  "5173c50b0a60847c": "Mise à jour disponible : {serverVersion} → {clientVersion}",
   "4eb599c7f36c99ba": "Ce fichier de thème n’est pas un JSON valide.",
   "29a5ff50ce55c4f9": "Thème VS Code",
   "10348092dfed8b11": "Ce thème VS Code n’a pas de couleur « editor.background » ; impossible d’en dériver une palette.",
+  "206811f6f441bfc7": "Ce projet prépare ses worktrees avec sa propre commande, que personne n’a approuvée telle qu’elle est écrite actuellement. Cette connexion ne peut pas l’approuver : approuvez-la depuis un client qui peut utiliser le terminal.",
+  "b8087c9a70c26da9": "Impossible d’approuver la commande de disposition des worktrees.",
   "6dff8d487001c6cf": "Adaptatif",
   "f5f61c338cc5aeb5": "Barre d’outils des appareils du navigateur",
   "3b4eb5b5ec5e60cb": "Préréglage d’appareil du navigateur",
@@ -1549,6 +1566,7 @@
   "6848f5bbb2bd9eec": "Document PDF",
   "7873a79df0cf6d0e": "Page du navigateur",
   "0b55696e27387e4e": "Appuyez sur Shift+Escape pour quitter la page du navigateur.",
+  "90dfebe26eb86b2d": "Options de sélection de la page",
   "737d3c6bec93f9e6": "Choisir des fichiers pour la page",
   "e6a3fa7cfc14f86a": "Boîte de dialogue du navigateur",
   "61a552a67e9e3eac": "Réponse à la boîte de dialogue",
@@ -1692,10 +1710,12 @@
   "bb7586d989532f55": "Les dépôts partent de {branch} lorsqu’ils l’ont",
   "8fbc792d713668c1": "Chaque modèle démarre dans son propre worktree.",
   "97405c12100cb246": "Exécuter sur",
+  "f858dae2d80bdbae": "Espace de travail : {workspace}",
   "44ad5a6f7fd4f644": "Contexte d’exécution : {context}",
   "25ae6917f8121f5d": "Répartition automatique",
   "0835c108d19201de": "Exécuter sur",
   "b969a1b480d68ad4": "Espace de travail",
+  "f04d00285fcc5e77": "Une branche distincte est créée à l’envoi du premier message",
   "96e12ca744c01e35": "Arrêtez le tour en cours pour changer de worktree.",
   "b957c6c180be3cb9": "L’API Presse-papiers n’est pas disponible pour copier le nom de la branche.",
   "3452323a2e5003e4": "Impossible de copier le nom de la branche dans le presse-papiers.",
@@ -1851,7 +1871,7 @@
   "67f5b13c3c7bcd40": "Partager avec un invité",
   "82da5b8b340217ac": "Redémarrer la session de l’agent",
   "963d099509eabcd6": "La session de l’agent va redémarrer",
-  "1d384d4fe7888a09": "Votre prochain message démarre une nouvelle session.",
+  "71ed7c0da0b93c77": "Votre prochain message redémarre l’agent. Cette conversation est conservée.",
   "e4b61c891fed297e": "Aller au fichier",
   "d2ccdb8cd3297212": "Ajouter un projet",
   "594bcbef04093f72": "Ouvrir un dossier WSL",
@@ -1866,7 +1886,6 @@
   "1d17dc60c59e0524": "Désépingler le projet",
   "5cfaaa20c460c328": "Épingler le projet",
   "24adf508b4c5d6b5": "Paramètres du projet",
-  "60e47b3da5901619": "Paramètres · {section}",
   "0c659f9a193255dd": "Échec de l’ajout du projet",
   "4b3fc098d5a08a66": "Les chemins de style Windows ne sont pris en charge que sous Windows.",
   "2c2637dc1e236fb4": "Les chemins relatifs nécessitent un projet actif.",
@@ -1918,13 +1937,13 @@
     "Nouveau fil dans",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "dbc0288da29ce1d4": "Recherche dans les messages…",
@@ -1954,6 +1973,7 @@
   "f844c41fac2d339c": "Actuel",
   "69154433587763c0": "Aucune action correspondante.",
   "90c3a382ecefa0ce": "Aucune commande, aucun projet ni aucun fil correspondant.",
+  "60e47b3da5901619": "Paramètres · {section}",
   "4758dde317babc14": "Impossible d’enregistrer le choix du thème",
   "448735c0084132f5": "Réessayez.",
   "e1ef4197dc810bab": "Pour le mode clair",
@@ -1967,13 +1987,16 @@
   "7af7f00b85cc2930": "Confirmer l’action",
   "8b418a02b73f49b8": "Cette action nécessite votre confirmation.",
   "e74139c17fab1fa1": "Confirmer",
+  "4a18481bea4b4ad5": "Nouvel appareil connecté à {environmentLabel}",
+  "4144ab6aa487528a": "{device} s’est connecté via {product}. Ce n’était pas vous ? Vérifiez-le.",
+  "a10cfdb27152c757": "{count, plural, one {{count} appareil s’est connecté} other {{count} appareils se sont connectés}} via {product}. Ce n’était pas vous ? Vérifiez-les.",
+  "4672f332c89dbcd9": "Examiner",
   "775a3e99e2638341": "Un appareil veut se connecter à {environmentLabel}",
   "a8befcb9f1c61f60": "{device}. N’approuvez que s’il affiche le code {code}.",
   "ac48cc297029db41": "Approuver",
   "c12ca3fea745def0": "Impossible d’approuver l’appareil",
   "af63f05ed2f5eeb3": "Refuser",
   "b735bab216b27041": "Impossible de refuser l’appareil",
-  "4672f332c89dbcd9": "Examiner",
   "913fc23f62321556": "Choisissez une date et une heure valides dans le futur.",
   "9485a52216cfc0d5": "Saisissez une durée positive.",
   "9bc551235d78e133": "Type de planification",
@@ -2067,6 +2090,8 @@
   "b2c35cd235de63e0": "Chargement des modifications...",
   "bcbd16c97c6c1215": "Aucune modification nette dans cette sélection.",
   "7e9cb3ca9f5470ae": "Aucun patch disponible pour cette sélection.",
+  "ccd5fc4db08374d7": "{count, plural, one {{count} fichier de test masqué} other {{count} fichiers de test masqués}}",
+  "a92edf8d81354772": "Afficher les fichiers de test",
   "e797245c587e7e29": "Redimensionner les fichiers modifiés",
   "99c76aa12c632a36": "Fichiers : {section}",
   "3e9ddb26c2c59bcc": "Modifications",
@@ -2097,7 +2122,7 @@
   "2c7dd1701c1e4878": "Le fournisseur a enregistré le contenu du fichier sans diff.",
   "7af7238975f15a8f": "Chargement du code...",
   "c53cf4b26ec0586d": "Machine, {label}",
-  "83614cccb38836d1": "Environnement Stardust",
+  "0c01f791ecef34ad": "Environnement T3 Code",
   "6ba599e5a409f99d": "Machine absente de cette app",
   "3826acf499042b3b": "Récupération des dernières modifications...",
   "4d104843b652df2c": "Lancement de l’action de gestion de versions...",
@@ -2148,7 +2173,6 @@
   "2e1225f8dd45c1b3": "{term, select, mr {MR créée} cr {Demande de modification créée} other {PR créée}}",
   "421c7b74b8abedfb": "Échec du pull",
   "24f0369a3c9d7936": "Pull effectué",
-  "adb9c574404d1db8": "Déjà à jour",
   "03898054efa2f20d": "{ref} mis à jour depuis {upstream}",
   "693e5ab425b5ca03": "{ref} mis à jour depuis l’upstream",
   "21c91dccca84c8c7": "{ref} est déjà synchronisé.",
@@ -2236,16 +2260,16 @@
   "363b9991fa23d36b": [
     "Ignorez l’installation si vous avez déjà ",
     {
-      "t": "code",
+      "c": "t3",
       "i": 1,
-      "c": "t3"
+      "t": "code"
     },
     ". Si",
     " ",
     {
-      "t": "code",
+      "c": "t3",
       "i": 2,
-      "c": "t3"
+      "t": "code"
     },
     " est introuvable après l’installation, ajoutez à votre PATH le dossier indiqué par l’installateur."
   ],
@@ -2277,7 +2301,7 @@
   "7543807a82fa9ccd": "Sélectionnez un fil existant ou créez-en un pour commencer.",
   "9a7d2f935254da1f": "Ajoutez un projet pour démarrer votre premier fil.",
   "2f09f0b45255d8ce": "Ajoutez un projet, ou commencez sans.",
-  "c5b11890aa7f406f": "Sur quoi travaille-t-on ?",
+  "4b78a6b33579994b": "Which star shall we start from?",
   "01059eb93804de5a": "Ajouter un projet",
   "d95275127354650e": "Les autorisations de {label} ont changé",
   "c87e4484112112e3": "Cette connexion utilise encore les anciennes autorisations ; certaines actions peuvent donc ne plus être disponibles. Appairez-la à nouveau avec un nouveau lien qui a les autorisations nécessaires.",
@@ -2579,13 +2603,13 @@
     " n’est pas installé sur",
     " ",
     {
-      "t": "span",
-      "i": 2,
       "c": {
         "i": 3,
         "k": "_gt_value_3",
         "v": "v"
-      }
+      },
+      "i": 2,
+      "t": "span"
     },
     ", les requêtes utilisent donc ici votre propre connexion GitHub et sa limite de débit plus basse."
   ],
@@ -2608,6 +2632,8 @@
   "fd1316b1f627872b": "Approbation requise",
   "a3178769f8308cbc": "Échec du fil",
   "c6196d99000642b4": "Ouvrir le fil",
+  "70bdebaa3d291d3b": "Fil indisponible",
+  "a351ebbdcf1a3f7a": "Ce fil se trouve dans un environnement auquel cette app n’est pas connectée.",
   "826cb862b4a11fb3": "{label} :",
   "3e597ec938e7551b": "Vous :",
   "a1fbf2422c588292": "Agent :",
@@ -2633,6 +2659,24 @@
   "fc2c9a91f498ad6b": "{count, plural, one {{count} processus de terminal en cours. Ouvrir le terminal} other {{count} processus de terminal en cours. Ouvrir le terminal}}",
   "643c4b50feadc874": "Worktree: {path} ({branch})",
   "fb7c44da0f0825ea": "Worktree: {path}",
+  "06d3fe3e6b255d15": [
+    "+",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " de plus"
+  ],
+  "f1b18820c0ab93ac": [
+    "+",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " de plus dans Éléments associés"
+  ],
   "56f37ff8ca568059": "pile",
   "6831e9a46cbd8939": "chaîne",
   "9aa9e74a3b7eee91": "Ajouter à la discussion",
@@ -2676,11 +2720,29 @@
   "a707abf0a4a73ffa": "Fermer le terminal ({shortcut})",
   "9206ecf328948f90": "Fermer le terminal",
   "9b1326a11cfe3308": "Pas encore de session de terminal pour ce fil.",
+  "49eda70cfd56e621": "S’exécute au démarrage d’un fil dans un worktree et à la restauration de son dossier",
+  "188ccaa1199f5611": "S’exécute à la suppression du worktree d’un fil",
+  "7e8476e7306acabe": "Autoriser ce projet à exécuter ses commandes de worktree ?",
+  "8e11914556fd8b13": [
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " prépare les fils en worktree avec ses propres commandes issues de ",
+    {
+      "c": "t3.json",
+      "i": 2,
+      "t": "code"
+    },
+    ". Elles s’exécutent sur la machine de cet environnement avec vos autorisations, hors de tout bac à sable d’agent. La question vous sera reposée chaque fois que leur texte changera."
+  ],
+  "46807acd02a4ff72": "Approuver et continuer",
+  "a0dfd0ea1cf08f90": "La branche par défaut de chaque dépôt",
   "2ac142f34e5dabc2": "Dépôts dans le nouveau worktree : {selection}",
   "c514773a8031f00b": "Filtrer les dépôts",
   "e32b730f6d27753f": "Choisissez les dépôts sur lesquels ce fil travaille",
   "6a483f4461919209": "Chacun reçoit son propre worktree sur la branche du fil",
-  "a0dfd0ea1cf08f90": "La branche par défaut de chaque dépôt",
   "fb4a7f9335463af5": "Branche de base",
   "2e2d1910c9859536": "Aucun dépôt correspondant",
   "be54224dbe3c6be5": "Partir de cette branche lorsqu’un dépôt l’a",
@@ -2752,9 +2814,9 @@
   "86f71ac04d41f95e": [
     "Appuyez sur un raccourci. Utilisez ",
     {
-      "t": "code",
+      "c": "Backspace",
       "i": 1,
-      "c": "Backspace"
+      "t": "code"
     },
     " pour l’effacer. Les raccourcis s’appliquent à tout l’environnement. Les projets qui utilisent la même action partagent son raccourci."
   ],
@@ -2912,11 +2974,11 @@
   "838bbb8348a7e1d7": "Stardust n’a pas pu ouvrir de nouveau fil.",
   "eb9ecb0cb72121a0": "Cette machine ne peut pas démarrer de fils sans projet.",
   "32e2dbf6abe8c748": "Lancement du tri…",
-  "ce5c66ae967fd7c8": "Actions sur le fil indisponibles",
-  "d4f0043ab9348e2c": "Ce fil n’est pas encore chargé.",
   "6c13d520b6601f65": "Archiver le fil « {title} » ?",
   "83e50f9b118a7a0a": "Fil archivé, mais la navigation a échoué",
   "da43691fb8ad8006": "Échec de l’archivage du fil",
+  "ce5c66ae967fd7c8": "Actions sur le fil indisponibles",
+  "d4f0043ab9348e2c": "Ce fil n’est pas encore chargé.",
   "de2cfd4a757c656a": "Impossible d’archiver tant que le fournisseur est actif.",
   "8523f86d3c21edf3": "Le serveur de cet environnement ne permet pas encore de clore les fils. Mettez à jour le serveur pour utiliser Clore.",
   "876b987471f908d4": "Le serveur de cet environnement ne permet pas encore de reporter les fils. Mettez à jour le serveur pour utiliser Reporter.",
@@ -2997,6 +3059,8 @@
   "4f14e3fc3a216f44": "Cela arrête le processus en cours et efface son historique.",
   "16ce8443044b45fd": "Fermer {count, plural, one {{count} terminal} other {{count} terminaux}} ?",
   "a9697e470d40706a": "Cela arrête leurs processus en cours et efface leurs historiques : {labels}.",
+  "f3c70064a22a0c76": "{terminalLabel} ligne {lineStart}",
+  "8ba6febaabeb6f14": "{terminalLabel} lignes {lineStart}–{lineEnd}",
   "ef4bae5c5f3684f4": "Contenu enregistré avant",
   "5e4a0e56a0788d86": "Contenu enregistré après",
   "6d5a8b471a561b9d": "Explorateur de fichiers",
@@ -3127,13 +3191,13 @@
     "Cet agent veut utiliser les fils de tous les projets sur",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     " ",
     "(",
@@ -3148,13 +3212,13 @@
     "Cet agent veut utiliser les fils de tous les projets sur",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     "."
   ],
@@ -3167,9 +3231,9 @@
     },
     " ",
     {
-      "t": "span",
+      "c": "· nom défini par l’app",
       "i": 2,
-      "c": "· nom défini par l’app"
+      "t": "span"
     }
   ],
   "47d3ba1a39016131": "L’accès est accordé à",
@@ -3180,9 +3244,9 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": [" ", "sur l’ordinateur qui a ouvert cette page"],
       "i": 2,
-      "c": [" ", "sur l’ordinateur qui a ouvert cette page"]
+      "t": "span"
     }
   ],
   "b2d53b4d1d48fbef": [
@@ -3192,9 +3256,9 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": [" ", "· quiconque l’exécute obtient cet accès"],
       "i": 2,
-      "c": [" ", "· quiconque l’exécute obtient cet accès"]
+      "t": "span"
     }
   ],
   "c54cc9c75db9dc58": "N’approuvez qu’une connexion que vous venez de lancer.",
@@ -3203,16 +3267,17 @@
     "Obtenez-en un via Utiliser Stardust dans une autre app (MCP), Paramètres → Partage et accès, ou",
     " ",
     {
-      "t": "code",
+      "c": "t3 auth pairing create",
       "i": 1,
-      "c": "t3 auth pairing create"
+      "t": "code"
     },
     " sur cette machine."
   ],
   "49e3cf16b3ac3e5f": "Accès",
   "9699d255b374e215": "Ce qu’il peut faire",
   "86f5769278f5fa4d": "Au-delà de la lecture seule, il peut démarrer, arrêter des fils et leur envoyer des messages, et aucun ne peut s’exécuter avec plus que le mode que vous choisissez.",
-  "693a1983e099523a": "Connexion à ce backend.",
+  "4f3982f640dfed5b": "Ce lien ajoute un backend à ce navigateur. Ne continuez que si vous lui faites confiance.",
+  "41b32a424841adb7": "L’hôte du backend de ce lien d’appairage n’est pas valide.",
   "ec2a82b05e616aa0": "Il manque l’hôte du backend ou le jeton dans ce lien d’appairage.",
   "630d4f04309bc19a": "Échec de l’authentification.",
   "63bc32e8544f4de1": "Cet environnement attend un identifiant d’appairage de confiance avant que l’app puisse se connecter.",
@@ -3226,27 +3291,30 @@
   "55c59743f7fdd7fa": "Collez un jeton à usage unique ou un secret d’appairage",
   "ca6a0c94398d763d": "Appairage...",
   "989f56b8297dd684": "Ce jeton d’appairage à usage unique a déjà été envoyé. Demandez un nouveau lien d’appairage.",
+  "693a1983e099523a": "Connexion à ce backend.",
   "db3dcafc90d10405": "{environment} est enregistré dans ce navigateur.",
   "47d4ab320c4c394c": "L’environnement est enregistré dans ce navigateur.",
   "d235c6bfa25870a4": "{error} Si le backend a accepté ce jeton à usage unique, demandez un nouveau lien d’appairage avant de réessayer.",
   "00c1dcaef4762f18": "Backend appairé",
   "aac4a30e5912c01c": "Échec de l’appairage",
+  "c142c3f3bed15f8d": "Ajouter ce backend ?",
   "dbb27f4ee8ecfa8e": "Backend d’appairage",
   "8049e9ba2e8b4867": "Jeton d’appairage",
   "0528294df7656322": [
     "Hôte :",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "ff5f1c260e87ecde": "Vérifiez que le backend est joignable depuis ce navigateur, qu’il prend en charge CORS pour les clients hébergés et qu’il est servi en HTTPS si cette page est ouverte en HTTPS.",
+  "984c25ffcae69300": "Ajouter le backend",
   "08570ee0982df89d": "Appairage...",
   "3bbae7c96b6cbfc3": "Ouvrir l’app",
   "49cc06e79f21f85a": "{seconds} s",
@@ -3254,6 +3322,9 @@
   "f2a955905704b91d": "{hours} h {minutes} min",
   "3609f564a63c8eca": "{minutes} min",
   "9251bb742f60720d": "{hours} h",
+  "035aab5e99159bd8": "{count, plural, one {… {hidden} caractère au milieu n’est pas affiché.} other {… {hidden} caractères au milieu ne sont pas affichés.}} Le texte se termine par :",
+  "011b1ef726fa9928": "Faites défiler chaque partie pour la lire en entier.",
+  "6c6e16b9488f8b91": "Faites défiler pour tout lire.",
   "a1e982c6047c0860": "Aller à la réponse citée : {label}",
   "c156140c3f5ebb75": "Aller à la réponse à laquelle ceci répond : {label}",
   "f8031a49c6e9fe25": "Voir le texte cité de l’assistant : {label}",
@@ -3325,7 +3396,7 @@
   "6b45252b76f5ca2e": "Impossible d’ajouter le fil",
   "da13069e7a3a8ffd": "Agrandir la zone de saisie",
   "d3356b4524173b25": "Activez un fournisseur dans les Paramètres",
-  "3d3f30f1a1c4fc52": "Demandez ce que vous voulez...",
+  "0370518a800e0d5c": "Tell Stardust your idea...",
   "305d6d72f1220d98": "Recherche de la pull request...",
   "cf855794f7b8ddb5": "Recherche des skills de l’espace de travail...",
   "e159e35b83a86404": "Recherche des fichiers de l’espace de travail...",
@@ -3382,13 +3453,13 @@
     "Basculer sur",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ?"
   ],
@@ -3432,7 +3503,7 @@
   "12170596ff889d5b": "Joindre à nouveau",
   "748efc40dc99b309": "Retirez pour envoyer",
   "fd3d4318e7b094fa": "Brouillon",
-  "9c421cab815b9905": "{count, plural, one {Afficher {count} image jointe de plus} other {Afficher {count} images jointes de plus}}",
+  "c7f5c98f1e79cc6c": "{count, plural, one {Afficher {count} image jointe de plus} other {Afficher {count} images jointes de plus}}",
   "ae136257600738d3": "Joindre des fichiers",
   "3e04fb123bbf31b4": "La pièce jointe du brouillon n’a pas pu être enregistrée localement et risque d’être perdue en changeant de page.",
   "81709882b9996586": "Joindre des fichiers",
@@ -3515,12 +3586,12 @@
   "35e0b8f7418b4a86": "Cliquez pour mettre en file d’attente, {modifier}-clic pour réorienter",
   "eed080cf5eb25bfd": "Résumer {tokens} tokens d’historique, puis envoyer",
   "e4116d7f64a6f593": "Compacter {tokens} tokens d’historique avant l’envoi",
-  "d6143c122719b099": "Garder",
-  "7335dc479a68818e": "Compacter",
   "b2411ad43ce3b143": "Le prochain envoi garde les {tokens} tokens.",
   "ab6720311ff3140d": "Le prochain envoi compacte d’abord {tokens} tokens.",
   "1486a422ba77a084": "Cliquez pour compacter d’abord",
   "b971f881c5dc4fca": "Cliquez pour garder tout l’historique",
+  "d6143c122719b099": "Garder",
+  "7335dc479a68818e": "Compacter",
   "89426e9b039148d7": "Échec de la saisie vocale",
   "2220a0fbb5b6fa47": "Téléchargement du modèle {percent} %",
   "5c05b24be2880672": "Enregistrement",
@@ -3576,8 +3647,8 @@
   "478e3b4551be4db3": "Afficher le texte extrait",
   "e7205ebfead1aafc": "Aperçu vidéo agrandi",
   "1bda77e861bb472f": "Aperçu d’image agrandi",
-  "eebe5b17e3c19a1c": "Retour, fermer l’aperçu vidéo",
-  "58fd0009a6eb7258": "Retour, fermer l’aperçu d’image",
+  "fb633d54edaeb4b1": "Fermer l’aperçu vidéo",
+  "62d0c453f5803180": "Fermer l’aperçu d’image",
   "47bae54b5f532ff3": "Média précédent",
   "fb9434aad2b5c0bb": "Impossible de charger cette image.",
   "26aee5d4e97bfb28": "Image indisponible. Le fichier a peut-être été déplacé ou supprimé.",
@@ -3591,6 +3662,7 @@
   "ddb7e6f8ce99e657": "Seule une personne autorisée à exécuter des agents sur cette machine peut l'envoyer ou le refuser.",
   "03c1eb603c112f47": "Ne pas envoyer",
   "653405e4ed498d9f": "Envoyer",
+  "76cf478e5674fd12": "{count, plural, one {{count} correspondance} other {{count} correspondances}}",
   "262955d6eb632f9b": "L’API Presse-papiers n’est pas disponible pour copier le lien invité.",
   "f1a4f2b04cdbb4ef": "Impossible de copier le lien invité dans le presse-papiers.",
   "cf3490a604e44d31": "Impossible de créer un lien invité.",
@@ -3739,6 +3811,21 @@
     " a été fermée"
   ],
   "dff97202cbdaec5b": "Afficher l’app",
+  "796b81c4875c4feb": [
+    "L’app ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " a besoin d’un serveur ",
+    {
+      "i": 2,
+      "k": "_gt_value_2",
+      "v": "v"
+    },
+    " plus récent sur cet environnement. Mettez à jour le serveur pour l’utiliser."
+  ],
   "705cf2b2ee4e0e42": [
     "L’app ",
     {
@@ -3817,8 +3904,8 @@
       "v": "v"
     },
     {
-      "t": "ArrowRightIcon",
-      "i": 3
+      "i": 3,
+      "t": "ArrowRightIcon"
     },
     {
       "i": 4,
@@ -3835,8 +3922,8 @@
       "v": "v"
     },
     {
-      "t": "ArrowRightIcon",
-      "i": 2
+      "i": 2,
+      "t": "ArrowRightIcon"
     },
     {
       "i": 3,
@@ -3884,11 +3971,11 @@
   "8413f3e7f703f14e": "Afficher/masquer le panneau des détails du fil",
   "a728e041b203714a": "Afficher/masquer les détails du fil ({shortcut})",
   "5417d84fba7b6b84": "Afficher/masquer les détails du fil",
-  "586edda3a01b9305": "Afficher/masquer le tiroir du terminal",
   "d395686a462b77d2": "Afficher/masquer le tiroir du terminal ({shortcut})",
+  "586edda3a01b9305": "Afficher/masquer le tiroir du terminal",
   "c2fdb28a7ae3921b": "Le tiroir du terminal est indisponible",
-  "8acd97d5e80bddd3": "Afficher/masquer le panneau de droite",
   "fdc7805c136f3f7b": "Afficher/masquer le panneau de droite ({shortcut})",
+  "8acd97d5e80bddd3": "Afficher/masquer le panneau de droite",
   "d47ad54e98d33190": "Le panneau de droite est indisponible",
   "7e4b0afa9879fd43": "Rétablir la taille du panneau",
   "8381e38420ae57f3": "Agrandir le panneau",
@@ -3918,22 +4005,22 @@
     "Saisissez un chemin relatif à",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     "."
   ],
   "dcd203d82cc65b22": [
     "Saisissez un chemin relatif à ",
     {
-      "t": "code",
+      "c": "l’espace de travail",
       "i": 1,
-      "c": "l’espace de travail"
+      "t": "code"
     },
     "."
   ],
@@ -4070,9 +4157,9 @@
   ],
   "4698c3007479de8c": [
     {
-      "t": "span",
+      "c": "Branche modifiée depuis",
       "i": 1,
-      "c": "Branche modifiée depuis"
+      "t": "span"
     },
     {
       "i": 2,
@@ -4093,8 +4180,8 @@
   "4a98174d589dc462": [
     "prochaine exécution ",
     {
-      "t": "ScheduledRelativeLabel",
-      "i": 1
+      "i": 1,
+      "t": "ScheduledRelativeLabel"
     }
   ],
   "768f1e16f55ea307": "en pause",
@@ -4315,7 +4402,6 @@
   "991cc9fb37606c91": "(réponse vide)",
   "36e4b8d2db087296": "Créer un fork depuis cette réponse",
   "c92a0bab54261695": "Répondre à cette réponse",
-  "405a3e88ee6e62b3": "Impossible de lister les modifications de ce tour dans ce dépôt.",
   "f6958f38dc87c712": "Créer un fork depuis cette réponse",
   "72f8e14b1246d224": "Répondre à cette réponse",
   "01d7728e893c281d": "Aller au message : {text}",
@@ -4346,11 +4432,11 @@
   "0647cef26e3b1fa5": "L’instantané est trop volumineux pour être copié.",
   "c036ab3d20c54b5b": "Vous",
   "6b2294cfd43aee15": "{name} (invité)",
-  "d1d1fed744318218": "Réorientation · en attente de lecture",
-  "75948010e112a8f4": "Réorientation",
   "1ccc41732907ca74": "En attente de lecture par l’agent. Il lit les réorientations entre deux étapes, une fois la commande en cours terminée.",
   "ae3f487ebde9db74": "Initialement en file d’attente, puis promu pour réorienter le tour actif",
   "4f2ec8c81b4efb22": "A réorienté le tour actif",
+  "d1d1fed744318218": "Réorientation · en attente de lecture",
+  "75948010e112a8f4": "Réorientation",
   "d201a2c11fc08817": "Modifier à partir d’ici",
   "5b30ae788fdc4fd0": "Envoi…",
   "b8e1cd0265566143": [
@@ -4378,9 +4464,9 @@
   "c0f9321d0e5b50b6": "Ouvrir le fil du sous-agent",
   "436773daf874e62f": [
     {
-      "t": "span",
+      "c": "Fil « ",
       "i": 1,
-      "c": "Fil « "
+      "t": "span"
     },
     {
       "i": 2,
@@ -4388,16 +4474,16 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": " » lu",
       "i": 3,
-      "c": " » lu"
+      "t": "span"
     }
   ],
   "20e8c0c6d9f710cc": [
     {
-      "t": "span",
+      "c": "Impossible de lire le fil « ",
       "i": 1,
-      "c": "Impossible de lire le fil « "
+      "t": "span"
     },
     {
       "i": 2,
@@ -4405,16 +4491,16 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": " »",
       "i": 3,
-      "c": " »"
+      "t": "span"
     }
   ],
   "d3e39673276735f7": [
     {
-      "t": "span",
+      "c": "Refus de lire le fil « ",
       "i": 1,
-      "c": "Refus de lire le fil « "
+      "t": "span"
     },
     {
       "i": 2,
@@ -4422,16 +4508,16 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": " »",
       "i": 3,
-      "c": " »"
+      "t": "span"
     }
   ],
   "1142cc8cc93ad54b": [
     {
-      "t": "span",
+      "c": "Arrêt de la lecture du fil « ",
       "i": 1,
-      "c": "Arrêt de la lecture du fil « "
+      "t": "span"
     },
     {
       "i": 2,
@@ -4439,16 +4525,16 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": " »",
       "i": 3,
-      "c": " »"
+      "t": "span"
     }
   ],
   "7f1ddce0d74afeb3": [
     {
-      "t": "span",
+      "c": "Lecture du fil « ",
       "i": 1,
-      "c": "Lecture du fil « "
+      "t": "span"
     },
     {
       "i": 2,
@@ -4456,11 +4542,12 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": " »",
       "i": 3,
-      "c": " »"
+      "t": "span"
     }
   ],
+  "91aadfc843c600de": "Vérifier le compte Google",
   "a2aaca7ff8310186": "Ouvrir la discussion",
   "a3048aaa541b7744": "Activité",
   "4a3cbccb2beedeb0": "image",
@@ -4470,8 +4557,8 @@
   "e81927b01b8b505c": [
     "Compactage depuis ",
     {
-      "t": "WorkingTimer",
-      "i": 1
+      "i": 1,
+      "t": "WorkingTimer"
     }
   ],
   "e9b38212eb281365": "Compactage…",
@@ -4480,22 +4567,22 @@
   "75cdbffdefbbae3a": "Mode Ultrafast activé",
   "79c3a186139f8c86": "Mode Fast activé",
   "a772b49a38a3db40": "Qu’est-ce qui n’a pas marché ?",
+  "0cb5a221e9e13a4e": "L’agent lit ici les journaux et le code source de T3 Code, et demande avant d’appliquer un correctif ou de publier quoi que ce soit.",
   "b29e1856c4aab31f": "Cette machine",
-  "ffae2a353bd9c06b": "L’agent lit ici les journaux et le code source de Stardust, et demande avant d’appliquer un correctif ou de publier quoi que ce soit.",
+  "275a97b4af3c6482": "Copier la commande, pour un terminal",
   "e7588632064e0364": "Copié",
   "996f7752fa033da6": [
     "ou exécutez",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     }
   ],
-  "275a97b4af3c6482": "Copier la commande, pour un terminal",
   "2b07985d23563374": "Reprise {time}",
   "a4b4e5eb6d313af9": "Réinitialisé {time}",
   "c0c3aa756405c1df": "Réinitialisation {time}",
@@ -4798,12 +4885,12 @@
   "70b12bc1e1a26abb": "Mettez de côté à nouveau une fois la compression terminée.",
   "f6b1ef37f7587664": "Joignez à nouveau les fichiers retirés ou supprimez-les avant de mettre de côté",
   "120167bbfb6d5939": "Attendez la fin de l’envoi des fichiers avant de mettre ce prompt de côté",
+  "410dded6e21c280d": "La réserve est pleine",
+  "1af8d12ac21cb183": "La réserve contient {max} prompts. Restaurez-en ou supprimez-en un pour faire de la place ; la zone de saisie a été laissée telle quelle.",
   "afdf475db3ca2af7": "Impossible de mettre ce prompt de côté",
   "3f5c37167aa5034f": "Le stockage du navigateur a refusé l’écriture ; la zone de saisie a donc été laissée telle quelle. Libérez des données de site et réessayez.",
   "41ba6c0b5c5e8b22": "Le prompt mis de côté ne survivra pas à un rechargement",
   "94d7f150b3f7b291": "Le stockage du navigateur est indisponible ; cette réserve est donc gardée en mémoire pour cette session uniquement.",
-  "f421c24666cd8c71": "Le plus ancien prompt mis de côté a été supprimé",
-  "1123f816ea2a6e3e": "La réserve contient {max} prompts ; le plus ancien a été supprimé pour faire de la place.",
   "c3a8f9b1b2e7d588": "Les images mises de côté n’ont pas été enregistrées",
   "fc3feba263971bce": "Le prompt a été mis de côté, mais le stockage du navigateur a refusé ses images. Elles manqueront si vous rechargez.",
   "9e36559d0fa0cca8": "Les images mises de côté n’ont pas été jointes",
@@ -4811,12 +4898,13 @@
   "13cf3cd978eef92a": "Garder les pièces jointes sur cette machine",
   "a4ca7da61227002d": "Retirez les pièces jointes avant de choisir le routage automatique, puis joignez-les sur la machine sélectionnée.",
   "512d8afab852df1a": "Impossible de changer de machine",
+  "ee3ea4351c88e7d7": "Ce projet n’est plus disponible.",
   "32e421d1e2dfdaff": "Vérification des machines…",
   "0db14066bd4ce117": "Répartition automatique indisponible",
   "55b562c00e37321b": "Impossible de forcer l’arrêt de l’agent",
   "ede15a83eedec569": "Tour arrêté ; l’agent est encore en train de s’arrêter",
   "f360accf1ccac178": "Tour arrêté ; le processus de l’agent continue de tourner",
-  "5b660a378c56cc91": "{others, plural, =0 {Il est partagé avec d’autres fils en cours. Arrêtez-les pour le libérer.} one {Il est partagé avec {others} fil en cours. Arrêtez-le pour le libérer.} other {Il est partagé avec {others} fils en cours. Arrêtez-les pour le libérer.}}",
+  "46f927ee332c1065": "{others, plural, =0 {Il est partagé avec d’autres fils en cours. Arrêtez-les pour le libérer.} one {Il est partagé avec {others} fil en cours. Arrêtez-le pour le libérer.} other {Il est partagé avec {others} fils en cours. Arrêtez-les pour le libérer.}}",
   "f5948facf9a10261": "{count, plural, one {{count} fil démarré en arrière-plan} other {{count} fils démarrés en arrière-plan}}",
   "d2a83704191622a6": "Échec de l’envoi des messages.",
   "c11072d4a6072902": "Un prompt en arrière-plan n’a pas pu être envoyé",
@@ -4971,9 +5059,9 @@
     " tunnels.",
     " ",
     {
-      "t": "a",
+      "c": "Passez à Premier sur T3 Chat",
       "i": 2,
-      "c": "Passez à Premier sur T3 Chat"
+      "t": "a"
     },
     " ",
     "pour en avoir ",
@@ -4986,9 +5074,9 @@
   ],
   "b50f44cd6c5c9bfa": [
     {
-      "t": "a",
+      "c": "Passez à l’offre supérieure sur T3 Chat",
       "i": 1,
-      "c": "Passez à l’offre supérieure sur T3 Chat"
+      "t": "a"
     },
     " ",
     "pour plus de tunnels"
@@ -4999,9 +5087,9 @@
     "Confirmez sur",
     " ",
     {
-      "t": "a",
+      "c": "t3.chat",
       "i": 1,
-      "c": "t3.chat"
+      "t": "a"
     },
     ", puis sélectionnez Actualiser."
   ],
@@ -5135,13 +5223,13 @@
     "Saisissez le mot de passe ou le code de vérification demandé par",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     ". Stardust transmet votre réponse au processus SSH local et la garde en mémoire pour la réutiliser avec cet hôte. Stardust ne l’écrit pas sur le disque."
   ],
@@ -5207,9 +5295,12 @@
   "c928303400ccaf24": "Le hub d’appareils n’a pas pu démarrer.",
   "4cb21672153c1f18": "Aucun simulateur ni émulateur trouvé dans cet environnement.",
   "c82410197256eb53": "Simulateurs iOS",
+  "31a71fec6b5f2bf3": "Appareils Android",
   "ac18a5e35195a258": "Émulateurs Android",
   "94215375ea2558b8": "En cours",
   "f8a65d4d662389b0": "Arrêté",
+  "381ceed77cb8b2b3": "Arrêter {name}",
+  "5b9fda36b610d25c": "Arrêter",
   "b1687c7b2b91e569": "Ouvrir {name}",
   "4b4ef3f2e2ed2c56": "Démarrer {name}",
   "08098a6fb84e8a34": "Ouvrir",
@@ -5232,6 +5323,7 @@
   ],
   "e902f208c4e6146f": "Aucun appareil virtuel Android trouvé. Créez-en un dans le Device Manager d’Android Studio, puis actualisez.",
   "d9a71f3db685cb0e": "Actualiser les appareils",
+  "1d372f6d555dde3c": "Arrêter tous les appareils",
   "4ad8ced64defdf73": "Appareil 3D interactif. Faites glisser l’écran pour interagir. Faites glisser en dehors ou balayez avec deux doigts pour le faire tourner.",
   "84e4baf07ad8883d": "Autorisez cet environnement à ouvrir des simulateurs et des émulateurs, qu’ils tournent ici ou sur un hôte d’appareils distant.",
   "771365c337509a82": "Autorisez les nouvelles sessions d’agent de cet environnement à démarrer et contrôler des appareils locaux et distants, avec les outils nécessaires configurés automatiquement.",
@@ -5239,13 +5331,13 @@
   "9edae9f03274cab1": "La prise en charge de {platform} n’a pas été détectée.",
   "9ceeca01c1c48b48": "Aucun appareil {platform} n’a été listé, car la découverte d’appareils a signalé un problème.",
   "6cfe3b4931af6f8a": "Xcode est installé, mais aucun simulateur iOS n’est disponible. Installez un runtime dans Réglages de Xcode → Components.",
-  "22750cc2c6dc56c4": "Le SDK Android est installé, mais aucun appareil virtuel n’existe. Créez-en un dans Android Studio → Device Manager.",
+  "dbc3908dc1f730ab": "Le SDK Android est installé, mais aucun appareil Android n’a été trouvé. Connectez un téléphone avec le débogage USB activé, ou créez un appareil virtuel dans Android Studio → Device Manager.",
   "3e436963e11ea3bc": "{host} démarre des simulateurs iOS dans le cloud avec Expo Simulators.",
   "1a6f2df32b8307a2": "{host} démarre des émulateurs Android dans le cloud avec Expo Simulators.",
   "600c3e7ff64413cf": "Xcode et le simulateur iOS sont disponibles sur {host}.",
   "64142a49e6bf92e7": "Xcode et le simulateur iOS sont disponibles.",
   "2fbdc66961a873a6": "Le SDK Android et l’émulateur sont disponibles sur {host}.",
-  "41c86e1a0fc8f0d2": "Le SDK Android et l’émulateur sont disponibles.",
+  "2d99f80191b88ee4": "Le SDK Android est disponible.",
   "7ff8efdb29b93b6d": "Configurer les appareils",
   "a29a9a0c5fbba6b0": "Vérifiez ce qui s’exécute dans cet environnement avant d’utiliser des simulateurs et des émulateurs.",
   "13c051bd01d4daf3": "Simulateurs",
@@ -5418,7 +5510,7 @@
     },
     "."
   ],
-  "774654575f014b55": "Enregistrez-le pour l’ouvrir dans une app qui prend en charge ce format de fichier.",
+  "d3170aa2bb08efbd": "Enregistrez-le pour l’ouvrir dans une app qui prend en charge ce format de fichier.",
   "46f943a30e259620": "Audio indisponible. Ouvrir {name}",
   "e2cf6b944d1d095d": "Audio indisponible. Réessayer {name}",
   "f08fb460ad4617d6": "Chargement de {name}",
@@ -5503,26 +5595,26 @@
   "944f4dc367eea775": [
     "Chemin tenté",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     }
   ],
   "a27abcd7b5a4b539": [
     "Dossier de l’espace de travail :",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     ". Vérifiez le chemin du lien ou retrouvez le fichier dans Fichiers."
   ],
@@ -5542,7 +5634,6 @@
   "6ad6c8fbb630657d": "Le fichier est indisponible.",
   "9450d1827ef336a1": "Une autre copie est en cours.",
   "8f48999eb6d9e2e3": "{count, plural, one {{formatted} ligne} other {{formatted} lignes}}",
-  "13b14784f8707ddd": "0 octet",
   "b75105bef8f564a4": "Affichage des 1 024 premières colonnes. Source et Enregistrer conservent toutes les colonnes.",
   "2a6e1b1f209c3888": "Ce fichier est vide.",
   "192fc79eb3b5b2cb": "Ce diagramme contient des URL de ressources, du balisage, des métadonnées de nœuds ou une configuration personnalisée. Affichez la source Mermaid pour l’examiner en toute sécurité.",
@@ -5942,13 +6033,13 @@
     "Code à approuver",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "bf753d700be48474": "Le code a expiré.",
@@ -6081,13 +6172,13 @@
     "Configuration de",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     "."
   ],
@@ -6097,9 +6188,9 @@
     "Stardust collecte des données d’utilisation anonymes pour améliorer l’app. Pour vous désinscrire, consultez la",
     " ",
     {
-      "t": "a",
+      "c": "politique de confidentialité",
       "i": 1,
-      "c": "politique de confidentialité"
+      "t": "a"
     },
     "."
   ],
@@ -6107,9 +6198,9 @@
     "Consultez la",
     " ",
     {
-      "t": "a",
+      "c": "politique de confidentialité",
       "i": 1,
-      "c": "politique de confidentialité"
+      "t": "a"
     },
     "."
   ],
@@ -6155,13 +6246,13 @@
     "Exécutez",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "dans ce terminal."
@@ -6177,18 +6268,18 @@
     ". Ouvrez un nouveau terminal pour utiliser",
     " ",
     {
-      "t": "code",
+      "c": "t3",
       "i": 2,
-      "c": "t3"
+      "t": "code"
     },
     "."
   ],
   "ad72bb102aa39c31": [
     "Utilisez ",
     {
-      "t": "code",
+      "c": "t3",
       "i": 1,
-      "c": "t3"
+      "t": "code"
     },
     " depuis n’importe quel terminal. Ajoute une ligne à",
     " ",
@@ -6260,13 +6351,13 @@
   "8321ff20c739dafb": "Ce fichier ne peut pas être affiché ici",
   "a43f940915211a99": [
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     " ",
     "de ",
@@ -6282,13 +6373,13 @@
   "b1343b62b1b140cc": "Ce site est inaccessible",
   "a7daf7102601242d": [
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     " : ",
     {
@@ -6444,48 +6535,48 @@
     "Copier le numéro de la",
     " ",
     {
-      "t": "Branch",
-      "i": 1,
+      "c": "PR",
       "d": {
         "b": {
-          "mr": "MR",
-          "cr": "demande de modification"
+          "cr": "demande de modification",
+          "mr": "MR"
         },
         "t": "b"
       },
-      "c": "PR"
+      "i": 1,
+      "t": "Branch"
     }
   ],
   "98035bebbcecd0bf": [
     "Rouvrir la",
     " ",
     {
-      "t": "Branch",
-      "i": 1,
+      "c": "pull request",
       "d": {
         "b": {
-          "mr": "merge request",
-          "cr": "demande de modification"
+          "cr": "demande de modification",
+          "mr": "merge request"
         },
         "t": "b"
       },
-      "c": "pull request"
+      "i": 1,
+      "t": "Branch"
     }
   ],
   "605261b246f7f98e": [
     "Impossible de charger l’activité de la",
     " ",
     {
-      "t": "Branch",
-      "i": 1,
+      "c": "pull request",
       "d": {
         "b": {
-          "mr": "merge request",
-          "cr": "demande de modification"
+          "cr": "demande de modification",
+          "mr": "merge request"
         },
         "t": "b"
       },
-      "c": "pull request"
+      "i": 1,
+      "t": "Branch"
     }
   ],
   "4ce1deae56b7392d": "Cette branche n’est pas à jour par rapport à {baseBranch}.",
@@ -6501,29 +6592,7 @@
   "1b381201aba745c2": "Aucun check signalé",
   "a6d75a4380173c60": "Ouvrir les checks : {summary}",
   "be3d1766bad18693": "Checks : {summary}",
-  "425e4a3d6c5c2867": "{count, plural, one {{count} en échec} other {{count} en échec}}",
   "cb116c139cdace98": "Aucun check signalé",
-  "d84d09b4818c50b7": [
-    {
-      "t": "span",
-      "i": 1,
-      "c": [
-        {
-          "i": 2,
-          "k": "_gt_value_2",
-          "v": "v"
-        },
-        "/",
-        {
-          "i": 3,
-          "k": "_gt_value_3",
-          "v": "v"
-        }
-      ]
-    },
-    " ",
-    "checks"
-  ],
   "60b56e201607c7ec": "Les détails des checks ne sont plus à jour. Actualisez la pull request pour les mettre à jour.",
   "e74cd4e960cbb5e5": "Les lignes inchangées ne sont pas disponibles dans un fichier aux lignes tronquées.",
   "38d6169e04a9a4ce": "Impossible de charger plus de commentaires",
@@ -6538,7 +6607,6 @@
   "2250f241daadd71b": "Ajouter à l’agent",
   "be9b06fae29cc07a": "Tous les commits",
   "5ef391d5403d7bdd": "{count, plural, one {Afficher plus ({count} restant)} other {Afficher plus ({count} restants)}}",
-  "ccd5fc4db08374d7": "{count, plural, one {{count} fichier de test masqué} other {{count} fichiers de test masqués}}",
   "c12871955b159db4": "vus dans {app}",
   "98b353c208fd7977": "vus",
   "d65b870952bbe4f0": "Ces coches sont conservées ici, pas sur l’hôte",
@@ -6547,7 +6615,6 @@
   "a35be3a33a60ada9": "Une partie de ce diff n’a pas été affichée",
   "74c7bae34db3147e": "Les commentaires de ligne portent sur l’ensemble de la modification",
   "4050f873dc790f8f": "Options du diff",
-  "a92edf8d81354772": "Afficher les fichiers de test",
   "48be78e4550011d3": "Chargement du diff de la {term, select, mr {merge request} cr {demande de modification} other {pull request}}...",
   "e76a1455903eef18": "Cette {term, select, mr {merge request} cr {demande de modification} other {pull request}} ne modifie aucun fichier.",
   "50abbcbc41691cb5": "Ce commit ne modifie aucun fichier.",
@@ -6562,8 +6629,8 @@
   "1239149344bb4b2b": "Diff trop volumineux pour être affiché.",
   "3ab928741d208f41": "Chargement...",
   "3e272ae9c5b76744": "Charger le diff",
-  "d4ccbc96f4d05950": "Modifié",
   "c12888742e7bd0ce": "Ce fichier a reçu un push depuis que vous l’avez marqué comme vu.",
+  "d4ccbc96f4d05950": "Modifié",
   "6594b013f63d2a3a": "Vu",
   "687f81dd084a5ab0": "Impossible de charger le reste de ce diff.",
   "cf44cf4e3479ea7a": "Tous les commits",
@@ -6621,16 +6688,16 @@
     "Extraire cette",
     " ",
     {
-      "t": "Branch",
-      "i": 1,
+      "c": "pull request",
       "d": {
         "b": {
-          "mr": "merge request",
-          "cr": "demande de modification"
+          "cr": "demande de modification",
+          "mr": "merge request"
         },
         "t": "b"
       },
-      "c": "pull request"
+      "i": 1,
+      "t": "Branch"
     }
   ],
   "443742ebc45e90e4": "Dans un worktree séparé",
@@ -6689,8 +6756,6 @@
   "0e3eede94227c151": "Préparation de l’extraction de la {term, select, mr {merge request} cr {demande de modification} other {pull request}}...",
   "f5fd3733da6e3556": "Impossible d’ouvrir un fil pour le checkout",
   "09f38e303898401f": "Impossible de préparer l’extraction de la {term, select, mr {merge request} cr {demande de modification} other {pull request}}",
-  "853a77d42f86c918": "Récupérée, mais le fil est resté où il était",
-  "0746dfa692f895cc": "Le checkout est prêt sur `{branch}`. Pointez un fil dessus depuis le sélecteur de branche, puis reposez la question.",
   "88db70a96177d202": "Récupérée ici",
   "baa66fde3613022b": "Récupérée",
   "10feb68552356a08": "Ce dépôt est sur la branche de la {term, select, mr {merge request} cr {demande de modification} other {pull request}}, avec un fil ouvert dessus.",
@@ -6709,6 +6774,8 @@
   "45674081908ac8aa": "Commande de checkout copiée",
   "d2970574ef7860d0": "Copier la branche de la {term, select, mr {merge request} cr {demande de modification} other {pull request}}",
   "45c92416a82cf22c": "Nom de la branche copié",
+  "43a18c0bc37988f4": "De nouveaux commits ont été poussés. Une fusion ou une revue s’applique toujours à {sha}.",
+  "c930a7ffa49054f0": "Charger les nouveaux commits",
   "63e533a9db74e8dc": "Vérifications",
   "4f7ca990d538a8bc": "Commentaires indisponibles",
   "95601ce075194611": "{count, plural, one {{formatted} commentaire} other {{formatted} commentaires}}",
@@ -6760,6 +6827,19 @@
   "36b7fbe31bde05f3": "Ce dépôt n’a aucun label.",
   "2764eab1d2853980": "Ce dépôt a plus de labels que ceux listés ici. Appliquez les autres sur l’hôte.",
   "5e5917c3b907c7d6": "Appliqué",
+  "4affc3da49f673c2": [
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " ",
+    {
+      "c": "a commenté",
+      "i": 2,
+      "t": "span"
+    }
+  ],
   "404ee0e0134b60ae": "Recherche de « {query} » sur tous les hôtes",
   "ca612a0074954046": "Vérification...",
   "8b04f78f836b6c11": "Rien avec ces filtres",
@@ -6791,6 +6871,7 @@
   "7074711ac6cc6f5c": "En échec",
   "75b2bb15e4624860": "Indisponible",
   "ff6b088c383bf910": "Rechercher des auteurs",
+  "a766a8ac2670096c": "{count, plural, one {{count} fusion chargée} other {{count} fusions chargées}}",
   "d6179a157948c07c": "Aucun auteur trouvé",
   "353773803bf92ad4": "Impossible de rechercher des auteurs sur l’hôte",
   "e3e2d073449a0289": "Tout le monde",
@@ -6876,8 +6957,8 @@
   "1df18577b47fe833": "Aucune personne ayant accès ne correspond.",
   "605ed234cd084078": "Impossible de lire la liste des personnes ayant accès.",
   "3e63297ce2f404d6": "Déjà sollicité",
-  "ad822604a0059e71": "trouvé dans la description",
   "3625557b4fc8ba68": "Trouvé dans la description",
+  "ad822604a0059e71": "trouvé dans la description",
   "ff1f73cd2455d0f6": "Aucune méthode de fusion n’est disponible pour ce dépôt.",
   "59b38d59700e0a5f": "Fermer",
   "25aa6faba20377ca": "Fermer #{number}",
@@ -6903,19 +6984,27 @@
     }
   ],
   "ce703d4ba40dc9b4": "Fusion de la pile...",
+  "8a883c4fbc127b68": "Activation de la fusion automatique de la pile...",
   "ac7feb9c583b02a0": "Rebase de la pile...",
   "cb0f63bbb0b68d94": "Impossible de fusionner la pile",
+  "5fb2a26ae31e8983": "Impossible d’activer la fusion automatique de la pile",
   "c8a943fa15a56b2b": "Impossible de faire le rebase de la pile",
   "ec22caeb8b949ed1": "L’hôte a refusé le rebase. Un rebase s’arrête au premier commit qui ne s’applique pas proprement.",
   "ead3e2bac1a8d231": "Demande de fusion de la pile terminée",
+  "986d0dcbf4dd0098": "Fusion automatique de la pile activée",
   "d7079b5ac269c65e": "Rebase de la pile effectué",
   "5631b32be0ce48d3": "{host} a fusionné la pile ou l’a ajoutée à sa file de fusion.",
+  "f3ed1f63c8a3eef2": "{host} fusionnera la pile jusqu’à #{number} dès que ses conditions seront remplies.",
+  "bd536a0a1754f6cb": "Impossible d’annuler la fusion automatique de la pile",
+  "bb90ac3b2f3a72d5": "L’hôte a refusé d’annuler la fusion automatique. Actualisez et réessayez.",
   "2d3b55018a54287e": "Vérification de la pile auprès de l’hôte…",
   "eea55205e46d2e3d": "Pile {number}, couche {position} sur {size}",
   "b6f729119107a145": "{count, plural, one {Fusionner la pile jusqu’à '#'{number} dans {base} ({count} {term, select, mr {merge request} cr {demande de modification} other {pull request}})} other {Fusionner la pile jusqu’à '#'{number} dans {base} ({count} {term, select, mr {merge requests} cr {demandes de modification} other {pull requests}})}}",
   "d4bfcdc6bb7676a3": "{count, plural, one {Fusionner {count} {term, select, mr {merge request} cr {demande de modification} other {pull request}} ?} other {Fusionner {count} {term, select, mr {merge requests} cr {demandes de modification} other {pull requests}} ?}}",
+  "9c28753c777c37b7": "{count, plural, one {Fusionner automatiquement {count} {term, select, mr {merge request} cr {demande de modification} other {pull request}} ?} other {Fusionner automatiquement {count} {term, select, mr {merge requests} cr {demandes de modification} other {pull requests}} ?}}",
   "b9f2a24a3757f6c9": "{count, plural, one {Faire le rebase de {count} {term, select, mr {merge request} cr {demande de modification} other {pull request}} ?} other {Faire le rebase de {count} {term, select, mr {merge requests} cr {demandes de modification} other {pull requests}} ?}}",
   "d1bcf19eb2753fff": "Fusionner #{number} et ses couches non fusionnées inférieures dans {base} avec {method}. {host} vérifie leurs règles avant de les fusionner ou de les mettre en file d’attente, puis fait le rebase du reste de la pile après la fusion.",
+  "a86b49982e18784d": "Fusionner #{number} et ses couches non fusionnées inférieures dans {base} avec {method} dès que chacune remplit les conditions de {host}. Cela peut se produire immédiatement.",
   "31d2f22f5a282719": "Faire le rebase des branches distantes de bas en haut sur {base}. Cela réécrit l’historique des branches et peut relancer les checks. Si une couche échoue, les mises à jour précédentes restent en place.",
   "a0adf78733c368ae": "Fusionner la pile",
   "140dc384c58b74f3": "Rebase de la pile",
@@ -6950,8 +7039,19 @@
     },
     ")"
   ],
+  "b1afda5c964deee4": [
+    "Fusion automatique de la pile (",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    ")"
+  ],
+  "33d18dda74f6d7b3": "Annuler la fusion automatique de la pile",
   "30440f98e929440a": "Rebase de la pile",
   "13718a03e3144142": "Chaque couche fusionnée doit être ouverte et prête pour la revue.",
+  "012c67c7f1a99e33": "Fusion automatique de la pile",
   "4aafe1baf113088a": "Fusionner la pile",
   "0292da19054f2a04": "Chargement de la pile…",
   "583869e6df57abeb": "Cette pull request ne fait plus partie d’une pile.",
@@ -7002,16 +7102,16 @@
     "Associer la",
     " ",
     {
-      "t": "Branch",
-      "i": 1,
+      "c": "pull request",
       "d": {
         "b": {
-          "mr": "merge request",
-          "cr": "demande de modification"
+          "cr": "demande de modification",
+          "mr": "merge request"
         },
         "t": "b"
       },
-      "c": "pull request"
+      "i": 1,
+      "t": "Branch"
     },
     " ",
     "à un fil"
@@ -7035,22 +7135,9 @@
     },
     " ",
     {
-      "t": "span",
+      "c": "a fait une revue",
       "i": 2,
-      "c": "a fait une revue"
-    }
-  ],
-  "4affc3da49f673c2": [
-    {
-      "i": 1,
-      "k": "_gt_value_1",
-      "v": "v"
-    },
-    " ",
-    {
-      "t": "span",
-      "i": 2,
-      "c": "a commenté"
+      "t": "span"
     }
   ],
   "04ea50285b00dcdd": "Vue d’ensemble",
@@ -7170,6 +7257,9 @@
   "9b0647af63a7d8c1": "Approbation de modifications antérieures",
   "abe99679224fea5e": "Modifications demandées sur des changements antérieurs",
   "6b31ad910278ff72": "Revue rejetée sur des changements antérieurs",
+  "425e4a3d6c5c2867": "{count, plural, one {{count} en échec} other {{count} en échec}}",
+  "fd63b391898889f9": "{count, plural, one {{count} en attente d’action} other {{count} en attente d’action}}",
+  "948185631ef288e6": "{count, plural, one {{count} en cours} other {{count} en cours}}",
   "aaf22207b2f18c45": "{workflows, plural, one {{workflows} workflow} other {{workflows} workflows}} et {checks, plural, one {{checks} check} other {{checks} checks}} en attente d’action",
   "c51411813ebafcc1": "{count, plural, one {{count} workflow en attente d’approbation} other {{count} workflows en attente d’approbation}}",
   "4946778c8e18a1db": "{count, plural, one {{count} check en attente d’action} other {{count} checks en attente d’action}}",
@@ -7368,9 +7458,20 @@
   "dc87902396b8ade4": "Lettres, chiffres, '-' ou '_'.",
   "251dfec07b7c3612": "Ce driver n’a aucune configuration requise. Vous pouvez ajouter l’instance maintenant.",
   "08fe32f007e788f1": "Configurer manuellement",
+  "65300794c1edb929": "Jeton Bearer (facultatif)",
   "84eb2878dc17d3eb": "Clé de gestion",
   "7ac196c1e8175928": "Par défaut, le nom d’hôte du hub",
+  "0c026221dcd2820b": "Ajouter une source de quotas HTTP",
   "e3548407052e9e12": "Ajouter un hub CLIProxyAPI",
+  "d185c750156b2121": [
+    "Consultez les quotas depuis un point de terminaison sur ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    "."
+  ],
   "432e85a50e2e7964": [
     "Affichez le quota de chaque compte regroupé par le hub, à côté des fournisseurs sur",
     " ",
@@ -7381,9 +7482,12 @@
     },
     ". La clé reste sur ce serveur."
   ],
+  "2324770ba91371ac": "URL du point de terminaison",
   "556a695b117565ac": "URL du hub",
+  "e4e5b75bba51396c": "Jeton Bearer (facultatif)",
   "e62cedcbcdbafc75": "Clé de gestion",
   "f1b3d0634ec035cb": "Libellé (facultatif)",
+  "b35256ca61016104": "Ajouter une source",
   "52814dd6f7d0a15c": "Ajouter le hub",
   "27b770d3402abfa2": "Avancé",
   "2f265d02c8753150": "Illustration Dev",
@@ -7393,6 +7497,7 @@
   "d5dc7576fd468be7": "Confortable",
   "3141408bf3874e64": "Large",
   "831badd18b64547e": "Pleine largeur",
+  "6287212fed0deec6": "Comme la discussion",
   "a96255594ebf2ce3": "Mot",
   "1ee44eb65708a8aa": "Barres",
   "7670f789e0d8672a": "Seuls les thèmes intégrés affichent une illustration ; ce thème affiche donc la pastille de version.",
@@ -7411,6 +7516,10 @@
   "92785adb251da88c": "Réinitialiser la largeur de la discussion à la valeur par défaut",
   "4d457bcce0c0e272": "Largeur de la discussion",
   "81f3a196537bbee0": "Confortable (par défaut)",
+  "70ce0af7f78d5957": "Permet aux aperçus HTML d’une discussion d’être plus larges que ses messages, qui restent centrés.",
+  "f2b119bf02ae2558": "Réinitialiser la largeur des aperçus HTML à la valeur par défaut",
+  "7d7f65967cc821e3": "Largeur des aperçus HTML",
+  "dc8e85ea0364649c": "Comme la discussion (par défaut)",
   "e79e5388f669495f": "Afficher l’effort de raisonnement dans la zone de saisie par son nom, comme Élevé, ou sous forme de barres.",
   "7f0365c7e4e8bcbf": "Réinitialiser l’affichage de l’effort à la valeur par défaut",
   "14bf40f765172a50": "Affichage de l’effort",
@@ -7882,8 +7991,8 @@
     "Connecté en tant que",
     " ",
     {
-      "t": "RedactedSensitiveText",
-      "i": 1
+      "i": 1,
+      "t": "RedactedSensitiveText"
     },
     "."
   ],
@@ -7906,13 +8015,13 @@
     "En attente d’approbation ·",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "d823dc6bc2f0b59f": [
@@ -8202,7 +8311,6 @@
   "e6886a7f77b73a8e": "{platform} non disponible",
   "b0b7610d9860d18d": "Non configuré sur cette machine.",
   "f5b66c481aa3e4df": "Modifier",
-  "b35256ca61016104": "Ajouter une source",
   "3b20ef0670ae4b0b": "Machine via SSH",
   "121ccffacb6b8c6d": "Expo Simulators",
   "130b55a1410a8030": "Pool Simlock (alpha)",
@@ -8302,13 +8410,13 @@
     "Vérifié il y a",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "42765186ac32bfb7": "Ouvrir le dossier des journaux",
@@ -8547,16 +8655,16 @@
     "Ouvrez des simulateurs et des émulateurs dans le panneau Appareils. Hub :",
     " ",
     {
-      "t": "DeviceToolVersions",
-      "i": 1
+      "i": 1,
+      "t": "DeviceToolVersions"
     }
   ],
   "151f86b6dcd56244": [
     "Les nouvelles sessions d’agent peuvent ouvrir et piloter ces appareils. agent-device :",
     " ",
     {
-      "t": "DeviceToolVersions",
-      "i": 1
+      "i": 1,
+      "t": "DeviceToolVersions"
     }
   ],
   "093c68324c1b1280": "Ajouter un profil",
@@ -8641,7 +8749,7 @@
   "a9cdd8c7073be920": "Palette de commandes : afficher/masquer",
   "4e0943e8c7a465d1": "Sélecteur de fichiers : afficher/masquer",
   "df5fdcdf26a6b52a": "Recherche dans le projet : afficher/masquer",
-  "a8ff6d33b060736f": "Utilisation : ouvrir",
+  "0ca6fd2b8fcab2c3": "Utilisation : Afficher ou masquer",
   "a513d51b71b95674": "Thème : sélectionner",
   "1ffd8427452372e1": "Apparence : alterner",
   "3a3bb4a7551a87cc": "Éditeur de thème : afficher/masquer",
@@ -8750,6 +8858,10 @@
   "f0e853acd2006d53": "Environnements associés",
   "ef10c2dff987f3ea": "Exécutez des workflows en plusieurs étapes à partir des fichiers du dossier workflows du répertoire T3 de ce serveur. Ouvrez-les depuis la palette de commandes. Tant que c'est désactivé, rien dans ce dossier ne s'exécute ; les exécutions attendent sa réactivation.",
   "2dadb2359422121c": "Workflows",
+  "933dabf0700708af": "Nombre d’exécutions ignorées que chaque workflow conserve dans son historique. Les exécutions ignorées plus anciennes sont supprimées ; celles qui ont fait quelque chose sont toujours conservées.",
+  "f172d7e5deb24f75": "Rétablir la valeur par défaut des exécutions ignorées conservées",
+  "ba94015389f327bc": "Exécutions ignorées conservées",
+  "d52b3d6bf9f2a013": "Mixte",
   "13e86eb5d8287a71": "Affiche un prochain message suggéré dans la zone de saisie vide après un tour Claude ou Codex. Tab l’utilise. Chaque suggestion est une requête en cache supplémentaire sur votre forfait. Nécessite Codex 0.165+. Les fils Claude se mettent à jour au redémarrage.",
   "d4b2a2ec812aafb0": "Suggérer le prochain prompt",
   "298c7150a7621c80": "Hôtes d’appareils Simlock",
@@ -8757,14 +8869,13 @@
   "f9904f78d3003f58": "Checkout rapide des worktrees",
   "9c2f647882522302": "Les machines sélectionnées utilisent des modes de retour des agents différents.",
   "31bbf7bf8c0a5279": "Retours des agents",
-  "d52b3d6bf9f2a013": "Mixte",
   "ec7623deed751c05": [
     "Partagez un fil avec un invité qui le suit en direct dans un navigateur et envoie des messages que vous approuvez. Nécessite T3 Connect : connectez-vous et associez cette machine dans",
     " ",
     {
-      "t": "Link",
+      "c": "Partage et accès",
       "i": 1,
-      "c": "Partage et accès"
+      "t": "Link"
     },
     ". La désactivation arrête tous les liens invités."
   ],
@@ -8772,9 +8883,9 @@
     "Permet aux agents d’ici de travailler sur vos autres machines, et aux leurs de travailler ici. Activez l’option sur chaque machine, puis associez-les dans",
     " ",
     {
-      "t": "Link",
+      "c": "Connexions",
       "i": 1,
-      "c": "Connexions"
+      "t": "Link"
     },
     ". Tant qu’elle est désactivée, rien de nouveau ne démarre via une association ; les tâches en cours se terminent."
   ],
@@ -8782,18 +8893,18 @@
     "Permet au panneau Appareils de louer des simulateurs et des émulateurs depuis votre propre pool",
     " ",
     {
-      "t": "a",
+      "c": "Simlock",
       "i": 1,
-      "c": "Simlock"
+      "t": "a"
     },
     ",",
     " ",
     "ajouté dans",
     " ",
     {
-      "t": "Link",
+      "c": "Appareils",
       "i": 2,
-      "c": "Appareils"
+      "t": "Link"
     },
     ". Une version alpha susceptible de changer ou de casser. Stardust n’installe jamais Simlock."
   ],
@@ -8904,9 +9015,9 @@
     " dans Stardust.",
     " ",
     {
-      "t": "a",
+      "c": "En savoir plus",
       "i": 2,
-      "c": "En savoir plus"
+      "t": "a"
     }
   ],
   "8f53ea4f124d16fb": "Alertes système quand un fil se termine, échoue ou attend une réponse ou une approbation. S’applique à cet appareil tant que Stardust est ouvert.",
@@ -9054,7 +9165,6 @@
   "b76e857a764ea02a": "Règle de regroupement de {path} sur {environment}",
   "e6e55f343639ae71": "Par défaut ({mode})",
   "87158e7b8e714bc6": "Ajoutez un projet depuis la barre latérale pour le configurer ici.",
-  "ee3ea4351c88e7d7": "Ce projet n’est plus disponible.",
   "062d19d24615e108": "Le titre du projet ne peut pas être vide",
   "303af9de2741db90": "Échec du renommage du projet",
   "f578154800d7af01": "Échec de la mise à jour de l’icône du projet",
@@ -9090,6 +9200,28 @@
   "d2ad2df4c015f417": "La règle de regroupement décide comment chaque checkout rejoint les groupes de projets de la barre latérale. La modifier peut déplacer un checkout vers un autre projet.",
   "0bdf6ae2117b6c23": "Vous ne trouvez pas un paramètre ? Gardez ce projet sélectionné ci-dessus et passez à n’importe quelle autre page de paramètres.",
   "3310e10f1efdc9bd": "Choisir une icône",
+  "a9cb97fca6a6576b": "Commande de création",
+  "90f45a354884ccdd": "Commande de suppression",
+  "0cdc8cdbed3e5eae": "Disposition des worktrees",
+  "c17b25519e2b194e": "Impossible de charger les commandes de disposition des worktrees",
+  "78e308ada516928b": "Impossible d’approuver la commande",
+  "a0c772d32a233da6": "Impossible de révoquer l’approbation",
+  "5ccd5614c65f8d1f": "Révoquer l’approbation de la commande {kind}",
+  "80c3794a5fa12f3a": "Approuver la commande {kind}",
+  "f206891e124c77b0": [
+    "Le ",
+    {
+      "c": "t3.json",
+      "i": 1,
+      "t": "code"
+    },
+    " de ce projet prépare les fils en worktree avec ses propres commandes. Elles s’exécutent sur la machine de cet environnement avec vos autorisations, et uniquement telles qu’approuvées ici : une commande dont le texte change doit être approuvée de nouveau."
+  ],
+  "8e73b883d41d4102": "Désactivé",
+  "f6a91589456cca50": "Approuvée",
+  "c92657bb7f2293ff": "Approbation requise",
+  "f1e5c1be1ac92361": "Approuver",
+  "fcb5f3c4d4753326": "Cette connexion ne peut pas approuver de commandes. Utilisez un client qui peut utiliser le terminal.",
   "65ccf4f8e049003e": "Choisissez un projet pour gérer son nom, son icône, ses checkouts et ses actions.",
   "067beea7d8f6e2c9": "Afficher tous les environnements",
   "1bf6da50131340d4": "Teinte de la couleur d’accent",
@@ -9134,8 +9266,8 @@
     "Connecté en tant que",
     " ",
     {
-      "t": "RedactedSensitiveText",
-      "i": 1
+      "i": 1,
+      "t": "RedactedSensitiveText"
     }
   ],
   "f507d41f66760d83": "Valeur par défaut du fournisseur",
@@ -9147,13 +9279,13 @@
     "Saisissez le code",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "dans votre navigateur."
@@ -9216,13 +9348,13 @@
     "Cette instance utilise",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     ", qui n’est pas disponible dans cette version. Sa configuration est conservée."
   ],
@@ -9281,7 +9413,7 @@
   "33fbce50a4ea67e6": "Arguments CLI supplémentaires passés au démarrage de la session.",
   "abdee70d90cb26a3": "Compacter après 100 000 à 1 000 000 de jetons. Laissez vide pour utiliser la valeur par défaut de Claude.",
   "f907b2466603538e": "Quand compacter un fil inactif de plus de 200 000 jetons : à votre retour, juste avant l’expiration de son cache de prompt, ou jamais. Remplace la valeur par défaut de Fournisseurs > Avancé.",
-  "484df18e29b21047": "Les comptes Google utilisent votre abonnement ; les clés d’API et Agent Platform facturent l’utilisation.",
+  "9610fb9f4d9849ec": "Compte Google et Gemini Enterprise utilisent votre forfait existant. Clé d’API Gemini et Agent Platform facturent à l’usage sur votre clé ou projet Google Cloud.",
   "931df01584748bf9": "Clé express Gemini ou Vertex AI. Stockée séparément sur l’hôte.",
   "8bf0f6ed8dd4b77e": "Requis pour Gemini Enterprise. Agent Platform l’utilise quand aucune clé d’API n’est définie.",
   "7c735c8fbd3fb6e3": "Région pour Gemini Enterprise ou Agent Platform.",
@@ -9425,6 +9557,7 @@
   "9bc60e1d0ef816cf": "Octets de stockage",
   "85de927f664ee3cb": "Octets logiques",
   "ec1f81bc9b395fb9": "Tous les octets d’E/S",
+  "9fd31461cee8ff82": "{count, plural, one {{count} processus} other {{count} processus}}",
   "7905928d59208450": "Lecture",
   "637254a20a8e24a5": "Écriture",
   "ab9f29f78275f7bd": "Disponible quand cette page s’exécute dans l’app de bureau.",
@@ -9483,26 +9616,26 @@
     "Mis à jour il y a",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "f717a7cb4715dd3d": [
     "Mis à jour",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "33822b085993c953": "CPU moyen",
@@ -9538,9 +9671,9 @@
   "ebd63e7a302c5790": [
     "Identité : ",
     {
-      "t": "span",
+      "c": "PID + heure de démarrage",
       "i": 1,
-      "c": "PID + heure de démarrage"
+      "t": "span"
     }
   ],
   "e3f32bcf2e8f7f4e": "Octets logiques par opération",
@@ -9559,7 +9692,6 @@
   "69f1a5115bd716c8": "Impossible de copier l’URL MCP",
   "4112c1a7b3c1d029": "Redémarrage",
   "543ef9fcaf8aa96f": "Éteint",
-  "5173c50b0a60847c": "Mise à jour disponible : {serverVersion} → {clientVersion}",
   "987c5623ba70f390": "Routes",
   "a0b701a0b87b18a1": "{label} server",
   "08f54865b364957d": "Mettre à jour",
@@ -9729,8 +9861,8 @@
   "8273d53bd6a6f665": [
     "Prochaine exécution ",
     {
-      "t": "ScheduledRelativeLabel",
-      "i": 1
+      "i": 1,
+      "t": "ScheduledRelativeLabel"
     }
   ],
   "f2a687289f3b3c81": "Livraisons",
@@ -10099,170 +10231,170 @@
   "1cf216566c1ee064": "Projet indisponible",
   "c1b8c351aa90f319": [
     {
-      "t": "span",
-      "i": 1,
       "c": [
         {
-          "t": "span",
+          "c": "Paramètres appliqués à",
           "i": 2,
-          "c": "Paramètres appliqués à"
+          "t": "span"
         },
         {
           "i": 3,
           "k": "_gt_value_3",
           "v": "v"
         }
-      ]
+      ],
+      "i": 1,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 4,
       "c": [
         {
-          "t": "span",
+          "c": "sur",
           "i": 5,
-          "c": "sur"
+          "t": "span"
         },
         {
           "i": 6,
           "k": "_gt_value_6",
           "v": "v"
         }
-      ]
+      ],
+      "i": 4,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 7,
       "c": [
         {
-          "t": "span",
+          "c": "dans",
           "i": 8,
-          "c": "dans"
+          "t": "span"
         },
         {
           "i": 9,
           "k": "_gt_value_9",
           "v": "v"
         }
-      ]
+      ],
+      "i": 7,
+      "t": "span"
     }
   ],
   "6de8a5700498d20f": [
     {
-      "t": "span",
-      "i": 1,
       "c": [
         {
-          "t": "span",
+          "c": "Paramètres appliqués à",
           "i": 2,
-          "c": "Paramètres appliqués à"
+          "t": "span"
         },
         {
           "i": 3,
           "k": "_gt_value_3",
           "v": "v"
         }
-      ]
+      ],
+      "i": 1,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 4,
       "c": [
         {
-          "t": "span",
+          "c": "sur",
           "i": 5,
-          "c": "sur"
+          "t": "span"
         },
         {
           "i": 6,
           "k": "_gt_value_6",
           "v": "v"
         }
-      ]
+      ],
+      "i": 4,
+      "t": "span"
     }
   ],
   "fc2262bcc4a2e4f0": [
     {
-      "t": "span",
-      "i": 1,
       "c": [
         {
-          "t": "span",
+          "c": "Paramètres appliqués à",
           "i": 2,
-          "c": "Paramètres appliqués à"
+          "t": "span"
         },
         {
           "i": 3,
           "k": "_gt_value_3",
           "v": "v"
         }
-      ]
+      ],
+      "i": 1,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 4,
       "c": [
         {
-          "t": "span",
+          "c": "sur",
           "i": 5,
-          "c": "sur"
+          "t": "span"
         },
         {
           "i": 6,
           "k": "_gt_value_6",
           "v": "v"
         }
-      ]
+      ],
+      "i": 4,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 7,
       "c": [
         {
-          "t": "span",
+          "c": "dans",
           "i": 8,
-          "c": "dans"
+          "t": "span"
         },
         {
           "i": 9,
           "k": "_gt_value_9",
           "v": "v"
         }
-      ]
+      ],
+      "i": 7,
+      "t": "span"
     }
   ],
   "86d52b318b1a3e7a": [
     {
-      "t": "span",
-      "i": 1,
       "c": [
         {
-          "t": "span",
+          "c": "Paramètres appliqués à",
           "i": 2,
-          "c": "Paramètres appliqués à"
+          "t": "span"
         },
         {
           "i": 3,
           "k": "_gt_value_3",
           "v": "v"
         }
-      ]
+      ],
+      "i": 1,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 4,
       "c": [
         {
-          "t": "span",
+          "c": "sur",
           "i": 5,
-          "c": "sur"
+          "t": "span"
         },
         {
           "i": 6,
           "k": "_gt_value_6",
           "v": "v"
         }
-      ]
+      ],
+      "i": 4,
+      "t": "span"
     }
   ],
   "a8c2b705bbb43a80": "Aucun résultat trouvé.",
@@ -10290,23 +10422,23 @@
     "Loue, pilote et diffuse les appareils. Créez-en un par environnement avec",
     " ",
     {
-      "t": "code",
+      "c": "simlock --gateway token create --role agent",
       "i": 1,
-      "c": "simlock --gateway token create --role agent"
+      "t": "code"
     },
     ", ou laissez vide pour l’ajouter plus tard. Un jeton vide utilise la variable",
     " ",
     {
-      "t": "code",
+      "c": "AGENT_DEVICE_DAEMON_AUTH_TOKEN",
       "i": 2,
-      "c": "AGENT_DEVICE_DAEMON_AUTH_TOKEN"
+      "t": "code"
     },
     " de la machine quand sa variable",
     " ",
     {
-      "t": "code",
+      "c": "AGENT_DEVICE_DAEMON_BASE_URL",
       "i": 3,
-      "c": "AGENT_DEVICE_DAEMON_BASE_URL"
+      "t": "code"
     },
     " pointe vers cette passerelle."
   ],
@@ -10314,23 +10446,23 @@
     "Loue, pilote et diffuse les appareils. Créez-en un avec",
     " ",
     {
-      "t": "code",
+      "c": "simlock --gateway token create --role agent",
       "i": 1,
-      "c": "simlock --gateway token create --role agent"
+      "t": "code"
     },
     ", ou laissez vide pour l’ajouter plus tard. Un jeton vide utilise la variable",
     " ",
     {
-      "t": "code",
+      "c": "AGENT_DEVICE_DAEMON_AUTH_TOKEN",
       "i": 2,
-      "c": "AGENT_DEVICE_DAEMON_AUTH_TOKEN"
+      "t": "code"
     },
     " de la machine quand sa variable",
     " ",
     {
-      "t": "code",
+      "c": "AGENT_DEVICE_DAEMON_BASE_URL",
       "i": 3,
-      "c": "AGENT_DEVICE_DAEMON_BASE_URL"
+      "t": "code"
     },
     " pointe vers cette passerelle."
   ],
@@ -10397,9 +10529,9 @@
   "b8366d1d16d38d54": [
     "Whoosh ",
     {
-      "t": "span",
+      "c": "(par défaut)",
       "i": 1,
-      "c": "(par défaut)"
+      "t": "span"
     }
   ],
   "53a960b81e52d6d6": "Toujours impossible de vérifier l’accès. Consultez Avancé pour obtenir de l’aide.",
@@ -10494,13 +10626,13 @@
     "Connectez-vous avec",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "sur l’hôte du serveur, puis relancez l’analyse pour choisir les comptes ici."
@@ -10509,13 +10641,13 @@
     "Choisissez l’identifiant",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "utilisé par chaque hôte ",
@@ -10536,8 +10668,8 @@
     },
     " actif (",
     {
-      "t": "RedactedLogin",
-      "i": 2
+      "i": 2,
+      "t": "RedactedLogin"
     },
     ")"
   ],
@@ -10563,13 +10695,11 @@
   "6e72b298ef439944": "Utiliser l’identifiant actif",
   "720ad3bcd44f1740": [
     {
-      "t": "RedactedLogin",
-      "i": 1
+      "i": 1,
+      "t": "RedactedLogin"
     },
     " ",
     {
-      "t": "span",
-      "i": 2,
       "c": [
         "ne peut pas être utilisé : ",
         {
@@ -10577,18 +10707,18 @@
           "k": "_gt_value_3",
           "v": "v"
         }
-      ]
+      ],
+      "i": 2,
+      "t": "span"
     }
   ],
   "4a95a2620a1e282c": [
     {
-      "t": "RedactedLogin",
-      "i": 1
+      "i": 1,
+      "t": "RedactedLogin"
     },
     " ",
     {
-      "t": "span",
-      "i": 2,
       "c": [
         "ne peut pas être utilisé : ",
         {
@@ -10597,7 +10727,9 @@
           "v": "v"
         },
         " signale cet identifiant comme non valide."
-      ]
+      ],
+      "i": 2,
+      "t": "span"
     }
   ],
   "216ea20c7b110871": [
@@ -10621,8 +10753,8 @@
   "c97e21dd6897fa79": [
     "Connecté en tant que ",
     {
-      "t": "RedactedSensitiveText",
-      "i": 1
+      "i": 1,
+      "t": "RedactedSensitiveText"
     }
   ],
   "a9d6996c73500a5c": "Copier le code et ouvrir GitHub",
@@ -10694,13 +10826,13 @@
     " n’est pas authentifié sur ce serveur. Connectez-vous ou configurez des identifiants avec l’outil",
     " ",
     {
-      "t": "code",
-      "i": 2,
       "c": {
         "i": 3,
         "k": "_gt_value_3",
         "v": "v"
-      }
+      },
+      "i": 2,
+      "t": "code"
     },
     " ",
     "sur l’hôte du serveur pour activer les fonctionnalités de demande de modification."
@@ -10734,25 +10866,25 @@
     "Un jeton enregistré ici est utilisé avant",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "et l’identifiant",
     " ",
     {
-      "t": "code",
-      "i": 3,
       "c": {
         "i": 4,
         "k": "_gt_value_4",
         "v": "v"
-      }
+      },
+      "i": 3,
+      "t": "code"
     },
     ", ",
     "donc ",
@@ -10824,13 +10956,13 @@
     " :",
     " ",
     {
-      "t": "strong",
-      "i": 2,
       "c": {
         "i": 3,
         "k": "_gt_value_3",
         "v": "v"
-      }
+      },
+      "i": 2,
+      "t": "strong"
     },
     " ",
     "(",
@@ -10855,8 +10987,6 @@
     "Vitesse :",
     " ",
     {
-      "t": "strong",
-      "i": 1,
       "c": [
         {
           "i": 2,
@@ -10864,7 +10994,9 @@
           "v": "v"
         },
         " s"
-      ]
+      ],
+      "i": 1,
+      "t": "strong"
     },
     " ",
     "/ 30 s"
@@ -10882,7 +11014,7 @@
   "4889f7885396c26b": "Worktrees",
   "2d96fe39105aae8f": "Journaux archivés",
   "1214c77f4bf1ee81": "Artefacts du navigateur",
-  "9831e9c703b3bdd0": "{omitted, plural, one {{environment} : {count} autre résultat.} other {{environment} : {count} autres résultats.}}",
+  "d9e33a2a8d404a96": "{omitted, plural, one {{environment} : {count} autre résultat.} other {{environment} : {count} autres résultats.}}",
   "c8192b219451a0d0": "{removed} supprimés, {kept} conservés, {failed} en échec",
   "cbd8bf91a856906a": "{removed} supprimés, {kept} conservés",
   "754564dc0b82aff7": "{count, plural, one {Dernière exécution {when}. {bytes} récupérés. {count} élément n’a pas pu être supprimé.} other {Dernière exécution {when}. {bytes} récupérés. {count} éléments n’ont pas pu être supprimés.}}",
@@ -10925,7 +11057,6 @@
   "b0d0aebadc521ed1": "Supprime les captures du navigateur enregistrées après ce nombre de jours. Les liens vers les anciennes captures ne s’ouvriront plus.",
   "fe4208562792c313": "Supprimer les anciens journaux archivés",
   "8debac9c8e9cff47": "Supprime les fichiers journaux archivés inactifs après ce nombre de jours. Les journaux actuels sont conservés.",
-  "8e73b883d41d4102": "Désactivé",
   "80d58a3fd4e4212a": "Projet",
   "de770505be25f1ff": "Dossier",
   "ada7b9a4d96959d2": "Fil",
@@ -10967,26 +11098,26 @@
     " depuis",
     " ",
     {
-      "t": "code",
-      "i": 2,
       "c": {
         "i": 3,
         "k": "_gt_value_3",
         "v": "v"
-      }
+      },
+      "i": 2,
+      "t": "code"
     }
   ],
   "ae9958ee0d8ed8e8": [
     "Exécution : désactivée depuis",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     }
   ],
   "97585565390197f6": "Abandonner",
@@ -11322,10 +11453,11 @@
       "v": "v"
     }
   ],
-  "f54364b854a07918": "Aucun hub configuré.",
+  "39f64d971ba424b5": "Aucune source de suivi de l’utilisation configurée.",
+  "dbd877abdc2c7c81": "Source de quotas HTTP",
   "4cf6a373a7535324": "{name} · Désactivé",
-  "1d1e9cda847bd398": "La clé de gestion du hub est supprimée de ce serveur. Ses comptes quittent la vue Limites ; le hub lui-même n’est pas touché. Ajoutez-le à nouveau avec l’URL et la clé pour les récupérer.",
-  "c9bee4f93481b77a": "Supprimer le hub",
+  "c792e744936dbe1b": "Ajouter une source HTTP",
+  "4032a03ee5301037": "La connexion enregistrée et ses identifiants sont supprimés de cet environnement.",
   "0424112d5a0ecd71": "Auto",
   "3f0e1b77e45d53a9": "Appuyer pour basculer, maintenir pour parler",
   "45928549c050a1b4": "Maintenir",
@@ -11420,6 +11552,7 @@
   "817dbf1c068b62e7": "Où votre parole est convertie en texte.",
   "710d3e4f0243014c": "Environnement choisi (indisponible)",
   "61088464d1b7174d": "environnement indisponible",
+  "800966eb58181745": "Vérification des langues prises en charge par le modèle…",
   "2b3e8ee4f31d1433": "Automatique utilise la langue de votre Mac. Une langue est téléchargée à sa première utilisation.",
   "71184e5a54a69f1d": "Le fournisseur détecte automatiquement votre langue.",
   "ffb2653eb2d9fc1a": "{model} détecte automatiquement la langue.",
@@ -11632,6 +11765,7 @@
   "9cf8308531b4ff31": "transparent transparence opaque menus boîtes de dialogue zone de saisie",
   "d8d6cfd630cff22d": "rouge vert bleu orange ajouts suppressions modifications compteurs palette daltonien",
   "717e49895cfee1c7": "large pleine largeur colonne mise en page messages zone de saisie écran",
+  "9d5c7430a7ff76cf": "large pleine largeur intégré page rendu graphique tableau de bord artefact centré",
   "88365077fd80787b": "personnaliser afficher masquer panneau carte environnement éditeur scripts branche pull request modifications git serveurs automatisations lignée utilisation limites 5 heures hebdomadaire quota jetons fenêtre de contexte",
   "d561f74efa5f3920": "effort de raisonnement réflexion barres graphique mot libellé niveau zone de saisie",
   "6113c17109ee0d57": "latex tex katex équations formules markdown",
@@ -11657,6 +11791,7 @@
   "6826fa9579c22035": "bêta partager invité invitation lien coéquipier regarder t3 connect tunnel",
   "f10c06cba0cdf7fe": "bêta associer une autre machine vps pair agents y travaillent déléguer",
   "bc0b409d89ce086e": "bêta workflow exécutions durables automatisation étapes planification webhook dossier",
+  "4b2669dcdb7d3776": "workflow historique rétention supprimer anciennes exécutions ignorées webhook history retention skipped runs",
   "4a21cf825a2045b0": "bêta tab autocomplétion prédire prochain message claude codex texte fantôme",
   "fea2dc36585c4a20": "Hôtes d’appareils Simlock (alpha)",
   "9d834d178130180e": "bêta alpha simlock callstack simulateur émulateur ios android pool bail passerelle",
@@ -11870,11 +12005,14 @@
   "37ffec8201f153c1": "Échec",
   "984b361806ce8d25": "Réveillé",
   "c6e8abc00ae470d2": "Terminé",
+  "353b08f4363dbb2c": "En attente",
   "f31a95961de19433": "Ticket {key} : {title}, {state}",
   "2dd9d295c882ef65": "{count, plural, one {{count} ticket lié} other {{count} tickets liés}}",
   "8cf699ae75fd8067": "Épinglés",
   "be451f475c514b37": "Ignorer la notification Réveillé",
   "e9ced65134f2f36c": "Réveiller le fil maintenant",
+  "a8f30f631e2b010e": "En attente de synchronisation avec son environnement",
+  "374dac09151d4578": "En attente",
   "aca5896600bf173e": "Vous êtes actuellement sur une autre branche.",
   "f665b5be60d8c144": [
     "Transféré depuis ",
@@ -11943,14 +12081,15 @@
   "c1a9fe8e24876f1d": "{count, plural, one {{count} fil en cours sera interrompu.} other {{count} fils en cours seront interrompus.}}",
   "ecdf5f108ecc71d0": "{count, plural, one {{count} peut reprendre après le redémarrage.} other {{count} peuvent reprendre après le redémarrage.}}",
   "0576c87870fb6389": "Mettre à jour",
-  "948185631ef288e6": "{count, plural, one {{count} en cours} other {{count} en cours}}",
   "3d9a2f6b9c114039": "Fournisseurs",
   "f4baf8deafbb227d": "Ignorés",
   "f938bb483eb3d189": "redémarre en dernier",
+  "f13e08bd3614112e": "mettez à jour T3 Code sur cette machine",
   "9bca02be2b4d612a": "non connecté",
   "2dcc418b6a13b83c": "nécessite une mise à jour manuelle",
-  "5c8ebc36f84dee7a": "nécessite une version plus récente de l’app de bureau",
   "fa8faa732a2688ef": "sur le canal {channel}",
+  "e65649675cb4cbaa": "désactivé",
+  "a1e7c08d9ef315c7": "chargement en cours",
   "9b961309baafa09d": "pas d’autorisation",
   "9bafb2622c22d145": "déjà en cours de mise à jour",
   "61aa0109862ff7ca": "Nightly",
@@ -11964,6 +12103,7 @@
   "3ac986d604a2ad62": "Cette app ne peut pas basculer : son serveur n’est pas connecté, sa base de données ne peut donc pas être vérifiée.",
   "3bbb6e9ade0cf7e1": "lancez `{command}` sur cette machine",
   "e7194946af611278": "exécute un build preview",
+  "3c3348c36a2695af": "changez le canal de mise à jour sur cette machine",
   "f5eac23351c99297": "changez l’app Mac sur ce Mac",
   "d7444fbde9a80f04": "<1 min",
   "09c1af20e9323765": "Redémarrage dans {seconds} s",
@@ -12006,6 +12146,7 @@
   "9c015d3d034316cb": "Utilisez les flèches pour ajuster la valeur active. Maintenez Shift pour des pas plus grands. Utilisez Home et End pour le minimum et le maximum. Appuyez sur Tab pour passer de la saturation à la luminosité.",
   "8639d5532561f87f": "Fermer",
   "e1186ad82ee08b33": "Fermer",
+  "a4579e548b768663": "Afficher la barre latérale",
   "a1b11a1cf39c9dc9": "Redimensionner la barre latérale",
   "c557090df5722838": "Afficher ou masquer la barre latérale",
   "bbde430e56272901": "Faites glisser pour redimensionner la barre latérale",
@@ -12020,6 +12161,36 @@
   "c6cf1b06e0433ca3": "Progression de la configuration",
   "e0167c02ca493094": "{step}, étape {number}, {summary}",
   "6389dee75a7cb536": "{step}, étape {number}",
+  "0e34c3076c08feb2": [
+    {
+      "c": [
+        "↻ +",
+        {
+          "i": 2,
+          "k": "_gt_value_2",
+          "v": "v"
+        },
+        "%"
+      ],
+      "i": 1,
+      "t": "span"
+    },
+    " ",
+    "dans ",
+    {
+      "i": 3,
+      "k": "_gt_value_3",
+      "v": "v"
+    }
+  ],
+  "f6116fcec2d2ea7f": "{remaining} % restant · {timeLeft} % de la fenêtre restant",
+  "07f5912af296f9ea": "{remaining} % restant",
+  "a01c358de99da345": "Réinitialisation {resetsAt} · {resetsIn}",
+  "93b30237a69f3fc4": "Réinitialisation {resetsAt}",
+  "59e6cdf357f52c19": "La ligne indique où en serait une consommation régulière.",
+  "61571f4542da9903": "{count, plural, one {{formatted} session} other {{formatted} sessions}}",
+  "3abf045a6c75e67f": "Afficher la carte au-dessus ↑",
+  "f80647e11d4fd2a0": "Cliquez sur une ligne pour voir les détails. Cliquez à nouveau ou appuyez sur Échap pour fermer.",
   "1c9d860be42b1c02": "Sortie",
   "0bd41ff995d36a66": "Lecture du cache",
   "3f0dfe0cb15a3272": "Écriture du cache",
@@ -12067,13 +12238,13 @@
     "Chaque fichier de",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "définit des workflows. Toute modification est prise en compte sans redémarrage."
@@ -12089,7 +12260,9 @@
   "7755500a4cde5066": "Fermer le panneau",
   "b8dcbc93a2ca1861": "Cette exécution ne le mentionne plus.",
   "115c69de3202f664": "Ouvrir",
-  "644eafa9048b62df": "{count, plural, =1 {1er essai} =2 {2e essai} =3 {3e essai} other {{count}e essai}}",
+  "a2bbf464a3be4882": "{count, plural, =1 {1er essai} =2 {2e essai} =3 {3e essai} other {{count}e essai}}",
+  "0398ca6c1d24b92d": "en attente, le prochain",
+  "0af6d5ffd5166214": "{count, plural, one {en attente, {count} devant} other {en attente, {count} devant}}",
   "e39f89c909df4db0": "Impossible de reprendre l’exécution",
   "865f034346b82f47": "Annuler {title} ? Ses agents s’arrêtent et l’exécution ne pourra pas être reprise.",
   "6bc75632fd9c9136": "Impossible d’annuler l’exécution",
@@ -12116,11 +12289,17 @@
   "dd7a1e58c2553933": "réveil dans {duration}",
   "95cc952724dd7310": "réveil imminent",
   "3cc34921c0128593": "en cours",
-  "e777db2880f53a46": "personne n’a répondu",
   "dc90739d391a5e67": "Vous avez répondu {choice}",
+  "4e96712d839ccbff": "{who} a répondu {choice}",
+  "e777db2880f53a46": "personne n’a répondu",
+  "201490988858b511": "retirée par {by}",
   "389f2563b5b763fd": "Étapes rapides",
+  "99451a5d2d40440f": "Retirée par {by}.",
+  "3ee30a50b70fffab": "Retirée par {by} : {reason}",
+  "92e129bf413a1220": "retirée",
   "a41c8d758121ad81": "en veille",
   "9db248b770096984": "a attendu",
+  "49be26a27dcb30e5": "en attente",
   "c76124517af28686": "en cours depuis {duration}",
   "89102905bf09b0e8": "Suivre en direct",
   "bdf338cdff4118f0": "Transcription",
@@ -12154,17 +12333,60 @@
   "8bffb377e2a6a7de": "sa version n’est plus enregistrée",
   "f92d9132f7b85d1a": "Chargement des étapes…",
   "6ebc59f64c761a49": "Rien pour l’instant.",
+  "19097cfb8f5a79cf": [
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " a répondu",
+    " ",
+    {
+      "c": {
+        "i": 3,
+        "k": "_gt_value_3",
+        "v": "v"
+      },
+      "i": 2,
+      "t": "span"
+    },
+    "."
+  ],
+  "e7bbf693910057bf": [
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " a répondu",
+    " ",
+    {
+      "c": {
+        "i": 3,
+        "k": "_gt_value_3",
+        "v": "v"
+      },
+      "i": 2,
+      "t": "span"
+    },
+    ": ",
+    {
+      "i": 4,
+      "k": "_gt_value_4",
+      "v": "v"
+    }
+  ],
   "a759dccd157d7dae": [
     "Vous avez répondu",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     "."
   ],
@@ -12172,18 +12394,27 @@
     "Vous avez répondu",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     " : ",
     {
       "i": 3,
       "k": "_gt_value_3",
+      "v": "v"
+    }
+  ],
+  "3759768c5d342c22": [
+    "répondue",
+    " ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
       "v": "v"
     }
   ],
@@ -12212,6 +12443,15 @@
   ],
   "02dfe6c63fd0b8a1": "Ajouter une raison",
   "19abd94828a3bdbc": "Demander d’abord à l’agent",
+  "e114d37b32ab0dc7": [
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " nécessite une raison."
+  ],
+  "46d614fa7b4bf1e5": "Exécutions de workflow",
   "a18721fa8f328361": "Vous attendent",
   "bbf24e7920c1e86b": "En cours",
   "8d6e18d2ad832db6": "Toutes",
@@ -12221,19 +12461,22 @@
   "5459bf696a187c26": "Impossible de charger les exécutions de workflow",
   "d57c35d43b0f163a": "Cette exécution n’est pas ici",
   "b9aae2f7cdb1a379": "Aucune exécution de workflow pour l’instant",
+  "45a94c724845ec1d": "Autres",
   "8f15f66e545af7c0": "Quelles exécutions",
   "b6409289e0c9a4dd": "Workflow",
   "035cb02ca1ae4952": "Les {count} workflows",
-  "46d614fa7b4bf1e5": "Exécutions de workflow",
+  "8eeb9cb07d7c59e1": "Type de question",
+  "e2131cbec8accfe3": "Tous les types",
   "1c635faa2fb45b8b": "Pas encore exécuté.",
+  "e4d1316c85ed7066": "Aucune question de ce type ne vous attend.",
   "156ff7b625287a1e": "Masquer les éléments ignorés",
   "69b985b97ab45e6b": "Afficher {count} ignorés",
   "2400254d362de84d": "Chargement des exécutions de workflow…",
   "cae5c3205c01d062": [
     {
-      "t": "span",
+      "c": "Un fichier de workflow présente un problème.",
       "i": 1,
-      "c": "Un fichier de workflow présente un problème."
+      "t": "span"
     },
     " ",
     "La dernière version valide continue de s’exécuter."
@@ -12243,28 +12486,29 @@
     "Cet environnement n’a aucune exécution avec ce lien.",
     " ",
     {
-      "t": "button",
+      "c": "Retour aux exécutions",
       "i": 1,
-      "c": "Retour aux exécutions"
+      "t": "button"
     }
   ],
   "783e616cb0476c17": [
     "Un workflow réunit agents, code, planifications et questions qui vous sont posées en une seule exécution qui survit aux redémarrages. Écrivez-en un dans",
     " ",
     {
-      "t": "button",
+      "c": "Définitions",
       "i": 1,
-      "c": "Définitions"
+      "t": "button"
     },
     ", ou demandez-le à un agent.",
     " ",
     {
-      "t": "a",
+      "c": "Lire le guide",
       "i": 2,
-      "c": "Lire le guide"
+      "t": "a"
     }
   ],
   "5d8d278ff828102d": "Tous les workflows",
+  "3b0f1659172107e4": "Tous les types",
   "39459da07479f482": "Agent",
   "7741243632056b81": "{step} · transcription",
   "c512071143a5ba32": "Ce fil n’existe plus.",
@@ -12282,9 +12526,9 @@
     "Activez-les pour ce serveur dans",
     " ",
     {
-      "t": "Link",
+      "c": "Paramètres → Labs",
       "i": 1,
-      "c": "Paramètres → Labs"
+      "t": "Link"
     },
     "."
   ],
@@ -12342,13 +12586,13 @@
     " de",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     " ne sont pas dans le diff chargé."
   ],

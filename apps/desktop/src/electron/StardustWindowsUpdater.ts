@@ -14,7 +14,8 @@ interface StardustWindowsUpdaterDeps extends StardustUpdaterDeps {
   readonly localAppData: string;
   readonly currentExecutable: string;
   readonly pid: number;
-  readonly spawnInstaller: (script: string, logPath: string) => void;
+  /** Settles when the helper process is running, or rejects when it could not start. */
+  readonly spawnInstaller: (script: string, logPath: string) => void | Promise<void>;
 }
 
 const psLiteral = (value: string): string => "'" + value.replaceAll("'", "''") + "'";
@@ -34,12 +35,35 @@ $exe = ${psLiteral(options.currentExecutable)}
 $setup = ${psLiteral(options.installer)}
 $log = ${psLiteral(options.logPath)}
 $dir = Split-Path -Parent $exe
-$backup = "$dir.update-previous"
+$previousBackup = "$dir.update-previous"
+$backup = "$previousBackup-$(New-Guid)"
 $ready = $false
 $copyStarted = $false
 $relaunch = ${options.relaunch ? "$true" : "$false"}
 function Write-UpdateLog([string] $text) {
   Add-Content -LiteralPath $log -Value "$(Get-Date -Format o) $text" -Encoding UTF8
+}
+function Wait-InstallProcesses {
+  $prefix = $dir.TrimEnd('\\') + '\\'
+  for ($attempt = 0; $attempt -lt 30; $attempt++) {
+    $holders = @(Get-Process | Where-Object {
+      $_.Path -and $_.Path.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)
+    })
+    if ($holders.Count -eq 0) { return }
+    Start-Sleep -Milliseconds 500
+  }
+  throw "Processes are still running from $dir."
+}
+function Invoke-WithFileRetries([scriptblock] $operation) {
+  for ($attempt = 1; ; $attempt++) {
+    try {
+      & $operation
+      return
+    } catch {
+      if ($attempt -ge 10) { throw }
+      Start-Sleep -Milliseconds 500
+    }
+  }
 }
 try {
   $running = Get-Process -Id ${options.pid} -ErrorAction SilentlyContinue
@@ -50,29 +74,33 @@ try {
     Remove-Item -LiteralPath $setup -Force
     throw 'The installer changed after downloading.'
   }
-  if (Test-Path -LiteralPath $backup) { throw "Previous backup remains at $backup" }
+  Wait-InstallProcesses
   $copyStarted = $true
   Copy-Item -LiteralPath $dir -Destination $backup -Recurse -Force
+  Wait-InstallProcesses
   $ready = $true
   $result = Start-Process -FilePath $setup -ArgumentList '/S', '--updated', '/currentuser' -PassThru
   $result.WaitForExit()
   if ($result.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $exe -PathType Leaf)) {
     throw "Setup failed with exit code $($result.ExitCode)."
   }
-  $metadata = Get-Content -LiteralPath (Join-Path $dir 'resources/stardust-build.json') -Raw | ConvertFrom-Json
+  $metadata = Get-Content -LiteralPath (Join-Path $dir 'resources/stardust-build.json') -Raw -Encoding UTF8 | ConvertFrom-Json
   if ($metadata.communityVersion -ne ${psLiteral(options.version)}) {
     throw 'Setup did not install the expected version.'
   }
   $ready = $false
   Write-UpdateLog 'Installation completed.'
-  Remove-Item -LiteralPath $backup -Recurse -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $backup, $previousBackup -Recurse -Force -ErrorAction SilentlyContinue
   Remove-Item -LiteralPath $setup -Force -ErrorAction SilentlyContinue
 } catch {
   Write-UpdateLog $_.Exception.Message
   if ($ready) {
     try {
-      Remove-Item -LiteralPath $dir -Recurse -Force
-      Move-Item -LiteralPath $backup -Destination $dir
+      Wait-InstallProcesses
+      Invoke-WithFileRetries {
+        if (Test-Path -LiteralPath $dir) { Remove-Item -LiteralPath $dir -Recurse -Force }
+      }
+      Invoke-WithFileRetries { Move-Item -LiteralPath $backup -Destination $dir }
       Write-UpdateLog 'Restored the previous installation files.'
     } catch {
       Write-UpdateLog "Rollback failed. The previous files are at $backup. $_"
@@ -97,7 +125,7 @@ export function makeStardustWindowsUpdater(deps: StardustWindowsUpdaterDeps) {
     target: "Windows-x64",
     cacheRoot,
     beforeDownload: async () => (payloadPath) => Promise.resolve(payloadPath),
-    start: (update, relaunch) => {
+    start: async (update, relaunch) => {
       try {
         NodeFS.accessSync(NodePath.dirname(deps.currentExecutable), NodeFS.constants.W_OK);
         const script = buildWindowsInstallScript({
@@ -109,7 +137,7 @@ export function makeStardustWindowsUpdater(deps: StardustWindowsUpdaterDeps) {
           logPath,
           relaunch,
         });
-        deps.spawnInstaller(script, logPath);
+        await deps.spawnInstaller(script, logPath);
       } catch (cause) {
         throw new StardustUpdateError("install-failed", describe(cause));
       }

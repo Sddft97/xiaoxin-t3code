@@ -1,3 +1,4 @@
+import { QuotaNextRefill } from "./QuotaNextRefill";
 import "./limitsV9.css";
 import {
   DndContext,
@@ -56,6 +57,7 @@ import { UsageCount } from "./UsageMotion";
 import { readUiLocale } from "~/i18n";
 import {
   CHATGPT_USAGE_URL,
+  collectHttpQuotaSources,
   collectLimitAccounts,
   collectExternalUsageLinks,
   collectLimitPools,
@@ -71,6 +73,7 @@ import {
   type ResetCreditChoice,
 } from "@t3tools/shared/usageLimits";
 import { collectLimitNotices, formatResetsIn } from "@t3tools/shared/usageLimitsCopy";
+import { useGT, useMessages } from "gt-react";
 import type { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 import { normalizeProviderAccentColor } from "@t3tools/client-runtime/state/provider-instance-display";
 import {
@@ -624,7 +627,7 @@ function PoolWindowCard({
   readonly description?: string | undefined;
 }) {
   const uiText = useUiText();
-  const nextRefill = pool.resets.find((reset) => reset.at > now);
+  const nextRefill = pool.resets.find((reset) => reset.at > now && reset.restoresPercent > 0);
   const elapsed = pool.members.map((m) => paceRemainingPercent(m.window, now));
   const timeUsed =
     elapsed.length && elapsed.every((v) => v !== null)
@@ -645,13 +648,17 @@ function PoolWindowCard({
         <span>{uiText("left")}</span>
         {nextRefill ? (
           <span className="ml-auto text-muted-foreground">
-            {uiText("Resets {time}", {
-              time: new Date(nextRefill.at).toLocaleString(readUiLocale(), {
-                weekday: "short",
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
-            })}
+            <QuotaNextRefill
+              window={pool}
+              now={now}
+              fallback={uiText("Resets {time}", {
+                time: new Date(nextRefill.at).toLocaleString(readUiLocale(), {
+                  weekday: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+              })}
+            />
           </span>
         ) : null}
       </div>
@@ -1326,6 +1333,42 @@ function limitsHeadline(
 // Claude logins are separate subscriptions; averaging them hides which one is nearly spent.
 const SEPARATE_LIMIT_DRIVERS = [ProviderDriverKind.make("claudeAgent")];
 
+function HttpQuotaSourceCards({
+  sources,
+  now,
+}: {
+  readonly sources: ReturnType<typeof collectHttpQuotaSources>;
+  readonly now: number;
+}) {
+  const gt = useGT();
+  const messages = useMessages();
+  return sources.map((source) => (
+    <section key={source.key} className="space-y-3 rounded-xl border p-4">
+      <h2 className="text-sm font-medium">{source.label}</h2>
+      {source.quotaAccounts?.map((account) => (
+        <div key={account.id} className="space-y-1">
+          <h3 className="text-sm font-medium">{account.label}</h3>
+          {account.windows.map((window) => {
+            const reset = formatResetsIn(window, now, messages);
+            return (
+              <div
+                key={window.id}
+                className="flex justify-between gap-3 text-sm text-muted-foreground"
+              >
+                <span>{window.label}</span>
+                <span>
+                  {gt("{remaining}% left", { remaining: remainingPercent(window) })}
+                  {reset ? ` · ${reset}` : ""}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      ))}
+    </section>
+  ));
+}
+
 export function UsageLimitsPooled({
   presentations,
   now,
@@ -1464,6 +1507,7 @@ export function UsageLimitsPooled({
   const staleAccount = pools
     .flatMap((p) => p.accounts)
     .find((a) => quotaReadingStale(a.limits, now));
+  const quotaSources = collectHttpQuotaSources(presentations);
   const notices = collectLimitNotices(presentations);
   const externalLinks = collectExternalUsageLinks(presentations);
   const headline = limitsHeadline(pools, titles, now);
@@ -1591,7 +1635,7 @@ export function UsageLimitsPooled({
           </div>
         </div>
 
-        {pools.length === 0 && externalLinks.length === 0 ? (
+        {pools.length === 0 && externalLinks.length === 0 && quotaSources.length === 0 ? (
           <div
             data-usage-limits-empty
             className="flex min-h-56 flex-col items-center justify-center gap-2 text-center"
@@ -1675,6 +1719,7 @@ export function UsageLimitsPooled({
               ) : null
             }
           </Popover>
+          <HttpQuotaSourceCards sources={quotaSources} now={now} />
           {externalLinks.map((link) => (
             <section
               key={link.url}
@@ -1749,9 +1794,6 @@ export function UsageLimitsPooled({
           pools={pools}
           now={now}
           v9
-          highlighted={highlighted}
-          openResetPoolId={openResetPoolId}
-          onHighlight={setHighlighted}
           resetPreview={resetPreview}
           onOpenResetPool={(poolId) => {
             setSelectedResetChoiceKey(null);
@@ -1816,7 +1858,7 @@ export function UsageLimitsPooled({
             : uiText("Official quota data · Bars show used quota; markers show elapsed time.")}
         </p>
       )}
-      {pools.length === 0 && externalLinks.length === 0 ? (
+      {pools.length === 0 && externalLinks.length === 0 && quotaSources.length === 0 ? (
         <div
           data-usage-limits-empty
           className="flex min-h-56 flex-col items-center justify-center gap-2 text-center"
@@ -1861,6 +1903,7 @@ export function UsageLimitsPooled({
             ) : null
           }
         </Popover>
+        <HttpQuotaSourceCards sources={quotaSources} now={now} />
         {externalLinks.map((link) => (
           <section
             key={link.url}
@@ -1904,7 +1947,7 @@ export function UsageLimitsPooled({
             })}
           </div>
         ) : null}
-        <UsageResetTimeline pools={pools} now={now} onHighlight={setHighlighted} />
+        <UsageResetTimeline pools={pools} now={now} />
       </div>
       {missing.some((driver) => driver === "cursor") ? (
         <div data-usage-cursor-notice>

@@ -103,7 +103,7 @@ NodeFS.writeFileSync(
 </style>
 <h1>星尘 v${mac.version} · macOS / Windows</h1>
 <p>两端均完成安装包启动和回放冒烟。Windows 系统外壳来自 CI 桌面，Mica 观感仍需实体 Win11 核对。</p>
-<p>Both release packages passed app launch and replay smoke. Windows shell evidence comes from the CI desktop. Verify Mica on physical Windows 11 hardware.</p>
+<p>Both packaged apps passed launch and replay smoke on disposable Playwright copies. The original release apps retained their disabled Node inspector fuse. Windows shell evidence comes from the CI desktop. Verify Mica on physical Windows 11 hardware.</p>
 ${rows.join("\n")}
 <h2>布局差值 / Layout deltas</h2>
 <p>Windows − macOS，CSS px。标题栏、平台字体和系统材质允许有意差异。</p>

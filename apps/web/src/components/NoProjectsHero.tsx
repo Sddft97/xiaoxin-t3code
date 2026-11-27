@@ -37,7 +37,7 @@ export function NoProjectsHero() {
           <div className="w-full max-w-2xl px-8 py-12">
             <EmptyHeader className="max-w-none">
               <EmptyTitle>
-                <T>What should we work on?</T>
+                <T>Which star shall we start from?</T>
               </EmptyTitle>
               <EmptyDescription>
                 {scratchTargetEnvironmentId === null

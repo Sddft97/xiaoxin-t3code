@@ -28,12 +28,7 @@ export interface ComposerBannerStackItem {
 
 const GROUPS = ["environment", "attention"] as const;
 
-/**
- * Where floating content hangs above the composer. It sits at the top of the whole stack of
- * notices, so the order from the top is: the plan (which includes anything waiting on you),
- * then environment notices, then attention notices joined to the composer. It takes no space,
- * so a notice or a taller composer moves the anchor up instead of being covered.
- */
+/** The plan contributes its height to the timeline inset; the jump button alone takes no space. */
 export function ComposerFloatAnchor({
   children,
   scrollToEnd,
@@ -168,7 +163,7 @@ export function NoticeText({
                 size="icon-xs"
                 variant="ghost-muted"
                 aria-label={detailsLabel}
-                className="flex-none"
+                className="flex-none self-center"
               />
             }
           >

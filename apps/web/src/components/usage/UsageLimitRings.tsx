@@ -1,3 +1,4 @@
+import { QuotaNextRefill } from "./QuotaNextRefill";
 import "./limitsV9.css";
 import { CornerUpLeftIcon, RotateCwIcon } from "lucide-react";
 import { type ReactNode, useRef, useState } from "react";
@@ -413,7 +414,13 @@ export function UsageLimitRings({
               </div>
               <div data-lv9="cap-foot" className="usage-limit-action-slot">
                 <span data-limit-countdown>
-                  {primaryResetShort ? text("Resets {time}", { time: primaryResetShort }) : null}
+                  <QuotaNextRefill
+                    window={usable.find((window) => window.kind === "weekly") ?? usable[0]}
+                    now={now}
+                    fallback={
+                      primaryResetShort ? text("Resets {time}", { time: primaryResetShort }) : null
+                    }
+                  />
                 </span>
                 {hiddenRows > 0 ? (
                   <span data-lv9="more-windows">

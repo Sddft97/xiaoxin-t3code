@@ -58,6 +58,11 @@ export function useAvailableSettingsSearchItems() {
         environment.serverConfig.managedPolicy?.limits?.providers?.allowedDrivers === undefined,
     ) === true;
   const hasSecretProvidersEnvironment = useHasSecretProvidersEnvironment();
+  const hasStorageCleanupRunEnvironment = environments.some(
+    (environment) =>
+      environment.connection.phase === "connected" &&
+      environment.serverConfig?.environment.capabilities.storageCleanupRun === true,
+  );
   const hasThreadAutoSettlement =
     getThreadAutoSettlementSearchAvailability(environments).eligibleEnvironmentIds.length > 0;
   const primaryEnvironmentId = usePrimaryEnvironmentId();
@@ -93,5 +98,6 @@ export function useAvailableSettingsSearchItems() {
     hasTextGeneratorsEnvironment,
     hasPrimaryEnvironment: primaryEnvironmentId !== null,
     hasSecretProvidersEnvironment,
+    hasStorageCleanupRunEnvironment,
   });
 }

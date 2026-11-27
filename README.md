@@ -8,14 +8,15 @@
 <h1 align="center">星尘 Agent</h1>
 
 <p align="center">
-  <strong>一个中文 AI 桌面工作台</strong><br />
-  V18 星舰发射栈流体推理滑块 · 多账号用量与限额洞察 · 新版本应用内提醒 · 苹果风极简质感
+  <strong>面向 Mac 和 Windows 的双语 AI 桌面工作台</strong><br />
+  在同一扇窗里切换智能体、查看账号额度、批注预览，并找回会话产物。
 </p>
 
 <p align="center">
   <a href="https://www.xiaoxin666.cn/stardust"><strong>产品官网与积木工坊</strong></a> ·
-  <a href="#download">下载 v1.2.4</a> ·
+  <a href="#download">下载 v1.2.6</a> ·
   <a href="https://github.com/zds-xiaoxin/stardust-legacy/releases">历史版本 / Older releases</a> ·
+  <a href="#release-highlights">v1.2.6</a> ·
   <a href="#highlights">核心亮点</a> ·
   <a href="#workshop">星尘积木工坊</a> ·
   <a href="#updates-privacy">更新与隐私</a> ·
@@ -26,11 +27,53 @@
 
 ---
 
+<a id="release-highlights"></a>
+
+## v1.2.6 新版工作台实录
+
+### 在第一条消息前选好工作区
+
+点问候语里的项目名可以换项目。在 Git 项目的输入框底部，选当前检出或新建工作树；选新工作树后还能指定起始分支。
+
+<p align="center"><a href="assets/community/v1.2.6/zh-draft.gif"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/community/v1.2.6/zh-draft-still.png"><img src="assets/community/v1.2.6/zh-draft.gif" alt="在第一条消息前选好工作区" width="880"></picture></a></p>
+
+### 下一个账号，什么时候恢复额度？
+
+点顶栏账号胶囊，看短周期和每周额度各剩多少、何时重置。要比较多个账号一周内的安排，在「用量与限额」的七天时间轴点对应行。
+
+<p align="center"><a href="assets/community/v1.2.6/zh-quota.gif"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/community/v1.2.6/zh-quota-still.png"><img src="assets/community/v1.2.6/zh-quota.gif" alt="下一个账号，什么时候恢复额度？" width="880"></picture></a></p>
+
+### 先看磁盘，再决定清哪几项
+
+在 macOS 扫描磁盘后，容量条分出「放心清」「看一眼」「只提醒不动」。检查勾选项与抢救设置，最后一次确认会写明直接删除的容量；直接删除的文件无法撤销。
+
+<p align="center"><a href="assets/community/v1.2.6/zh-storage.gif"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/community/v1.2.6/zh-storage-still.png"><img src="assets/community/v1.2.6/zh-storage.gif" alt="先看磁盘，再决定清哪几项" width="880"></picture></a></p>
+
+### 把常用会话置顶，把其他会话留待稍后
+
+在会话里按 ⌘K（Windows 用 Ctrl+K），可以置顶、标为已处理，或设置稍后提醒。向内拖动侧栏右边缘可隐藏侧栏，从窗口左边缘可恢复。切换会话时，时间线也能更早显示。
+
+<p align="center"><a href="assets/community/v1.2.6/zh-commands.gif"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/community/v1.2.6/zh-commands-still.png"><img src="assets/community/v1.2.6/zh-commands.gif" alt="把常用会话置顶，把其他会话留待稍后" width="880"></picture></a></p>
+
+### 切换工作现场时，保留手头的内容
+
+检出 PR 时保留输入中的草稿。Claude 启动失败且本机原生会话记录缺失时，星尘可用已保存的会话历史接续。GitLab 的下游检查跟随对应主机。终端长粘贴期间的其他输入会等待；工作流可用并发池限制共享步骤同时运行的数量。
+
+<p align="center"><a href="assets/community/v1.2.6/zh-workflow-guide.png"><img src="assets/community/v1.2.6/zh-workflow-guide.png" alt="切换工作现场时，保留手头的内容" width="880"></a></p>
+
+### macOS 全屏时，给系统标题栏留出空间
+
+macOS 原生全屏时，星尘按窗口状态布置顶栏。Windows x64 的工具按钮与系统窗口按钮各占自己的位置。图中为两端的窗口控件局部。
+
+<p align="center"><a href="assets/community/v1.2.6/zh-titlebars.png"><img src="assets/community/v1.2.6/zh-titlebars.png" alt="macOS 全屏时，给系统标题栏留出空间" width="880"></a></p>
+
+---
+
 <a id="highlights"></a>
 
 ## 核心亮点与动效实录
 
-**v1.2** 基于上游开源代码截至 2026-11-21 的版本（`0.1.11`，提交 `f9b19a7f85`）二次开发，重点打磨推理交互、用量可视化、界面流畅度与新版本提醒。
+以下保留早期版本的操作演示。新版模型选择器使用银河滑块，可选推理档位取决于模型。
 
 ### 1. V18「星舰发射栈」流体推理强度滑块（离屏贴图 + 静止 2 秒停止重绘）
 
@@ -44,7 +87,7 @@
 
 ### 2. Composer V9 统一输入台与底部「会话概览 / 令牌缓存」弹簧浮层
 
-- **统一模型触发胶囊（输入台右侧）**：显示当前提供方图标、模型名称与推理档位色点；点击向上展开弹窗，依次集成 Spotlight 模型搜索、横向提供方药丸标签、模型列表（含剩余额度）、V18 星舰推理滑块与底部三段式弹性权限滑块（默认「完全访问」不占底栏，切换为「自动 / 需审批」时在模型胶囊左侧显示独立权限芯片）。
+- **统一模型触发胶囊（输入台右侧）**：显示当前提供方图标、模型名称与推理档位色点；点击向上展开弹窗，依次集成 Spotlight 模型搜索、横向提供方药丸标签、模型列表（含剩余额度）、推理滑块与底部三段式弹性权限滑块（默认「完全访问」不占底栏，切换为「自动 / 需审批」时在模型胶囊左侧显示独立权限芯片）。
 - **居中会话统计浮层**：底部悬停磁吸 Dock 药丸顺滑跟手，点击纯合成层弹簧弹出「会话概览」（轮次/步数/速率/思考与工具耗时占比）与「令牌与缓存」（总计/缓存命中读取与命中率）。
 
 <p align="center">
@@ -64,8 +107,16 @@
 ### 4. 任务步骤卡、内置预览图钉批注与产物墙
 
 - **任务步骤卡与命令人话描述**：把晦涩终端命令自动折叠成可读步骤卡（如 `跑测试`、`类型检查`），展示耗时与产出数，展开保留原始命令。
+
+<p align="center"><a href="assets/community/v1.2.6/zh-steps.png"><img src="assets/community/v1.2.6/zh-steps.png" alt="任务步骤" width="880"></a></p>
+
 - **预览图钉批注**：在内置浏览器预览里直接点元素钉图钉、按「待改 / 已改」筛选、双向定位，发送给助手时自动附带局部截图。
+
+<p align="center"><a href="assets/community/v1.2.6/zh-annotations.webp"><img src="assets/community/v1.2.6/zh-annotations.webp" alt="预览批注" width="880"></a></p>
+
 - **产物面板**：集中管理当前会话与项目产出的文档、图片和代码文件。
+
+<p align="center"><a href="assets/community/v1.2.6/zh-artifacts.webp"><img src="assets/community/v1.2.6/zh-artifacts.webp" alt="会话产物" width="880"></a></p>
 
 ---
 
@@ -81,13 +132,13 @@
   <img src="assets/community/v1.2.0/demo-slider-gallery.gif" alt="星尘积木工坊：V18 流体星舰 / V16 星尘观测站 / V19 像素星舰 / V19 赛博机甲 HUD" width="94%" />
 </p>
 
-| 积木方案                  | 视觉风格                                           | 仓库目录                                                                          | 在线体验                                                     |
-| ------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| **V18 流体写实星舰**      | 正式版默认搭载 · 连续飞行 + 离屏贴图 + 2s 自动休眠 | [`stardust-kit/v18-starship-fluid`](stardust-kit/v18-starship-fluid/)             | [demo.html](stardust-kit/v18-starship-fluid/demo.html)       |
-| **V16 星尘观测站**        | 治愈像素叙事 · 小机器人夜间逐件点亮观测站与流星    | [`stardust-kit/v16-stardust-observatory`](stardust-kit/v16-stardust-observatory/) | [demo.html](stardust-kit/v16-stardust-observatory/demo.html) |
-| **V19-A 16-Bit 像素星舰** | 复古街机高精像素火箭与圆润火焰烟球                 | [`stardust-kit/v19-pixel-starship`](stardust-kit/v19-pixel-starship/)             | [demo.html](stardust-kit/v19-pixel-starship/demo.html)       |
-| **V19-B 赛博机甲 HUD**    | 高达 / EVA 遥测网格、流体光带尾迹与曲速护盾        | [`stardust-kit/v19-cyber-hud`](stardust-kit/v19-cyber-hud/)                       | [demo.html](stardust-kit/v19-cyber-hud/demo.html)            |
-| **V17 高对比实验 4 套**   | 星舰 / 聚变核心超频 / 日食引力弹弓 / 星钢淬火      | [`stardust-kit/v17-thrill-experiments`](stardust-kit/v17-thrill-experiments/)     | [demo.html](stardust-kit/v17-thrill-experiments/demo.html)   |
+| 积木方案                  | 视觉风格                                        | 仓库目录                                                                          | 在线体验                                                     |
+| ------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| **V18 流体写实星舰**      | 工坊可试玩 · 连续飞行 + 离屏贴图 + 2s 自动休眠  | [`stardust-kit/v18-starship-fluid`](stardust-kit/v18-starship-fluid/)             | [demo.html](stardust-kit/v18-starship-fluid/demo.html)       |
+| **V16 星尘观测站**        | 治愈像素叙事 · 小机器人夜间逐件点亮观测站与流星 | [`stardust-kit/v16-stardust-observatory`](stardust-kit/v16-stardust-observatory/) | [demo.html](stardust-kit/v16-stardust-observatory/demo.html) |
+| **V19-A 16-Bit 像素星舰** | 复古街机高精像素火箭与圆润火焰烟球              | [`stardust-kit/v19-pixel-starship`](stardust-kit/v19-pixel-starship/)             | [demo.html](stardust-kit/v19-pixel-starship/demo.html)       |
+| **V19-B 赛博机甲 HUD**    | 高达 / EVA 遥测网格、流体光带尾迹与曲速护盾     | [`stardust-kit/v19-cyber-hud`](stardust-kit/v19-cyber-hud/)                       | [demo.html](stardust-kit/v19-cyber-hud/demo.html)            |
+| **V17 高对比实验 4 套**   | 星舰 / 聚变核心超频 / 日食引力弹弓 / 星钢淬火   | [`stardust-kit/v17-thrill-experiments`](stardust-kit/v17-thrill-experiments/)     | [demo.html](stardust-kit/v17-thrill-experiments/demo.html)   |
 
 ---
 
@@ -95,22 +146,20 @@
 
 ## 更新提醒与隐私说明
 
-### 应用内新版本提醒
+### 应用内更新与隐私开关
 
-- 启动时及之后每 6 小时，应用会请求 GitHub 公开接口，查看本仓库最新的正式发行版（只认带完整 macOS Apple Silicon 安装包和 SHA256 摘要的版本）。
-- 发现新版本时弹出提醒，点击直达发行页下载。**应用不会自动下载、替换或重启**，升级请按下方「下载与安装」步骤手动完成。
-- 在 **设置 → 关于** 中可以：
-  - 切换 **社区更新模式**：「标准版 · 手动确认更新」（默认，跳转发行下载页）或「自行改造 · 仅提醒」（跳转源码差异页，适合自己魔改过代码的用户）；
-  - 关闭 **自动检查社区更新**。
-- 检查更新不发送聊天、账号或项目数据。
+进入「设置 → 关于」。标准安装支持时，可点「更新并重启」，也可选择后台下载、下次启动使用新版。自行改造的版本可用源码模式查看差异。星尘活跃设备统计有单独开关。
+
+<p align="center"><a href="assets/community/v1.2.6/zh-update.png"><img src="assets/community/v1.2.6/zh-update.png" alt="应用内更新与隐私开关" width="880"></a></p>
+
+若安装方式不支持应用内更新，更新卡会引导你到发行页下载。
 
 ### 使用统计与隐私
 
-- **星尘活跃人数（v1.2.1 起，默认开启）**：为了知道有多少人在用，应用每天最多发送一次：随机安装 ID、星尘版本号、系统和芯片类型，发到 `xiaoxin666.cn/api/stardust`。不发送聊天、账号、项目或文件路径；网站接口不读取也不转发你的 IP，服务器只保存安装 ID 的再哈希值，按天去重，90 天后删除。
+- **星尘活跃人数（v1.2.1 起，默认开启）**：为了知道有多少人在用，应用每天最多发送一次：随机安装 ID、星尘版本号、系统和芯片类型，发到 `xiaoxin666.cn/api/stardust`。不发送聊天、账号、项目或文件路径；统计库不保存 IP，安装 ID 再次哈希后按天去重，写入时清理超过 90 天的记录。
 - 第一次启动新版本会弹出说明，可以直接点「关闭统计」；之后在 **设置 → 关于 →「计入星尘活跃用户」** 随时开关。关闭后不再发送。
 - 网站 [xiaoxin666.cn/stardust](https://www.xiaoxin666.cn/stardust) 只公开「近 7 天活跃设备数」一个数字。
-- 上游自带的匿名使用统计在星尘里**默认关闭**，未开启时不记录、不缓存、不发送任何数据。
-- 如愿意帮助上游改进，可在 **设置 → 关于 →「共享匿名使用数据」** 手动开启：只发送功能使用、应用版本和操作系统信息（不含提示词、文件或路径）到上游项目的 `ingest.t3.codes`；关闭后立即停止发送并丢弃未发送的事件。
+- 星尘发行版已关闭上游使用统计。模型请求仍按你选择的服务通道发送。
 
 ---
 
@@ -118,30 +167,40 @@
 
 ## 下载与安装
 
-> **系统要求**：macOS 13 及以上 · Apple Silicon（M1 / M2 / M3 / M4）
+[macOS ARM64 ZIP](https://github.com/zds-xiaoxin/stardust/releases/download/v1.2.6/Stardust-v1.2.6-macOS-arm64.zip) · [Windows x64 Setup](https://github.com/zds-xiaoxin/stardust/releases/download/v1.2.6/Stardust-v1.2.6-Windows-x64-Setup.exe) · [GitHub Releases / SHA256SUMS.txt](https://github.com/zds-xiaoxin/stardust/releases/latest)
 
-- **安装包下载**：[Stardust-v1.2.4-macOS-arm64.zip](https://github.com/zds-xiaoxin/stardust/releases/download/v1.2.4/Stardust-v1.2.4-macOS-arm64.zip) · [Releases 发行页 & SHA256SUMS.txt](https://github.com/zds-xiaoxin/stardust/releases/tag/v1.2.4) · [详细发行说明](docs/community/v1.2.4/RELEASE.zh.md)
+### macOS · Apple Silicon
 
-### 快速校验与安装
+macOS 13 及以上。将 ZIP 的 SHA-256 与同一发行页的校验值对照后，解压并把应用移入「应用程序」。
 
-1. 下载 ZIP 与 `SHA256SUMS.txt` 到同一目录，终端校验完整性：
-   ```bash
-   shasum -a 256 -c SHA256SUMS.txt
-   ```
-2. 解压后将 `Stardust.app`拖入 `/Applications`（升级旧版前建议先等待运行中的任务结束）。
-   > **注意**：这个版本可能与上游桌面应用共用本机数据和凭据存储。切换前请完全退出两个应用并备份数据，每次只运行其中一个。
-3. 公开版为社区 **ad-hoc 签名**（未经 Apple 付费公证），首次打开若出现系统提示，在 **系统设置 → 隐私与安全性** 点击「仍要打开」，或运行：
-   ```bash
-   xattr -dr com.apple.quarantine "/Applications/Stardust.app"
-   ```
-4. 使用你本机已登录的智能体 CLI（Claude Code、Codex、Cursor、OpenCode 或任意 ACP 智能体）。
+<p align="center"><a href="assets/community/v1.2.6/zh-install-mac.png"><img src="assets/community/v1.2.6/zh-install-mac.png" alt="macOS · Apple Silicon" width="880"></a></p>
 
-### Windows x64 测试版
+在下载目录运行以下命令，把结果与同一发行页中 ZIP 对应的 64 位校验值逐字对照。
 
-[下载 Windows 安装程序](https://github.com/zds-xiaoxin/stardust/releases/download/v1.2.4/Stardust-v1.2.4-Windows-x64-Setup.exe) · [安装、SHA-256 校验与 SmartScreen](docs/user/stardust-windows-install.md)
+```sh
+shasum -a 256 Stardust-v1.2.6-macOS-arm64.zip
+```
+
+切换已有安装前，等运行中的任务结束，退出桌面应用并备份本地数据。首次启动后连接已登录的智能体 CLI。
+
+### Windows · x64
+
+Windows 10/11 x64 测试版。核对 SHA-256 后运行安装程序。如遇 SmartScreen，选择「更多信息 → 仍要运行」。若组织策略阻止运行，请停止安装。
+
+<p align="center"><a href="assets/community/v1.2.6/zh-install-win.png"><img src="assets/community/v1.2.6/zh-install-win.png" alt="Windows · x64" width="880"></a></p>
+
+在下载目录用 PowerShell 计算校验值，对照同一份清单中的 EXE 条目。
+
+```powershell
+(Get-FileHash Stardust-v1.2.6-Windows-x64-Setup.exe -Algorithm SHA256).Hash
+```
+
+[Windows 安装与校验说明](docs/user/stardust-windows-install.md)
 
 ---
 
 ## 致谢与许可
+
+<img src="assets/community/v1.2.6/author.png" width="56" height="56" alt="开源小新">
 
 星尘 Agent 是由**开源小新**和贡献者维护的独立项目，采用 [MIT 许可](LICENSE)。项目来源、版权与第三方组件见 [NOTICE](NOTICE.md)。星尘 Agent 的问题请在[本仓库](https://github.com/zds-xiaoxin/stardust/issues)反馈。

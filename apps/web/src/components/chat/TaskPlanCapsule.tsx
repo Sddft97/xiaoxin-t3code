@@ -11,6 +11,7 @@ import { ChevronUpIcon } from "lucide-react";
 
 import { useUiText } from "~/i18n/useUiText";
 import type { TaskProgressSnapshot } from "../../taskProgress";
+import { TaskTitleTooltip } from "./TaskTitleTooltip";
 import { TaskPlanStages, completedTitle } from "./TaskPlanStages";
 import {
   capsuleMode,
@@ -78,6 +79,7 @@ export function TaskPlanCapsule({
   const panelId = useId();
   const rootRef = useRef<HTMLElement>(null);
   const barRef = useRef<HTMLButtonElement>(null);
+  const titleRef = useRef<HTMLSpanElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [openStage, setOpenStage] = useState<string | null>(null);
@@ -302,52 +304,58 @@ export function TaskPlanCapsule({
             </div>
           </div>
         </div>
-        <button
-          ref={barRef}
-          type="button"
-          className="plan-bar"
-          aria-expanded={open}
-          aria-controls={panelId}
-          aria-label={barLabel}
-          onClick={() => setOpen(!open)}
-        >
-          <Ring mode={mode} percent={complete ? 100 : percent} />
-          <span className="plan-bar-ico" data-mode={mode} aria-hidden>
-            {mode === "done" ? (
-              <svg viewBox="0 0 16 16">
-                <path d="M3.6 8.4l3 3 5.8-6.2" />
-              </svg>
-            ) : null}
-          </span>
-          <span className="plan-title" data-swapping={outgoing !== null}>
-            {outgoing === null ? null : (
-              <span key={outgoing} className="plan-title-out" aria-hidden>
-                {outgoing}
+        <TaskTitleTooltip
+          label={title}
+          textRef={titleRef}
+          trigger={
+            <button
+              ref={barRef}
+              type="button"
+              className="plan-bar"
+              aria-expanded={open}
+              aria-controls={panelId}
+              aria-label={barLabel}
+              onClick={() => setOpen(!open)}
+            >
+              <Ring mode={mode} percent={complete ? 100 : percent} />
+              <span className="plan-bar-ico" data-mode={mode} aria-hidden>
+                {mode === "done" ? (
+                  <svg viewBox="0 0 16 16">
+                    <path d="M3.6 8.4l3 3 5.8-6.2" />
+                  </svg>
+                ) : null}
               </span>
-            )}
-            <span key={title} className="plan-title-in">
-              {title}
-            </span>
-          </span>
-          {pill === null ? null : (
-            <span className="plan-pill" data-tone={mode === "problem" ? "problem" : mode}>
-              {pill}
-            </span>
-          )}
-          {liveFallback ? null : (
-            <>
-              <span className="plan-segments" aria-hidden>
-                {milestones.map((milestone) => (
-                  <i key={milestone.id} data-status={milestone.status} />
-                ))}
+              <span className="plan-title" data-swapping={outgoing !== null}>
+                {outgoing === null ? null : (
+                  <span key={outgoing} className="plan-title-out" aria-hidden>
+                    {outgoing}
+                  </span>
+                )}
+                <span ref={titleRef} key={title} className="plan-title-in">
+                  {title}
+                </span>
               </span>
-              <span className="plan-count">
-                {complete ? milestones.length : finished}/{milestones.length}
-              </span>
-            </>
-          )}
-          <ChevronUpIcon className="plan-chevron" aria-hidden />
-        </button>
+              {pill === null ? null : (
+                <span className="plan-pill" data-tone={mode === "problem" ? "problem" : mode}>
+                  {pill}
+                </span>
+              )}
+              {liveFallback ? null : (
+                <>
+                  <span className="plan-segments" aria-hidden>
+                    {milestones.map((milestone) => (
+                      <i key={milestone.id} data-status={milestone.status} />
+                    ))}
+                  </span>
+                  <span className="plan-count">
+                    {complete ? milestones.length : finished}/{milestones.length}
+                  </span>
+                </>
+              )}
+              <ChevronUpIcon className="plan-chevron" aria-hidden />
+            </button>
+          }
+        />
       </div>
     </section>
   );

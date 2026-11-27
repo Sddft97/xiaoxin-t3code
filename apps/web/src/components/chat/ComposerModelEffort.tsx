@@ -35,7 +35,6 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { ComposerControl, type ComposerControlSize } from "./ComposerControl";
 import { Popover, PopoverPopup, PopoverTrigger } from "../ui/popover";
 import { useComposerMenuState } from "./useComposerMenuState";
-import type { RuntimeModeOption } from "./ComposerFooterControls";
 import { GalaxyEffortSlider } from "./GalaxyEffortSlider";
 import { galaxyEffortStops } from "./galaxyEffortLevels";
 import { cosmicColorAtRatio } from "./CosmicEffortSlider";
@@ -44,6 +43,12 @@ import {
   takeOpenTarget,
   useComposerMenuProps,
 } from "./composerEventScope";
+import type { RuntimeModeOption } from "./ComposerFooterControls";
+import { use } from "react";
+import {
+  RuntimeModeLimitsTargetContext,
+  useProviderRuntimeModeLimits,
+} from "../../state/runtimeModeLimits";
 import { EffortGlyph, FastBolt, resolveEffortGlyph } from "./EffortGlyph";
 import { DockedPickerContext } from "./ProviderModelPicker";
 import {
@@ -52,6 +57,7 @@ import {
   ULTRATHINK_IN_BODY_NOTE,
   useTraitsSelection,
 } from "./TraitsPicker";
+import { SharedTooltipTrigger } from "../ui/shared-tooltip";
 
 type SelectDescriptor = Extract<ProviderOptionDescriptor, { type: "select" }>;
 type BooleanDescriptor = Extract<ProviderOptionDescriptor, { type: "boolean" }>;
@@ -298,12 +304,14 @@ function ColumnRow(props: {
   );
   if (!props.description) return <button {...rowProps}>{content}</button>;
   return (
-    <Tooltip>
-      <TooltipTrigger render={<button {...rowProps} />}>{content}</TooltipTrigger>
-      <TooltipPopup side="right" className="max-w-56">
-        {props.description}
-      </TooltipPopup>
-    </Tooltip>
+    <SharedTooltipTrigger
+      render={<button {...rowProps} />}
+      label={props.description}
+      side="right"
+      className="max-w-56"
+    >
+      {content}
+    </SharedTooltipTrigger>
   );
 }
 
@@ -639,10 +647,9 @@ function SpeedSegment(props: {
   );
   if (!props.description) return <button {...buttonProps}>{content}</button>;
   return (
-    <Tooltip>
-      <TooltipTrigger render={<button {...buttonProps} />}>{content}</TooltipTrigger>
-      <TooltipPopup side="top">{props.description}</TooltipPopup>
-    </Tooltip>
+    <SharedTooltipTrigger render={<button {...buttonProps} />} label={props.description}>
+      {content}
+    </SharedTooltipTrigger>
   );
 }
 
@@ -853,6 +860,7 @@ export function ComposerPickerFooter(props: {
   runtimeModeOptions: ReadonlyArray<RuntimeModeOption>;
   onRuntimeModeChange: (mode: RuntimeMode) => void;
 }) {
+  useProviderRuntimeModeLimits(use(RuntimeModeLimitsTargetContext), "picker");
   return (
     <div className="flex flex-col">
       {props.traits ? (

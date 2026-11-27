@@ -47,6 +47,7 @@ describe("web runtime relay telemetry policy", () => {
     vi.stubEnv("VITE_RELAY_OTLP_TRACES_URL", "https://telemetry.example.test/v1/traces");
     vi.stubEnv("VITE_RELAY_OTLP_TRACES_DATASET", "relay-test");
     vi.stubEnv("VITE_RELAY_OTLP_TRACES_TOKEN", "test-token");
+    vi.stubEnv("VITE_HOSTED_APP_URL", "https://app.example.test");
     vi.stubGlobal("window", { desktopBridge });
     const fetchFn = vi.fn<typeof fetch>(async () => new Response(null, { status: 202 }));
     vi.stubGlobal("fetch", fetchFn);

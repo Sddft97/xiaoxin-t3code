@@ -66,10 +66,16 @@ function activateLocale(locale: string): void {
   for (const listener of listeners) listener();
 }
 
+/** Packaged desktop pins `navigator.languages` to en-US, so "system" must ask the OS. */
+function systemLanguages(): ReadonlyArray<string> {
+  const fromOs = window.desktopBridge?.getPreferredSystemLanguages?.() ?? [];
+  return fromOs.length > 0 ? fromOs : navigator.languages;
+}
+
 function applyLanguageSetting(): void {
   // Not desktopBridge.getSystemLocale(): that is the regional/time locale, not the UI language.
   const language = getClientSettings().language;
-  const browserLocales = navigator.languages;
+  const browserLocales = systemLanguages();
   const selection = resolveWebLocaleSelection(language, browserLocales);
   const catalogLocale = resolveStardustLocale(
     language,

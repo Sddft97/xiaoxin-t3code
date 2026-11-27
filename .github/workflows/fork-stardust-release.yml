@@ -82,7 +82,6 @@ jobs:
       - name: Merge the released source without changing fork features
         if: steps.version.outputs.skip != 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
           UPSTREAM_COMMIT: ${{ steps.version.outputs.upstream_commit }}
           UPSTREAM_TAG: ${{ steps.version.outputs.upstream_tag }}
         shell: bash
@@ -98,23 +97,39 @@ jobs:
               echo "::error::Stardust $UPSTREAM_TAG has independent Git history. Integrate its source into the fork before publishing."
               exit 1
             fi
-            git merge --no-ff "$UPSTREAM_COMMIT" -m "chore: merge Stardust $UPSTREAM_TAG into the fork"
-            git push origin main
-            gh workflow run ci.yml --ref main --repo "$GITHUB_REPOSITORY"
+            if ! git merge --no-ff "$UPSTREAM_COMMIT" -m "chore: merge Stardust $UPSTREAM_TAG into the fork"; then
+              echo "::error::Stardust $UPSTREAM_TAG needs a conflict resolution before it can be published."
+              git diff --name-only --diff-filter=U
+              exit 1
+            fi
           fi
 
       - name: Verify the fork customizations survive every merge
         id: source
         if: steps.version.outputs.skip != 'true'
+        env:
+          UPSTREAM_COMMIT: ${{ steps.version.outputs.upstream_commit }}
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "${GITHUB_SHA}" || test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+          git merge-base --is-ancestor "$UPSTREAM_COMMIT" HEAD
+          test -z "$(git status --porcelain)"
           grep -q 'readEnvFile(NodePath.join(repoRoot, ".env.example"))' scripts/lib/public-config.ts
           grep -q 'resolvePublicConfig(baseEnv, localEnv, rootEnv, exampleEnv)' scripts/lib/public-config.ts
-          test "$(git show "${{ steps.version.outputs.upstream_commit }}:scripts/lib/public-config.ts" | grep -c 'resolvePublicConfig(baseEnv, localEnv, rootEnv)')" -gt 0
 
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Push newly merged source and start CI
+        if: steps.version.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]]; then
+            git push origin HEAD:main
+            gh workflow run ci.yml --ref main --repo "$GITHUB_REPOSITORY"
+          fi
 
   build:
     name: Build fork macOS arm64 update

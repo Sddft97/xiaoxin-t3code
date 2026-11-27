@@ -7,7 +7,7 @@ import {
 import { createModelCapabilities } from "@t3tools/shared/model";
 import { useState } from "react";
 import { expect, it } from "vite-plus/test";
-import { page, userEvent } from "vite-plus/test/browser";
+import { commands, page, userEvent } from "vite-plus/test/browser";
 
 import { render } from "../../../test/render";
 import { ComposerEffortColumn, describeComposerEffort } from "./ComposerModelEffort";
@@ -148,5 +148,35 @@ it("selects reasoning levels with keyboard arrows and Home and End", async () =>
   await expect.element(slider).toHaveAttribute("aria-valuetext", "High");
   await userEvent.keyboard("{Home}");
   await expect.element(slider).toHaveAttribute("aria-valuetext", "Low");
+  await expect.element(slider).toHaveFocus();
+});
+
+it("follows a held pointer between stops and settles on the selected level after release", async () => {
+  await using screen = await render(<Column />, { router: false });
+  const slider = screen.getByRole("slider", { name: "Reasoning effort" });
+  const stage = slider.element() as HTMLElement;
+  const thumb = stage.querySelector(".gx-thumb")!;
+  const width = stage.getBoundingClientRect().width;
+  const x = Math.round(width * 0.44);
+  const thumbCenter = () => {
+    const box = thumb.getBoundingClientRect();
+    return box.left + box.width / 2 - stage.getBoundingClientRect().left;
+  };
+  const eye = stage.querySelector("[data-eye] path")!;
+  let heldExpression: string | null;
+  await userEvent.hover(slider, { position: { x: 22, y: 22 } });
+  await commands.pointerDown();
+  try {
+    await userEvent.hover(slider, { position: { x, y: 22 } });
+    await expect.poll(thumbCenter).toBeCloseTo(x, 0);
+    heldExpression = eye.getAttribute("d");
+    await expect.element(slider).toHaveAttribute("aria-valuetext", "High");
+  } finally {
+    await commands.pointerUp();
+  }
+  await expect.poll(thumbCenter).toBeCloseTo(width / 2, 0);
+  // The same High selection has a different face between stops than at its detent.
+  expect(eye.getAttribute("d")).not.toEqual(heldExpression);
+  await expect.element(slider).toHaveAttribute("aria-valuetext", "High");
   await expect.element(slider).toHaveFocus();
 });

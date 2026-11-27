@@ -100,15 +100,37 @@ describe("searchSettings", () => {
     }
   });
 
-  it("gives Storage & cleanup its own page next to Maintenance, found by search in both languages", () => {
-    const paths = settingsNavGroups(false).flatMap((group) => group.paths);
-    expect(paths[paths.indexOf("/settings/maintenance") + 1]).toBe("/settings/storage");
-    for (const query of ["storage", "cleanup", "disk space", "mole"]) {
-      expect(searchSettings(query)[0], query).toMatchObject({ to: "/settings/storage" });
+  it("gives Storage & cleanup its own page next to Maintenance on macOS", () => {
+    vi.stubGlobal("navigator", { platform: "MacIntel" });
+    try {
+      const paths = settingsNavGroups(false).flatMap((group) => group.paths);
+      expect(paths[paths.indexOf("/settings/maintenance") + 1]).toBe("/settings/storage");
+      for (const query of ["storage", "cleanup", "disk space", "mole"]) {
+        expect(searchSettings(query)[0], query).toMatchObject({ to: "/settings/storage" });
+      }
+      expect(searchSettings("storage")[0]).toMatchObject({ id: "storage-tidy" });
+      expect(searchSettings("rescue first")[0]).toMatchObject({ to: "/settings/storage" });
+    } finally {
+      vi.unstubAllGlobals();
     }
-    expect(searchSettings("storage")[0]).toMatchObject({ id: "storage-tidy" });
-    expect(searchSettings("rescue first")[0]).toMatchObject({ to: "/settings/storage" });
   });
+
+  it.each(["Win32", "Linux x86_64"])(
+    "omits Storage & cleanup from nav and search on %s",
+    (platform) => {
+      vi.stubGlobal("navigator", { platform });
+      try {
+        expect(settingsNavGroups(false).flatMap((group) => group.paths)).not.toContain(
+          "/settings/storage",
+        );
+        for (const query of ["storage", "cleanup", "disk space", "mole", "rescue first"]) {
+          expect(searchSettings(query).map((item) => item.to)).not.toContain("/settings/storage");
+        }
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    },
+  );
 
   it("finds the Scheduled tasks page", () => {
     expect(searchSettings("scheduled tasks")[0]).toMatchObject({

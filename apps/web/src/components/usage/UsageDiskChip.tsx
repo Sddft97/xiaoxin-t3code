@@ -6,12 +6,17 @@ import * as Option from "effect/Option";
 import { HardDriveIcon } from "lucide-react";
 
 import { useUiText } from "~/i18n/useUiText";
+import { platformProfile } from "~/lib/PlatformProfile";
 import { cn } from "~/lib/utils";
 import { formatBytes } from "../../lib/formatBytes";
 import { serverEnvironment } from "../../state/server";
 
 /** The one disk entry on the usage page: free space, linking to Settings → Storage & cleanup. */
 export function UsageDiskChip({ environmentId }: { readonly environmentId: EnvironmentId }) {
+  return platformProfile.id === "mac" ? <MacUsageDiskChip environmentId={environmentId} /> : null;
+}
+
+function MacUsageDiskChip({ environmentId }: { readonly environmentId: EnvironmentId }) {
   const t = useUiText();
   const result = useAtomValue(serverEnvironment.storageTidyState({ environmentId, input: {} }));
   const state = Option.getOrNull(AsyncResult.value(result));

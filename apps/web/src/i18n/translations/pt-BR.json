@@ -20,11 +20,16 @@
   "2aa1c01bf8014725": "{organization} limita as threads a Aceitar edições automaticamente.",
   "89563a8fff8bb751": "{organization} limita as threads a Auto.",
   "5b7ff1208620c2c2": "{organization} limita as threads a Acesso total.",
+  "069e0382ff2496f5": "As configurações do Claude da sua organização desativam o modo automático.",
+  "8ccf7e0def66d339": "Suas configurações do Claude desativam o modo automático.",
+  "04ac2410d2cc0666": "As configurações do Claude deste projeto desativam o modo automático.",
+  "7e27789f5d58960e": "As configurações do Claude desativam o modo automático.",
   "9bf017edd3847eb1": "A política de {organization} não permite conexões de outros dispositivos.",
   "ef9533bcc048f17b": "A política de {organization} não permite o T3 Connect.",
   "986b0873f913a840": "A política de {organization} não permite tarefas de webhook.",
   "eebc538e25b09fe2": "A política de {organization} não permite importar cookies do navegador.",
   "7642a133db05f164": "A política de {organization} não permite abrir os servidores locais desta máquina em outros dispositivos.",
+  "e0856d6a402ad821": "A política de {organization} não permite comandos de layout de worktree de projetos.",
   "39f6771b49f9b3b6": "Usar padrão",
   "45bb0e90e1c42046": "Quando você voltar",
   "d8fa0a55446bbb0d": "Antes de o cache expirar (beta)",
@@ -66,7 +71,7 @@
   "2f6e4f7cd364da73": "Resultado esperado",
   "9d11c93d4035de3e": "O que aconteceu",
   "c87d0595693704f9": "Alternativa utilizada",
-  "d7a4ea6ce5af44e0": "{speaker} · {count} caracteres",
+  "ed5c85bb4aecb472": "{count, plural, one {{speaker} · {count} caractere} other {{speaker} · {count} caracteres}}",
   "f5114fb9c40fd929": "Você",
   "cd03eb1b84271c02": "Agente",
   "bfe1a60f3f9c60fb": "Turno {turn} · {what}",
@@ -405,6 +410,7 @@
   "834ca879c14c167b": "Trabalhando",
   "582d6df7dfab86fb": "Pausada",
   "ea6583ce92507ee3": "Dormindo",
+  "7150557773b3818b": "Na fila",
   "7ea8cb8af281ce93": "Aguardando",
   "1347868f2523140e": "Concluída",
   "57d76c4614054271": "Parada",
@@ -416,6 +422,7 @@
   "d3890f4eb1508781": "Executando as próprias etapas",
   "3e7ced10c9482af0": "{step} está trabalhando",
   "237e1bcb1cf1bdec": "Dormindo em {step}",
+  "efbeb3993ee2c3f5": "Na fila de {pool}",
   "3f7b17ac5a20c8d2": "Executa {run}",
   "0306f5f324b8aaa5": "{count} execuções em andamento",
   "e8fd779b84a202a2": "Aguardando",
@@ -430,19 +437,19 @@
   "960aa0b106793f99": "Não foi possível carregar a chave de autorização do ambiente.",
   "facb167869d93774": "Tempo esgotado ao renovar a credencial do ambiente.",
   "5f68899450a25421": "Este cliente não é compatível com este servidor. Atualize o app ou use uma versão compatível para se conectar a {host}.",
-  "64d380898f3dc4ee": "Este cliente exige um servidor mais recente. Atualize o Stardust em {host} para se conectar.",
+  "64d380898f3dc4ee": "Este cliente exige um servidor mais recente. Atualize o T3 Code em {host} para se conectar.",
   "b7554d48eece78bf": "Este dispositivo está offline",
   "ad2b3faedb0bd846": "Este dispositivo ainda está carregando o login do T3 Connect",
   "150d1298d7e12a18": "{host} está aguardando alguém aprovar este dispositivo",
-  "64e8bf8f894e8d4b": "{host} usa uma versão antiga do Stardust",
+  "64e8bf8f894e8d4b": "{host} usa uma versão antiga do T3 Code",
   "7978b128f836c1ca": "O relógio deste dispositivo está errado",
   "26f98026953e6835": "{host} não está vinculado à sua conta do T3 Connect",
   "df82277b5fdf21ad": "O T3 Connect retornou um erro",
   "d2c536acf6fef486": "O túnel de {host} ainda está sendo configurado",
   "4e554b7a57549e72": "O T3 Connect não está ativado em {host}",
   "919dcd4227cf751a": "O túnel de {host} está offline",
-  "34e205f55d30b081": "O túnel funciona, mas o Stardust em {host} não respondeu",
-  "ff444db47a6c5d7b": "O Stardust em {host} enviou uma resposta inesperada",
+  "34e205f55d30b081": "O túnel funciona, mas o T3 Code em {host} não respondeu",
+  "ff444db47a6c5d7b": "O T3 Code em {host} enviou uma resposta inesperada",
   "382dbe658dff5a11": "O endereço do túnel de {host} não foi resolvido",
   "7b15ef746f8fe359": "A conexão segura com o túnel de {host} falhou",
   "6545cbf2f3aca443": "O túnel de {host} recusou a conexão",
@@ -452,27 +459,27 @@
   "fbd2d87881e54615": "Este dispositivo não consegue acessar o T3 Connect",
   "7ac7d2bd5d3c3b74": "Este dispositivo não consegue acessar o túnel de {host}",
   "9cf0001d0c442fe2": "O T3 Connect não conseguiu acessar o túnel de {host}",
-  "e7d37a933a7e89f5": "O Stardust em {host} não aceitou este dispositivo",
-  "b7e1fa98dd44a903": "O Stardust em {host} não respondeu",
+  "e7d37a933a7e89f5": "O T3 Code em {host} não aceitou este dispositivo",
+  "b7e1fa98dd44a903": "O T3 Code em {host} não respondeu",
   "5d11910833c27d35": "Em {host}, verifique Configurações > Compartilhamento e acesso ou execute `t3 connect status`.",
-  "b73e30d8d9cf80ae": "Conecte este dispositivo à internet. O Stardust se reconecta sozinho.",
-  "c8a0daf6db0928f3": "Aguarde um momento. O Stardust tenta novamente sozinho.",
-  "25bb53e6f08b6ce6": "Se continuar aguardando, recarregue ou reinicie o Stardust neste dispositivo.",
+  "b73e30d8d9cf80ae": "Conecte este dispositivo à internet. O T3 Code se reconecta sozinho.",
+  "c8a0daf6db0928f3": "Aguarde um momento. O T3 Code tenta novamente sozinho.",
+  "25bb53e6f08b6ce6": "Se continuar aguardando, recarregue ou reinicie o T3 Code neste dispositivo.",
   "570aaeb32dc600a7": "Em um dispositivo já conectado a {host}, abra Configurações > Compartilhamento e acesso e aprove o dispositivo que mostra {code}.",
   "08a2d57d02f30799": "Em um dispositivo já conectado a {host}, abra Configurações > Compartilhamento e acesso e aprove este dispositivo.",
   "9cc57bb41f513f35": "Ou execute `t3 auth connect-device approve {code}` em {host}.",
-  "6c043146ff104471": "Atualize o Stardust em {host}.",
+  "6c043146ff104471": "Atualize o T3 Code em {host}.",
   "3c35e0980e06bfa6": "Ative data e hora automáticas neste dispositivo e em {host} e tente novamente.",
   "0f441d0e53f2e965": "Verifique se este dispositivo está conectado à mesma conta do T3 Connect que o host.",
   "1e02d6062710ffb3": "Em {host}, abra Configurações > Compartilhamento e acesso e ative o T3 Connect.",
-  "3ca9e905a0e76944": "Aguarde um minuto. O Stardust tenta novamente sozinho.",
-  "62d01449990d28a4": "Aguarde alguns minutos. O Stardust tenta novamente sozinho.",
+  "3ca9e905a0e76944": "Aguarde um minuto. O T3 Code tenta novamente sozinho.",
+  "62d01449990d28a4": "Aguarde alguns minutos. O T3 Code tenta novamente sozinho.",
   "6c9d04c73fe1eb63": "Se continuar falhando, copie o diagnóstico e relate o problema.",
-  "6671e2adfb0e35b3": "Verifique se {host} está ativo e com o Stardust em execução.",
+  "6671e2adfb0e35b3": "Verifique se {host} está ativo e com o T3 Code em execução.",
   "3c988e8ceac72484": "Uma VPN ou um exit node do Tailscale em {host} pode bloquear o túnel (porta 7844). Desative-o ou libere o túnel.",
-  "b5aacc0b9163c0e3": "Abra ou reinicie o Stardust em {host}.",
+  "b5aacc0b9163c0e3": "Abra ou reinicie o T3 Code em {host}.",
   "a80f88e893129bd9": "Verifique se {host} está ativo e online.",
-  "a11d4c010567faac": "Reinicie o Stardust neste dispositivo.",
+  "a11d4c010567faac": "Reinicie o T3 Code neste dispositivo.",
   "6a1d53c7bee371aa": "Se continuar falhando, remova {host} deste dispositivo e adicione-o novamente.",
   "41dd22a83e2fa219": "Saia do T3 Connect e entre novamente.",
   "a569ba31753e80a3": "Verifique a conexão com a internet deste dispositivo.",
@@ -480,11 +487,11 @@
   "13d74302502bdb92": "Uma VPN, um firewall ou um filtro de DNS neste dispositivo pode bloquear o túnel.",
   "6538d9af1dc853bc": "Tente outra rede ou adicione uma rota direta, como um endereço do Tailscale.",
   "e950948b20d099cf": "O login deste dispositivo em {host} expirou ou foi revogado. Pareie-o novamente com um novo link de pareamento de {host}.",
-  "964a38e20cc7ecda": "Verifique se o Stardust está em execução em {host}.",
+  "964a38e20cc7ecda": "Verifique se o T3 Code está em execução em {host}.",
   "00fcb4f22434502b": "Tente novamente. Se continuar falhando, copie o diagnóstico.",
   "589f3050d8371c67": "Este dispositivo",
   "f8561e25d9a3d132": "Túnel de {host}",
-  "11e2222747466460": "Stardust em {host}",
+  "11e2222747466460": "T3 Code em {host}",
   "3d1e8943c6f1623f": "Causa",
   "68c94644988bb4d7": "Status HTTP",
   "c86eb684e1531ef8": "Tentativas",
@@ -498,7 +505,7 @@
   "bc24c300d53d61c5": "{host} não respondeu em nenhuma rota salva.",
   "b0dd3cd876937ca8": "O perfil de conexão {connectionId} não está disponível.",
   "5ce46783e79ca9d1": "A credencial de conexão {connectionId} não está disponível.",
-  "0bda0cac7f5acc20": "O ambiente conectado {actual} não corresponde a {expected}.",
+  "b39d1428ec8b23f5": "Este endereço agora executa outra instalação do T3 Code ({actual}, não {expected}). Remova esta conexão e adicione-a novamente.",
   "ea0d3e4e51d5706f": "A credencial do ambiente é inválida.",
   "7283ebfd16d09677": "A credencial do ambiente não concede o acesso necessário.",
   "d3e9a9cb543b4b7b": "O ambiente rejeitou a solicitação de autenticação.",
@@ -514,8 +521,9 @@
   "693cb5c4fb40f109": "Só é possível editar ambientes bearer salvos.",
   "5f5844b910cb1544": "A credencial bearer salva não está disponível.",
   "51b0133f1ed3cf5c": "O rótulo do ambiente não pode ficar vazio.",
-  "3aa15bfbe1920376": "Atualize o Stardust em {host} manualmente; ele não consegue se atualizar sozinho.",
-  "71907f57b7ec64d5": "{host} não voltou em uma versão compatível do Stardust.",
+  "3aa15bfbe1920376": "Atualize o T3 Code em {host} manualmente; ele não consegue se atualizar sozinho.",
+  "adb9c574404d1db8": "Já está atualizado",
+  "71907f57b7ec64d5": "{host} não voltou em uma versão compatível do T3 Code.",
   "e77ac580a4ddcd3b": "Disponível",
   "a980c44b06fc7b26": "Offline",
   "fef710ef9d9e365d": "Conectando...",
@@ -615,7 +623,7 @@
   "d4258d4b87cf0ab1": "O relay encontrou um erro interno ({reason}).",
   "796de796c15cf68f": "O relay atingiu o tempo limite antes de concluir a solicitação (HTTP 504). Tente novamente em alguns minutos. Se continuar falhando, copie o ID de rastreamento ao relatar o problema.",
   "34e963f61ae55b28": "O relay retornou um HTTP {status} inesperado.",
-  "e17ef8aff174e6fe": "Ficou offline por um tempo, então o túnel do T3 Connect foi removido. Inicie o Stardust naquele computador e atualize-o para a versão mais recente para reconectar.",
+  "e17ef8aff174e6fe": "Ficou offline por um tempo, então o túnel do T3 Connect foi removido. Inicie o T3 Code naquele computador e atualize-o para a versão mais recente para reconectar.",
   "e07aeb67f54ee2c4": "Não foi possível carregar a chave de prova DPoP do relay.",
   "0d7264480ef70038": "A troca do token de acesso DPoP do relay atingiu o tempo limite.",
   "b396dce04e615665": "A listagem de ambientes do relay atingiu o tempo limite.",
@@ -687,6 +695,7 @@
   "56b4ff3993c93eca": "{host} enviou uma configuração de servidor incompatível.",
   "368c4d4f99c66bfb": "Atualize o cliente e o servidor para versões compatíveis.",
   "e5fd422e445391fc": "Falha no envio. Toque para tentar novamente.",
+  "13b14784f8707ddd": "0 bytes",
   "b2bc6bd92ea24e5c": "{size} MB",
   "88f84178edbb7f57": "{size} KB",
   "5a78fd0a1d8e9945": "{count} MB",
@@ -703,7 +712,7 @@
   "28d9a7709f6be166": "As versões não foram verificadas. Reconecte o host e verifique as versões.",
   "bb86986ccd77751a": "Atualização pendente. As ferramentas necessárias serão instaladas automaticamente no próximo uso. O host precisa de acesso à rede; uma instalação antiga não é usada como alternativa.",
   "27120a57b27c8f12": "As ferramentas necessárias são instaladas automaticamente quando preciso. Verificar as versões não instala nem inicia nada.",
-  "69c618154e02084f": "O servidor Stardust deste ambiente escolhe as versões das ferramentas de dispositivo para si e para seus hosts SSH. Atualize esse servidor para receber versões mais novas; atualizar só o navegador ou o app móvel não atualiza um servidor remoto.",
+  "69c618154e02084f": "O servidor T3 deste ambiente escolhe as versões das ferramentas de dispositivo para si e para seus hosts SSH. Atualize esse servidor para receber versões mais novas; atualizar só o navegador ou o app móvel não atualiza um servidor remoto.",
   "2f7a7712ac730d09": "Não há um assinante DPoP disponível para autorizar a solicitação ao ambiente.",
   "2271933ad114dfd2": "Não foi possível criar a prova de autorização da solicitação ao ambiente.",
   "63691126fe3aa03a": "O ambiente não está conectado.",
@@ -775,7 +784,7 @@
   "4f076ebbf1c8846e": "Isto remove apenas as entradas do projeto, não os arquivos no disco.",
   "19b8f3ad79efb9e1": "As outras entradas deste projeto agrupado não são afetadas.",
   "2207c69b042b2e37": "Esta ação não pode ser desfeita.",
-  "0b3de745be8aee67": "Esta sessão do ambiente não é mais válida (invalid_credential). Atualize a página ou feche e reabra o Stardust.",
+  "0b3de745be8aee67": "Esta sessão do ambiente não é mais válida (invalid_credential). Atualize a página ou feche e reabra o T3 Code.",
   "a414f5045fa2e8da": "O ambiente não respondeu à solicitação do PR.",
   "e1b5268aa311f464": "O ambiente foi removido.",
   "00d50f88c665cc51": "A conexão HTTP do ambiente não está pronta.",
@@ -818,6 +827,7 @@
   "21872f69ccbc711d": "Iniciando servidores MCP do {provider}",
   "fedaa29ff8815a77": "Carregando hooks do {provider}",
   "57025ae4de5beb57": "Carregando regras e skills do {provider}",
+  "1cbfbcad9f0d04fe": "Retomando a sessão do {provider}",
   "4729a188600f1501": "Conectando ao {provider}",
   "8c8977097681630f": "Iniciando {provider}",
   "f1d27d127ab27ac6": "Iniciando",
@@ -872,9 +882,13 @@
   "05b16c85cb1e18bd": "Nenhum repositório",
   "04ea9e0e663983fd": "Todos os repositórios",
   "c07bd24ff49e85d9": "{count, plural, one {{count} repositório} other {{count} repositórios}}",
+  "1b799ebfa94c2408": "Aprovação de hooks de push",
+  "81d703184fe5112e": "Executar os hooks de push deste repositório?",
+  "027b0d65c7a67af6": "Arquivo de hook",
+  "ade585910165bb52": "Hook configurado",
   "e94aa66471dae6aa": "Por que estou recebendo esta pergunta?",
   "228a325b5708e675": "O acesso total ignora as aprovações, mas uma regra de pergunta nas configurações do próprio agente corresponde a esta ação, então ele ainda pergunta. Remova ou restrinja essa regra para parar esses pedidos.",
-  "3f9101f696c738a8": "O acesso total ignora as aprovações, mas o agente ainda para em algumas verificações de segurança próprias que nenhuma configuração ignora, como uma exclusão cujo caminho ele não consegue verificar. O Stardust não consegue desativá-las, então confira a solicitação e aprove se for o que você espera.",
+  "3f9101f696c738a8": "O acesso total ignora as aprovações, mas o agente ainda para em algumas verificações de segurança próprias que nenhuma configuração ignora, como uma exclusão cujo caminho ele não consegue verificar. O T3 Code não consegue desativá-las, então confira a solicitação e aprove se for o que você espera.",
   "508591c3b632b254": "{count, plural, one {Em {count} dia} other {Em {count} dias}}",
   "b6e3cd6c7a081b8c": "{count, plural, one {Em {count} hora} other {Em {count} horas}}",
   "3b8e428bf67b3a2d": "{count, plural, one {Em {count} minuto} other {Em {count} minutos}}",
@@ -1003,15 +1017,15 @@
   "ad8172e048016a67": "{status, select, inProgress {Atualizando uma tarefa agendada} completed {Atualizou uma tarefa agendada} failed {Falha ao atualizar uma tarefa agendada} declined {Recusou-se a atualizar uma tarefa agendada} stopped {Parou de atualizar uma tarefa agendada} other {Atualizando uma tarefa agendada}}",
   "3983da99adfa059f": "{status, select, inProgress {Excluindo uma tarefa agendada} completed {Pediu a exclusão de uma tarefa agendada} failed {Falha ao excluir uma tarefa agendada} declined {Recusou-se a excluir uma tarefa agendada} stopped {Parou de excluir uma tarefa agendada} other {Excluindo uma tarefa agendada}}",
   "2e5bcbeed3f7c7d5": "{status, select, inProgress {Pedindo um segredo} completed {Pediu um segredo} failed {Falha ao pedir um segredo} declined {Recusou-se a pedir um segredo} stopped {Parou de pedir um segredo} other {Pedindo um segredo}}",
-  "64103dee63e54d6a": "{status, select, inProgress {Criando threads do Stardust} completed {Criou threads do Stardust} failed {Falha ao criar threads do Stardust} declined {Recusou-se a criar threads do Stardust} stopped {Parou de criar threads do Stardust} other {Criando threads do Stardust}}",
-  "0a7ec36662b6eff7": "{status, select, inProgress {Iniciando uma thread do Stardust} completed {Iniciou uma thread do Stardust} failed {Falha ao iniciar uma thread do Stardust} declined {Recusou-se a iniciar uma thread do Stardust} stopped {Parou de iniciar uma thread do Stardust} other {Iniciando uma thread do Stardust}}",
-  "091b32b694a56e46": "{status, select, inProgress {Listando threads do Stardust} completed {Listou threads do Stardust} failed {Falha ao listar threads do Stardust} declined {Recusou-se a listar threads do Stardust} stopped {Parou de listar threads do Stardust} other {Listando threads do Stardust}}",
-  "c9964791c2b5e1ae": "{status, select, inProgress {Lendo uma thread do Stardust} completed {Leu uma thread do Stardust} failed {Falha ao ler uma thread do Stardust} declined {Recusou-se a ler uma thread do Stardust} stopped {Parou de ler uma thread do Stardust} other {Lendo uma thread do Stardust}}",
-  "11f8fa5c63041915": "{status, select, inProgress {Enviando para uma thread do Stardust} completed {Enviou para uma thread do Stardust} failed {Falha ao enviar para uma thread do Stardust} declined {Recusou-se a enviar para uma thread do Stardust} stopped {Parou de enviar para uma thread do Stardust} other {Enviando para uma thread do Stardust}}",
-  "9a30dcc6b7680d28": "{status, select, inProgress {Aguardando uma thread do Stardust} completed {Aguardou uma thread do Stardust} failed {Falha ao aguardar uma thread do Stardust} declined {Recusou-se a aguardar uma thread do Stardust} stopped {Parou de aguardar uma thread do Stardust} other {Aguardando uma thread do Stardust}}",
+  "64103dee63e54d6a": "{status, select, inProgress {Criando threads do T3} completed {Criou threads do T3} failed {Falha ao criar threads do T3} declined {Recusou-se a criar threads do T3} stopped {Parou de criar threads do T3} other {Criando threads do T3}}",
+  "0a7ec36662b6eff7": "{status, select, inProgress {Iniciando uma thread do T3} completed {Iniciou uma thread do T3} failed {Falha ao iniciar uma thread do T3} declined {Recusou-se a iniciar uma thread do T3} stopped {Parou de iniciar uma thread do T3} other {Iniciando uma thread do T3}}",
+  "091b32b694a56e46": "{status, select, inProgress {Listando threads do T3} completed {Listou threads do T3} failed {Falha ao listar threads do T3} declined {Recusou-se a listar threads do T3} stopped {Parou de listar threads do T3} other {Listando threads do T3}}",
+  "c9964791c2b5e1ae": "{status, select, inProgress {Lendo uma thread do T3} completed {Leu uma thread do T3} failed {Falha ao ler uma thread do T3} declined {Recusou-se a ler uma thread do T3} stopped {Parou de ler uma thread do T3} other {Lendo uma thread do T3}}",
+  "11f8fa5c63041915": "{status, select, inProgress {Enviando para uma thread do T3} completed {Enviou para uma thread do T3} failed {Falha ao enviar para uma thread do T3} declined {Recusou-se a enviar para uma thread do T3} stopped {Parou de enviar para uma thread do T3} other {Enviando para uma thread do T3}}",
+  "9a30dcc6b7680d28": "{status, select, inProgress {Aguardando uma thread do T3} completed {Aguardou uma thread do T3} failed {Falha ao aguardar uma thread do T3} declined {Recusou-se a aguardar uma thread do T3} stopped {Parou de aguardar uma thread do T3} other {Aguardando uma thread do T3}}",
   "9a6cfe52bf7474e3": "{status, select, inProgress {Parando um workflow} completed {Pediu a parada de um workflow} failed {Falha ao parar um workflow} declined {Recusou-se a parar um workflow} stopped {Desistiu de parar um workflow} other {Parando um workflow}}",
   "c442e0a7c4299554": "{status, select, inProgress {Atualizando esperas em segundo plano} completed {Atualizou esperas em segundo plano} failed {Falha ao atualizar esperas em segundo plano} declined {Recusou-se a atualizar esperas em segundo plano} stopped {Parou de atualizar esperas em segundo plano} other {Atualizando esperas em segundo plano}}",
-  "56753cad0f6ffa6e": "{status, select, inProgress {Interrompendo uma thread do Stardust} completed {Pediu a interrupção de uma thread do Stardust} failed {Falha ao interromper uma thread do Stardust} declined {Recusou-se a interromper uma thread do Stardust} stopped {Parou de interromper uma thread do Stardust} other {Interrompendo uma thread do Stardust}}",
+  "56753cad0f6ffa6e": "{status, select, inProgress {Interrompendo uma thread do T3} completed {Pediu a interrupção de uma thread do T3} failed {Falha ao interromper uma thread do T3} declined {Recusou-se a interromper uma thread do T3} stopped {Parou de interromper uma thread do T3} other {Interrompendo uma thread do T3}}",
   "1656e79608b8d13e": "{status, select, inProgress {Transferindo a thread para um worktree do git} completed {Transferiu a thread para um worktree do git} failed {Falha ao transferir a thread para um worktree do git} declined {Recusou-se a transferir a thread para um worktree do git} stopped {Parou de transferir a thread para um worktree do git} other {Transferindo a thread para um worktree do git}}",
   "bfab58e83d64783d": "{status, select, inProgress {Obtendo o status do worktree da thread} completed {Obteve o status do worktree da thread} failed {Falha ao obter o status do worktree da thread} declined {Recusou-se a obter o status do worktree da thread} stopped {Parou de obter o status do worktree da thread} other {Obtendo o status do worktree da thread}}",
   "fc34b0e6c9243ae6": "{status, select, inProgress {Obtendo o status do navegador de pré-visualização} completed {Obteve o status do navegador de pré-visualização} failed {Falha ao obter o status do navegador de pré-visualização} declined {Recusou-se a obter o status do navegador de pré-visualização} stopped {Parou de obter o status do navegador de pré-visualização} other {Obtendo o status do navegador de pré-visualização}}",
@@ -1058,7 +1072,7 @@
   "e1a8104deda845e8": "{status, select, inProgress {Pesquisando o conteúdo das threads} completed {Pesquisou o conteúdo das threads} failed {Falha ao pesquisar o conteúdo das threads} declined {Recusou-se a pesquisar o conteúdo das threads} stopped {Parou de pesquisar o conteúdo das threads} other {Pesquisando o conteúdo das threads}}",
   "0b64c9ece7beac84": "{status, select, inProgress {Lendo transferências de threads} completed {Leu transferências de threads} failed {Falha ao ler transferências de threads} declined {Recusou-se a ler transferências de threads} stopped {Parou de ler transferências de threads} other {Lendo transferências de threads}}",
   "be359ad2daa518d5": "{status, select, inProgress {Organizando uma thread} completed {Organizou uma thread} failed {Falha ao organizar uma thread} declined {Recusou-se a organizar uma thread} stopped {Parou de organizar uma thread} other {Organizando uma thread}}",
-  "2c7c576cb8cff44f": "{status, select, inProgress {Atualizando os metadados da thread do Stardust} completed {Atualizou os metadados da thread do Stardust} failed {Falha ao atualizar os metadados da thread do Stardust} declined {Recusou-se a atualizar os metadados da thread do Stardust} stopped {Parou de atualizar os metadados da thread do Stardust} other {Atualizando os metadados da thread do Stardust}}",
+  "2c7c576cb8cff44f": "{status, select, inProgress {Atualizando os metadados da thread do T3} completed {Atualizou os metadados da thread do T3} failed {Falha ao atualizar os metadados da thread do T3} declined {Recusou-se a atualizar os metadados da thread do T3} stopped {Parou de atualizar os metadados da thread do T3} other {Atualizando os metadados da thread do T3}}",
   "3c3133980286c94e": "{status, select, inProgress {Listando os branches do workspace} completed {Listou os branches do workspace} failed {Falha ao listar os branches do workspace} declined {Recusou-se a listar os branches do workspace} stopped {Parou de listar os branches do workspace} other {Listando os branches do workspace}}",
   "2eb79ae96a3f08b8": "{status, select, inProgress {Listando as abas de pré-visualização} completed {Listou as abas de pré-visualização} failed {Falha ao listar as abas de pré-visualização} declined {Recusou-se a listar as abas de pré-visualização} stopped {Parou de listar as abas de pré-visualização} other {Listando as abas de pré-visualização}}",
   "2eea47957955b2f3": "{status, select, inProgress {Fechando uma aba de pré-visualização} completed {Fechou uma aba de pré-visualização} failed {Falha ao fechar uma aba de pré-visualização} declined {Recusou-se a fechar uma aba de pré-visualização} stopped {Parou de fechar uma aba de pré-visualização} other {Fechando uma aba de pré-visualização}}",
@@ -1156,7 +1170,7 @@
   "925416c7a6459d5c": "Este link aponta para um pull request que o Stardust não consegue ler.",
   "df1915cc1c939ef9": "Este link não tem prompt.",
   "b901183273710f78": "Este link aponta para um repositório que o Stardust não consegue ler.",
-  "207267a58d3542ba": "Depois que você parar, {environment} envia a gravação para o OpenRouter. O OpenRouter escolhe quem executa seu modelo. O Stardust solicita retenção zero de dados; sua conta do OpenRouter pode permitir retenção por segurança.",
+  "207267a58d3542ba": "Depois que você parar, {environment} envia a gravação para o OpenRouter. O OpenRouter escolhe quem executa seu modelo. O T3 solicita retenção zero de dados; sua conta do OpenRouter pode permitir retenção por segurança.",
   "81b64c298285297c": "Depois que você parar, {environment} envia sua gravação e as dicas de vocabulário, incluindo nomes de projetos, para {provider}.",
   "615ce9f2edf7208f": "Vincular um pull request",
   "4ece383dad280e57": "Vincular pull requests",
@@ -1193,15 +1207,15 @@
   "7c6d982ac7206fff": "Atualizar uma tarefa agendada",
   "6c5a5c1fc484b994": "Excluir uma tarefa agendada",
   "76ed47bc9da51cc4": "Pedir um segredo",
-  "30a8c0f9a6576ee8": "Criar threads do Stardust",
-  "557ba6282ab349d7": "Iniciar uma thread do Stardust",
-  "55cb2eb842d7b91b": "Listar threads do Stardust",
-  "96249620a43e7e9e": "Ler uma thread do Stardust",
-  "5d935e12e0833489": "Enviar para uma thread do Stardust",
-  "dd0cfbfec90e795b": "Aguardar uma thread do Stardust",
+  "30a8c0f9a6576ee8": "Criar threads do T3",
+  "557ba6282ab349d7": "Iniciar uma thread do T3",
+  "55cb2eb842d7b91b": "Listar threads do T3",
+  "96249620a43e7e9e": "Ler uma thread do T3",
+  "5d935e12e0833489": "Enviar para uma thread do T3",
+  "dd0cfbfec90e795b": "Aguardar uma thread do T3",
   "4c114e8efb34f0e6": "Parar um workflow",
   "ff41ed44675c0388": "Atualizar esperas em segundo plano",
-  "9d65078ad69d11ff": "Interromper uma thread do Stardust",
+  "9d65078ad69d11ff": "Interromper uma thread do T3",
   "b8f29a57d98e0842": "Transferir a thread para um worktree do git",
   "214b538f1253466c": "Obter o status do worktree da thread",
   "512a4723a4ed98a4": "Obter o status do navegador de pré-visualização",
@@ -1248,7 +1262,7 @@
   "239f30c38e1d3e76": "Pesquisar o conteúdo das threads",
   "f36654f4bd1c14f4": "Ler transferências de threads",
   "cdf532d3300f1bd4": "Organizar uma thread",
-  "5f2369d5ff9ada4c": "Atualizar os metadados da thread do Stardust",
+  "5f2369d5ff9ada4c": "Atualizar os metadados da thread do T3",
   "d7e4d133cc051025": "Listar os branches do workspace",
   "0d2de20595847b47": "Listar as abas de pré-visualização",
   "a65e8408c7f89599": "Fechar uma aba de pré-visualização",
@@ -1297,7 +1311,7 @@
   "c13753167634f7aa": "Leu o arquivo",
   "5ce648cd03020fd9": "Leu {path} e mais {count}",
   "5d6c2898401c94e6": "Leu {path}",
-  "612170d804b03320": "{count, plural, one {{count} registro de uso malformado ou inconsistente foi ignorado; o uso pode estar incompleto.} other {{count} registros de uso malformados ou inconsistentes foram ignorados; o uso pode estar incompleto.}}",
+  "69150fe436b3a0c2": "{count, plural, one {{count} registro de uso malformado ou inconsistente foi ignorado; o uso pode estar incompleto.} other {{count} registros de uso malformados ou inconsistentes foram ignorados; o uso pode estar incompleto.}}",
   "ee448ceb6820ce2f": "{environment} roda uma versão mais antiga do servidor e fica fora dos totais.",
   "732708950237004e": "Este cliente é mais antigo que o servidor em {environment}; o uso dele fica fora dos totais.",
   "9758c2ede06aa19b": "Hoje às {hour}",
@@ -1332,7 +1346,7 @@
   "c47ebef856c52c5f": "renova em {duration}",
   "aeac6844ac2cde59": "Texto simples",
   "d1d2b3130458bf2e": "Assembly",
-  "06ca993fa4236249": "Pergunte qualquer coisa. @ arquivos, $ skills, / comandos",
+  "9e25f0ed481ee573": "Tell Stardust your idea… @ files, $ skills, / commands",
   "279a7589a1c78b0d": "Menu de contexto",
   "54f1a9e3c9e146cd": "Editor",
   "c3b46a31a4d3999b": "Abrir no editor",
@@ -1342,9 +1356,9 @@
   "a9b663922945a4fa": "Esta conexão não pode abrir um editor neste ambiente.",
   "868596d482a1a2bd": "Abrir",
   "f58caaa68c09fbeb": "Abrir com",
+  "75b6d7c3bc9c72da": "Não foi possível abrir no {editor}",
   "415d9fed5542d278": "Não foi possível abrir o arquivo",
   "1d1bbe5b700afe63": "Não foi possível mostrar o arquivo",
-  "75b6d7c3bc9c72da": "Não foi possível abrir no {editor}",
   "31dc19d033af2774": "Não foi possível abrir o link.",
   "029d8d0201aed231": "Não foi possível abrir as Configurações do Sistema.",
   "9af3083226778d3c": "O Open VSX retornou detalhes de tema malformados.",
@@ -1518,9 +1532,12 @@
   "85632ff85a7d923d": "O arquivo não está disponível neste computador.",
   "3d2036743bbda4c9": "Não foi possível arrastar o arquivo",
   "a5df28a112e62bc3": "Versões incompatíveis. Tente sincronizar o cliente e o servidor na mesma versão do Stardust.",
+  "5173c50b0a60847c": "Atualização disponível: {serverVersion} → {clientVersion}",
   "4eb599c7f36c99ba": "Esse arquivo de tema não é um JSON válido.",
   "29a5ff50ce55c4f9": "Tema do VS Code",
   "10348092dfed8b11": "Esse tema do VS Code não tem a cor \"editor.background\", então não há base para criar uma paleta.",
+  "206811f6f441bfc7": "Este projeto prepara os worktrees com um comando próprio, que ninguém aprovou como está escrito agora. Esta conexão não pode aprová-lo: aprove-o em um cliente que possa usar o terminal.",
+  "b8087c9a70c26da9": "Não foi possível aprovar o comando de layout de worktree.",
   "6dff8d487001c6cf": "Responsivo",
   "f5f61c338cc5aeb5": "Barra de dispositivos do navegador",
   "3b4eb5b5ec5e60cb": "Predefinição de dispositivo do navegador",
@@ -1549,6 +1566,7 @@
   "6848f5bbb2bd9eec": "Documento PDF",
   "7873a79df0cf6d0e": "Página do navegador",
   "0b55696e27387e4e": "Pressione Shift+Escape para sair da página do navegador.",
+  "90dfebe26eb86b2d": "Opções de seleção da página",
   "737d3c6bec93f9e6": "Escolher arquivos para a página",
   "e6a3fa7cfc14f86a": "Caixa de diálogo do navegador",
   "61a552a67e9e3eac": "Resposta da caixa de diálogo",
@@ -1692,10 +1710,12 @@
   "bb7586d989532f55": "Os repositórios começam a partir de {branch} quando o têm",
   "8fbc792d713668c1": "Cada modelo começa no próprio worktree.",
   "97405c12100cb246": "Executar em",
+  "f858dae2d80bdbae": "Área de trabalho: {workspace}",
   "44ad5a6f7fd4f644": "Contexto de execução: {context}",
   "25ae6917f8121f5d": "Balanceamento automático",
   "0835c108d19201de": "Executar em",
   "b969a1b480d68ad4": "Workspace",
+  "f04d00285fcc5e77": "Uma branch separada é criada ao enviar a primeira mensagem",
   "96e12ca744c01e35": "Pare o turno atual para trocar de worktree.",
   "b957c6c180be3cb9": "A API da área de transferência não está disponível ao copiar o nome do branch.",
   "3452323a2e5003e4": "Falha ao copiar o nome do branch para a área de transferência.",
@@ -1851,7 +1871,7 @@
   "67f5b13c3c7bcd40": "Compartilhar com convidado",
   "82da5b8b340217ac": "Reiniciar a sessão do agente",
   "963d099509eabcd6": "A sessão do agente será reiniciada",
-  "1d384d4fe7888a09": "Sua próxima mensagem inicia uma nova sessão.",
+  "71ed7c0da0b93c77": "Sua próxima mensagem reinicia o agente. Esta conversa é mantida.",
   "e4b61c891fed297e": "Ir para arquivo",
   "d2ccdb8cd3297212": "Adicionar projeto",
   "594bcbef04093f72": "Abrir pasta do WSL",
@@ -1866,7 +1886,6 @@
   "1d17dc60c59e0524": "Desafixar projeto",
   "5cfaaa20c460c328": "Fixar projeto",
   "24adf508b4c5d6b5": "Configurações do projeto",
-  "60e47b3da5901619": "Configurações · {section}",
   "0c659f9a193255dd": "Falha ao adicionar o projeto",
   "4b3fc098d5a08a66": "Caminhos no estilo Windows só são compatíveis com o Windows.",
   "2c2637dc1e236fb4": "Caminhos relativos exigem um projeto ativo.",
@@ -1918,13 +1937,13 @@
     "Nova thread em",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "dbc0288da29ce1d4": "Pesquisando mensagens…",
@@ -1954,6 +1973,7 @@
   "f844c41fac2d339c": "Atual",
   "69154433587763c0": "Nenhuma ação correspondente.",
   "90c3a382ecefa0ce": "Nenhum comando, projeto ou thread correspondente.",
+  "60e47b3da5901619": "Configurações · {section}",
   "4758dde317babc14": "Não foi possível salvar a seleção de tema",
   "448735c0084132f5": "Tente novamente.",
   "e1ef4197dc810bab": "Para o modo claro",
@@ -1967,13 +1987,16 @@
   "7af7f00b85cc2930": "Confirmar ação",
   "8b418a02b73f49b8": "Esta ação exige sua confirmação.",
   "e74139c17fab1fa1": "Confirmar",
+  "4a18481bea4b4ad5": "Novo dispositivo conectado a {environmentLabel}",
+  "4144ab6aa487528a": "{device} se conectou pelo {product}. Não foi você? Revise.",
+  "a10cfdb27152c757": "{count, plural, one {{count} dispositivo se conectou} other {{count} dispositivos se conectaram}} pelo {product}. Não foi você? Revise.",
+  "4672f332c89dbcd9": "Revisar",
   "775a3e99e2638341": "Um dispositivo quer se conectar a {environmentLabel}",
   "a8befcb9f1c61f60": "{device}. Aprove apenas se ele mostrar o código {code}.",
   "ac48cc297029db41": "Aprovar",
   "c12ca3fea745def0": "Não foi possível aprovar o dispositivo",
   "af63f05ed2f5eeb3": "Negar",
   "b735bab216b27041": "Não foi possível negar o dispositivo",
-  "4672f332c89dbcd9": "Revisar",
   "913fc23f62321556": "Escolha uma data e hora válidas no futuro.",
   "9485a52216cfc0d5": "Informe uma duração positiva.",
   "9bc551235d78e133": "Tipo de agendamento",
@@ -2067,6 +2090,8 @@
   "b2c35cd235de63e0": "Carregando alterações...",
   "bcbd16c97c6c1215": "Nenhuma alteração líquida nesta seleção.",
   "7e9cb3ca9f5470ae": "Nenhum patch disponível para esta seleção.",
+  "ccd5fc4db08374d7": "{count, plural, one {{count} arquivo de teste oculto} other {{count} arquivos de teste ocultos}}",
+  "a92edf8d81354772": "Mostrar arquivos de teste",
   "e797245c587e7e29": "Redimensionar arquivos de Alterações",
   "99c76aa12c632a36": "Arquivos de {section}",
   "3e9ddb26c2c59bcc": "Alterações",
@@ -2097,7 +2122,7 @@
   "2c7dd1701c1e4878": "O provedor gravou o conteúdo do arquivo sem um diff.",
   "7af7238975f15a8f": "Carregando código...",
   "c53cf4b26ec0586d": "Máquina, {label}",
-  "83614cccb38836d1": "Ambiente do Stardust",
+  "0c01f791ecef34ad": "Ambiente do T3 Code",
   "6ba599e5a409f99d": "Máquina fora deste app",
   "3826acf499042b3b": "Fazendo pull das alterações mais recentes...",
   "4d104843b652df2c": "Iniciando ação de controle de versão...",
@@ -2148,7 +2173,6 @@
   "2e1225f8dd45c1b3": "{term, select, mr {MR criado} cr {Solicitação de alteração criada} other {PR criado}}",
   "421c7b74b8abedfb": "Falha no pull",
   "24f0369a3c9d7936": "Pull concluído",
-  "adb9c574404d1db8": "Já está atualizado",
   "03898054efa2f20d": "{ref} atualizada a partir de {upstream}",
   "693e5ab425b5ca03": "{ref} atualizada a partir do upstream",
   "21c91dccca84c8c7": "{ref} já está sincronizada.",
@@ -2236,16 +2260,16 @@
   "363b9991fa23d36b": [
     "Pule a instalação se você já tem o ",
     {
-      "t": "code",
+      "c": "t3",
       "i": 1,
-      "c": "t3"
+      "t": "code"
     },
     ". Se o",
     " ",
     {
-      "t": "code",
+      "c": "t3",
       "i": 2,
-      "c": "t3"
+      "t": "code"
     },
     " não for encontrado após a instalação, adicione ao seu PATH a pasta indicada pelo instalador."
   ],
@@ -2277,7 +2301,7 @@
   "7543807a82fa9ccd": "Selecione uma thread existente ou crie uma nova para começar.",
   "9a7d2f935254da1f": "Adicione um projeto para iniciar sua primeira thread.",
   "2f09f0b45255d8ce": "Adicione um projeto ou comece sem um.",
-  "c5b11890aa7f406f": "No que vamos trabalhar?",
+  "4b78a6b33579994b": "Which star shall we start from?",
   "01059eb93804de5a": "Adicionar projeto",
   "d95275127354650e": "As permissões de {label} mudaram",
   "c87e4484112112e3": "Esta conexão ainda usa as permissões antigas, então algumas ações podem não estar mais disponíveis. Pareie novamente usando um novo link com as permissões de que você precisa.",
@@ -2579,13 +2603,13 @@
     " não está instalado em",
     " ",
     {
-      "t": "span",
-      "i": 2,
       "c": {
         "i": 3,
         "k": "_gt_value_3",
         "v": "v"
-      }
+      },
+      "i": 2,
+      "t": "span"
     },
     ", então as solicitações aqui usam seu próprio login do GitHub e o limite de taxa menor dele."
   ],
@@ -2608,6 +2632,8 @@
   "fd1316b1f627872b": "Aprovação necessária",
   "a3178769f8308cbc": "A thread falhou",
   "c6196d99000642b4": "Abrir thread",
+  "70bdebaa3d291d3b": "Thread indisponível",
+  "a351ebbdcf1a3f7a": "Esta thread está em um ambiente ao qual este app não está conectado.",
   "826cb862b4a11fb3": "{label}:",
   "3e597ec938e7551b": "Você:",
   "a1fbf2422c588292": "Agente:",
@@ -2633,6 +2659,24 @@
   "fc2c9a91f498ad6b": "{count, plural, one {{count} processo do terminal em execução. Abrir terminal} other {{count} processos do terminal em execução. Abrir terminal}}",
   "643c4b50feadc874": "Worktree: {path} ({branch})",
   "fb7c44da0f0825ea": "Worktree: {path}",
+  "06d3fe3e6b255d15": [
+    "+",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " mais"
+  ],
+  "f1b18820c0ab93ac": [
+    "+",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " mais em Itens vinculados"
+  ],
   "56f37ff8ca568059": "pilha",
   "6831e9a46cbd8939": "cadeia",
   "9aa9e74a3b7eee91": "Adicionar ao chat",
@@ -2676,11 +2720,29 @@
   "a707abf0a4a73ffa": "Fechar terminal ({shortcut})",
   "9206ecf328948f90": "Fechar terminal",
   "9b1326a11cfe3308": "Ainda não há sessões de terminal nesta thread.",
+  "49eda70cfd56e621": "Executado quando uma thread em worktree começa e quando a pasta dela é restaurada",
+  "188ccaa1199f5611": "Executado quando o worktree de uma thread é removido",
+  "7e8476e7306acabe": "Permitir que este projeto execute seus comandos de worktree?",
+  "8e11914556fd8b13": [
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " prepara as threads em worktree com comandos próprios de ",
+    {
+      "c": "t3.json",
+      "i": 2,
+      "t": "code"
+    },
+    ". Eles são executados na máquina deste ambiente com as suas permissões, fora de qualquer sandbox de agente. Você será perguntado de novo sempre que o texto deles mudar."
+  ],
+  "46807acd02a4ff72": "Aprovar e continuar",
+  "a0dfd0ea1cf08f90": "O branch padrão de cada repositório",
   "2ac142f34e5dabc2": "Repositórios no novo worktree: {selection}",
   "c514773a8031f00b": "Filtrar repositórios",
   "e32b730f6d27753f": "Escolha os repositórios em que esta thread trabalha",
   "6a483f4461919209": "Cada um recebe seu próprio worktree no branch da thread",
-  "a0dfd0ea1cf08f90": "O branch padrão de cada repositório",
   "fb4a7f9335463af5": "Branch base",
   "2e2d1910c9859536": "Nenhum repositório correspondente",
   "be54224dbe3c6be5": "Começar a partir deste branch quando um repositório o tiver",
@@ -2752,9 +2814,9 @@
   "86f71ac04d41f95e": [
     "Pressione um atalho. Use ",
     {
-      "t": "code",
+      "c": "Backspace",
       "i": 1,
-      "c": "Backspace"
+      "t": "code"
     },
     " para limpar. Os atalhos valem para todo o ambiente. Projetos que usam a mesma ação compartilham o atalho."
   ],
@@ -2912,11 +2974,11 @@
   "838bbb8348a7e1d7": "O Stardust não conseguiu abrir uma nova thread.",
   "eb9ecb0cb72121a0": "Esta máquina não pode iniciar threads sem projeto.",
   "32e2dbf6abe8c748": "Iniciando a triagem…",
-  "ce5c66ae967fd7c8": "Ações de thread indisponíveis",
-  "d4f0043ab9348e2c": "Esta thread ainda não foi carregada.",
   "6c13d520b6601f65": "Arquivar a thread \"{title}\"?",
   "83e50f9b118a7a0a": "Thread arquivada, mas a navegação falhou",
   "da43691fb8ad8006": "Falha ao arquivar a thread",
+  "ce5c66ae967fd7c8": "Ações de thread indisponíveis",
+  "d4f0043ab9348e2c": "Esta thread ainda não foi carregada.",
   "de2cfd4a757c656a": "Não é possível arquivar enquanto o provedor está ativo.",
   "8523f86d3c21edf3": "O servidor deste ambiente ainda não permite concluir threads. Atualize o servidor para usar Concluir.",
   "876b987471f908d4": "O servidor deste ambiente ainda não permite adiar threads. Atualize o servidor para usar Adiar.",
@@ -2997,6 +3059,8 @@
   "4f14e3fc3a216f44": "Isso encerra o processo em execução e apaga o histórico dele.",
   "16ce8443044b45fd": "Fechar {count, plural, one {{count} terminal} other {{count} terminais}}?",
   "a9697e470d40706a": "Isso encerra os processos em execução e apaga os históricos deles: {labels}.",
+  "f3c70064a22a0c76": "{terminalLabel} linha {lineStart}",
+  "8ba6febaabeb6f14": "{terminalLabel} linhas {lineStart}–{lineEnd}",
   "ef4bae5c5f3684f4": "Conteúdo gravado antes",
   "5e4a0e56a0788d86": "Conteúdo gravado depois",
   "6d5a8b471a561b9d": "Explorador de Arquivos",
@@ -3127,13 +3191,13 @@
     "Este agente quer usar as threads de todos os projetos em",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     " ",
     "(",
@@ -3148,13 +3212,13 @@
     "Este agente quer usar as threads de todos os projetos em",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     "."
   ],
@@ -3167,9 +3231,9 @@
     },
     " ",
     {
-      "t": "span",
+      "c": "· nome definido pelo app",
       "i": 2,
-      "c": "· nome definido pelo app"
+      "t": "span"
     }
   ],
   "47d3ba1a39016131": "O acesso vai para",
@@ -3180,9 +3244,9 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": [" ", "no computador que abriu esta página"],
       "i": 2,
-      "c": [" ", "no computador que abriu esta página"]
+      "t": "span"
     }
   ],
   "b2d53b4d1d48fbef": [
@@ -3192,9 +3256,9 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": [" ", "· quem executar recebe este acesso"],
       "i": 2,
-      "c": [" ", "· quem executar recebe este acesso"]
+      "t": "span"
     }
   ],
   "c54cc9c75db9dc58": "Aprove apenas um login que você acabou de iniciar.",
@@ -3203,16 +3267,17 @@
     "Obtenha um em Usar o Stardust em outro app (MCP), Configurações → Compartilhamento ou com",
     " ",
     {
-      "t": "code",
+      "c": "t3 auth pairing create",
       "i": 1,
-      "c": "t3 auth pairing create"
+      "t": "code"
     },
     " nesta máquina."
   ],
   "49e3cf16b3ac3e5f": "Acesso",
   "9699d255b374e215": "O que ele pode fazer",
   "86f5769278f5fa4d": "Além da leitura, ele pode iniciar, enviar mensagens e parar threads, e nenhuma delas pode rodar com mais do que o modo que você escolher.",
-  "693a1983e099523a": "Conectando a este backend.",
+  "4f3982f640dfed5b": "Este link adiciona um backend a este navegador. Continue somente se você confia nele.",
+  "41b32a424841adb7": "Este link de pareamento tem um host de backend inválido.",
   "ec2a82b05e616aa0": "Falta o host do backend ou o token neste link de pareamento.",
   "630d4f04309bc19a": "Falha na autenticação.",
   "63bc32e8544f4de1": "Este ambiente exige uma credencial de pareamento confiável antes que o app possa se conectar.",
@@ -3226,27 +3291,30 @@
   "55c59743f7fdd7fa": "Cole um token de uso único ou um segredo de pareamento",
   "ca6a0c94398d763d": "Pareando...",
   "989f56b8297dd684": "Este token de pareamento de uso único já foi enviado. Solicite um novo link de pareamento.",
+  "693a1983e099523a": "Conectando a este backend.",
   "db3dcafc90d10405": "{environment} está salvo neste navegador.",
   "47d4ab320c4c394c": "O ambiente está salvo neste navegador.",
   "d235c6bfa25870a4": "{error} Se o backend aceitou este token de uso único, solicite um novo link de pareamento antes de tentar novamente.",
   "00c1dcaef4762f18": "Backend pareado",
   "aac4a30e5912c01c": "Falha no pareamento",
+  "c142c3f3bed15f8d": "Adicionar este backend?",
   "dbb27f4ee8ecfa8e": "Pareando o backend",
   "8049e9ba2e8b4867": "Token de pareamento",
   "0528294df7656322": [
     "Host:",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "ff5f1c260e87ecde": "Verifique se o backend está acessível a partir deste navegador, se permite CORS para clientes hospedados e se é servido por HTTPS quando esta página é aberta via HTTPS.",
+  "984c25ffcae69300": "Adicionar backend",
   "08570ee0982df89d": "Pareando...",
   "3bbae7c96b6cbfc3": "Abrir app",
   "49cc06e79f21f85a": "{seconds}s",
@@ -3254,6 +3322,9 @@
   "f2a955905704b91d": "{hours}h {minutes}min",
   "3609f564a63c8eca": "{minutes}min",
   "9251bb742f60720d": "{hours}h",
+  "035aab5e99159bd8": "{count, plural, one {… {hidden} caractere do meio não é exibido.} other {… {hidden} caracteres do meio não são exibidos.}} O texto termina com:",
+  "011b1ef726fa9928": "Role cada parte para ler tudo.",
+  "6c6e16b9488f8b91": "Role para ler tudo.",
   "a1e982c6047c0860": "Ir para a resposta citada: {label}",
   "c156140c3f5ebb75": "Ir para a resposta a que esta responde: {label}",
   "f8031a49c6e9fe25": "Ver o texto citado do assistente: {label}",
@@ -3325,7 +3396,7 @@
   "6b45252b76f5ca2e": "Não foi possível adicionar a thread",
   "da13069e7a3a8ffd": "Expandir o editor de mensagens",
   "d3356b4524173b25": "Ative um provedor nas Configurações",
-  "3d3f30f1a1c4fc52": "Pergunte qualquer coisa...",
+  "0370518a800e0d5c": "Tell Stardust your idea...",
   "305d6d72f1220d98": "Procurando o pull request...",
   "cf855794f7b8ddb5": "Pesquisando skills do workspace...",
   "e159e35b83a86404": "Pesquisando arquivos do workspace...",
@@ -3382,13 +3453,13 @@
     "Mudar para",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     "?"
   ],
@@ -3432,7 +3503,7 @@
   "12170596ff889d5b": "Anexar novamente",
   "748efc40dc99b309": "Remova para enviar",
   "fd3d4318e7b094fa": "Rascunho",
-  "9c421cab815b9905": "{count, plural, one {Mostrar mais {count} imagem anexada} other {Mostrar mais {count} imagens anexadas}}",
+  "c7f5c98f1e79cc6c": "{count, plural, one {Mostrar mais {count} imagem anexada} other {Mostrar mais {count} imagens anexadas}}",
   "ae136257600738d3": "Anexar arquivos",
   "3e04fb123bbf31b4": "Não foi possível salvar o anexo do rascunho localmente, e ele pode se perder ao navegar.",
   "81709882b9996586": "Anexar arquivos",
@@ -3515,12 +3586,12 @@
   "35e0b8f7418b4a86": "Clique para enfileirar, {modifier}-clique para direcionar",
   "eed080cf5eb25bfd": "Resumir {tokens} tokens do histórico e enviar",
   "e4116d7f64a6f593": "Compactar {tokens} tokens do histórico antes de enviar",
-  "d6143c122719b099": "Manter",
-  "7335dc479a68818e": "Compactar",
   "b2411ad43ce3b143": "O próximo envio mantém todos os {tokens} tokens.",
   "ab6720311ff3140d": "O próximo envio compacta {tokens} tokens antes.",
   "1486a422ba77a084": "Clique para compactar antes",
   "b971f881c5dc4fca": "Clique para manter o histórico completo",
+  "d6143c122719b099": "Manter",
+  "7335dc479a68818e": "Compactar",
   "89426e9b039148d7": "Falha na entrada de voz",
   "2220a0fbb5b6fa47": "Baixando o modelo {percent}%",
   "5c05b24be2880672": "Gravando",
@@ -3576,8 +3647,8 @@
   "478e3b4551be4db3": "Mostrar texto extraído",
   "e7205ebfead1aafc": "Pré-visualização de vídeo expandida",
   "1bda77e861bb472f": "Pré-visualização de imagem expandida",
-  "eebe5b17e3c19a1c": "Voltar, fechar a pré-visualização do vídeo",
-  "58fd0009a6eb7258": "Voltar, fechar a pré-visualização da imagem",
+  "fb633d54edaeb4b1": "Fechar a pré-visualização do vídeo",
+  "62d0c453f5803180": "Fechar a pré-visualização da imagem",
   "47bae54b5f532ff3": "Mídia anterior",
   "fb9434aad2b5c0bb": "Não foi possível carregar esta imagem.",
   "26aee5d4e97bfb28": "Imagem indisponível. O arquivo pode ter sido movido ou excluído.",
@@ -3591,6 +3662,7 @@
   "ddb7e6f8ce99e657": "Somente quem pode executar agentes nesta máquina pode enviar ou recusar o relatório.",
   "03c1eb603c112f47": "Não enviar",
   "653405e4ed498d9f": "Enviar",
+  "76cf478e5674fd12": "{count, plural, one {{count} correspondência} other {{count} correspondências}}",
   "262955d6eb632f9b": "A API da área de transferência não está disponível ao copiar o link de convidado.",
   "f1a4f2b04cdbb4ef": "Falha ao copiar o link de convidado para a área de transferência.",
   "cf3490a604e44d31": "Não foi possível criar um link de convidado.",
@@ -3739,6 +3811,21 @@
     " foi fechado"
   ],
   "dff97202cbdaec5b": "Mostrar app",
+  "796b81c4875c4feb": [
+    "O app ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " precisa de um servidor ",
+    {
+      "i": 2,
+      "k": "_gt_value_2",
+      "v": "v"
+    },
+    " mais recente neste ambiente. Atualize o servidor para usá-lo."
+  ],
   "705cf2b2ee4e0e42": [
     "O app ",
     {
@@ -3817,8 +3904,8 @@
       "v": "v"
     },
     {
-      "t": "ArrowRightIcon",
-      "i": 3
+      "i": 3,
+      "t": "ArrowRightIcon"
     },
     {
       "i": 4,
@@ -3835,8 +3922,8 @@
       "v": "v"
     },
     {
-      "t": "ArrowRightIcon",
-      "i": 2
+      "i": 2,
+      "t": "ArrowRightIcon"
     },
     {
       "i": 3,
@@ -3884,11 +3971,11 @@
   "8413f3e7f703f14e": "Alternar painel de detalhes da thread",
   "a728e041b203714a": "Alternar detalhes da thread ({shortcut})",
   "5417d84fba7b6b84": "Alternar detalhes da thread",
-  "586edda3a01b9305": "Alternar gaveta do terminal",
   "d395686a462b77d2": "Alternar gaveta do terminal ({shortcut})",
+  "586edda3a01b9305": "Alternar gaveta do terminal",
   "c2fdb28a7ae3921b": "A gaveta do terminal não está disponível",
-  "8acd97d5e80bddd3": "Alternar painel direito",
   "fdc7805c136f3f7b": "Alternar painel direito ({shortcut})",
+  "8acd97d5e80bddd3": "Alternar painel direito",
   "d47ad54e98d33190": "O painel direito não está disponível",
   "7e4b0afa9879fd43": "Restaurar tamanho do painel",
   "8381e38420ae57f3": "Maximizar painel",
@@ -3918,22 +4005,22 @@
     "Informe um caminho relativo a",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     "."
   ],
   "dcd203d82cc65b22": [
     "Informe um caminho relativo a ",
     {
-      "t": "code",
+      "c": "o workspace",
       "i": 1,
-      "c": "o workspace"
+      "t": "code"
     },
     "."
   ],
@@ -4070,9 +4157,9 @@
   ],
   "4698c3007479de8c": [
     {
-      "t": "span",
+      "c": "Branch alterado de",
       "i": 1,
-      "c": "Branch alterado de"
+      "t": "span"
     },
     {
       "i": 2,
@@ -4093,8 +4180,8 @@
   "4a98174d589dc462": [
     "próxima ",
     {
-      "t": "ScheduledRelativeLabel",
-      "i": 1
+      "i": 1,
+      "t": "ScheduledRelativeLabel"
     }
   ],
   "768f1e16f55ea307": "pausada",
@@ -4314,7 +4401,6 @@
   "991cc9fb37606c91": "(resposta vazia)",
   "36e4b8d2db087296": "Criar fork a partir desta resposta",
   "c92a0bab54261695": "Responder a esta resposta",
-  "405a3e88ee6e62b3": "Não é possível listar as alterações deste turno neste repositório.",
   "f6958f38dc87c712": "Criar fork a partir desta resposta",
   "72f8e14b1246d224": "Responder a esta resposta",
   "01d7728e893c281d": "Ir para a mensagem: {text}",
@@ -4345,11 +4431,11 @@
   "0647cef26e3b1fa5": "O snapshot é grande demais para copiar.",
   "c036ab3d20c54b5b": "Você",
   "6b2294cfd43aee15": "{name} (convidado)",
-  "d1d1fed744318218": "Direcionamento · aguardando leitura",
-  "75948010e112a8f4": "Direcionamento",
   "1ccc41732907ca74": "Aguardando o agente ler isto. Ele lê os direcionamentos entre as etapas, depois que um comando em execução termina.",
   "ae3f487ebde9db74": "Estava na fila e depois foi promovido para direcionar o turno ativo",
   "4f2ec8c81b4efb22": "Direcionou o turno ativo",
+  "d1d1fed744318218": "Direcionamento · aguardando leitura",
+  "75948010e112a8f4": "Direcionamento",
   "d201a2c11fc08817": "Editar a partir daqui",
   "5b30ae788fdc4fd0": "Enviando…",
   "b8e1cd0265566143": [
@@ -4377,9 +4463,9 @@
   "c0f9321d0e5b50b6": "Abrir a thread do subagente",
   "436773daf874e62f": [
     {
-      "t": "span",
+      "c": "Leu a thread “",
       "i": 1,
-      "c": "Leu a thread “"
+      "t": "span"
     },
     {
       "i": 2,
@@ -4387,16 +4473,16 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": "”",
       "i": 3,
-      "c": "”"
+      "t": "span"
     }
   ],
   "20e8c0c6d9f710cc": [
     {
-      "t": "span",
+      "c": "Falha ao ler a thread “",
       "i": 1,
-      "c": "Falha ao ler a thread “"
+      "t": "span"
     },
     {
       "i": 2,
@@ -4404,16 +4490,16 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": "”",
       "i": 3,
-      "c": "”"
+      "t": "span"
     }
   ],
   "d3e39673276735f7": [
     {
-      "t": "span",
+      "c": "Recusou-se a ler a thread “",
       "i": 1,
-      "c": "Recusou-se a ler a thread “"
+      "t": "span"
     },
     {
       "i": 2,
@@ -4421,16 +4507,16 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": "”",
       "i": 3,
-      "c": "”"
+      "t": "span"
     }
   ],
   "1142cc8cc93ad54b": [
     {
-      "t": "span",
+      "c": "Parou de ler a thread “",
       "i": 1,
-      "c": "Parou de ler a thread “"
+      "t": "span"
     },
     {
       "i": 2,
@@ -4438,16 +4524,16 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": "”",
       "i": 3,
-      "c": "”"
+      "t": "span"
     }
   ],
   "7f1ddce0d74afeb3": [
     {
-      "t": "span",
+      "c": "Lendo a thread “",
       "i": 1,
-      "c": "Lendo a thread “"
+      "t": "span"
     },
     {
       "i": 2,
@@ -4455,11 +4541,12 @@
       "v": "v"
     },
     {
-      "t": "span",
+      "c": "”",
       "i": 3,
-      "c": "”"
+      "t": "span"
     }
   ],
+  "91aadfc843c600de": "Verificar conta Google",
   "a2aaca7ff8310186": "Abrir chat",
   "a3048aaa541b7744": "Atividade",
   "4a3cbccb2beedeb0": "imagem",
@@ -4469,8 +4556,8 @@
   "e81927b01b8b505c": [
     "Compactando há ",
     {
-      "t": "WorkingTimer",
-      "i": 1
+      "i": 1,
+      "t": "WorkingTimer"
     }
   ],
   "e9b38212eb281365": "Compactando…",
@@ -4479,22 +4566,22 @@
   "75cdbffdefbbae3a": "Modo Ultrafast ativado",
   "79c3a186139f8c86": "Modo Fast ativado",
   "a772b49a38a3db40": "O que deu errado?",
+  "0cb5a221e9e13a4e": "O agente lê os logs e o código-fonte do T3 Code aqui e pergunta antes de aplicar uma correção ou publicar qualquer coisa.",
   "b29e1856c4aab31f": "Esta máquina",
-  "ffae2a353bd9c06b": "O agente lê os logs e o código-fonte do Stardust aqui e pergunta antes de aplicar uma correção ou publicar qualquer coisa.",
+  "275a97b4af3c6482": "Copiar comando para um terminal",
   "e7588632064e0364": "Copiado",
   "996f7752fa033da6": [
     "ou execute",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     }
   ],
-  "275a97b4af3c6482": "Copiar comando para um terminal",
   "2b07985d23563374": "Retoma {time}",
   "a4b4e5eb6d313af9": "Renovado {time}",
   "c0c3aa756405c1df": "Renova {time}",
@@ -4797,12 +4884,12 @@
   "70b12bc1e1a26abb": "Guarde novamente quando a compressão terminar.",
   "f6b1ef37f7587664": "Anexe novamente os arquivos soltos ou remova-os antes de guardar",
   "120167bbfb6d5939": "Aguarde o upload dos arquivos antes de guardar este prompt",
+  "410dded6e21c280d": "Os guardados estão cheios",
+  "1af8d12ac21cb183": "Os guardados comportam {max} prompts. Restaure ou exclua um para abrir espaço; o campo de texto ficou como estava.",
   "afdf475db3ca2af7": "Não foi possível guardar este prompt",
   "3f5c37167aa5034f": "O armazenamento do navegador rejeitou a gravação, então o editor de mensagens ficou como estava. Libere dados do site e tente novamente.",
   "41ba6c0b5c5e8b22": "O prompt guardado não vai sobreviver a uma recarga",
   "94d7f150b3f7b291": "O armazenamento do navegador não está disponível, então estes guardados ficam só na memória durante esta sessão.",
-  "f421c24666cd8c71": "Prompt guardado mais antigo descartado",
-  "1123f816ea2a6e3e": "Os guardados comportam {max} prompts; o mais antigo foi removido para abrir espaço.",
   "c3a8f9b1b2e7d588": "As imagens guardadas não foram salvas",
   "fc3feba263971bce": "O prompt foi guardado, mas o armazenamento do navegador rejeitou as imagens. Elas vão faltar se você recarregar.",
   "9e36559d0fa0cca8": "As imagens guardadas não foram anexadas",
@@ -4810,12 +4897,13 @@
   "13cf3cd978eef92a": "Manter os anexos nesta máquina",
   "a4ca7da61227002d": "Remova os anexos antes de escolher o roteamento automático e depois anexe-os na máquina selecionada.",
   "512d8afab852df1a": "Não foi possível trocar de máquina",
+  "ee3ea4351c88e7d7": "Este projeto não está mais disponível.",
   "32e421d1e2dfdaff": "Verificando as máquinas…",
   "0db14066bd4ce117": "Balanceamento automático indisponível",
   "55b562c00e37321b": "Não foi possível forçar a parada do agente",
   "ede15a83eedec569": "Turno parado; o agente ainda está encerrando",
   "f360accf1ccac178": "Turno parado; o processo do agente continuou em execução",
-  "5b660a378c56cc91": "{others, plural, =0 {Ele é compartilhado com outras threads em andamento. Pare-as para liberá-lo.} one {Ele é compartilhado com {others} thread em andamento. Pare-a para liberá-lo.} other {Ele é compartilhado com {others} threads em andamento. Pare-as para liberá-lo.}}",
+  "46f927ee332c1065": "{others, plural, =0 {Ele é compartilhado com outras threads em andamento. Pare-as para liberá-lo.} one {Ele é compartilhado com {others} thread em andamento. Pare-a para liberá-lo.} other {Ele é compartilhado com {others} threads em andamento. Pare-as para liberá-lo.}}",
   "f5948facf9a10261": "{count, plural, one {{count} thread iniciada em segundo plano} other {{count} threads iniciadas em segundo plano}}",
   "d2a83704191622a6": "Falha ao enviar as mensagens.",
   "c11072d4a6072902": "Não foi possível enviar um prompt em segundo plano",
@@ -4970,9 +5058,9 @@
     " túneis.",
     " ",
     {
-      "t": "a",
+      "c": "Faça upgrade no T3 Chat",
       "i": 2,
-      "c": "Faça upgrade no T3 Chat"
+      "t": "a"
     },
     " ",
     "para o Premier e tenha ",
@@ -4985,9 +5073,9 @@
   ],
   "b50f44cd6c5c9bfa": [
     {
-      "t": "a",
+      "c": "Faça upgrade no T3 Chat",
       "i": 1,
-      "c": "Faça upgrade no T3 Chat"
+      "t": "a"
     },
     " ",
     "para ter mais túneis"
@@ -4998,9 +5086,9 @@
     "Confirme no",
     " ",
     {
-      "t": "a",
+      "c": "t3.chat",
       "i": 1,
-      "c": "t3.chat"
+      "t": "a"
     },
     " e selecione Atualizar."
   ],
@@ -5134,13 +5222,13 @@
     "Informe a senha ou o código de verificação exigido por",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     ". O Stardust repassa sua resposta ao processo SSH local e a mantém na memória para reutilizar com este host. O Stardust não a grava no disco."
   ],
@@ -5206,9 +5294,12 @@
   "c928303400ccaf24": "Falha ao iniciar o device hub.",
   "4cb21672153c1f18": "Nenhum simulador ou emulador foi encontrado neste ambiente.",
   "c82410197256eb53": "Simuladores iOS",
+  "31a71fec6b5f2bf3": "Dispositivos Android",
   "ac18a5e35195a258": "Emuladores Android",
   "94215375ea2558b8": "Em execução",
   "f8a65d4d662389b0": "Parado",
+  "381ceed77cb8b2b3": "Parar {name}",
+  "5b9fda36b610d25c": "Parar",
   "b1687c7b2b91e569": "Abrir {name}",
   "4b4ef3f2e2ed2c56": "Iniciar {name}",
   "08098a6fb84e8a34": "Abrir",
@@ -5231,6 +5322,7 @@
   ],
   "e902f208c4e6146f": "Nenhum dispositivo virtual Android encontrado. Crie um no Device Manager do Android Studio e atualize.",
   "d9a71f3db685cb0e": "Atualizar dispositivos",
+  "1d372f6d555dde3c": "Parar todos os dispositivos",
   "4ad8ced64defdf73": "Dispositivo 3D interativo. Arraste a tela para interagir. Arraste fora dela ou deslize com dois dedos para girar.",
   "84e4baf07ad8883d": "Ative este ambiente para abrir simuladores e emuladores, rodando aqui ou em um host de dispositivos remoto.",
   "771365c337509a82": "Permite que novas sessões de agente neste ambiente iniciem e controlem dispositivos locais e remotos, com as ferramentas necessárias configuradas automaticamente.",
@@ -5238,13 +5330,13 @@
   "9edae9f03274cab1": "O suporte a {platform} não foi detectado.",
   "9ceeca01c1c48b48": "Nenhum dispositivo {platform} foi listado porque a descoberta de dispositivos relatou um problema.",
   "6cfe3b4931af6f8a": "O Xcode está instalado, mas nenhum iOS Simulator está disponível. Instale um runtime em Xcode Settings → Components.",
-  "22750cc2c6dc56c4": "O Android SDK está instalado, mas não existe nenhum dispositivo virtual. Crie um em Android Studio → Device Manager.",
+  "dbc3908dc1f730ab": "O Android SDK está instalado, mas nenhum dispositivo Android foi encontrado. Conecte um celular com a depuração USB ativada ou crie um dispositivo virtual em Android Studio → Device Manager.",
   "3e436963e11ea3bc": "{host} inicia iOS Simulators na nuvem com o Expo Simulators.",
   "1a6f2df32b8307a2": "{host} inicia emuladores Android na nuvem com o Expo Simulators.",
   "600c3e7ff64413cf": "O Xcode e o iOS Simulator estão disponíveis em {host}.",
   "64142a49e6bf92e7": "O Xcode e o iOS Simulator estão disponíveis.",
   "2fbdc66961a873a6": "O Android SDK e o Emulator estão disponíveis em {host}.",
-  "41c86e1a0fc8f0d2": "O Android SDK e o Emulator estão disponíveis.",
+  "2d99f80191b88ee4": "O Android SDK está disponível.",
   "7ff8efdb29b93b6d": "Configurar dispositivos",
   "a29a9a0c5fbba6b0": "Revise o que roda neste ambiente antes de usar simuladores e emuladores.",
   "13c051bd01d4daf3": "Simuladores",
@@ -5417,7 +5509,7 @@
     },
     "."
   ],
-  "774654575f014b55": "Salve-o para abrir em um app compatível com este formato.",
+  "d3170aa2bb08efbd": "Salve-o para abrir em um app compatível com este formato.",
   "46f943a30e259620": "Áudio indisponível. Abrir {name}",
   "e2cf6b944d1d095d": "Áudio indisponível. Tentar {name} novamente",
   "f08fb460ad4617d6": "Carregando {name}",
@@ -5502,26 +5594,26 @@
   "944f4dc367eea775": [
     "Caminho tentado",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     }
   ],
   "a27abcd7b5a4b539": [
     "Pasta do workspace:",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     ". Verifique o caminho do link ou localize o arquivo em Arquivos."
   ],
@@ -5541,7 +5633,6 @@
   "6ad6c8fbb630657d": "O arquivo não está disponível.",
   "9450d1827ef336a1": "Outra cópia está em andamento.",
   "8f48999eb6d9e2e3": "{count, plural, one {{formatted} linha} other {{formatted} linhas}}",
-  "13b14784f8707ddd": "0 bytes",
   "b75105bef8f564a4": "Mostrando as primeiras 1.024 colunas. O código-fonte e o arquivo salvo mantêm todas as colunas.",
   "2a6e1b1f209c3888": "Este arquivo está vazio.",
   "192fc79eb3b5b2cb": "Este diagrama contém URLs de recursos, markup, metadados de nós ou configuração personalizada. Mostre o código Mermaid para inspecioná-lo com segurança.",
@@ -5941,13 +6032,13 @@
     "Código para aprovar",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "bf753d700be48474": "O código expirou.",
@@ -6080,13 +6171,13 @@
     "Configurando",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     "."
   ],
@@ -6096,9 +6187,9 @@
     "O Stardust coleta dados de uso anônimos para melhorar o app. Para recusar, consulte a",
     " ",
     {
-      "t": "a",
+      "c": "política de privacidade",
       "i": 1,
-      "c": "política de privacidade"
+      "t": "a"
     },
     "."
   ],
@@ -6106,9 +6197,9 @@
     "Consulte a",
     " ",
     {
-      "t": "a",
+      "c": "política de privacidade",
       "i": 1,
-      "c": "política de privacidade"
+      "t": "a"
     },
     "."
   ],
@@ -6154,13 +6245,13 @@
     "Execute",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "neste terminal."
@@ -6176,18 +6267,18 @@
     ". Abra um novo terminal para usar",
     " ",
     {
-      "t": "code",
+      "c": "t3",
       "i": 2,
-      "c": "t3"
+      "t": "code"
     },
     "."
   ],
   "ad72bb102aa39c31": [
     "Use ",
     {
-      "t": "code",
+      "c": "t3",
       "i": 1,
-      "c": "t3"
+      "t": "code"
     },
     " em qualquer terminal. Adiciona uma linha a",
     " ",
@@ -6259,13 +6350,13 @@
   "8321ff20c739dafb": "Este arquivo não pode ser mostrado aqui",
   "a43f940915211a99": [
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     " ",
     "de ",
@@ -6281,13 +6372,13 @@
   "b1343b62b1b140cc": "Não é possível acessar este site",
   "a7daf7102601242d": [
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     ": ",
     {
@@ -6443,48 +6534,48 @@
     "Copiar o número",
     " ",
     {
-      "t": "Branch",
-      "i": 1,
+      "c": "do PR",
       "d": {
         "b": {
-          "mr": "do MR",
-          "cr": "da solicitação de alteração"
+          "cr": "da solicitação de alteração",
+          "mr": "do MR"
         },
         "t": "b"
       },
-      "c": "do PR"
+      "i": 1,
+      "t": "Branch"
     }
   ],
   "98035bebbcecd0bf": [
     "Reabrir",
     " ",
     {
-      "t": "Branch",
-      "i": 1,
+      "c": "o pull request",
       "d": {
         "b": {
-          "mr": "o merge request",
-          "cr": "a solicitação de alteração"
+          "cr": "a solicitação de alteração",
+          "mr": "o merge request"
         },
         "t": "b"
       },
-      "c": "o pull request"
+      "i": 1,
+      "t": "Branch"
     }
   ],
   "605261b246f7f98e": [
     "Não foi possível carregar a atividade",
     " ",
     {
-      "t": "Branch",
-      "i": 1,
+      "c": "do pull request",
       "d": {
         "b": {
-          "mr": "do merge request",
-          "cr": "da solicitação de alteração"
+          "cr": "da solicitação de alteração",
+          "mr": "do merge request"
         },
         "t": "b"
       },
-      "c": "do pull request"
+      "i": 1,
+      "t": "Branch"
     }
   ],
   "4ce1deae56b7392d": "Este branch está desatualizado em relação a {baseBranch}.",
@@ -6500,29 +6591,7 @@
   "1b381201aba745c2": "Nenhuma verificação informada",
   "a6d75a4380173c60": "Abrir verificações: {summary}",
   "be3d1766bad18693": "Verificações: {summary}",
-  "425e4a3d6c5c2867": "{count, plural, one {{count} com falha} other {{count} com falha}}",
   "cb116c139cdace98": "Nenhuma verificação informada",
-  "d84d09b4818c50b7": [
-    {
-      "t": "span",
-      "i": 1,
-      "c": [
-        {
-          "i": 2,
-          "k": "_gt_value_2",
-          "v": "v"
-        },
-        "/",
-        {
-          "i": 3,
-          "k": "_gt_value_3",
-          "v": "v"
-        }
-      ]
-    },
-    " ",
-    "verificações"
-  ],
   "60b56e201607c7ec": "Os detalhes das verificações estão desatualizados. Atualize o pull request para atualizá-los.",
   "e74cd4e960cbb5e5": "As linhas não alteradas não estão disponíveis em um arquivo com linhas cortadas.",
   "38d6169e04a9a4ce": "Não foi possível carregar mais comentários",
@@ -6537,7 +6606,6 @@
   "2250f241daadd71b": "Adicionar ao agente",
   "be9b06fae29cc07a": "Todos os commits",
   "5ef391d5403d7bdd": "{count, plural, one {Mostrar mais ({count} restante)} other {Mostrar mais ({count} restantes)}}",
-  "ccd5fc4db08374d7": "{count, plural, one {{count} arquivo de teste oculto} other {{count} arquivos de teste ocultos}}",
   "c12871955b159db4": "vistos no {app}",
   "98b353c208fd7977": "vistos",
   "d65b870952bbe4f0": "Estas marcações ficam aqui, não no host",
@@ -6546,7 +6614,6 @@
   "a35be3a33a60ada9": "Parte deste diff não foi mostrada",
   "74c7bae34db3147e": "Os comentários de linha são escritos a partir da alteração inteira",
   "4050f873dc790f8f": "Opções do diff",
-  "a92edf8d81354772": "Mostrar arquivos de teste",
   "48be78e4550011d3": "Carregando o diff {term, select, mr {do merge request} cr {da solicitação de alteração} other {do pull request}}...",
   "e76a1455903eef18": "{term, select, mr {Este merge request} cr {Esta solicitação de alteração} other {Este pull request}} não tem alterações em arquivos.",
   "50abbcbc41691cb5": "Este commit não tem alterações de arquivos.",
@@ -6561,8 +6628,8 @@
   "1239149344bb4b2b": "O diff é grande demais para exibir.",
   "3ab928741d208f41": "Carregando...",
   "3e272ae9c5b76744": "Carregar diff",
-  "d4ccbc96f4d05950": "Alterado",
   "c12888742e7bd0ce": "Houve push neste arquivo desde que você o marcou como visto.",
+  "d4ccbc96f4d05950": "Alterado",
   "6594b013f63d2a3a": "Visto",
   "687f81dd084a5ab0": "Não foi possível carregar o restante deste diff.",
   "cf44cf4e3479ea7a": "Todos os commits",
@@ -6620,16 +6687,16 @@
     "Fazer checkout",
     " ",
     {
-      "t": "Branch",
-      "i": 1,
+      "c": "deste pull request",
       "d": {
         "b": {
-          "mr": "deste merge request",
-          "cr": "desta solicitação de alteração"
+          "cr": "desta solicitação de alteração",
+          "mr": "deste merge request"
         },
         "t": "b"
       },
-      "c": "deste pull request"
+      "i": 1,
+      "t": "Branch"
     }
   ],
   "443742ebc45e90e4": "Em um worktree separado",
@@ -6688,8 +6755,6 @@
   "0e3eede94227c151": "Preparando o checkout {term, select, mr {do merge request} cr {da solicitação de alteração} other {do pull request}}...",
   "f5fd3733da6e3556": "Não foi possível abrir uma thread para o checkout",
   "09f38e303898401f": "Não foi possível preparar o checkout {term, select, mr {do merge request} cr {da solicitação de alteração} other {do pull request}}",
-  "853a77d42f86c918": "Checkout feito, mas a thread ficou onde estava",
-  "0746dfa692f895cc": "O checkout está pronto em `{branch}`. Aponte uma thread para ele pelo seletor de branch e pergunte novamente.",
   "88db70a96177d202": "Checkout feito aqui",
   "baa66fde3613022b": "Checkout feito",
   "10feb68552356a08": "Este repositório está no branch {term, select, mr {do merge request} cr {da solicitação de alteração} other {do pull request}}, com uma thread aberta nele.",
@@ -6708,6 +6773,8 @@
   "45674081908ac8aa": "Comando de checkout copiado",
   "d2970574ef7860d0": "Copiar o branch {term, select, mr {do merge request} cr {da solicitação de alteração} other {do pull request}}",
   "45c92416a82cf22c": "Nome do branch copiado",
+  "43a18c0bc37988f4": "Novos commits foram enviados. Um merge ou uma revisão ainda se aplica a {sha}.",
+  "c930a7ffa49054f0": "Carregar novos commits",
   "63e533a9db74e8dc": "Verificações",
   "4f7ca990d538a8bc": "Comentários indisponíveis",
   "95601ce075194611": "{count, plural, one {{formatted} comentário} other {{formatted} comentários}}",
@@ -6759,6 +6826,19 @@
   "36b7fbe31bde05f3": "Este repositório não tem rótulos.",
   "2764eab1d2853980": "Este repositório tem mais rótulos do que os listados aqui. Aplique os demais no host.",
   "5e5917c3b907c7d6": "Aplicada",
+  "4affc3da49f673c2": [
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " ",
+    {
+      "c": "comentou",
+      "i": 2,
+      "t": "span"
+    }
+  ],
   "404ee0e0134b60ae": "Pesquisando “{query}” em todos os hosts",
   "ca612a0074954046": "Verificando...",
   "8b04f78f836b6c11": "Nada com estes filtros",
@@ -6790,6 +6870,7 @@
   "7074711ac6cc6f5c": "Falhando",
   "75b2bb15e4624860": "Indisponível",
   "ff6b088c383bf910": "Pesquisar autores",
+  "a766a8ac2670096c": "{count, plural, one {{count} merge carregado} other {{count} merges carregados}}",
   "d6179a157948c07c": "Nenhum autor encontrado",
   "353773803bf92ad4": "Não foi possível pesquisar autores no host",
   "e3e2d073449a0289": "Qualquer pessoa",
@@ -6875,8 +6956,8 @@
   "1df18577b47fe833": "Ninguém com acesso corresponde.",
   "605ed234cd084078": "Não foi possível ler as pessoas com acesso.",
   "3e63297ce2f404d6": "Já solicitado",
-  "ad822604a0059e71": "encontrado na descrição",
   "3625557b4fc8ba68": "Encontrado na descrição",
+  "ad822604a0059e71": "encontrado na descrição",
   "ff1f73cd2455d0f6": "Nenhum método de merge disponível para este repositório.",
   "59b38d59700e0a5f": "Fechar",
   "25aa6faba20377ca": "Fechar #{number}",
@@ -6902,19 +6983,27 @@
     }
   ],
   "ce703d4ba40dc9b4": "Mesclando a pilha...",
+  "8a883c4fbc127b68": "Ativando o merge automático da pilha...",
   "ac7feb9c583b02a0": "Fazendo rebase da pilha...",
   "cb0f63bbb0b68d94": "Não foi possível mesclar a pilha",
+  "5fb2a26ae31e8983": "Não foi possível ativar o merge automático da pilha",
   "c8a943fa15a56b2b": "Não foi possível fazer rebase da pilha",
   "ec22caeb8b949ed1": "O host recusou o rebase. Um rebase para no primeiro commit que não se aplica sem conflitos.",
   "ead3e2bac1a8d231": "Pedido de merge da pilha concluído",
+  "986d0dcbf4dd0098": "Merge automático da pilha ativado",
   "d7079b5ac269c65e": "Rebase da pilha feito",
   "5631b32be0ce48d3": "{host} mesclou a pilha ou a adicionou à fila de merge.",
+  "f3ed1f63c8a3eef2": "{host} vai mesclar a pilha até o #{number} quando os requisitos forem atendidos.",
+  "bd536a0a1754f6cb": "Não foi possível cancelar o merge automático da pilha",
+  "bb90ac3b2f3a72d5": "O host recusou o cancelamento do merge automático. Atualize e tente novamente.",
   "2d3b55018a54287e": "Verificando a pilha com o host…",
   "eea55205e46d2e3d": "Pilha {number}, camada {position} de {size}",
   "b6f729119107a145": "{count, plural, one {Mesclar a pilha até o '#'{number} em {base} ({count} {term, select, mr {merge request} cr {solicitação de alteração} other {pull request}})} other {Mesclar a pilha até o '#'{number} em {base} ({count} {term, select, mr {merge requests} cr {solicitações de alteração} other {pull requests}})}}",
   "d4bfcdc6bb7676a3": "{count, plural, one {Mesclar {count} {term, select, mr {merge request} cr {solicitação de alteração} other {pull request}}?} other {Mesclar {count} {term, select, mr {merge requests} cr {solicitações de alteração} other {pull requests}}?}}",
+  "9c28753c777c37b7": "{count, plural, one {Mesclar automaticamente {count} {term, select, mr {merge request} cr {solicitação de alteração} other {pull request}}?} other {Mesclar automaticamente {count} {term, select, mr {merge requests} cr {solicitações de alteração} other {pull requests}}?}}",
   "b9f2a24a3757f6c9": "{count, plural, one {Fazer rebase de {count} {term, select, mr {merge request} cr {solicitação de alteração} other {pull request}}?} other {Fazer rebase de {count} {term, select, mr {merge requests} cr {solicitações de alteração} other {pull requests}}?}}",
   "d1bcf19eb2753fff": "Mescla o #{number} e as camadas não mescladas abaixo dele em {base} usando {method}. {host} verifica as regras antes de mesclá-las ou enfileirá-las e faz rebase do restante da pilha depois do merge.",
+  "a86b49982e18784d": "Mescla o #{number} e as camadas não mescladas abaixo dele em {base} usando {method} quando todas atenderem aos requisitos de {host}. Isso pode acontecer imediatamente.",
   "31d2f22f5a282719": "Faz rebase dos branches remotos, de baixo para cima, sobre {base}. Isso reescreve o histórico dos branches e pode reiniciar as verificações. Se uma camada falhar, as atualizações anteriores permanecem.",
   "a0adf78733c368ae": "Mesclar pilha",
   "140dc384c58b74f3": "Fazer rebase da pilha",
@@ -6949,8 +7038,19 @@
     },
     ")"
   ],
+  "b1afda5c964deee4": [
+    "Merge automático da pilha (",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    ")"
+  ],
+  "33d18dda74f6d7b3": "Cancelar merge automático da pilha",
   "30440f98e929440a": "Fazer rebase da pilha",
   "13718a03e3144142": "Todas as camadas a mesclar precisam estar abertas e prontas para revisão.",
+  "012c67c7f1a99e33": "Merge automático da pilha",
   "4aafe1baf113088a": "Mesclar pilha",
   "0292da19054f2a04": "Carregando a pilha…",
   "583869e6df57abeb": "Este pull request não está mais em uma pilha.",
@@ -7001,16 +7101,16 @@
     "Vincular",
     " ",
     {
-      "t": "Branch",
-      "i": 1,
+      "c": "o pull request",
       "d": {
         "b": {
-          "mr": "o merge request",
-          "cr": "a solicitação de alteração"
+          "cr": "a solicitação de alteração",
+          "mr": "o merge request"
         },
         "t": "b"
       },
-      "c": "o pull request"
+      "i": 1,
+      "t": "Branch"
     },
     " ",
     "a uma thread"
@@ -7034,22 +7134,9 @@
     },
     " ",
     {
-      "t": "span",
+      "c": "revisou",
       "i": 2,
-      "c": "revisou"
-    }
-  ],
-  "4affc3da49f673c2": [
-    {
-      "i": 1,
-      "k": "_gt_value_1",
-      "v": "v"
-    },
-    " ",
-    {
-      "t": "span",
-      "i": 2,
-      "c": "comentou"
+      "t": "span"
     }
   ],
   "04ea50285b00dcdd": "Visão geral",
@@ -7169,6 +7256,9 @@
   "9b0647af63a7d8c1": "Aprovou alterações anteriores",
   "abe99679224fea5e": "Solicitou mudanças em alterações anteriores",
   "6b31ad910278ff72": "Revisão de alterações anteriores descartada",
+  "425e4a3d6c5c2867": "{count, plural, one {{count} com falha} other {{count} com falha}}",
+  "fd63b391898889f9": "{count, plural, one {{count} aguardando ação} other {{count} aguardando ação}}",
+  "948185631ef288e6": "{count, plural, one {{count} em execução} other {{count} em execução}}",
   "aaf22207b2f18c45": "{workflows, plural, one {{workflows} workflow} other {{workflows} workflows}} e {checks, plural, one {{checks} verificação} other {{checks} verificações}} aguardando ação",
   "c51411813ebafcc1": "{count, plural, one {{count} workflow aguardando aprovação} other {{count} workflows aguardando aprovação}}",
   "4946778c8e18a1db": "{count, plural, one {{count} verificação aguardando ação} other {{count} verificações aguardando ação}}",
@@ -7367,9 +7457,20 @@
   "dc87902396b8ade4": "Letras, dígitos, '-' ou '_'.",
   "251dfec07b7c3612": "Este driver não exige configuração. Você pode adicionar a instância agora.",
   "08fe32f007e788f1": "Configurar manualmente",
+  "65300794c1edb929": "Token Bearer (opcional)",
   "84eb2878dc17d3eb": "Chave de gerenciamento",
   "7ac196c1e8175928": "Usa o nome do host do hub por padrão",
+  "0c026221dcd2820b": "Adicionar uma fonte de cotas HTTP",
   "e3548407052e9e12": "Adicionar um hub CLIProxyAPI",
+  "d185c750156b2121": [
+    "Consulte as cotas em um endpoint em ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    "."
+  ],
   "432e85a50e2e7964": [
     "Mostra a cota de cada conta agrupada pelo hub, ao lado dos provedores em",
     " ",
@@ -7380,9 +7481,12 @@
     },
     ". A chave fica nesse servidor."
   ],
+  "2324770ba91371ac": "URL do endpoint",
   "556a695b117565ac": "URL do hub",
+  "e4e5b75bba51396c": "Token Bearer (opcional)",
   "e62cedcbcdbafc75": "Chave de gerenciamento",
   "f1b3d0634ec035cb": "Rótulo (opcional)",
+  "b35256ca61016104": "Adicionar fonte",
   "52814dd6f7d0a15c": "Adicionar hub",
   "27b770d3402abfa2": "Avançado",
   "2f265d02c8753150": "Arte do Dev",
@@ -7392,6 +7496,7 @@
   "d5dc7576fd468be7": "Confortável",
   "3141408bf3874e64": "Larga",
   "831badd18b64547e": "Total",
+  "6287212fed0deec6": "Igual ao chat",
   "a96255594ebf2ce3": "Palavra",
   "1ee44eb65708a8aa": "Barras",
   "7670f789e0d8672a": "Só os temas integrados mostram arte, então este tema mostra a pílula de versão.",
@@ -7410,6 +7515,10 @@
   "92785adb251da88c": "Redefinir a largura do chat para o padrão",
   "4d457bcce0c0e272": "Largura do chat",
   "81f3a196537bbee0": "Confortável (padrão)",
+  "70ce0af7f78d5957": "Permite que as pré-visualizações HTML de um chat fiquem mais largas que as mensagens, que continuam centralizadas.",
+  "f2b119bf02ae2558": "Redefinir a largura da pré-visualização HTML para o padrão",
+  "7d7f65967cc821e3": "Largura da pré-visualização HTML",
+  "dc8e85ea0364649c": "Igual ao chat (padrão)",
   "e79e5388f669495f": "Mostra o esforço de raciocínio no editor de mensagens pelo nome, como Alto, ou como barras.",
   "7f0365c7e4e8bcbf": "Redefinir a exibição do esforço para o padrão",
   "14bf40f765172a50": "Exibição do esforço",
@@ -7881,8 +7990,8 @@
     "Conectado como",
     " ",
     {
-      "t": "RedactedSensitiveText",
-      "i": 1
+      "i": 1,
+      "t": "RedactedSensitiveText"
     },
     "."
   ],
@@ -7905,13 +8014,13 @@
     "Aguardando aprovação ·",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "d823dc6bc2f0b59f": [
@@ -8201,7 +8310,6 @@
   "e6886a7f77b73a8e": "{platform} indisponível",
   "b0b7610d9860d18d": "Não configurado nesta máquina.",
   "f5b66c481aa3e4df": "Editar",
-  "b35256ca61016104": "Adicionar fonte",
   "3b20ef0670ae4b0b": "Máquina via SSH",
   "121ccffacb6b8c6d": "Expo Simulators",
   "130b55a1410a8030": "Pool do Simlock (alfa)",
@@ -8301,13 +8409,13 @@
     "Verificado há",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "42765186ac32bfb7": "Abrir pasta de logs",
@@ -8546,16 +8654,16 @@
     "Abra simuladores e emuladores no painel Dispositivo. Hub:",
     " ",
     {
-      "t": "DeviceToolVersions",
-      "i": 1
+      "i": 1,
+      "t": "DeviceToolVersions"
     }
   ],
   "151f86b6dcd56244": [
     "Novas sessões de agente podem abrir e controlar estes dispositivos. agent-device:",
     " ",
     {
-      "t": "DeviceToolVersions",
-      "i": 1
+      "i": 1,
+      "t": "DeviceToolVersions"
     }
   ],
   "093c68324c1b1280": "Adicionar perfil",
@@ -8640,7 +8748,7 @@
   "a9cdd8c7073be920": "Paleta de comandos: alternar",
   "4e0943e8c7a465d1": "Seletor de arquivos: alternar",
   "df5fdcdf26a6b52a": "Pesquisa no projeto: alternar",
-  "a8ff6d33b060736f": "Uso: abrir",
+  "0ca6fd2b8fcab2c3": "Uso: Mostrar ou ocultar",
   "a513d51b71b95674": "Tema: selecionar",
   "1ffd8427452372e1": "Aparência: alternar ciclicamente",
   "3a3bb4a7551a87cc": "Editor de temas: alternar",
@@ -8749,6 +8857,10 @@
   "f0e853acd2006d53": "Ambientes vinculados",
   "ef10c2dff987f3ea": "Execute workflows de várias etapas a partir de arquivos na pasta workflows da pasta T3 deste servidor. Abra-os pela paleta de comandos. Enquanto estiver desativado, nada dessa pasta é executado; as execuções aguardam até que seja ativado novamente.",
   "2dadb2359422121c": "Workflows",
+  "933dabf0700708af": "Quantas execuções ignoradas cada workflow mantém no histórico. Execuções ignoradas mais antigas são excluídas; execuções que fizeram algo são sempre mantidas.",
+  "f172d7e5deb24f75": "Redefinir execuções ignoradas mantidas para o padrão",
+  "ba94015389f327bc": "Execuções ignoradas mantidas",
+  "d52b3d6bf9f2a013": "Misto",
   "13e86eb5d8287a71": "Mostra uma próxima mensagem prevista no editor vazio após um turno do Claude ou do Codex. Tab a usa. Cada uma é uma requisição extra em cache no seu plano. Requer Codex 0.165+. As threads do Claude são atualizadas ao reiniciar.",
   "d4b2a2ec812aafb0": "Sugerir próximo prompt",
   "298c7150a7621c80": "Hosts de dispositivos Simlock",
@@ -8756,14 +8868,13 @@
   "f9904f78d3003f58": "Checkout rápido de worktree",
   "9c2f647882522302": "As máquinas selecionadas usam modos diferentes de feedback dos agentes.",
   "31bbf7bf8c0a5279": "Feedback dos agentes",
-  "d52b3d6bf9f2a013": "Misto",
   "ec7623deed751c05": [
     "Compartilhe uma thread com um convidado que a acompanha ao vivo no navegador e envia mensagens que você aprova. Requer T3 Connect: entre e vincule esta máquina em",
     " ",
     {
-      "t": "Link",
+      "c": "Compartilhamento",
       "i": 1,
-      "c": "Compartilhamento"
+      "t": "Link"
     },
     ". Desativar encerra todos os links de convidado."
   ],
@@ -8771,9 +8882,9 @@
     "Permite que os agentes daqui trabalhem nas suas outras máquinas, e os delas aqui. Ative em cada máquina e depois vincule-as em",
     " ",
     {
-      "t": "Link",
+      "c": "Conexões",
       "i": 1,
-      "c": "Conexões"
+      "t": "Link"
     },
     ". Enquanto desativado, nada novo começa por um vínculo; as tarefas em execução terminam."
   ],
@@ -8781,18 +8892,18 @@
     "Permite que o painel Dispositivo reserve simuladores e emuladores do seu próprio pool",
     " ",
     {
-      "t": "a",
+      "c": "Simlock",
       "i": 1,
-      "c": "Simlock"
+      "t": "a"
     },
     ",",
     " ",
     "adicionado em",
     " ",
     {
-      "t": "Link",
+      "c": "Dispositivos",
       "i": 2,
-      "c": "Dispositivos"
+      "t": "Link"
     },
     ". Recurso alfa que pode mudar ou quebrar. O Stardust nunca instala o Simlock."
   ],
@@ -8903,9 +9014,9 @@
     " no Stardust.",
     " ",
     {
-      "t": "a",
+      "c": "Mais informações",
       "i": 2,
-      "c": "Mais informações"
+      "t": "a"
     }
   ],
   "8f53ea4f124d16fb": "Alertas do sistema quando uma thread termina, falha ou precisa de uma resposta ou aprovação. Vale para este dispositivo enquanto o Stardust está aberto.",
@@ -9054,7 +9165,6 @@
   "b76e857a764ea02a": "Regra de agrupamento de {path} em {environment}",
   "e6e55f343639ae71": "Padrão ({mode})",
   "87158e7b8e714bc6": "Adicione um projeto pela barra lateral para configurá-lo aqui.",
-  "ee3ea4351c88e7d7": "Este projeto não está mais disponível.",
   "062d19d24615e108": "O título do projeto não pode ficar vazio",
   "303af9de2741db90": "Falha ao renomear o projeto",
   "f578154800d7af01": "Falha ao atualizar o ícone do projeto",
@@ -9090,6 +9200,28 @@
   "d2ad2df4c015f417": "A regra de agrupamento define como cada checkout entra nos grupos de projetos da barra lateral. Alterá-la pode mover um checkout para outro projeto.",
   "0bdf6ae2117b6c23": "Não encontrou uma configuração? Mantenha este projeto selecionado acima e vá para qualquer outra página de configurações.",
   "3310e10f1efdc9bd": "Escolher ícone",
+  "a9cb97fca6a6576b": "Comando de criação",
+  "90f45a354884ccdd": "Comando de remoção",
+  "0cdc8cdbed3e5eae": "Layout de worktree",
+  "c17b25519e2b194e": "Não foi possível carregar os comandos de layout de worktree",
+  "78e308ada516928b": "Não foi possível aprovar o comando",
+  "a0c772d32a233da6": "Não foi possível revogar a aprovação",
+  "5ccd5614c65f8d1f": "Revogar a aprovação do comando {kind}",
+  "80c3794a5fa12f3a": "Aprovar o comando {kind}",
+  "f206891e124c77b0": [
+    "O ",
+    {
+      "c": "t3.json",
+      "i": 1,
+      "t": "code"
+    },
+    " deste projeto prepara as threads em worktree com comandos próprios. Eles são executados na máquina deste ambiente com as suas permissões e somente como aprovados aqui: um comando cujo texto muda precisa de aprovação de novo."
+  ],
+  "8e73b883d41d4102": "Desativado",
+  "f6a91589456cca50": "Aprovado",
+  "c92657bb7f2293ff": "Precisa de aprovação",
+  "f1e5c1be1ac92361": "Aprovar",
+  "fcb5f3c4d4753326": "Esta conexão não pode aprovar comandos. Use um cliente que possa usar o terminal.",
   "65ccf4f8e049003e": "Escolha um projeto para gerenciar o nome, o ícone, os checkouts e as ações dele.",
   "067beea7d8f6e2c9": "Mostrar todos os ambientes",
   "1bf6da50131340d4": "Matiz da cor de destaque",
@@ -9134,8 +9266,8 @@
     "Conectado como",
     " ",
     {
-      "t": "RedactedSensitiveText",
-      "i": 1
+      "i": 1,
+      "t": "RedactedSensitiveText"
     }
   ],
   "f507d41f66760d83": "Padrão do provedor",
@@ -9147,13 +9279,13 @@
     "Digite o código",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "no seu navegador."
@@ -9216,13 +9348,13 @@
     "Esta instância usa",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     ", que não está disponível nesta build. A configuração dela é preservada."
   ],
@@ -9281,7 +9413,7 @@
   "33fbce50a4ea67e6": "Argumentos de CLI adicionais passados no início da sessão.",
   "abdee70d90cb26a3": "Compactar após 100.000 a 1.000.000 tokens. Deixe vazio para usar o padrão do Claude.",
   "f907b2466603538e": "Quando compactar uma thread ociosa com mais de 200.000 tokens: depois que você voltar, pouco antes de o cache do prompt expirar ou nunca. Substitui o padrão em Provedores > Avançado.",
-  "484df18e29b21047": "Contas Google usam sua assinatura; chaves de API e o Agent Platform cobram pelo uso.",
+  "9610fb9f4d9849ec": "Conta Google e Gemini Enterprise usam seu plano atual. Chave de API do Gemini e Agent Platform cobram por uso na sua chave ou projeto do Google Cloud.",
   "931df01584748bf9": "Chave express do Gemini ou do Vertex AI. Armazenada separadamente no host.",
   "8bf0f6ed8dd4b77e": "Obrigatório para o Gemini Enterprise. O Agent Platform usa quando nenhuma chave de API está definida.",
   "7c735c8fbd3fb6e3": "Região do Gemini Enterprise ou do Agent Platform.",
@@ -9425,6 +9557,7 @@
   "9bc60e1d0ef816cf": "Bytes de armazenamento",
   "85de927f664ee3cb": "Bytes lógicos",
   "ec1f81bc9b395fb9": "Todos os bytes de E/S",
+  "9fd31461cee8ff82": "{count, plural, one {{count} processo} other {{count} processos}}",
   "7905928d59208450": "Leitura",
   "637254a20a8e24a5": "Gravação",
   "ab9f29f78275f7bd": "Disponível quando esta página roda dentro do app desktop.",
@@ -9483,26 +9616,26 @@
     "Atualizado há",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "f717a7cb4715dd3d": [
     "Atualizado",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     }
   ],
   "33822b085993c953": "CPU média",
@@ -9538,9 +9671,9 @@
   "ebd63e7a302c5790": [
     "Identidade: ",
     {
-      "t": "span",
+      "c": "PID + hora de início",
       "i": 1,
-      "c": "PID + hora de início"
+      "t": "span"
     }
   ],
   "e3f32bcf2e8f7f4e": "Bytes lógicos por operação",
@@ -9559,7 +9692,6 @@
   "69f1a5115bd716c8": "Não foi possível copiar a URL do MCP",
   "4112c1a7b3c1d029": "Reiniciando",
   "543ef9fcaf8aa96f": "Desligado",
-  "5173c50b0a60847c": "Atualização disponível: {serverVersion} → {clientVersion}",
   "987c5623ba70f390": "Rotas",
   "a0b701a0b87b18a1": "{label} server",
   "08f54865b364957d": "Atualizar",
@@ -9729,8 +9861,8 @@
   "8273d53bd6a6f665": [
     "Próxima execução ",
     {
-      "t": "ScheduledRelativeLabel",
-      "i": 1
+      "i": 1,
+      "t": "ScheduledRelativeLabel"
     }
   ],
   "f2a687289f3b3c81": "Entregas",
@@ -10099,170 +10231,170 @@
   "1cf216566c1ee064": "Projeto indisponível",
   "c1b8c351aa90f319": [
     {
-      "t": "span",
-      "i": 1,
       "c": [
         {
-          "t": "span",
+          "c": "Aplicando configurações para",
           "i": 2,
-          "c": "Aplicando configurações para"
+          "t": "span"
         },
         {
           "i": 3,
           "k": "_gt_value_3",
           "v": "v"
         }
-      ]
+      ],
+      "i": 1,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 4,
       "c": [
         {
-          "t": "span",
+          "c": "em",
           "i": 5,
-          "c": "em"
+          "t": "span"
         },
         {
           "i": 6,
           "k": "_gt_value_6",
           "v": "v"
         }
-      ]
+      ],
+      "i": 4,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 7,
       "c": [
         {
-          "t": "span",
+          "c": "em",
           "i": 8,
-          "c": "em"
+          "t": "span"
         },
         {
           "i": 9,
           "k": "_gt_value_9",
           "v": "v"
         }
-      ]
+      ],
+      "i": 7,
+      "t": "span"
     }
   ],
   "6de8a5700498d20f": [
     {
-      "t": "span",
-      "i": 1,
       "c": [
         {
-          "t": "span",
+          "c": "Aplicando configurações para",
           "i": 2,
-          "c": "Aplicando configurações para"
+          "t": "span"
         },
         {
           "i": 3,
           "k": "_gt_value_3",
           "v": "v"
         }
-      ]
+      ],
+      "i": 1,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 4,
       "c": [
         {
-          "t": "span",
+          "c": "em",
           "i": 5,
-          "c": "em"
+          "t": "span"
         },
         {
           "i": 6,
           "k": "_gt_value_6",
           "v": "v"
         }
-      ]
+      ],
+      "i": 4,
+      "t": "span"
     }
   ],
   "fc2262bcc4a2e4f0": [
     {
-      "t": "span",
-      "i": 1,
       "c": [
         {
-          "t": "span",
+          "c": "Aplicando configurações para",
           "i": 2,
-          "c": "Aplicando configurações para"
+          "t": "span"
         },
         {
           "i": 3,
           "k": "_gt_value_3",
           "v": "v"
         }
-      ]
+      ],
+      "i": 1,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 4,
       "c": [
         {
-          "t": "span",
+          "c": "em",
           "i": 5,
-          "c": "em"
+          "t": "span"
         },
         {
           "i": 6,
           "k": "_gt_value_6",
           "v": "v"
         }
-      ]
+      ],
+      "i": 4,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 7,
       "c": [
         {
-          "t": "span",
+          "c": "em",
           "i": 8,
-          "c": "em"
+          "t": "span"
         },
         {
           "i": 9,
           "k": "_gt_value_9",
           "v": "v"
         }
-      ]
+      ],
+      "i": 7,
+      "t": "span"
     }
   ],
   "86d52b318b1a3e7a": [
     {
-      "t": "span",
-      "i": 1,
       "c": [
         {
-          "t": "span",
+          "c": "Aplicando configurações para",
           "i": 2,
-          "c": "Aplicando configurações para"
+          "t": "span"
         },
         {
           "i": 3,
           "k": "_gt_value_3",
           "v": "v"
         }
-      ]
+      ],
+      "i": 1,
+      "t": "span"
     },
     {
-      "t": "span",
-      "i": 4,
       "c": [
         {
-          "t": "span",
+          "c": "em",
           "i": 5,
-          "c": "em"
+          "t": "span"
         },
         {
           "i": 6,
           "k": "_gt_value_6",
           "v": "v"
         }
-      ]
+      ],
+      "i": 4,
+      "t": "span"
     }
   ],
   "a8c2b705bbb43a80": "Nenhum resultado encontrado.",
@@ -10290,23 +10422,23 @@
     "Reserva, controla e transmite dispositivos. Crie um por ambiente com",
     " ",
     {
-      "t": "code",
+      "c": "simlock --gateway token create --role agent",
       "i": 1,
-      "c": "simlock --gateway token create --role agent"
+      "t": "code"
     },
     " ou deixe em branco para adicionar depois. Um token em branco usa o",
     " ",
     {
-      "t": "code",
+      "c": "AGENT_DEVICE_DAEMON_AUTH_TOKEN",
       "i": 2,
-      "c": "AGENT_DEVICE_DAEMON_AUTH_TOKEN"
+      "t": "code"
     },
     " da máquina quando o",
     " ",
     {
-      "t": "code",
+      "c": "AGENT_DEVICE_DAEMON_BASE_URL",
       "i": 3,
-      "c": "AGENT_DEVICE_DAEMON_BASE_URL"
+      "t": "code"
     },
     " dela é este gateway."
   ],
@@ -10314,23 +10446,23 @@
     "Reserva, controla e transmite dispositivos. Crie um com",
     " ",
     {
-      "t": "code",
+      "c": "simlock --gateway token create --role agent",
       "i": 1,
-      "c": "simlock --gateway token create --role agent"
+      "t": "code"
     },
     " ou deixe em branco para adicionar depois. Um token em branco usa o",
     " ",
     {
-      "t": "code",
+      "c": "AGENT_DEVICE_DAEMON_AUTH_TOKEN",
       "i": 2,
-      "c": "AGENT_DEVICE_DAEMON_AUTH_TOKEN"
+      "t": "code"
     },
     " da máquina quando o",
     " ",
     {
-      "t": "code",
+      "c": "AGENT_DEVICE_DAEMON_BASE_URL",
       "i": 3,
-      "c": "AGENT_DEVICE_DAEMON_BASE_URL"
+      "t": "code"
     },
     " dela é este gateway."
   ],
@@ -10397,9 +10529,9 @@
   "b8366d1d16d38d54": [
     "Whoosh ",
     {
-      "t": "span",
+      "c": "(padrão)",
       "i": 1,
-      "c": "(padrão)"
+      "t": "span"
     }
   ],
   "53a960b81e52d6d6": "Ainda não foi possível verificar o acesso. Veja Avançado para obter ajuda.",
@@ -10494,13 +10626,13 @@
     "Entre com",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "no host do servidor e depois faça uma nova varredura para escolher as contas aqui."
@@ -10509,13 +10641,13 @@
     "Escolha qual login do",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "cada host ",
@@ -10536,8 +10668,8 @@
     },
     " ativa (",
     {
-      "t": "RedactedLogin",
-      "i": 2
+      "i": 2,
+      "t": "RedactedLogin"
     },
     ")"
   ],
@@ -10563,13 +10695,11 @@
   "6e72b298ef439944": "Usar login ativo",
   "720ad3bcd44f1740": [
     {
-      "t": "RedactedLogin",
-      "i": 1
+      "i": 1,
+      "t": "RedactedLogin"
     },
     " ",
     {
-      "t": "span",
-      "i": 2,
       "c": [
         "não pode ser usado: ",
         {
@@ -10577,18 +10707,18 @@
           "k": "_gt_value_3",
           "v": "v"
         }
-      ]
+      ],
+      "i": 2,
+      "t": "span"
     }
   ],
   "4a95a2620a1e282c": [
     {
-      "t": "RedactedLogin",
-      "i": 1
+      "i": 1,
+      "t": "RedactedLogin"
     },
     " ",
     {
-      "t": "span",
-      "i": 2,
       "c": [
         "não pode ser usado: ",
         {
@@ -10597,7 +10727,9 @@
           "v": "v"
         },
         " informa que este login é inválido."
-      ]
+      ],
+      "i": 2,
+      "t": "span"
     }
   ],
   "216ea20c7b110871": [
@@ -10621,8 +10753,8 @@
   "c97e21dd6897fa79": [
     "Conectado como",
     {
-      "t": "RedactedSensitiveText",
-      "i": 1
+      "i": 1,
+      "t": "RedactedSensitiveText"
     }
   ],
   "a9d6996c73500a5c": "Copiar código e abrir o GitHub",
@@ -10694,13 +10826,13 @@
     " não está autenticado neste servidor. Entre ou configure as credenciais usando a ferramenta",
     " ",
     {
-      "t": "code",
-      "i": 2,
       "c": {
         "i": 3,
         "k": "_gt_value_3",
         "v": "v"
-      }
+      },
+      "i": 2,
+      "t": "code"
     },
     " ",
     "no host do servidor para ativar os recursos de solicitações de alteração."
@@ -10734,25 +10866,25 @@
     "Um token salvo aqui é usado antes de",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "e do login do",
     " ",
     {
-      "t": "code",
-      "i": 3,
       "c": {
         "i": 4,
         "k": "_gt_value_4",
         "v": "v"
-      }
+      },
+      "i": 3,
+      "t": "code"
     },
     ", ",
     "então ",
@@ -10824,13 +10956,13 @@
     ":",
     " ",
     {
-      "t": "strong",
-      "i": 2,
       "c": {
         "i": 3,
         "k": "_gt_value_3",
         "v": "v"
-      }
+      },
+      "i": 2,
+      "t": "strong"
     },
     " ",
     "(",
@@ -10855,8 +10987,6 @@
     "Velocidade:",
     " ",
     {
-      "t": "strong",
-      "i": 1,
       "c": [
         {
           "i": 2,
@@ -10864,7 +10994,9 @@
           "v": "v"
         },
         " s"
-      ]
+      ],
+      "i": 1,
+      "t": "strong"
     },
     " ",
     "/ 30 s"
@@ -10882,7 +11014,7 @@
   "4889f7885396c26b": "Worktrees",
   "2d96fe39105aae8f": "Logs rotacionados",
   "1214c77f4bf1ee81": "Artefatos do navegador",
-  "9831e9c703b3bdd0": "{omitted, plural, one {{environment}: mais {count} resultado.} other {{environment}: mais {count} resultados.}}",
+  "d9e33a2a8d404a96": "{omitted, plural, one {{environment}: mais {count} resultado.} other {{environment}: mais {count} resultados.}}",
   "c8192b219451a0d0": "{removed} removidos, {kept} mantidos, {failed} falharam",
   "cbd8bf91a856906a": "{removed} removidos, {kept} mantidos",
   "754564dc0b82aff7": "{count, plural, one {Última execução {when}. {bytes} recuperados. {count} item não pôde ser removido.} other {Última execução {when}. {bytes} recuperados. {count} itens não puderam ser removidos.}}",
@@ -10925,7 +11057,6 @@
   "b0d0aebadc521ed1": "Exclui as capturas do navegador salvas após esta quantidade de dias. Links de capturas mais antigas deixarão de abrir.",
   "fe4208562792c313": "Excluir logs rotacionados antigos",
   "8debac9c8e9cff47": "Exclui os arquivos de log rotacionados inativos após esta quantidade de dias. Os logs atuais são mantidos.",
-  "8e73b883d41d4102": "Desativado",
   "80d58a3fd4e4212a": "Projeto",
   "de770505be25f1ff": "Pasta",
   "ada7b9a4d96959d2": "Thread",
@@ -10967,26 +11098,26 @@
     " de",
     " ",
     {
-      "t": "code",
-      "i": 2,
       "c": {
         "i": 3,
         "k": "_gt_value_3",
         "v": "v"
-      }
+      },
+      "i": 2,
+      "t": "code"
     }
   ],
   "ae9958ee0d8ed8e8": [
     "Em execução: desativado por",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     }
   ],
   "97585565390197f6": "Descartar",
@@ -11322,10 +11453,11 @@
       "v": "v"
     }
   ],
-  "f54364b854a07918": "Nenhum hub configurado.",
+  "39f64d971ba424b5": "Nenhuma fonte de uso configurada.",
+  "dbd877abdc2c7c81": "Fonte de cotas HTTP",
   "4cf6a373a7535324": "{name} · Desativado",
-  "1d1e9cda847bd398": "A chave de gerenciamento do hub é excluída deste servidor. As contas dele saem da visualização Limites; o hub em si não é afetado. Adicione-o novamente com a URL e a chave para trazê-las de volta.",
-  "c9bee4f93481b77a": "Remover hub",
+  "c792e744936dbe1b": "Adicionar fonte HTTP",
+  "4032a03ee5301037": "A conexão salva e suas credenciais são removidas deste ambiente.",
   "0424112d5a0ecd71": "Automático",
   "3f0e1b77e45d53a9": "Toque para alternar, segure para falar",
   "45928549c050a1b4": "Manter pressionado",
@@ -11420,6 +11552,7 @@
   "817dbf1c068b62e7": "Onde sua fala é convertida em texto.",
   "710d3e4f0243014c": "Ambiente escolhido (indisponível)",
   "61088464d1b7174d": "ambiente indisponível",
+  "800966eb58181745": "Verificando quais idiomas o modelo suporta…",
   "2b3e8ee4f31d1433": "Automático usa o idioma do seu Mac. Um idioma é baixado no primeiro uso.",
   "71184e5a54a69f1d": "O provedor detecta seu idioma automaticamente.",
   "ffb2653eb2d9fc1a": "{model} detecta o idioma automaticamente.",
@@ -11632,6 +11765,7 @@
   "9cf8308531b4ff31": "transparente transparência sólido menus caixas de diálogo editor de mensagens",
   "d8d6cfd630cff22d": "vermelho verde azul laranja adições exclusões alterações contagens paleta daltonismo",
   "717e49895cfee1c7": "largo largura total coluna layout mensagens editor de mensagens monitor",
+  "9d5c7430a7ff76cf": "largo largura total em linha página renderizar gráfico painel artefato centralizado",
   "88365077fd80787b": "personalizar mostrar ocultar painel cartão ambiente editor scripts branch pull request git alterações servidores automações linhagem uso limites 5 horas semanal cota tokens janela de contexto",
   "d561f74efa5f3920": "esforço de raciocínio pensamento barras gráfico palavra rótulo nível editor de mensagens",
   "6113c17109ee0d57": "latex tex katex equações fórmulas markdown",
@@ -11657,6 +11791,7 @@
   "6826fa9579c22035": "beta compartilhar convidado convite link colega acompanhar t3 connect túnel",
   "f10c06cba0cdf7fe": "beta vincular outra máquina vps par agentes trabalham lá delegar",
   "bc0b409d89ce086e": "beta workflow execuções duráveis automação etapas agendamento webhook pasta",
+  "4b2669dcdb7d3776": "workflow histórico retenção excluir antigas execuções ignoradas webhook history retention skipped runs",
   "4a21cf825a2045b0": "beta tab autocompletar prever próxima mensagem claude codex texto fantasma",
   "fea2dc36585c4a20": "Hosts de dispositivos Simlock (alfa)",
   "9d834d178130180e": "beta alpha simlock callstack simulador emulador ios android pool lease gateway",
@@ -11870,11 +12005,14 @@
   "37ffec8201f153c1": "Falhou",
   "984b361806ce8d25": "Despertou",
   "c6e8abc00ae470d2": "Pronta",
+  "353b08f4363dbb2c": "Pendente",
   "f31a95961de19433": "Issue {key}: {title}, {state}",
   "2dd9d295c882ef65": "{count, plural, one {{count} issue vinculada} other {{count} issues vinculadas}}",
   "8cf699ae75fd8067": "Fixadas",
   "be451f475c514b37": "Dispensar notificação de despertar",
   "e9ced65134f2f36c": "Despertar thread agora",
+  "a8f30f631e2b010e": "Aguardando sincronização com o ambiente",
+  "374dac09151d4578": "Pendente",
   "aca5896600bf173e": "Você está com outro branch em checkout no momento.",
   "f665b5be60d8c144": [
     "Transferida de ",
@@ -11943,14 +12081,15 @@
   "c1a9fe8e24876f1d": "{count, plural, one {{count} thread em execução será interrompida.} other {{count} threads em execução serão interrompidas.}}",
   "ecdf5f108ecc71d0": "{count, plural, one {{count} pode retomar após a reinicialização.} other {{count} podem retomar após a reinicialização.}}",
   "0576c87870fb6389": "Atualizar",
-  "948185631ef288e6": "{count, plural, one {{count} em execução} other {{count} em execução}}",
   "3d9a2f6b9c114039": "Provedores",
   "f4baf8deafbb227d": "Ignorado",
   "f938bb483eb3d189": "reinicia por último",
+  "f13e08bd3614112e": "atualize o T3 Code nessa máquina",
   "9bca02be2b4d612a": "não conectado",
   "2dcc418b6a13b83c": "precisa de atualização manual",
-  "5c8ebc36f84dee7a": "precisa de um app desktop mais novo",
   "fa8faa732a2688ef": "no canal {channel}",
+  "e65649675cb4cbaa": "desativado",
+  "a1e7c08d9ef315c7": "ainda carregando",
   "9b961309baafa09d": "sem permissão",
   "9bafb2622c22d145": "já está atualizando",
   "61aa0109862ff7ca": "Nightly",
@@ -11964,6 +12103,7 @@
   "3ac986d604a2ad62": "Este app não pode mudar: o servidor dele não está conectado, então o banco de dados não pode ser verificado.",
   "3bbb6e9ade0cf7e1": "execute `{command}` lá",
   "e7194946af611278": "roda uma build de pré-visualização",
+  "3c3348c36a2695af": "mude o canal de atualização nessa máquina",
   "f5eac23351c99297": "mude o app para Mac naquele Mac",
   "d7444fbde9a80f04": "<1 min",
   "09c1af20e9323765": "Reiniciar em {seconds} s",
@@ -12006,6 +12146,7 @@
   "9c015d3d034316cb": "Use as setas para ajustar o valor em foco. Segure Shift para passos maiores. Use Home e End para o mínimo e o máximo. Pressione Tab para alternar entre saturação e brilho.",
   "8639d5532561f87f": "Fechar",
   "e1186ad82ee08b33": "Fechar",
+  "a4579e548b768663": "Mostrar barra lateral",
   "a1b11a1cf39c9dc9": "Redimensionar barra lateral",
   "c557090df5722838": "Alternar barra lateral",
   "bbde430e56272901": "Arraste para redimensionar a barra lateral",
@@ -12020,6 +12161,36 @@
   "c6cf1b06e0433ca3": "Progresso da configuração",
   "e0167c02ca493094": "{step}, etapa {number}, {summary}",
   "6389dee75a7cb536": "{step}, etapa {number}",
+  "0e34c3076c08feb2": [
+    {
+      "c": [
+        "↻ +",
+        {
+          "i": 2,
+          "k": "_gt_value_2",
+          "v": "v"
+        },
+        "%"
+      ],
+      "i": 1,
+      "t": "span"
+    },
+    " ",
+    "em ",
+    {
+      "i": 3,
+      "k": "_gt_value_3",
+      "v": "v"
+    }
+  ],
+  "f6116fcec2d2ea7f": "{remaining}% restante · {timeLeft}% da janela restante",
+  "07f5912af296f9ea": "{remaining}% restante",
+  "a01c358de99da345": "Redefine {resetsAt} · {resetsIn}",
+  "93b30237a69f3fc4": "Redefine {resetsAt}",
+  "59e6cdf357f52c19": "A linha mostra onde estaria um consumo uniforme.",
+  "61571f4542da9903": "{count, plural, one {{formatted} sessão} other {{formatted} sessões}}",
+  "3abf045a6c75e67f": "Mostrar cartão acima ↑",
+  "f80647e11d4fd2a0": "Clique em uma linha para ver os detalhes. Clique novamente ou pressione Esc para fechar.",
   "1c9d860be42b1c02": "Saída",
   "0bd41ff995d36a66": "Leitura de cache",
   "3f0dfe0cb15a3272": "Gravação de cache",
@@ -12067,13 +12238,13 @@
     "Cada arquivo em",
     " ",
     {
-      "t": "code",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "code"
     },
     " ",
     "define workflows. Uma alteração em qualquer um deles é aplicada sem reiniciar."
@@ -12089,7 +12260,9 @@
   "7755500a4cde5066": "Fechar o painel",
   "b8dcbc93a2ca1861": "Esta execução não o lista mais.",
   "115c69de3202f664": "Abrir",
-  "644eafa9048b62df": "{count, plural, =1 {1ª tentativa} =2 {2ª tentativa} =3 {3ª tentativa} other {{count}ª tentativa}}",
+  "a2bbf464a3be4882": "{count, plural, =1 {1ª tentativa} =2 {2ª tentativa} =3 {3ª tentativa} other {{count}ª tentativa}}",
+  "0398ca6c1d24b92d": "na fila, o próximo",
+  "0af6d5ffd5166214": "{count, plural, one {na fila, {count} à frente} other {na fila, {count} à frente}}",
   "e39f89c909df4db0": "Não foi possível retomar a execução",
   "865f034346b82f47": "Cancelar {title}? Os agentes param e a execução não pode ser retomada.",
   "6bc75632fd9c9136": "Não foi possível cancelar a execução",
@@ -12116,11 +12289,17 @@
   "dd7a1e58c2553933": "acorda em {duration}",
   "95cc952724dd7310": "prestes a acordar",
   "3cc34921c0128593": "em execução",
-  "e777db2880f53a46": "ninguém respondeu",
   "dc90739d391a5e67": "Você disse {choice}",
+  "4e96712d839ccbff": "{who} disse {choice}",
+  "e777db2880f53a46": "ninguém respondeu",
+  "201490988858b511": "retirada por {by}",
   "389f2563b5b763fd": "Etapas rápidas",
+  "99451a5d2d40440f": "Retirada por {by}.",
+  "3ee30a50b70fffab": "Retirada por {by}: {reason}",
+  "92e129bf413a1220": "retirada",
   "a41c8d758121ad81": "em espera",
   "9db248b770096984": "aguardou",
+  "49be26a27dcb30e5": "na fila",
   "c76124517af28686": "em execução há {duration}",
   "89102905bf09b0e8": "Assistir ao vivo",
   "bdf338cdff4118f0": "Transcrição",
@@ -12154,17 +12333,60 @@
   "8bffb377e2a6a7de": "sua versão não está mais registrada",
   "f92d9132f7b85d1a": "Carregando etapas…",
   "6ebc59f64c761a49": "Nada ainda.",
+  "19097cfb8f5a79cf": [
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " disse",
+    " ",
+    {
+      "c": {
+        "i": 3,
+        "k": "_gt_value_3",
+        "v": "v"
+      },
+      "i": 2,
+      "t": "span"
+    },
+    "."
+  ],
+  "e7bbf693910057bf": [
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " disse",
+    " ",
+    {
+      "c": {
+        "i": 3,
+        "k": "_gt_value_3",
+        "v": "v"
+      },
+      "i": 2,
+      "t": "span"
+    },
+    ": ",
+    {
+      "i": 4,
+      "k": "_gt_value_4",
+      "v": "v"
+    }
+  ],
   "a759dccd157d7dae": [
     "Você disse",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     "."
   ],
@@ -12172,18 +12394,27 @@
     "Você disse",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     ": ",
     {
       "i": 3,
       "k": "_gt_value_3",
+      "v": "v"
+    }
+  ],
+  "3759768c5d342c22": [
+    "respondida",
+    " ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
       "v": "v"
     }
   ],
@@ -12212,6 +12443,15 @@
   ],
   "02dfe6c63fd0b8a1": "Adicionar um motivo",
   "19abd94828a3bdbc": "Perguntar ao agente primeiro",
+  "e114d37b32ab0dc7": [
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " precisa de um motivo."
+  ],
+  "46d614fa7b4bf1e5": "Execuções de workflow",
   "a18721fa8f328361": "Precisam de você",
   "bbf24e7920c1e86b": "Em execução",
   "8d6e18d2ad832db6": "Todas",
@@ -12221,19 +12461,22 @@
   "5459bf696a187c26": "Não foi possível carregar as execuções de workflow",
   "d57c35d43b0f163a": "Esta execução não está aqui",
   "b9aae2f7cdb1a379": "Nenhuma execução de workflow ainda",
+  "45a94c724845ec1d": "Outras",
   "8f15f66e545af7c0": "Quais execuções",
   "b6409289e0c9a4dd": "Workflow",
   "035cb02ca1ae4952": "Todos os workflows ({count})",
-  "46d614fa7b4bf1e5": "Execuções de workflow",
+  "8eeb9cb07d7c59e1": "Tipo de pergunta",
+  "e2131cbec8accfe3": "Todos os tipos",
   "1c635faa2fb45b8b": "Ainda não foi executado.",
+  "e4d1316c85ed7066": "Nenhuma pergunta desse tipo aguarda você.",
   "156ff7b625287a1e": "Ocultar puladas",
   "69b985b97ab45e6b": "Mostrar puladas ({count})",
   "2400254d362de84d": "Carregando execuções de workflow…",
   "cae5c3205c01d062": [
     {
-      "t": "span",
+      "c": "Um arquivo de workflow tem um problema.",
       "i": 1,
-      "c": "Um arquivo de workflow tem um problema."
+      "t": "span"
     },
     " ",
     "A última versão que carregou continua em execução."
@@ -12243,28 +12486,29 @@
     "Este ambiente não tem nenhuma execução com esse link.",
     " ",
     {
-      "t": "button",
+      "c": "Voltar às execuções",
       "i": 1,
-      "c": "Voltar às execuções"
+      "t": "button"
     }
   ],
   "783e616cb0476c17": [
     "Um workflow reúne agentes, código, agendamentos e perguntas para você em uma única execução que sobrevive a reinicializações. Escreva um em",
     " ",
     {
-      "t": "button",
+      "c": "Definições",
       "i": 1,
-      "c": "Definições"
+      "t": "button"
     },
     ", ou peça a um agente.",
     " ",
     {
-      "t": "a",
+      "c": "Leia o guia",
       "i": 2,
-      "c": "Leia o guia"
+      "t": "a"
     }
   ],
   "5d8d278ff828102d": "Todos os workflows",
+  "3b0f1659172107e4": "Todos os tipos",
   "39459da07479f482": "Agente",
   "7741243632056b81": "{step} · transcrição",
   "c512071143a5ba32": "Esta thread não existe mais.",
@@ -12282,9 +12526,9 @@
     "Ative-os para este servidor em",
     " ",
     {
-      "t": "Link",
+      "c": "Configurações → Labs",
       "i": 1,
-      "c": "Configurações → Labs"
+      "t": "Link"
     },
     "."
   ],
@@ -12342,13 +12586,13 @@
     " de",
     " ",
     {
-      "t": "span",
-      "i": 1,
       "c": {
         "i": 2,
         "k": "_gt_value_2",
         "v": "v"
-      }
+      },
+      "i": 1,
+      "t": "span"
     },
     " não estão no diff carregado."
   ],

@@ -348,7 +348,6 @@ export const zhCN: Readonly<Record<string, string>> = {
   "全部时段 · 合计": "全部时段 · 合计",
   这周的重置: "这周的重置",
   "圆点是重置时刻；斜纹是用完后等待重置的空档": "圆点是重置时刻；斜纹是用完后等待重置的空档",
-  "指一行看详情；点一行定位到上面的卡片": "指一行看详情；点一行定位到上面的卡片",
   未来七天额度重置时间轴: "未来七天额度重置时间轴",
   现在: "现在",
   "Map to a different model.": "请映射到其他模型。",
@@ -471,9 +470,11 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Good morning": "上午好",
   "Good afternoon": "下午好",
   "Good evening": "晚上好",
-  "{greeting}, what would you like to do in": "{greeting}，今天想在",
-  "today?": "做什么？",
-  "{greeting}, what would you like to do today?": "{greeting}，今天想做什么？",
+  "{greeting}, Stardust is ready.": "{greeting}，星尘已就位。",
+  "What will you light up in {project} today?": "今天在{project}点亮什么？",
+  "Which star shall we start from?": "我们从哪颗星开始？",
+  "Hand your ideas to Stardust and watch them gather into galaxies.":
+    "把想法交给星尘，慢慢聚成星系。",
   "Start something new, or continue below": "新开一个，或者从下面接着做",
   "{0} of {1} selected": "已选择 {0}/{1} 项",
   "Context from": "上下文来自",
@@ -2511,7 +2512,7 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Ask for changes, send follow-ups, or attach images": "提出修改、发送后续消息或添加图片",
   "Ask anything, @tag files/folders, $use skills, or / for commands":
     "输入任何问题，@ 引用文件或文件夹，$ 使用技能，/ 使用命令",
-  "Ask anything...": "输入任何问题...",
+  "Tell Stardust your idea...": "告诉星尘你的想法...",
   "Start a Codex thread first": "请先启动 Codex 任务",
   "Send a message before you submit feedback.": "发送一条消息后才能提交反馈。",
   "Could not send feedback to OpenAI": "无法向 OpenAI 发送反馈",
@@ -2555,7 +2556,6 @@ export const zhCN: Readonly<Record<string, string>> = {
     "选择现有任务或新建任务即可开始。",
   "Couldn’t start a new thread": "无法新建任务",
   "The project is still available. Try opening the draft again.": "项目仍然可用，请重新打开草稿。",
-  "What should we work on?": "我们要做什么？",
   "Add a project to start your first thread.": "添加项目以开始第一个任务。",
   "Connect an environment to get started": "连接环境以开始使用",
   "Sign in to T3 Connect to connect a linked environment through its managed tunnel, or add a reachable backend manually.":
@@ -4105,6 +4105,7 @@ export const zhCN: Readonly<Record<string, string>> = {
   "New model ID": "新模型标识",
   "Automatic pricing after saving": "保存后使用自动定价",
   "Input rate": "输入价格",
+  "Map new model to model": "为新模型指定映射",
   "Remove new model": "移除新模型",
   "Undo reset": "撤销重置",
   "Remove row": "移除价格行",
@@ -7648,7 +7649,8 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Send a message to decline and redirect the agent": "发送消息以拒绝本次请求，并调整任务方向",
   "The connection was interrupted. You can send again when it reconnects.":
     "连接已中断，重新连接后可再次发送。",
-  "Ask anything. @ files, $ skills, / commands": "问点什么… @ 文件、$ 技能、/ 命令",
+  "Tell Stardust your idea… @ files, $ skills, / commands":
+    "告诉星尘你的想法… @ 文件 · $ 技能 · / 命令",
   "Kept out of chat, in a private file this agent's commands can read for 24 hours":
     "不会写入聊天；保存在私密文件中，此智能体的命令可在 24 小时内读取",
   "Stored securely, never shown to the agent": "安全存储，不会向智能体显示",
@@ -9074,7 +9076,6 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Resets this week": "这周的重置",
   "Dots show resets. Stripes show time without quota.":
     "圆点是重置时刻；斜纹是用完后等待重置的空档",
-  "Hover for details. Select a row to find its card above.": "指一行看详情；点一行定位到上面的卡片",
   "Quota resets over the next seven days": "未来七天额度重置时间轴",
   "Lowest remaining {percent}%": "最低剩余 {percent}%",
   "About {count} days without quota": "约 {count} 天用不了",
@@ -9974,7 +9975,7 @@ export const zhCN: Readonly<Record<string, string>> = {
   "{free} free": "剩余 {free}",
   Free: "可用空间",
   "Press Scan to start. Scanning only reads; it never changes a file. You choose what to clean afterwards. Before worktrees and build backups are cleaned, screenshots, previews and uncommitted changes are rescued first.":
-    "点中间的按钮开始。扫描只读，不会改动任何文件；结果出来后由你勾选。清理 worktree 与构建备份前，会先抢救截图、预览和未提交的改动。",
+    "点击「扫描」开始。扫描只读，不会改动任何文件；结果出来后由你勾选。清理 worktree 与构建备份前，会先抢救截图、预览和未提交的改动。",
   "That folder cannot be used. Choose an existing folder on this computer, other than your home folder or the disk root.":
     "这个文件夹不能用。请选择本机上已存在的文件夹，不能是主目录或磁盘根目录。",
   "Another cleanup step is still running. Try again in a moment.":
@@ -10037,6 +10038,12 @@ export const zhCN: Readonly<Record<string, string>> = {
   "Scan again": "重新扫描",
   "Move to Trash": "移到废纸篓",
   "Clean selected": "清理已选项",
+  "Items totaling {size} will be deleted directly. This part cannot be undone.":
+    "将直接删除共 {size} 的项目，这部分无法撤销。",
+  "Clean {count} selected items?": "确认清理已选的 {count} 项？",
+  "Selected assets and changes will be rescued before cleanup.":
+    "清理前会先归档所选项目中的素材和改动。",
+  "Rescue is turned off for this cleanup.": "本次清理已关闭抢救。",
   "Delete and free the space": "直接删除并释放",
   "Mole could not finish its preview, so its cache list is missing. The rest of the scan is unaffected.":
     "Mole 没能完成预览，所以缺少它的缓存清单。其余扫描结果不受影响。",
@@ -10057,6 +10064,7 @@ export const zhCN: Readonly<Record<string, string>> = {
   "You can undo it for {days} more days. After that this app empties its Trash batch.":
     "还可以撤销 {days} 天，之后本应用会清空这一批。",
   "Storage & cleanup": "存储与清理",
+  "Storage & cleanup is macOS-only for now": "存储与清理目前仅支持 macOS",
   "See what is taking up the disk first, then clean only what can be safely recovered or rebuilt.":
     "先看清磁盘被什么占着，再只清理能安全找回或重建的东西。",
   "Checked {checked} of {total} places": "已检查 {checked}/{total} 处",

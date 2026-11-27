@@ -128,7 +128,11 @@ jobs:
           [[ "$GITHUB_REPOSITORY" == zds-xiaoxin/stardust-ci ]]
           [[ "$SOURCE_RUN" =~ ^[0-9]+$ ]]
           run="repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN"
-          source_sha="$(gh api "$run" --jq 'select(.path == ".github/workflows/stardust-release.yml" and .head_branch == "win-m1" and .event == "workflow_dispatch") | .head_sha')"
+          source_sha="$(gh api "$run" | jq -r --arg branch "$GITHUB_REF_NAME" '
+            select(.path == ".github/workflows/stardust-release.yml" and .event == "workflow_dispatch")
+            | select(.head_branch == $branch or (.head_branch | startswith("build/")))
+            | .head_sha
+          ')"
           [[ "$source_sha" =~ ^[a-f0-9]{40}$ ]]
           gh api "$run/jobs" | jq -e 'any(.jobs[]; .name == "windows-x64 native build and smoke" and any(.steps[]; .name == "Package native desktop application" and .conclusion == "success") and any(.steps[]; .name == "Upload package" and .conclusion == "success"))'
           gh api "repos/$GITHUB_REPOSITORY/compare/$source_sha...$GITHUB_SHA" | jq -e '.status == "ahead" and (.files | length < 300) and all(.files[]; .filename == ".github/workflows/stardust-release.yml" or (.filename | startswith("scripts/stardust-release/")))'
@@ -210,19 +214,25 @@ jobs:
             }
           }
 
-      - name: Run packaged smoke and capture screenshots
-        run: |
-          set -euo pipefail
-          node scripts/stardust-release/smoke.ts \
-            --version "$VERSION" --executable-file "$T3CODE_DESKTOP_OUTPUT_DIR/executable.txt" \
-            --output parity-evidence --native
-
       - name: Verify Windows installer and shortcut metadata
         if: runner.os == 'Windows' && !cancelled() && steps.windows_install.outcome == 'success'
         shell: pwsh
         run: |
           $setup = (Resolve-Path "release/stardust-win/Stardust-v$env:VERSION-Windows-x64-Setup.exe").Path
           ./scripts/stardust-release/windows-shell.ps1 -Action verify -Setup $setup -Version $env:VERSION -Output release/stardust-win/executable.txt
+
+      - name: Run packaged smoke and capture screenshots
+        run: |
+          set -euo pipefail
+          executable_file="$T3CODE_DESKTOP_OUTPUT_DIR/executable.txt"
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            pwsh -NoProfile -File scripts/stardust-release/windows-shell.ps1 -Action smoke \
+              -Version "$VERSION" -ExecutableFile "$executable_file" -Output parity-evidence
+          else
+            node scripts/stardust-release/smoke.ts \
+              --version "$VERSION" --executable-file "$executable_file" \
+              --output parity-evidence --native
+          fi
 
       - name: Silently uninstall Windows package
         if: always() && runner.os == 'Windows'

@@ -1,5 +1,6 @@
 import { uiText } from "~/i18n";
 import { isElectron } from "~/env";
+import { platformProfile } from "~/lib/PlatformProfile";
 import { isMacPlatform, isWindowsPlatform, normalizeSearchText } from "~/lib/utils";
 import { STATIC_KEYBINDING_COMMANDS, type KeybindingCommand } from "@t3tools/contracts";
 import type { EnvironmentId } from "@t3tools/contracts";
@@ -60,6 +61,7 @@ export interface SettingsSearchItem {
   readonly macOnly?: boolean;
   readonly windowsOnly?: boolean;
   readonly secretProvidersOnly?: boolean;
+  readonly storageCleanupRunOnly?: boolean;
   readonly cloudOnly?: boolean;
   readonly environmentOnly?: boolean;
   readonly providerSettingsOnly?: boolean;
@@ -91,6 +93,7 @@ export interface SettingsSearchAvailability {
   readonly hasTextGeneratorsEnvironment?: boolean;
   readonly hasPrimaryEnvironment?: boolean;
   readonly hasSecretProvidersEnvironment?: boolean;
+  readonly hasStorageCleanupRunEnvironment?: boolean;
 }
 
 export const SETTINGS_SECTION_LABELS: Readonly<Record<SettingsPath, string>> = {
@@ -192,9 +195,15 @@ const SETTINGS_NAV_GROUPS_WITHOUT_SECRETS = ALL_SETTINGS_NAV_GROUPS.map((group) 
 
 /** Sidebar groups; Secrets shows only when some environment's server enables secret providers. */
 export function settingsNavGroups(hasSecretProvidersEnvironment: boolean) {
-  return hasSecretProvidersEnvironment
+  const groups = hasSecretProvidersEnvironment
     ? ALL_SETTINGS_NAV_GROUPS
     : SETTINGS_NAV_GROUPS_WITHOUT_SECRETS;
+  return platformProfile.id === "mac"
+    ? groups
+    : groups.map((group) => ({
+        ...group,
+        paths: group.paths.filter((path) => path !== "/settings/storage"),
+      }));
 }
 
 export function keybindingSearchAnchorId<Command extends KeybindingCommand>(command: Command) {
@@ -285,6 +294,7 @@ export const SETTINGS_SEARCH_ITEMS = [
   },
   {
     id: "storage-tidy",
+    macOnly: true,
     title: msg("Storage & cleanup"),
     to: "/settings/storage",
     scope: "environment-defaults",
@@ -296,6 +306,7 @@ export const SETTINGS_SEARCH_ITEMS = [
   },
   {
     id: "storage-tidy-settings",
+    macOnly: true,
     title: msg("Cleanup preferences"),
     to: "/settings/storage",
     scope: "environment-defaults",
@@ -315,6 +326,7 @@ export const SETTINGS_SEARCH_ITEMS = [
   },
   {
     id: "storage-delete-now",
+    storageCleanupRunOnly: true,
     title: msg("Delete now"),
     to: "/settings/maintenance",
     scope: "environment-defaults",
@@ -433,6 +445,12 @@ export const SETTINGS_SEARCH_ITEMS = [
     title: msg("Chat width"),
     to: "/settings/appearance",
     searchTerms: [msg("wide full width column layout messages composer monitor")],
+  },
+  {
+    id: "html-preview-width",
+    title: msg("HTML preview width"),
+    to: "/settings/appearance",
+    searchTerms: [msg("wide full width inline page render chart dashboard artifact centered")],
   },
   {
     id: "thread-details-items",
@@ -627,6 +645,15 @@ export const SETTINGS_SEARCH_ITEMS = [
     to: "/settings/labs",
     scope: "environment",
     searchTerms: [msg("beta workflow durable runs automation steps schedule webhook folder")],
+  },
+  {
+    id: "workflow-skipped-runs",
+    title: msg("Skipped runs kept"),
+    to: "/settings/labs",
+    // Shown only while workflows are on, so search lands on the switch that turns them on.
+    targetId: "workflows-beta",
+    scope: "environment",
+    searchTerms: [msg("workflow history retention delete old skipped runs webhook")],
   },
   {
     id: "prompt-suggestions-beta",
@@ -1735,7 +1762,8 @@ export function filterAvailableSettingsSearchItems(
         availability.hasFastWorktreeCheckoutEnvironment === true) &&
       (!item.agentFeedbackOnly || availability.hasAgentFeedbackEnvironment === true) &&
       (!item.textGeneratorsOnly || availability.hasTextGeneratorsEnvironment === true) &&
-      (!item.secretProvidersOnly || availability.hasSecretProvidersEnvironment === true),
+      (!item.secretProvidersOnly || availability.hasSecretProvidersEnvironment === true) &&
+      (!item.storageCleanupRunOnly || availability.hasStorageCleanupRunEnvironment === true),
   );
 }
 

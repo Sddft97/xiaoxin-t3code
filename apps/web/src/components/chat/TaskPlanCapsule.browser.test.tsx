@@ -227,10 +227,10 @@ it("hangs above the composer: still while the chat scrolls, lifted by a taller c
       <div data-testid="chat" style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
         <div style={{ height: 3000 }}>conversation</div>
       </div>
+      <ComposerFloatAnchor>
+        <TaskPlanCapsule progress={plan(4, 1)} />
+      </ComposerFloatAnchor>
       <form data-testid="composer" data-chat-composer-form="true">
-        <ComposerFloatAnchor>
-          <TaskPlanCapsule progress={plan(4, 1)} />
-        </ComposerFloatAnchor>
         <textarea data-testid="editor" style={{ display: "block", width: "100%", height: 80 }} />
       </form>
     </div>,

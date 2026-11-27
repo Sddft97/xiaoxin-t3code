@@ -13,10 +13,12 @@ import { useEffect, useState } from "react";
 
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { useUiText } from "~/i18n/useUiText";
+import { platformProfile } from "~/lib/PlatformProfile";
 import { usePrimaryEnvironmentId } from "../../state/environments";
 import { serverEnvironment } from "../../state/server";
 import { useAtomCommand } from "../../state/use-atom-command";
 import { toastManager } from "../ui/toast";
+import { Empty, EmptyHeader, EmptyTitle } from "../ui/empty";
 import { SettingsPageContainer } from "../settings/settingsLayout";
 import { useSettingsScope } from "../settings/SettingsScopeContext";
 import { StorageTidyView, type StorageTidyViewMode } from "./StorageTidyView";
@@ -49,16 +51,41 @@ function errorCopy(t: Translate, code: string): string {
   }
 }
 
+function StorageTidyUnavailable() {
+  const t = useUiText();
+  return (
+    <SettingsPageContainer width="wide">
+      <Empty size="compact">
+        <EmptyHeader>
+          <EmptyTitle role="heading" aria-level={1}>
+            {t("Storage & cleanup is macOS-only for now")}
+          </EmptyTitle>
+        </EmptyHeader>
+      </Empty>
+    </SettingsPageContainer>
+  );
+}
+
 export function StorageTidySettingsPanel() {
+  return platformProfile.id === "mac" ? (
+    <MacStorageTidySettingsPanel />
+  ) : (
+    <StorageTidyUnavailable />
+  );
+}
+
+function MacStorageTidySettingsPanel() {
   const { environment } = useSettingsScope();
   const primary = usePrimaryEnvironmentId();
   const environmentId = environment?.environmentId ?? primary;
-  return (
-    <SettingsPageContainer width="wide">
-      {environmentId ? (
-        <StorageTidyEnvironment key={environmentId} environmentId={environmentId} />
-      ) : null}
-    </SettingsPageContainer>
+  const serverPlatform = environment?.serverConfig?.environment.platform.os;
+  if (serverPlatform !== undefined && serverPlatform !== "darwin") {
+    return <StorageTidyUnavailable />;
+  }
+  return environmentId ? (
+    <StorageTidyEnvironment key={environmentId} environmentId={environmentId} />
+  ) : (
+    <SettingsPageContainer width="wide">{null}</SettingsPageContainer>
   );
 }
 
@@ -133,7 +160,6 @@ export function StorageTidyEnvironment({
           setOverride({ base: queried, value: outcome.value });
           setNowMs(Date.now());
           refresh();
-          setPending(false);
           return true;
         }
         const failure = squashAtomCommandFailure(outcome);
@@ -144,21 +170,24 @@ export function StorageTidyEnvironment({
         (onFailure ?? setError)(errorCopy(t, code));
       } catch (cause) {
         (onFailure ?? setError)(errorCopy(t, String(cause)));
+      } finally {
+        setPending(false);
       }
-      setPending(false);
       return false;
     },
   );
 
   if (!state)
     return (
-      <p role="status" className="text-sm text-muted-foreground">
-        {t(
-          result._tag === "Failure"
-            ? "Storage information is unavailable. Nothing was changed."
-            : "Reading storage information…",
-        )}
-      </p>
+      <SettingsPageContainer width="wide">
+        <p role="status" className="text-sm text-muted-foreground">
+          {t(
+            result._tag === "Failure"
+              ? "Storage information is unavailable. Nothing was changed."
+              : "Reading storage information…",
+          )}
+        </p>
+      </SettingsPageContainer>
     );
   const scanKey = state.scan?.scannedAt ?? "";
   const selected =

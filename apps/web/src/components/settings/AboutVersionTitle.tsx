@@ -6,7 +6,7 @@ import { useUiText } from "../../i18n/useUiText";
 import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
 import { InlineButton } from "../ui/button";
 import { stackedThreadToast, toastManager } from "../ui/toast";
-import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
+import { SharedTooltipTrigger } from "../ui/shared-tooltip";
 
 export function AboutVersionTitle({ version }: { version: string }) {
   const gt = useGT();
@@ -29,23 +29,19 @@ export function AboutVersionTitle({ version }: { version: string }) {
   });
 
   return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <InlineButton
-            tone="muted"
-            aria-label={gt("Copy version {version}", { version })}
-            onClick={() => copyToClipboard(version, undefined)}
-          >
-            {platformProfile.isWindowsDesktop
-              ? `${STARDUST_WINDOWS_BRAND.description} ${version}`
-              : uiText("Stardust {version}", { version })}
-          </InlineButton>
-        }
-      />
-      <TooltipPopup>
-        <T>Copy version</T>
-      </TooltipPopup>
-    </Tooltip>
+    <SharedTooltipTrigger
+      render={
+        <InlineButton
+          tone="muted"
+          aria-label={gt("Copy version {version}", { version })}
+          onClick={() => copyToClipboard(version, undefined)}
+        >
+          {platformProfile.isWindowsDesktop
+            ? `${STARDUST_WINDOWS_BRAND.description} ${version}`
+            : uiText("Stardust {version}", { version })}
+        </InlineButton>
+      }
+      label={<T>Copy version</T>}
+    />
   );
 }

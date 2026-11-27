@@ -10,6 +10,7 @@ import {
   type StorageTidyState,
   type StorageTidyVolume,
 } from "@t3tools/contracts";
+import * as HostProcess from "@t3tools/shared/HostProcess";
 import * as Context from "effect/Context";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
@@ -82,6 +83,14 @@ export async function listTidyVolumes(): Promise<StorageTidyVolume[]> {
 }
 
 const make = Effect.gen(function* () {
+  if ((yield* HostProcess.Platform) !== "darwin") {
+    const unavailable = Effect.fail(new StorageTidyError({ message: "unsupported-platform" }));
+    return StorageTidy.of({
+      state: unavailable,
+      act: Effect.fn("StorageTidy.act")(() => unavailable),
+    });
+  }
+
   const config = yield* ServerConfig.ServerConfig;
   const settings = yield* ServerSettings.ServerSettingsService;
   const cleanup = yield* StorageCleanup.StorageCleanup;

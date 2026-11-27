@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>Component title · Stardust Kit</title>
+    <style>
+      /* Kit demo host (MIT, Stardust project). Dark kit backdrop; the ORIGINAL component styles go in the second <style>. */
+      :root {
+        color-scheme: dark;
+        --bg: #07061a;
+        --fg: #f2f0ff;
+        --mut: rgba(212, 204, 255, 0.74);
+        --faint: rgba(212, 204, 255, 0.55);
+        --line: rgba(212, 204, 255, 0.14);
+        --card: rgba(30, 28, 70, 0.55);
+        --acc: #8d7dff;
+        --motion-hover: 120ms;
+        --motion-swap: 160ms;
+        --motion-ease-standard: cubic-bezier(0.32, 0.72, 0, 1);
+        --font:
+          -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB",
+          "Helvetica Neue", system-ui, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: radial-gradient(90% 70% at 50% 0%, #1c1840 0%, #07061a 80%);
+        color: var(--fg);
+        font: 14px/1.5 var(--font);
+        -webkit-font-smoothing: antialiased;
+      }
+      .stage {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        align-content: center;
+        gap: 14px;
+        padding: 24px 16px;
+      }
+      .cap {
+        font-size: 12px;
+        color: var(--faint);
+        text-align: center;
+        max-width: 46ch;
+      }
+      .langsw {
+        position: fixed;
+        top: 10px;
+        right: 12px;
+        font-size: 12px;
+        color: var(--mut);
+      }
+      .langsw a {
+        color: inherit;
+        text-decoration: none;
+        padding: 3px 7px;
+        border-radius: 99px;
+      }
+      .langsw a[aria-current] {
+        background: var(--card);
+        color: var(--fg);
+      }
+      .embed body {
+        background: transparent;
+      }
+      .embed .langsw {
+        display: none;
+      }
+      .embed .stage {
+        min-height: 0;
+        padding: 10px;
+      }
+      a:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--acc);
+        outline-offset: 2px;
+        border-radius: 8px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
+    </style>
+    <style>
+      /* >>> ORIGINAL component CSS, copied unchanged from the app source (e.g. modelChip.css). Do not retype or restyle. <<< */
+    </style>
+  </head>
+  <body>
+    <nav class="langsw" aria-label="Language">
+      <a href="?lang=zh" id="lz">中</a><a href="?lang=en" id="le">EN</a>
+    </nav>
+
+    <main class="stage">
+      <!-- The stage id is the contract: thumbnails, proportion checks and website embedding all measure this element. -->
+      <div id="workshop-original">
+        <!-- >>> ORIGINAL component markup / script mount. Sample data only. <<< -->
+        <div data-zh="在这里放原件" data-en="Original component goes here"></div>
+      </div>
+      <p
+        class="cap"
+        data-zh="一句话说明这是什么，以及状态（已在星尘里 / 设计稿）。"
+        data-en="One line: what this is and its status (In Stardust / Design draft)."
+      ></p>
+    </main>
+
+    <script>
+      const Q = new URLSearchParams(location.search);
+      const ZH = (Q.get("lang") || navigator.language || "en").toLowerCase().startsWith("zh");
+      const RM = matchMedia("(prefers-reduced-motion: reduce)").matches; // use it in script-driven motion
+      document.documentElement.lang = ZH ? "zh-CN" : "en";
+      if (Q.has("embed")) document.documentElement.classList.add("embed"); // transparent, no chrome, for the website iframe
+      document.getElementById(ZH ? "lz" : "le").setAttribute("aria-current", "page");
+      document.title = (ZH ? "组件标题" : "Component title") + " · Stardust Kit";
+      document
+        .querySelectorAll("[data-zh]")
+        .forEach((e) => (e.textContent = ZH ? e.dataset.zh : e.dataset.en));
+    </script>
+
+    <script>
+      /* Embed height reporting. The website hosts this page in <iframe sandbox="allow-scripts"> and listens for
+       * {stardustEmbedHeight:number}. Only reports when embedded (?embed) and only when the height changes.
+       * The parent must accept messages ONLY from its current iframe (event.source === frame.contentWindow). */
+      (function () {
+        if (!/[?&]embed/.test(location.search) || parent === window) return;
+        var last = 0,
+          raf = 0,
+          stage = document.querySelector("#workshop-original") || document.body;
+        function measure() {
+          raf = 0;
+          var h = Math.ceil(stage.getBoundingClientRect().height);
+          if (h && h !== last) {
+            last = h;
+            parent.postMessage({ stardustEmbedHeight: h }, "*");
+          }
+        }
+        function queue() {
+          if (!raf) raf = requestAnimationFrame(measure);
+        }
+        addEventListener("load", queue);
+        addEventListener("resize", queue);
+        addEventListener(
+          "click",
+          function () {
+            setTimeout(queue, 60);
+            setTimeout(queue, 420);
+          },
+          true,
+        );
+        addEventListener(
+          "keyup",
+          function () {
+            setTimeout(queue, 60);
+            setTimeout(queue, 420);
+          },
+          true,
+        );
+        if (window.ResizeObserver) new ResizeObserver(queue).observe(stage);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
+        queue();
+      })();
+    </script>
+  </body>
+</html>

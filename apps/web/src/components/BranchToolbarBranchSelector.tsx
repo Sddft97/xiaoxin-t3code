@@ -1,4 +1,5 @@
 import { ThreadDetailsControl } from "./chat/ThreadDetailsControl";
+import { contextMenuSourceOf } from "../contextMenuSource";
 import { ComposerContextLabel } from "./ComposerContextLabel";
 import { useRightPanelStore } from "../rightPanelStore";
 import { scopeProjectRef, scopeThreadRef } from "@t3tools/client-runtime/environment";
@@ -15,7 +16,7 @@ import {
   type ThreadId,
 } from "@t3tools/contracts";
 import { msg, T, useGT, useMessages, Var } from "gt-react";
-import { GitBranchIcon } from "lucide-react";
+import { ChevronDownIcon, GitBranchIcon } from "lucide-react";
 import {
   useEffect,
   useEffectEvent,
@@ -85,7 +86,7 @@ interface BranchToolbarBranchSelectorProps {
   forceNewWorktree?: boolean;
   ref?: Ref<BranchToolbarBranchSelectorHandle>;
   className?: string;
-  displayMode?: "toolbar" | "panel";
+  displayMode?: "toolbar" | "panel" | "draft-home";
   environmentId: EnvironmentId;
   threadId: ThreadId;
   draftId?: DraftId;
@@ -124,6 +125,7 @@ export function BranchToolbarBranchSelector({
   onCheckoutPullRequestRequest,
   onComposerFocusRequest,
 }: BranchToolbarBranchSelectorProps) {
+  const isDraftHome = displayMode === "draft-home";
   const gt = useGT();
   const messages = useMessages();
   const composerFloatingLayerProps = useComposerMenuProps();
@@ -421,9 +423,11 @@ export function BranchToolbarBranchSelector({
     const items: ContextMenuItem<"copy-branch-name">[] = [
       { id: "copy-branch-name", label: gt("Copy branch name"), icon: "copy" },
     ];
-    void api.contextMenu.show(items, { x: event.clientX, y: event.clientY }).then((action) => {
-      if (action === "copy-branch-name") copyBranchName(branchName);
-    });
+    void api.contextMenu
+      .show(items, { x: event.clientX, y: event.clientY }, contextMenuSourceOf(event))
+      .then((action) => {
+        if (action === "copy-branch-name") copyBranchName(branchName);
+      });
   };
 
   const runBranchAction = (action: () => Promise<void>) => {
@@ -505,7 +509,7 @@ export function BranchToolbarBranchSelector({
     }
 
     const selectedBranchName = refName.isRemote
-      ? deriveLocalBranchNameFromRemoteRef(refName.name)
+      ? deriveLocalBranchNameFromRemoteRef(refName.name, refName.remoteName)
       : refName.name;
 
     runBranchAction(async () => {
@@ -855,10 +859,13 @@ export function BranchToolbarBranchSelector({
           : undefined
       }
       popupProps={{
-        align: displayMode === "panel" ? "start" : "end",
+        align: displayMode === "toolbar" ? "end" : "start",
         side: displayMode === "panel" ? "bottom" : "top",
-        className: cn("flex flex-col", displayMode === "panel" ? "w-(--anchor-width)" : "w-80"),
-        ...(displayMode === "toolbar" ? composerFloatingLayerProps : {}),
+        className: cn(
+          "flex flex-col",
+          displayMode === "panel" ? "w-(--anchor-width)" : isDraftHome ? "w-66" : "w-80",
+        ),
+        ...(displayMode !== "panel" ? composerFloatingLayerProps : {}),
       }}
     >
       <div
@@ -868,7 +875,7 @@ export function BranchToolbarBranchSelector({
           className,
         )}
       >
-        {displayMode !== "panel" ? (
+        {displayMode === "toolbar" ? (
           <ThreadPullRequestBadgeControl
             render={<ComposerControl size="xs" />}
             badge={prBadge}
@@ -893,31 +900,52 @@ export function BranchToolbarBranchSelector({
         >
           <ComboboxTrigger
             render={
-              displayMode === "panel" ? (
+              isDraftHome ? (
+                <button type="button" />
+              ) : displayMode === "panel" ? (
                 <ThreadDetailsControl part="select" />
               ) : (
                 <ComposerControl size="xs" />
               )
             }
-            className="min-w-0 max-w-full active:scale-100"
+            className={cn(
+              "min-w-0 max-w-full",
+              isDraftHome ? "inline-flex items-center" : "active:scale-100",
+            )}
             disabled={isInitialBranchesLoadPending || isBranchActionPending}
+            data-draft-worktree-base={isDraftHome ? "" : undefined}
             // NVDA browse mode re-reads a combobox when its attributes change, not when its text does.
             aria-label={gt("Branch: {branch}", { branch: triggerLabel })}
           >
-            <GitBranchIcon
-              className={cn(
-                "size-3 shrink-0",
-                displayMode === "panel" && THREAD_DETAILS_PANEL_ICON_CLASS,
-              )}
-            />
-            <ComposerContextLabel displayMode={displayMode}>
-              <MiddleTruncate
-                value={triggerLabel}
-                variant="cap-aligned"
-                className="w-full"
-                aria-hidden
-              />
-            </ComposerContextLabel>
+            {isDraftHome ? (
+              <>
+                <GitBranchIcon
+                  className="size-3.5 shrink-0 text-muted-foreground"
+                  strokeWidth={1.6}
+                />
+                <span className="max-w-56 truncate" aria-hidden>
+                  {triggerLabel}
+                </span>
+                <ChevronDownIcon className="size-3 shrink-0 text-muted-foreground" />
+              </>
+            ) : (
+              <>
+                <GitBranchIcon
+                  className={cn(
+                    "size-3 shrink-0",
+                    displayMode === "panel" && THREAD_DETAILS_PANEL_ICON_CLASS,
+                  )}
+                />
+                <ComposerContextLabel displayMode={displayMode}>
+                  <MiddleTruncate
+                    value={triggerLabel}
+                    variant="cap-aligned"
+                    className="w-full"
+                    aria-hidden
+                  />
+                </ComposerContextLabel>
+              </>
+            )}
           </ComboboxTrigger>
         </span>
         {displayMode === "panel" ? (

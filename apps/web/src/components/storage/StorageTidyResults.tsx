@@ -1,11 +1,6 @@
-import type {
-  StorageTidyItem,
-  StorageTidyState,
-  StorageTidyTier,
-  StorageTidyVolume,
-} from "@t3tools/contracts";
+import type { StorageTidyItem, StorageTidyState, StorageTidyTier } from "@t3tools/contracts";
 import { ChevronRightIcon, CopyIcon, LifeBuoyIcon, PackageIcon } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
 import { useUiText } from "~/i18n/useUiText";
 import { cn } from "~/lib/utils";
@@ -13,8 +8,19 @@ import { formatBytes } from "../../lib/formatBytes";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
+import { WorkspacePageContainer } from "../WorkspacePageContainer";
+import { Collapsible, CollapsibleTrigger, CollapsiblePanel } from "../ui/collapsible";
+import {
+  AlertDialog,
+  AlertDialogClose,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogPopup,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 import { Switch } from "../ui/switch";
-import { TIER_COLORS } from "./StorageTidyOverview";
+import { capacityFill } from "./StorageCapacityBar";
 import { blockedCopy, itemCopy, relativeDays } from "./storageTidyCopy";
 import {
   MOLE_REPOSITORY_URL,
@@ -82,7 +88,7 @@ function TierHeading({
     <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
       <div className="min-w-0 max-w-[44rem]">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
-          <span className="size-2.5 rounded-full" style={{ backgroundColor: TIER_COLORS[tier] }} />
+          <span className={cn("size-2 rounded-full", capacityFill[tier])} />
           {title}
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">{description}</p>
@@ -139,12 +145,12 @@ export function TidyItemRow({
   readonly nowMs: number;
 }) {
   const t = useUiText();
-  const [open, setOpen] = useState(false);
   const copy = itemCopy(t, item);
   const selectable = isSelectable(item);
   const reason = item.tier === "remind" ? blockedCopy(t, item) : "";
   return (
-    <li
+    <Collapsible
+      render={<li />}
       data-testid="tidy-item"
       data-tier={item.tier}
       data-kind={item.kind}
@@ -157,12 +163,7 @@ export function TidyItemRow({
           onCheckedChange={(checked) => onToggle(item.id, checked === true)}
           aria-label={t("Select {name}", { name: copy.title })}
         />
-        <button
-          type="button"
-          className="flex min-w-0 flex-1 items-center gap-3 text-left"
-          aria-expanded={open}
-          onClick={() => setOpen((value) => !value)}
-        >
+        <CollapsibleTrigger className="group flex min-w-0 flex-1 items-center gap-3 rounded-sm text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
           <span className="min-w-0 flex-1">
             <span className="flex flex-wrap items-center gap-2">
               <span className="truncate text-sm font-semibold">{copy.title}</span>
@@ -189,15 +190,10 @@ export function TidyItemRow({
           <span className="text-right tabular-nums">
             <span className="block text-sm font-semibold">{formatBytes(item.bytes)}</span>
           </span>
-          <ChevronRightIcon
-            className={cn(
-              "size-4 shrink-0 text-muted-foreground transition-transform",
-              open && "rotate-90",
-            )}
-          />
-        </button>
+          <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground transition-transform group-aria-expanded:rotate-90 motion-reduce:transition-none" />
+        </CollapsibleTrigger>
       </div>
-      {open ? (
+      <CollapsiblePanel>
         <dl className="grid gap-x-8 gap-y-3 border-t border-border/40 bg-muted/30 px-4 py-3.5 pl-11 sm:grid-cols-2">
           <Fact label={t("What it is")}>{copy.what}</Fact>
           <Fact label={t("Produced by")}>{copy.tool}</Fact>
@@ -231,8 +227,8 @@ export function TidyItemRow({
             </Fact>
           </div>
         </dl>
-      ) : null}
-    </li>
+      </CollapsiblePanel>
+    </Collapsible>
   );
 }
 
@@ -287,14 +283,14 @@ function RescueCard({
   const dirtyFiles = preview.dirtyRepos.reduce((n, repo) => n + repo.files, 0);
   return (
     <section
-      className="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-xs/5"
+      className="flex gap-4 rounded-xl border border-border bg-card p-5 shadow-xs/5"
       data-testid="rescue-card"
     >
       <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
         <LifeBuoyIcon className="size-5" />
       </span>
       <div className="min-w-0 flex-1 space-y-2">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <h3 className="text-base font-semibold">{t("Rescue first, then clean")}</h3>
           <Badge variant="info" size="sm">
             {t("Runs before deleting")}
@@ -345,90 +341,166 @@ export function ActionBar({
   busy,
   onExecute,
   onRescan,
-  volume,
 }: {
   readonly summary: ReturnType<typeof selectionSummary>;
   readonly rescueEnabled: boolean;
   readonly busy: boolean;
   readonly onExecute: () => void;
   readonly onRescan: () => void;
-  readonly volume: StorageTidyVolume | undefined;
 }) {
   const t = useUiText();
+  const [confirming, setConfirming] = useState(false);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const action = summary.hasTrash
+    ? summary.freeNow === 0
+      ? t("Move to Trash")
+      : t("Clean selected")
+    : t("Delete and free the space");
+  const hasRescue = summary.rescueAssets > 0 || summary.dirtyFiles > 0;
   return (
     <div
-      className="sticky bottom-4 z-10 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-border bg-popover/95 px-5 py-3.5 shadow-lg backdrop-blur"
-      data-testid="tidy-action-bar"
+      data-active={summary.count > 0 || undefined}
+      className="relative shrink-0 before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-4 before:bg-linear-to-t before:from-background before:to-transparent before:opacity-0 before:transition-opacity data-active:before:opacity-100 motion-reduce:before:transition-none"
     >
-      <div className="min-w-0 flex-1 space-y-0.5">
-        <div className="flex items-center gap-2 text-sm">
-          <span className="font-semibold">
-            {t("{count} items selected", { count: summary.count })}
-          </span>
-          <span className="tabular-nums text-muted-foreground">{formatBytes(summary.bytes)}</span>
-          {rescueEnabled && (summary.rescueAssets > 0 || summary.dirtyFiles > 0) ? (
-            <Badge variant="info" size="sm">
-              {t("Rescue first")}
-            </Badge>
-          ) : null}
-        </div>
-        <div className="text-xs text-muted-foreground tabular-nums">
-          {t("Freed now")} <b className="text-foreground">{formatBytes(summary.freeNow)}</b>
-          {summary.hasTrash ? (
-            <> · {t("In Trash {size}, freed in 7 days", { size: formatBytes(summary.pending) })}</>
-          ) : null}
-        </div>
-        {summary.freeAfter !== null && volume ? (
-          <div className="text-xs text-muted-foreground tabular-nums">
-            {t("About {free} free afterwards", { free: formatBytes(summary.freeAfter) })}
-            {summary.usedPercentAfter !== null
-              ? ` · ${t("Used {percent}%", { percent: summary.usedPercentAfter })}`
-              : ""}
+      <Collapsible open={summary.count > 0}>
+        <CollapsiblePanel className="group/dock">
+          <div className="scrollbar-gutter-both overflow-y-hidden transition-[opacity,translate] duration-200 ease-out starting:translate-y-2 starting:opacity-0 group-data-ending-style/dock:translate-y-2 group-data-ending-style/dock:opacity-0 motion-reduce:transition-none">
+            <WorkspacePageContainer width="wide" className="py-2 sm:pb-3">
+              <div
+                className="mx-auto flex w-full max-w-[920px] flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-xl border border-border/70 bg-card/90 px-4 py-2.5 shadow-xs/5"
+                data-testid="tidy-action-bar"
+              >
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="font-semibold">
+                      {t("{count} items selected", { count: summary.count })}
+                    </span>
+                    <span className="tabular-nums text-muted-foreground">
+                      {formatBytes(summary.bytes)}
+                    </span>
+                    {rescueEnabled && hasRescue ? (
+                      <Badge variant="info" size="sm">
+                        {t("Rescue first")}
+                      </Badge>
+                    ) : null}
+                  </div>
+                  <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground tabular-nums">
+                    <span>
+                      {t("Freed now")}{" "}
+                      <b className="text-foreground">{formatBytes(summary.freeNow)}</b>
+                      {summary.hasTrash ? (
+                        <>
+                          {" "}
+                          ·{" "}
+                          {t("In Trash {size}, freed in 7 days", {
+                            size: formatBytes(summary.pending),
+                          })}
+                        </>
+                      ) : null}
+                    </span>
+                    {summary.freeAfter !== null ? (
+                      <span>
+                        {t("About {free} free afterwards", {
+                          free: formatBytes(summary.freeAfter),
+                        })}
+                        {summary.usedPercentAfter !== null
+                          ? ` · ${t("Used {percent}%", { percent: summary.usedPercentAfter })}`
+                          : ""}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button variant="ghost" onClick={onRescan} disabled={busy}>
+                    {t("Scan again")}
+                  </Button>
+                  <Button
+                    ref={trigger}
+                    disabled={busy || summary.count === 0}
+                    onClick={() => setConfirming(true)}
+                  >
+                    {action}
+                  </Button>
+                </div>
+                <AlertDialog open={confirming && summary.count > 0} onOpenChange={setConfirming}>
+                  <AlertDialogPopup finalFocus={trigger}>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        {t("Clean {count} selected items?", { count: summary.count })}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription render={<div />} className="space-y-2">
+                        {summary.freeNow > 0 && (
+                          <p>
+                            {t(
+                              "Items totaling {size} will be deleted directly. This part cannot be undone.",
+                              { size: formatBytes(summary.freeNow) },
+                            )}
+                          </p>
+                        )}
+                        {summary.hasTrash && (
+                          <p>
+                            {t("In Trash {size}, freed in 7 days", {
+                              size: formatBytes(summary.pending),
+                            })}
+                          </p>
+                        )}
+                        {hasRescue && (
+                          <p>
+                            {rescueEnabled
+                              ? t("Selected assets and changes will be rescued before cleanup.")
+                              : t("Rescue is turned off for this cleanup.")}
+                          </p>
+                        )}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogClose render={<Button variant="outline" />}>
+                        {t("Cancel")}
+                      </AlertDialogClose>
+                      <Button
+                        variant="destructive"
+                        disabled={busy || summary.count === 0}
+                        onClick={() => {
+                          setConfirming(false);
+                          onExecute();
+                        }}
+                      >
+                        {action}
+                      </Button>
+                    </AlertDialogFooter>
+                  </AlertDialogPopup>
+                </AlertDialog>
+              </div>
+            </WorkspacePageContainer>
           </div>
-        ) : null}
-      </div>
-      <Button variant="ghost" onClick={onRescan} disabled={busy}>
-        {t("Scan again")}
-      </Button>
-      <Button size="lg" disabled={busy || summary.count === 0} onClick={onExecute}>
-        {summary.hasTrash && summary.freeNow === 0
-          ? t("Move to Trash")
-          : summary.hasTrash
-            ? t("Clean selected")
-            : t("Delete and free the space")}
-      </Button>
+        </CollapsiblePanel>
+      </Collapsible>
     </div>
   );
 }
 
 export function StorageTidyResults({
   state,
-  volume,
+  summary,
   selected,
   rescueEnabled,
-  busy,
   nowMs,
   dateLabel,
   onToggle,
   onToggleMany,
   onRescueChange,
-  onExecute,
-  onRescan,
   onCopyMoleInstall,
   settingsHint,
 }: {
   readonly state: StorageTidyState;
-  readonly volume: StorageTidyVolume | undefined;
+  readonly summary: ReturnType<typeof selectionSummary>;
   readonly selected: ReadonlySet<string>;
   readonly rescueEnabled: boolean;
-  readonly busy: boolean;
   readonly nowMs: number;
   readonly dateLabel: string;
   readonly onToggle: (id: string, checked: boolean) => void;
   readonly onToggleMany: (ids: ReadonlyArray<string>, checked: boolean) => void;
   readonly onRescueChange: (enabled: boolean) => void;
-  readonly onExecute: () => void;
-  readonly onRescan: () => void;
   readonly onCopyMoleInstall: () => void;
   readonly settingsHint?: ReactNode;
 }) {
@@ -436,7 +508,6 @@ export function StorageTidyResults({
   const scan = state.scan;
   if (!scan) return null;
   const tiers = itemsByTier(scan);
-  const summary = selectionSummary(scan.items, selected, volume);
   const sections: ReadonlyArray<StorageTidyTier> = ["safe", "review", "remind"];
   return (
     <div className="space-y-8" data-testid="tidy-results">
@@ -486,7 +557,7 @@ export function StorageTidyResults({
                       : ""}
                   </h3>
                 ) : null}
-                <ul className="overflow-hidden rounded-2xl border border-border bg-card shadow-xs/5">
+                <ul className="overflow-hidden rounded-xl border border-border bg-card shadow-xs/5">
                   {groupRows.map((item) => (
                     <TidyItemRow
                       key={item.id}
@@ -513,14 +584,6 @@ export function StorageTidyResults({
         </p>
       ) : null}
       <StorageTidyNotes />
-      <ActionBar
-        summary={summary}
-        rescueEnabled={rescueEnabled}
-        busy={busy}
-        onExecute={onExecute}
-        onRescan={onRescan}
-        volume={volume}
-      />
     </div>
   );
 }

@@ -1,10 +1,11 @@
 # Runs only on the disposable Windows release runner.
 param(
-  [Parameter(Mandatory)][ValidateSet('installer', 'theme', 'desktop', 'start', 'install', 'verify', 'uninstall')][string] $Action,
+  [Parameter(Mandatory)][ValidateSet('installer', 'theme', 'desktop', 'start', 'install', 'verify', 'smoke', 'uninstall')][string] $Action,
   [string] $Setup,
   [string] $Output,
   [ValidateSet('light', 'dark')][string] $Theme = 'light',
-  [string] $Version
+  [string] $Version,
+  [string] $ExecutableFile
 )
 $ErrorActionPreference = 'Stop'
 if ($env:GITHUB_ACTIONS -ne 'true') { throw 'Use a disposable Windows CI desktop.' }
@@ -13,6 +14,7 @@ $AppId = 'com.opensourcexiaoxin.stardust'
 $Programs = [Environment]::GetFolderPath('Programs')
 $Shortcut = Join-Path $Programs "$AppName.lnk"
 $UninstallRoot = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall'
+$ProtocolKey = 'HKCU:\Software\Classes\t3code'
 
 function Find-Installation {
   @(Get-ChildItem $UninstallRoot -ErrorAction SilentlyContinue |
@@ -118,7 +120,15 @@ public static class ThemeBroadcast {
   'verify' {
     $entry = Find-Installation | Select-Object -First 1
     if (-not $entry) { throw 'Stardust uninstall entry is missing.' }
-    $exe = (Get-Content -LiteralPath $Output -Raw).Trim()
+    $exe = (Get-Content -LiteralPath $Output -Raw -Encoding UTF8).Trim()
+    if (-not ((Get-Item -LiteralPath $ProtocolKey).GetValueNames() -contains 'URL Protocol')) {
+      throw 'The t3code URL protocol is missing.'
+    }
+    $protocol = (Get-Item -LiteralPath "$ProtocolKey\shell\open\command").GetValue('')
+    if ($protocol -notmatch '^"([^"]+)" "%1"$' -or
+        (Get-FileHash -LiteralPath $Matches[1]).Hash -ne (Get-FileHash -LiteralPath $exe).Hash) {
+      throw 'The t3code URL protocol does not launch the installed Stardust executable.'
+    }
     $file = Get-Item -LiteralPath $exe
     $shortcutItem = (New-Object -ComObject Shell.Application).Namespace($Programs).ParseName("$AppName.lnk")
     if (-not $shortcutItem) { throw "Stardust Start shortcut is missing at $Shortcut." }
@@ -153,7 +163,28 @@ public static class ThemeBroadcast {
       $info.FileDescription, $info.OriginalFilename, $setupInfo.CompanyName, $setupInfo.ProductName,
       $setupInfo.FileDescription, (Get-ChildItem $file.DirectoryName -File | ForEach-Object Name)
     )
-    Write-Output "Stardust $Version installer, executable, Start shortcut and AUMID validated."
+    Write-Output "Stardust $Version installer, executable, Start shortcut, AUMID and t3code URL registration validated."
+  }
+  'smoke' {
+    $commandPath = "$ProtocolKey\shell\open\command"
+    $key = Get-Item -LiteralPath $commandPath
+    $installedCommand = $key.GetValue('')
+    $installedKind = $key.GetValueKind('')
+    try {
+      & node (Join-Path $PSScriptRoot 'smoke.ts') --version $Version --executable-file $ExecutableFile --output $Output --native
+      if ($LASTEXITCODE -ne 0) { throw "Windows packaged smoke exited with code $LASTEXITCODE." }
+    } finally {
+      # Clerk can replace the verified installer command while running the disposable copy.
+      $key = Get-Item -LiteralPath $commandPath
+      $currentCommand = $key.GetValue('')
+      if ($currentCommand -cne $installedCommand) {
+        Set-ItemProperty -LiteralPath $commandPath -Name '(default)' -Value $installedCommand -Type $installedKind
+        if ((Get-Item -LiteralPath $commandPath).GetValue('') -cne $installedCommand) {
+          throw 'Could not restore the installed t3code URL command after smoke.'
+        }
+        Write-Output 'Restored the verified installed t3code URL command after Playwright.'
+      }
+    }
   }
   'uninstall' {
     $entries = Find-Installation
@@ -169,6 +200,7 @@ public static class ThemeBroadcast {
       $remaining = @(
         if ((Find-Installation).Count -ne 0) { 'uninstall registry entry' }
         if (Test-Path -LiteralPath $Shortcut) { 'Start shortcut' }
+        if (Test-Path -LiteralPath $ProtocolKey) { 't3code URL protocol' }
         if (Test-Path -LiteralPath $app) { 'application executable' }
         if (Test-Path -LiteralPath $executable) { 'uninstaller executable' }
       )

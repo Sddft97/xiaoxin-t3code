@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>星尘 · 推理强度滑块 · 第 5 轮 · 功率曲线（背景随档位剧烈升级）</title>
+<link rel="stylesheet" href="gx5.css">
+<script>
+addEventListener('DOMContentLoaded', () => {
+  if ("galaxy-effort-slider" === 'slider-r4-q') document.querySelector('#vSeg [data-l="Q"]').click();
+  const component = document.querySelector("#live .th-dark .gx");
+  if (!component) throw new Error('Missing original workshop component: ' + "#live .th-dark .gx");
+  const stage = document.createElement('div');
+  stage.id = 'workshop-original';
+  document.body.insertBefore(stage, document.body.firstChild);
+  let branch = component;
+  while (branch.parentElement !== document.body) {
+    const parent = branch.parentElement;
+    for (const sibling of parent.children) {
+      if (sibling === branch) continue;
+      if ("galaxy-effort-slider" === 'v16-stardust-observatory' && sibling.matches('.card')) {
+        sibling.inert = true;
+        sibling.style.cssText += ';position:fixed;left:0;top:0;width:min(280px,100vw);visibility:hidden;pointer-events:none';
+      } else sibling.style.setProperty('display', 'none', 'important');
+    }
+    branch = parent;
+  }
+  for (const child of document.body.children) {
+    if (child !== stage && child !== branch && !child.matches('svg,script,style')) {
+      child.style.setProperty('display', 'none', 'important');
+    }
+  }
+  stage.append(branch);
+  for (let el = branch; el !== component; el = [...el.children].find(n => n.contains(component))) {
+    el.style.cssText += ';display:block!important;width:100%;min-width:0;max-width:none;margin:0;padding:0;min-height:0;background:transparent;border:0;box-shadow:none';
+  }
+  document.body.style.cssText += ';width:auto;max-width:none;margin:0;padding:0;background:#111025;min-height:0';
+  document.documentElement.style.background = '#111025';
+  if (component.matches('.gx,.cos')) {
+    const row = () => {
+      stage.style.width = '360px';
+      stage.style.marginInline = 'auto';
+      stage.style.zoom = Math.min(1, document.documentElement.clientWidth / 360);
+    };
+    row();
+    addEventListener('resize', row);
+  }
+});
+</script></head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sd-star" viewBox="260 265 504 480"><path d="M475.4 324.7 Q512.0 265.0 548.6 324.7 L581.3 378.0 Q600.2 408.6 635.2 417.1 L696.0 431.7 Q764.0 448.1 718.6 501.4 L678.0 549.0 Q654.7 576.4 657.5 612.2 L662.3 674.6 Q667.8 744.4 603.1 717.6 L545.3 693.8 Q512.0 680.0 478.7 693.8 L420.9 717.6 Q356.2 744.4 361.7 674.6 L366.5 612.2 Q369.3 576.4 346.0 549.0 L305.4 501.4 Q260.0 448.1 328.0 431.7 L388.8 417.1 Q423.8 408.6 442.7 378.0 Z"/></symbol></svg>
+
+<div class="bar">
+  <h1>星尘 · 推理强度滑块 · 第 5 轮<small>功率曲线 · 背景随档位剧烈升级 · 设计稿（canvas + CSS，无依赖）</small></h1>
+  <div class="grp">同步到<div class="seg" id="syncSeg"></div></div>
+  <button class="tg go" id="demoBtn">▶ 自动演示</button>
+  <button class="tg" id="haloBtn" aria-pressed="false" title="超高 / 极限：带外最多 6–8px 的柔光">光晕（带外 ≤ 6–8px）</button>
+  <button class="tg" id="slowBtn" aria-pressed="false">慢放 0.25×</button>
+  <button class="tg" id="rmBtn" aria-pressed="false" title="模拟 prefers-reduced-motion: reduce">减少动态（模拟）</button>
+</div>
+
+<main>
+  <h2>1 · 实时预览（亮 / 暗，386px 弹窗复刻）</h2>
+  <p class="sub">点击、拖动、键盘 ← → ↑ ↓ Home End 都可用。低 → 极限：星场从稀疏慢漂的点变成曲速线，星云从冷靛蓝升到白紫热核，到达瞬间有冲击波 + 光闪 + 粒子（极限 = 白闪 + 带震 + 曲速加速）。</p>
+  <div class="live" id="live"></div>
+
+  <h2>2 · 五档静止态（背景本身的差异）</h2>
+  <p class="sub">下面是 5 个实时滑块（每档一个）。低 档几乎静止；高 档以下只有 CSS 慢漂；超高 / 极限 才有持续动画（弹窗不可见 / 页面隐藏时暂停）。</p>
+  <div class="ladder" id="ladder"></div>
+
+  <h2>3 · 功率曲线</h2>
+  <div class="card"><table class="curve" id="curve"></table></div>
+
+  <h2>4 · 实测（本页实时）</h2>
+  <div class="card"><div class="perf" id="perf">…</div></div>
+
+  <h2>5 · 产出物</h2>
+  <div class="gal" id="gal"></div>
+  <div class="m-only" id="modeRoot"></div>
+</main>
+
+<script src="gx5-engine.js"></script>
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const G=GXG,LAB=GX_LABELS,CV=GX_CURVE;
+const Q=new URLSearchParams(location.search),MODE=Q.get('mode');
+if(Q.get('rm')==='1')document.documentElement.classList.add('rm');
+if(MODE||Q.get('manual')==='1')G.manual=true;
+const HALO=Q.get('halo')==='1';
+const ALL=[];const box=()=>document.createElement('div');
+function mk(host,v,o={}){const s=new GX(host,{v,halo:HALO,...o});host.dataset.halo=s.halo?'1':'0';ALL.push(s);return s}
+function popReplica(sec){
+  const w=document.createElement('div');w.className='pop';
+  w.innerHTML=`<div class="mps"><span>⌕</span><span style="color:var(--fg3)">搜索模型</span><span>⌘K</span></div>
+    <div class="mtabs"><span>★ 常用</span><span class="on">Claude</span><span>Codex</span><span>本地</span></div>
+    <div class="mlist"><div class="mi"><span class="nm">Opus 5.5</span><span class="mt">1M</span></div><div class="mi on"><span class="nm">Sonnet 5.5</span><span class="mt">200K</span><span class="ck">✓</span></div><div class="mi"><span class="nm">Haiku 5.5</span><span class="mt">200K</span></div></div>`;
+  w.appendChild(sec);
+  const pr=document.createElement('div');pr.className='prow';pr.innerHTML=`<span>权限</span><span class="segc"><span>询问</span><span class="on">自动</span><span>完全访问</span></span>`;w.appendChild(pr);return w}
+
+const CURVE_ROWS=[
+ ['低','约 21 颗（淡）· 0.35×：1.2 / 2.5 / 4.2 px/s','冷暗靛蓝 #05050b→#11122c','只有安静的内发光','—（降档仅一个小环）'],
+ ['中','约 26 颗 · 1×：3.5 / 7 / 12 px/s','靛紫 · 星云团更亮 · 一条淡极光电流','点亮段变亮、变粗','1 道半带冲击环 · 粒子 10 · 闪光 11%'],
+ ['高','约 46 颗 · 2.6×：9–47 px/s','紫 · 极光 75% · 整体亮度 ↑（亮色带变成饱和蓝紫）','极光双色带反向流动','1 道扫过整条带的波 · 粒子 22 · 闪光 22%'],
+ ['超高','约 61 颗 + 16 条星轨 · 5.5×：19–143 px/s；星轨起步 ≈130–330 px/s','品红蓝 · 极光 95%（亮色带变成深紫宝石）','边缘流光 + 彗星脉冲 + 可选光晕','2 道波 · 粒子 40 · 闪光 40% · 带震 0.9px · 星轨加速 ×2.5'],
+ ['极限','约 61 颗（衬底，调暗）+ 46 条曲速线 · 10×：35–260 px/s；曲速线起步 ≈470–1250 px/s，离星越远越快','白紫热核 + 品红 · 呼吸脉动 1.7s','流光 100% · 热核呼吸 · 可选光晕呼吸','白闪 88% → 3 道波 · 粒子 72 · 曲速 ×5.2 衰减 · 带震 1.7px']];
+function buildCurve(){
+  const sw=['#0b0b1d','#15133a','#241072','#3b1496','#6c27d4'],swl=['#dcdff3','#c6c5f6','#8a76f2','#5a2ed6','#6a2ad8'];
+  $('#curve').innerHTML=`<tr><th>档</th><th>星场（数量 · 速度）</th><th>星云 · 色温（暗 / 亮色色块）</th><th>带能量</th><th>到达爆发（上一档 → 本档）</th></tr>`+
+   CURVE_ROWS.map((r,i)=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td><i class="sw" style="background:${sw[i]}"></i><i class="sw" style="background:${swl[i]}"></i> ${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('');
+}
+let live=[],ladder=[];
+function buildMain(){
+  const lv=$('#live');
+  ['th-light','th-dark'].forEach((th,i)=>{const col=document.createElement('div');col.className='col '+th;const b=box();col.appendChild(popReplica(b));lv.appendChild(col);live.push(mk(b,i?3:2))});
+  const ld=$('#ladder');
+  ['th-light','th-dark'].forEach(th=>{const col=document.createElement('div');col.className='col '+th;ld.appendChild(col);
+    for(let v=0;v<5;v++){const c=document.createElement('div');c.innerHTML=`<div class="cap">${LAB[v]}（第 ${v+1}/5 档）</div>`;const b=box();c.appendChild(b);col.appendChild(c);ladder.push(mk(b,v))}});
+  buildCurve();
+  const gal=$('#gal');
+  gal.innerHTML=`<div class="card"><h3 style="margin:0 0 8px;font-size:14px">低 → 极限 → 低 · 2.5× 放大（亮 | 暗）</h3><video data-review-src="video/x/r5-1920x1080.mp4" controls loop muted playsinline preload="metadata"></video><p><a href="video/x/r5-1920x1080.mp4">1920×1080</a> · <a href="video/x/r5-1080x1350.mp4">1080×1350</a> · <a href="video/x/cover-r5.png">封面</a> · <a href="video/r5.mp4">raw</a></p></div>
+   <div class="card"><h3 style="margin:0 0 8px;font-size:14px">弹窗内 1×（真实尺寸）</h3><video data-review-src="video/r5-popover-1x.mp4" controls loop muted playsinline preload="metadata"></video><p><a href="video/r5-popover-1x.mp4">r5-popover-1x.mp4</a></p></div>
+   <div class="card" style="grid-column:1/-1"><h3 style="margin:0 0 8px;font-size:14px">五档静止态 · png/levels.png</h3><img data-review-src="png/levels.png" alt=""></div>
+   <div class="card" style="grid-column:1/-1"><h3 style="margin:0 0 8px;font-size:14px">到达爆发峰值帧 · png/bursts.png</h3><img data-review-src="png/bursts.png" alt=""></div>
+   <div class="card" style="grid-column:1/-1"><h3 style="margin:0 0 8px;font-size:14px">r4 Q vs r5 · png/compare-r4.png</h3><img data-review-src="png/compare-r4.png" alt=""></div>`;
+  const seg=$('#syncSeg');LAB.forEach((l,i)=>{const b=document.createElement('button');b.textContent=l;b.setAttribute('aria-pressed','false');b.onclick=()=>{live.forEach(s=>s.setValue(i));[...seg.children].forEach(x=>x.setAttribute('aria-pressed',x===b))};seg.appendChild(b)});
+  const tgl=(id,fn)=>$(id).addEventListener('click',e=>{const on=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',on);fn(on)});
+  tgl('#haloBtn',on=>ALL.forEach(s=>s.setHalo(on)));
+  tgl('#rmBtn',on=>{document.documentElement.classList.toggle('rm',on);ALL.forEach(s=>{s.jump(s.v);s.draw()})});
+  tgl('#slowBtn',on=>{G.scale=on?.25:1});
+  let tm=null;
+  $('#demoBtn').addEventListener('click',()=>{clearTimeout(tm);const seq=[0,1,2,3,4,3,2,1,0];let i=0;live.forEach(s=>s.jump(0));
+    const run=()=>{if(i>=seq.length)return;live.forEach(s=>s.setValue(seq[i]));i++;tm=setTimeout(run,i<=5?1500:1200)};tm=setTimeout(run,300)});
+  setInterval(()=>{const st=G.stats();$('#perf').innerHTML=st.slice(0,2).map(s=>`${s.dark?'暗':'亮'}色实时 · 当前档 ${s.lv} · 循环${s.running?'运行中':'已停'} · 帧 ${s.frames} · 平均 ${s.avg.toFixed(3)} ms/帧 · 最大 ${s.max.toFixed(2)} ms`).join('<br>')+'<br>其余 10 个静止档位滑块：低 / 中 / 高 档 JS 循环不运行；超高 / 极限 两档持续运行（看上面「循环」状态）。'},700);
+}
+
+/* ================= 工具模式 ================= */
+const FMT=Q.get('fmt')||'169',LV=+(Q.get('lv')||0);
+const EVT_TXT=(a,b)=>`${b>a?'▲ 升档':'▽ 降档'} ${LAB[a]} → ${LAB[b]}`;
+const chips=cur=>LAB.map((l,i)=>`<i class="${i===cur?'on':''}">${l}</i>`).join('');
+if(MODE){
+  document.body.classList.add('mode');
+  const root=$('#modeRoot');
+  if(MODE==='levels'){
+    const sheet=document.createElement('div');sheet.className='sheet';sheet.style.width='1520px';root.appendChild(sheet);
+    const notes=['低 · 冷暗靛蓝 · 稀疏慢漂的点 · 只有安静内发光','中 · 靛紫 · 星更多更快 · 一条淡极光电流','高 · 紫 · 星场更密更快 · 极光流动 · 点亮段变亮','超高 · 品红蓝 · 星轨 · 边缘流光 · 彗星脉冲','极限 · 白紫热核 · 曲速线从星星喷射 · 呼吸脉动'];
+    ['th-light','th-dark'].forEach(th=>{const col=document.createElement('div');col.className='col '+th;col.innerHTML=`<h4>${th==='th-light'?'亮色':'暗色'} · 五档静止态${HALO?'（光晕开）':''}</h4>`;sheet.appendChild(col);
+      for(let v=0;v<5;v++){const w=document.createElement('div');w.className='cell';w.innerHTML=`<div class="cap">${notes[v]}</div>`;const b=box();w.appendChild(b);col.appendChild(w);mk(b,v)}});
+  }else if(MODE==='bursts'){
+    const sheet=document.createElement('div');sheet.className='sheet';sheet.style.width='1520px';root.appendChild(sheet);
+    const PK=[96,118,134,112];   // 各档峰值帧（ms，自拇指出发起算）
+    ['th-light','th-dark'].forEach(th=>{const col=document.createElement('div');col.className='col '+th;col.innerHTML=`<h4>${th==='th-light'?'亮色':'暗色'} · 到达爆发峰值帧${HALO?'（光晕开）':''}</h4>`;sheet.appendChild(col);
+      for(let t=0;t<4;t++){const w=document.createElement('div');w.className='cell';w.innerHTML=`<div class="cap">${EVT_TXT(t,t+1)} · +${PK[t]}ms · 冲击 ${Math.round(GX_BURST[t+1].e*100)}%</div>`;const b=box();w.appendChild(b);col.appendChild(w);const s=mk(b,t);w.__s=s;w.__pk=PK[t];w.__t=t}});
+    window.__bursts=[...root.querySelectorAll('.cell')];
+    window.__fireBursts=()=>{window.__bursts.forEach(w=>w.__s.setValue(w.__t+1))};
+  }else if(MODE==='vid'){
+    const vid=document.createElement('div');vid.className='vid';root.appendChild(vid);const sl=[];window.__vevt=[];
+    ['th-light','th-dark'].forEach(th=>{const col=document.createElement('div');col.className='col '+th;col.innerHTML=`<div class="ttl">r5 · ${th==='th-light'?'亮':'暗'}</div>`;
+      const b=box();col.appendChild(popReplica(b));const ev=document.createElement('div');ev.className='evt';col.appendChild(ev);window.__vevt.push(ev);vid.appendChild(col);sl.push(mk(b,0))});
+    window.__vid=sl;window.__setEvt=(a,b)=>window.__vevt.forEach(ev=>{ev.innerHTML=a==null?'':`<span>${EVT_TXT(a,b)}</span><span class="chips" style="display:inline-flex;gap:3px">${chips(b)}</span>`});
+  }else if(MODE==='xcard'){
+    const xv=document.createElement('div');xv.className='xv f'+FMT;root.appendChild(xv);
+    xv.innerHTML=`<div class="hd"><b>星尘 · 推理强度 · 银河带 r5</b><span>低 → 极限：背景本身的功率曲线</span></div>`;
+    const grid=document.createElement('div');grid.className='grid';xv.appendChild(grid);const sl=[];
+    ['th-light','th-dark'].forEach(th=>{const pn=document.createElement('div');pn.className='pn '+th;pn.innerHTML=`<div class="ttl">${th==='th-light'?'亮色':'暗色'}</div>`;
+      const pop=document.createElement('div');const b=box();pop.appendChild(b);pn.appendChild(pop);grid.appendChild(pn);sl.push(mk(b,0))});
+    const big=document.createElement('div');big.className='big';xv.appendChild(big);
+    window.__vid=sl;
+    window.__setLv=(v,prev)=>{big.innerHTML=`<div class="bl"><b>${LAB[v]}</b><span>${prev==null||prev===v?'':EVT_TXT(prev,v)}</span></div><span class="chips">${chips(v)}</span>`};
+    window.__setEvt=()=>{};window.__setLv(0);
+  }
+}else buildMain();
+window.__ALL=ALL;
+requestAnimationFrame(()=>requestAnimationFrame(()=>{if(G.manual)G.advance(34);window.__ready=true}));
+</script>
+</body>
+</html>

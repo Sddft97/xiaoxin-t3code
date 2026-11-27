@@ -103,7 +103,7 @@ export const ThreadErrorBanner = memo(function ThreadErrorBanner({
   const chatGptLimit = workspaceLimit || errorCode === CHATGPT_USAGE_LIMIT_CODE;
   const variant = errorClass === "usage_limit" || chatGptLimit ? "warning" : "error";
   return (
-    <div className="pointer-events-auto mx-auto w-fit max-w-[min(48rem,calc(100%-2rem))] pt-3">
+    <div className="pointer-events-auto mx-auto w-fit max-w-[min(48rem,calc(100%-2rem),var(--chat-banner-max-width,100%))] pt-3">
       <Alert variant={variant} surface="glass" controlAlignment="first-line" data-variant={variant}>
         {chatGptLimit ? (
           <OpenAI className="size-4 text-foreground!" aria-hidden="true" />
